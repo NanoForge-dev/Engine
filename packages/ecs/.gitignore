@@ -229,3 +229,8 @@ dist
 # Compiled files
 src/**/*.js
 src/**/*.d.ts
+
+# pubilc directory
+public/
+*.o
+compile_commands.json
