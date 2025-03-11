@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "removeComments": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": false,
+    "forceConsistentCasingInFileNames": true,
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "useUnknownInCatchVariables": false,
+    "target": "ES2023",
+    "sourceMap": true,
+    "allowJs": false,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@nanoforge/common": ["./packages/common"],
+      "@nanoforge/common/*": ["./packages/common/*"],
+      "@nanoforge/core": ["./packages/core"],
+      "@nanoforge/core/*": ["./packages/core/*"],
+      "@nanoforge/ecs": ["./packages/ecs"],
+      "@nanoforge/ecs/*": ["./packages/ecs/*"],
+    }
+  },
+  "include": ["packages/**/*", "integration/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}

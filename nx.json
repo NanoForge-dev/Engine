@@ -1,0 +1,10 @@
+{
+  "targetDefaults": {
+    "lint": {
+      "cache": true
+    },
+    "fix": {
+      "cache": true
+    }
+  }
+}
