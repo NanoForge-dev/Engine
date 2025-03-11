@@ -22,8 +22,12 @@
     "directory": "packages/ecs"
   },
   "scripts": {
-    "build": "tsc -b .",
-    "clean": "pnpm clean:types && pnpm clean:scripts && rm -f tsconfig.build.tsbuildinfo",
+    "build": "pnpm build:wasm && pnpm build:script",
+    "build:script": "tsc -b .",
+    "build:wasm": "make",
+    "clean": "pnpm clean:wasm && pnpm clean:script",
+    "clean:script": "pnpm clean:types && pnpm clean:scripts && rm -f tsconfig.build.tsbuildinfo",
+    "clean:wasm": "make fclean",
     "clean:types": "find src -name '*.d.ts' -delete",
     "clean:scripts": "find src -name '*.js' -delete",
     "lint": "eslint . && prettier --check .",
