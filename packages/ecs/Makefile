@@ -3,10 +3,10 @@ SRC = wasm/lib.cpp
 NAME := libecs
 
 OUT_DIR = public
-JS_NAME = $(OUT_DIR)/$(NAME).js
+JS_NAME = $(OUT_DIR)/$(NAME).html
 WASM_NAME = $(OUT_DIR)/$(NAME).wasm
 
-CC = emcc
+CC = em++
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -17,7 +17,7 @@ all: $(JS_NAME)
 
 $(JS_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) $(CFLAGS) -o $(JS_NAME)
+	$(CC) $(OBJ) -o $(JS_NAME) --bind
 
 clean:
 	$(RM) $(OBJ)
