@@ -234,3 +234,4 @@ src/**/*.d.ts
 public/
 *.o
 compile_commands.json
+emsdk/
