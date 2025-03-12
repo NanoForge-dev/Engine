@@ -139,6 +139,9 @@ namespace nfo {
 
     EMSCRIPTEN_BINDINGS(SparseArray)
     {
+        emscripten::register_optional<emscripten::val>();
+        emscripten::register_vector<std::optional<emscripten::val>>("container");
+
         emscripten::function("copySparseArray", &copySparseArray<emscripten::val>);
         emscripten::function("moveSparseArray", &moveSparseArray<emscripten::val>);
         emscripten::function("setSparseArrayCopy", &setSparseArrayCopy<emscripten::val>);
@@ -177,8 +180,5 @@ namespace nfo {
                 )
             )
             .property("_data", &SparseArray<emscripten::val>::_data);
-
-        emscripten::register_optional<emscripten::val>();
-        emscripten::register_vector<std::optional<emscripten::val>>("container");
     }
 } // namespace nfo
