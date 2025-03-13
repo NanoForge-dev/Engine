@@ -39,6 +39,16 @@ namespace nfo {
             return *this;
         }
 
+        SparseArray &setByCopy(SparseArray const &other)
+        {
+            return *this = other;
+        }
+
+        SparseArray &setByMove(SparseArray &&other)
+        {
+            return *this = std::move(other);
+        }
+
         void erase(const size_type &idx)
         {
             if (idx < _data.size()) {
@@ -171,50 +181,15 @@ namespace nfo {
         container _data;
     };
 
-    template <typename Component>
-    SparseArray<Component> copySparseArray(SparseArray<Component> const &other)
-    {
-        return SparseArray<Component>(other);
-    }
-
-    template <typename Component>
-    SparseArray<Component> moveSparseArray(SparseArray<Component> &&other)
-    {
-        return SparseArray<Component>(other);
-    }
-
-    template <typename Component>
-    SparseArray<Component> &setSparseArrayCopy(
-        SparseArray<Component> &array,
-        SparseArray<Component> const &other
-    )
-    {
-        array = other;
-        return array;
-    }
-
-    template <typename Component>
-    SparseArray<Component> &setSparseArrayMove(
-        SparseArray<Component> &array,
-        SparseArray<Component> &&other
-    )
-    {
-        array = other;
-        return array;
-    }
-
     EMSCRIPTEN_BINDINGS(SparseArray)
     {
         emscripten::register_optional<emscripten::val>();
         emscripten::register_vector<std::optional<emscripten::val>>("container");
 
-        emscripten::function("copySparseArray", &copySparseArray<emscripten::val>);
-        emscripten::function("moveSparseArray", &moveSparseArray<emscripten::val>);
-        emscripten::function("setSparseArrayCopy", &setSparseArrayCopy<emscripten::val>);
-        emscripten::function("setSparseArrayMove", &setSparseArrayMove<emscripten::val>);
-
         emscripten::class_<SparseArray<emscripten::val>>("SparseArray")
             .constructor<>()
+            .constructor<const SparseArray<emscripten::val> &>()
+            .constructor<SparseArray<emscripten::val> &&>()
             .function("size", &SparseArray<emscripten::val>::size)
             .function(
                 "get_index",
@@ -253,6 +228,8 @@ namespace nfo {
             .function("clear", &SparseArray<emscripten::val>::clear)
             .function("empty", &SparseArray<emscripten::val>::empty)
             .function("resize", &SparseArray<emscripten::val>::resize)
-            .function("set", &SparseArray<emscripten::val>::set);
+            .function("set", &SparseArray<emscripten::val>::set)
+            .function("setByCopy", &SparseArray<emscripten::val>::setByCopy)
+            .function("setByMove", &SparseArray<emscripten::val>::setByMove);
     }
 } // namespace nfo
