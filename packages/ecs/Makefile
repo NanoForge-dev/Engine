@@ -6,7 +6,7 @@ OUT_DIR = public
 JS_NAME = $(OUT_DIR)/$(NAME).js
 HTML_NAME = $(OUT_DIR)/$(NAME).html
 WASM_NAME = $(OUT_DIR)/$(NAME).wasm
-TS_TYPES = $(NAME).d.ts
+TS_NAME = $(NAME).d.ts
 
 CFLAGS += -O3 --no-entry --bind
 
@@ -23,7 +23,7 @@ js: $(JS_NAME)
 
 html: $(HTML_NAME)
 
-ts: $(TS_TYPES)
+ts: $(TS_NAME)
 
 $(WASM_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
@@ -39,20 +39,20 @@ $(HTML_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
 	$(CC) $(OBJ) $(CFLAGS) -o $(HTML_NAME)
 
-$(TS_TYPES): $(OBJ)
+$(TS_NAME): CFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s STANDALONE_WASM=1
+$(TS_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) --bind --emit-tsd $(TS_TYPES) -o $(JS_NAME)
+	$(CC) $(OBJ) $(CFLAGS) --emit-tsd $(TS_NAME) -o $(JS_NAME)
 
 clean:
 	$(RM) $(OBJ)
 	$(RM) -r $(OUT_DIR)
-	$(RM) $(JS_NAME) $(WASM_NAME) $(HTML_NAME) $(TS_TYPES)
+	$(RM) $(JS_NAME) $(WASM_NAME) $(HTML_NAME) $(TS_NAME)
 
 fclean: clean
 
 tests: fclean $(OBJ)
-	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) -O3 -s MODULARIZE=1 --bind -o $(JS_NAME)
+	$(MAKE) js
 
 re: fclean all
 
