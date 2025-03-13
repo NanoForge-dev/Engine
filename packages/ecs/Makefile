@@ -17,7 +17,7 @@ OBJ = $(SRC:.cpp=.o)
 %.o: %.cpp
 	$(CC) -c $< -o $@
 
-all: $(WASM_NAME)
+all: $(WASM_NAME) $(JS_NAME) $(HTML_NAME) $(TS_TYPES)
 
 js: $(JS_NAME)
 
@@ -46,10 +46,14 @@ $(TS_TYPES): $(OBJ)
 clean:
 	$(RM) $(OBJ)
 	$(RM) -r $(OUT_DIR)
-	$(RM) $(JS_NAME) $(WASM_NAME)
+	$(RM) $(JS_NAME) $(WASM_NAME) $(HTML_NAME) $(TS_TYPES)
 
 fclean: clean
 
+tests: fclean $(OBJ)
+	@mkdir -p $(OUT_DIR)
+	$(CC) $(OBJ) -O3 -s MODULARIZE=1 --bind -o $(JS_NAME)
+
 re: fclean all
 
-.PHONY: re fclean all clean
+.PHONY: re fclean all clean tests
