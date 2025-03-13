@@ -1,4 +1,5 @@
-SRC = wasm/SparseArray.cpp
+SRC = wasm/SparseArray.cpp\
+	wasm/Registry.cpp
 
 NAME := libecs
 
