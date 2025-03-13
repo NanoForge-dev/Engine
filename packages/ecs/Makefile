@@ -17,7 +17,7 @@ OBJ = $(SRC:.cpp=.o)
 %.o: %.cpp
 	$(CC) -c $< -o $@
 
-all: $(WASM_NAME) $(JS_NAME) $(HTML_NAME) $(TS_TYPES)
+all: $(WASM_NAME)
 
 js: $(JS_NAME)
 
