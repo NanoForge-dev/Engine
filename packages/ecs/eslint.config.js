@@ -1,12 +1,23 @@
 import pluginJs from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
-import globals, { jest } from "globals";
+import globals from "globals";
 import tseslint from "typescript-eslint";
+import pluginJest from "eslint-plugin-jest";
 
 export default [
   {
     files: ["src/**/*.{ts}", "tests/**/*"],
-    env: {jest: true},
+    plugins: { jest: pluginJest },
+    languageOptions: {
+      globals: pluginJest.environments.globals.globals,
+    },
+    rules: {
+      "jest/no-disabled-tests": "warn",
+      "jest/no-focused-tests": "error",
+      "jest/no-identical-title": "error",
+      "jest/prefer-to-have-length": "warn",
+      "jest/valid-expect": "error",
+    }
   },
   { languageOptions: { globals: globals.node } },
 
@@ -15,7 +26,7 @@ export default [
   ...tseslint.configs.recommended,
   ...tseslint.configs.strict,
   eslintConfigPrettier,
-  { ignores: ['**/*.js'] },
+  { ignores: ["**/*.js"] },
   {
     rules: {
       "@typescript-eslint/consistent-type-imports": [
