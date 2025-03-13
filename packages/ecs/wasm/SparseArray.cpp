@@ -189,8 +189,7 @@ namespace nfo {
 
         emscripten::class_<SparseArray<emscripten::val>>("SparseArray")
             .constructor<>()
-            .constructor<const SparseArray<emscripten::val> &>()
-            .constructor<SparseArray<emscripten::val> &&>()
+            .function("erase", &SparseArray<emscripten::val>::erase)
             .function("size", &SparseArray<emscripten::val>::size)
             .function(
                 "get_index",
