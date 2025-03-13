@@ -1,4 +1,4 @@
-import Module from "../../public/libecs.js";
+import Module from "../../public/libecs";
 
 describe("SparseArray", () => {
   test("basic instantation", async () => {

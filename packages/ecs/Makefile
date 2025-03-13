@@ -51,8 +51,10 @@ clean:
 
 fclean: clean
 
+tests: CFLAGS += -s MODULARIZE=1 -s STANDALONE_WASM=1
 tests: fclean $(OBJ)
-	$(MAKE) js
+	@mkdir -p $(OUT_DIR)
+	$(CC) $(OBJ) $(CFLAGS) -o $(JS_NAME)
 
 re: fclean all
 
