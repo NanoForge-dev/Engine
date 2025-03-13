@@ -160,6 +160,9 @@ importers:
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.13.10
       eslint:
         specifier: ^9.22.0
         version: 9.22.0(jiti@2.4.2)
@@ -190,6 +193,9 @@ importers:
       ts-jest:
         specifier: ^29.2.6
         version: 29.2.6(@babel/core@7.26.10)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.10))(jest@29.7.0(@types/node@22.13.10))(typescript@5.8.2)
+      typescript:
+        specifier: ^5.8.2
+        version: 5.8.2
       typescript-eslint:
         specifier: ^8.26.0
         version: 8.26.1(eslint@9.22.0(jiti@2.4.2))(typescript@5.8.2)
