@@ -6,18 +6,7 @@ import pluginJest from "eslint-plugin-jest";
 
 export default [
   {
-    files: ["src/**/*.{ts}", "tests/**/*"],
-    plugins: { jest: pluginJest },
-    languageOptions: {
-      globals: pluginJest.environments.globals.globals,
-    },
-    rules: {
-      "jest/no-disabled-tests": "warn",
-      "jest/no-focused-tests": "error",
-      "jest/no-identical-title": "error",
-      "jest/prefer-to-have-length": "warn",
-      "jest/valid-expect": "error",
-    }
+    files: ["src/**/*.{ts}"],
   },
   { languageOptions: { globals: globals.node } },
 
@@ -57,4 +46,18 @@ export default [
       ],
     },
   },
+  {
+    files: ["**/*.spec.ts"],
+    plugins: { jest: pluginJest },
+    languageOptions: {
+      globals: pluginJest.environments.globals.globals,
+    },
+    rules: {
+      "jest/no-disabled-tests": "warn",
+      "jest/no-focused-tests": "error",
+      "jest/no-identical-title": "error",
+      "jest/prefer-to-have-length": "warn",
+      "jest/valid-expect": "error",
+    }
+  }
 ];
