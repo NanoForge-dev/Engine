@@ -6,7 +6,7 @@ OUT_DIR = public
 JS_NAME = $(OUT_DIR)/$(NAME).js
 HTML_NAME = $(OUT_DIR)/$(NAME).html
 WASM_NAME = $(OUT_DIR)/$(NAME).wasm
-TS_TYPES = $(OUT_DIR)/$(NAME).d.ts
+TS_TYPES = $(NAME).d.ts
 
 CFLAGS += -O3 --no-entry --bind
 
@@ -17,7 +17,7 @@ OBJ = $(SRC:.cpp=.o)
 %.o: %.cpp
 	$(CC) -c $< -o $@
 
-all: $(WASM_NAME) $(JS_NAME) $(HTML_NAME) $(TS_TYPES)
+all: $(WASM_NAME)
 
 js: $(JS_NAME)
 
@@ -41,7 +41,7 @@ $(HTML_NAME): $(OBJ)
 
 $(TS_TYPES): $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) --bind --emit-tsd $(TS_TYPES)
+	$(CC) $(OBJ) --bind --emit-tsd $(TS_TYPES) -o $(JS_NAME)
 
 clean:
 	$(RM) $(OBJ)
