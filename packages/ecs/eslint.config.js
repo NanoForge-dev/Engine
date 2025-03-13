@@ -1,11 +1,15 @@
 import pluginJs from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
-import globals from "globals";
+import globals, { jest } from "globals";
 import tseslint from "typescript-eslint";
 
 export default [
-  { files: ["src/**/*.{ts}"] },
+  {
+    files: ["src/**/*.{ts}", "tests/**/*"],
+    env: {jest: true},
+  },
   { languageOptions: { globals: globals.node } },
+
 
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,

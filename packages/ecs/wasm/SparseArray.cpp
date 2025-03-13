@@ -82,6 +82,22 @@ namespace nfo {
             return _data[idx];
         }
 
+        reference_type get(size_t idx)
+        {
+            if (idx >= _data.size()) {
+                _data.resize(idx + 1);
+            }
+            return _data[idx];
+        }
+
+        void set(size_t idx, value_type value)
+        {
+            if (idx >= _data.size()) {
+                _data.resize(idx + 1);
+            }
+            _data[idx] = value;
+        }
+
         std::size_t size() const
         {
             return _data.size();
@@ -99,22 +115,7 @@ namespace nfo {
     template <typename Component>
     SparseArray<Component> moveSparseArray(SparseArray<Component> &&other)
     {
-        return SparseArray<Component>(std::move(other));
-    }
-
-    template <typename Component>
-    typename SparseArray<Component>::reference_type getSparseArrayElement(
-        SparseArray<Component> &array,
-        size_t idx
-    )
-    {
-        return array[idx];
-    }
-
-    template <typename Component>
-    void setSparseArrayElement(SparseArray<Component> &array, size_t idx, Component const &value)
-    {
-        array[idx] = value;
+        return SparseArray<Component>(other);
     }
 
     template <typename Component>
@@ -133,7 +134,7 @@ namespace nfo {
         SparseArray<Component> &&other
     )
     {
-        array = std::move(other);
+        array = other;
         return array;
     }
 
@@ -146,39 +147,15 @@ namespace nfo {
         emscripten::function("moveSparseArray", &moveSparseArray<emscripten::val>);
         emscripten::function("setSparseArrayCopy", &setSparseArrayCopy<emscripten::val>);
         emscripten::function("setSparseArrayMove", &setSparseArrayMove<emscripten::val>);
-        emscripten::function("getSparseArrayElement", &getSparseArrayElement<emscripten::val>);
-        emscripten::function("setSparseArrayElement", &setSparseArrayElement<emscripten::val>);
+        // emscripten::function("getSparseArrayElement", &getSparseArrayElement<emscripten::val>);
+        // emscripten::function("setSparseArrayElement", &setSparseArrayElement<emscripten::val>);
 
         emscripten::class_<SparseArray<emscripten::val>>("SparseArray")
             .constructor<>()
             .function("erase", &SparseArray<emscripten::val>::erase)
             .function("size", &SparseArray<emscripten::val>::size)
-            .function(
-                "end",
-                emscripten::select_overload<SparseArray<emscripten::val>::iterator()>(
-                    &SparseArray<emscripten::val>::end
-                )
-            )
-            .function(
-                "end",
-                emscripten::select_overload<SparseArray<emscripten::val>::const_iterator() const>(
-                    &SparseArray<emscripten::val>::end
-                )
-            )
-            .function("cbegin", emscripten::select_const(&SparseArray<emscripten::val>::cbegin))
-            .function("cend", emscripten::select_const(&SparseArray<emscripten::val>::cend))
-            .function(
-                "begin",
-                emscripten::select_overload<SparseArray<emscripten::val>::iterator()>(
-                    &SparseArray<emscripten::val>::begin
-                )
-            )
-            .function(
-                "begin",
-                emscripten::select_overload<SparseArray<emscripten::val>::const_iterator() const>(
-                    &SparseArray<emscripten::val>::begin
-                )
-            )
+            .function("get", &SparseArray<emscripten::val>::get)
+            .function("set", &SparseArray<emscripten::val>::set)
             .property("_data", &SparseArray<emscripten::val>::_data);
     }
 } // namespace nfo
