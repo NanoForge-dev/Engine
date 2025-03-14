@@ -15,6 +15,7 @@
 
 #include <optional>
 #include <utility>
+#include <ranges>
 
 namespace nfo {
     template <typename Component>
@@ -49,16 +50,6 @@ namespace nfo {
                 _data = std::move(other._data);
             }
             return *this;
-        }
-
-        SparseArray &setByCopy(SparseArray const &other)
-        {
-            return *this = other;
-        }
-
-        SparseArray &setByMove(SparseArray &&other)
-        {
-            return *this = std::move(other);
         }
 
         void erase(const size_type &idx)
@@ -114,16 +105,6 @@ namespace nfo {
             return _data[idx];
         }
 
-        reference_type get(size_type idx)
-        {
-            return (*this)[idx];
-        }
-
-        [[nodiscard]] const_reference_type get(size_type idx) const
-        {
-            return (*this)[idx];
-        }
-
         void set(size_type idx, value_type value)
         {
             (*this)[idx] = std::move(value);
@@ -146,7 +127,7 @@ namespace nfo {
 
         [[nodiscard]] bool empty() const
         {
-            return _data.empty() || std::all_of(_data.begin(), _data.end(), [](const auto &v) {
+            return _data.empty() || std::ranges::all_of(_data, [](const auto &v) {
                        return !v.has_value();
                    });
         }

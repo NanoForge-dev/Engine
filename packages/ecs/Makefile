@@ -1,4 +1,6 @@
 SRC = wasm/SparseArray.cpp\
+	wasm/Entity.cpp\
+	wasm/Utils.cpp\
 	wasm/Registry.cpp
 
 NAME := libecs
@@ -9,14 +11,15 @@ HTML_NAME = $(OUT_DIR)/$(NAME).html
 WASM_NAME = $(OUT_DIR)/$(NAME).wasm
 TS_NAME = $(NAME).d.ts
 
-CFLAGS += -O3 --no-entry --bind
+CFLAGS = -std=c++20
+LDFLAGS = -O3 --no-entry --bind
 
 CC = em++
 
 OBJ = $(SRC:.cpp=.o)
 
 %.o: %.cpp
-	$(CC) -c $< -o $@
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 all: $(WASM_NAME)
 
@@ -28,22 +31,22 @@ ts: $(TS_NAME)
 
 $(WASM_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) $(CFLAGS) -o $(WASM_NAME)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(WASM_NAME)
 
-$(JS_NAME): CFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s STANDALONE_WASM=1
+$(JS_NAME): LDFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s STANDALONE_WASM=1
 $(JS_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) $(CFLAGS) -o $(JS_NAME)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(JS_NAME)
 
-$(HTML_NAME): CFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s STANDALONE_WASM=1
+$(HTML_NAME): LDFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s STANDALONE_WASM=1
 $(HTML_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) $(CFLAGS) -o $(HTML_NAME)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(HTML_NAME)
 
-$(TS_NAME): CFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s STANDALONE_WASM=1
+$(TS_NAME): LDFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s STANDALONE_WASM=1
 $(TS_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) $(CFLAGS) --emit-tsd $(TS_NAME) -o $(JS_NAME)
+	$(CC) $(OBJ) $(LDFLAGS) --emit-tsd $(TS_NAME) -o $(JS_NAME)
 
 clean:
 	$(RM) $(OBJ)
@@ -52,10 +55,10 @@ clean:
 
 fclean: clean
 
-tests: CFLAGS += -s MODULARIZE=1 -s STANDALONE_WASM=1
-tests: fclean $(OBJ)
+tests: LDFLAGS += -s MODULARIZE=1 -s STANDALONE_WASM=1
+tests: $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) $(CFLAGS) -o $(JS_NAME)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(JS_NAME)
 
 re: fclean all
 
