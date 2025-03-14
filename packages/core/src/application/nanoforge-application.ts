@@ -1,4 +1,5 @@
 import {
+  type IAssetManagerLibrary,
   type IComponentSystemLibrary,
   type ILibrary,
   type INetworkLibrary,
@@ -25,6 +26,10 @@ export abstract class NanoforgeApplication {
 
   public useNetwork(library: INetworkLibrary) {
     this.applicationConfig.useNetworkLibrary(library);
+  }
+
+  public useAssetManager(library: IAssetManagerLibrary) {
+    this.applicationConfig.useAssetManagerLibrary(library);
   }
 
   public run() {
