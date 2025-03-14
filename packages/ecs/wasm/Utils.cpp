@@ -12,6 +12,7 @@
 */
 
 #include <emscripten/val.h>
+#include <iostream>
 #include <optional>
 #include <string>
 
@@ -32,7 +33,21 @@ std::optional<emscripten::val> get_js_member(const emscripten::val &c, const std
 std::optional<std::string> get_js_class_name(const emscripten::val &c)
 {
     const std::optional<emscripten::val> name = get_js_member(c, "name");
-    if (name.has_value())
+    if (name.has_value()) {
+        std::cout << "has name: " << name.value().typeOf().as<std::string>() << std::endl;
         return json_to_str(name.value());
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> get_js_class_var_name(const emscripten::val &c)
+{
+    const std::optional<emscripten::val> constructor = get_js_member(c, "constructor");
+    if (constructor.has_value()) {
+        const std::optional<emscripten::val> name = get_js_member(constructor.value(), "name");
+        if (name.has_value()) {
+            return json_to_str(name.value());
+        }
+    }
     return std::nullopt;
 }

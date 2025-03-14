@@ -129,7 +129,7 @@ namespace nfo {
 
         SparseArray<emscripten::val>::reference_type add_component(Entity const &to, emscripten::val &&c)
         {
-            const std::string component_type(get_js_class_name(c).value_or(UNKNOWN_COMPONENT_TYPE));
+            const std::string component_type(get_js_class_var_name(c).value_or(UNKNOWN_COMPONENT_TYPE));
             if (!_components_arrays.contains(component_type)) {
                 std::cout << "registering" << std::endl;
                 register_component(c);
@@ -146,7 +146,7 @@ namespace nfo {
                 _remove_functions[component_type](*this, from);
         }
 
-        template<typename Function>
+        template <typename Function>
         void add_system(Function &&f)
         {
             _systems.emplace_back(std::forward<Function>(f));

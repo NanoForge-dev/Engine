@@ -20,3 +20,4 @@
 std::optional<std::string> get_js_as_string(const emscripten::val &c);
 std::optional<emscripten::val> get_js_member(const emscripten::val &c, const std::string &member);
 std::optional<std::string> get_js_class_name(const emscripten::val &c);
+std::optional<std::string> get_js_class_var_name(const emscripten::val &c);
