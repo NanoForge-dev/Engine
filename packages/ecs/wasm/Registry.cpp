@@ -47,6 +47,7 @@ namespace nfo {
             )
             .function("remove_component", emscripten::select_overload<void(const Entity &, emscripten::val &&), Registry>(&Registry::remove_component))
             .function("add_system", emscripten::select_overload<void(emscripten::val &&), Registry>(&Registry::add_system))
+            .function("run_systems", &Registry::run_systems)
             .function("remove_system", &Registry::remove_system)
             .function("clear_systems", &Registry::clear_systems)
             .function("max_entities", &Registry::max_entities);
