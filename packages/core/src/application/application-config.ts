@@ -1,4 +1,5 @@
 import {
+  type IAssetManagerLibrary,
   type IComponentSystemLibrary,
   type IGraphicsLibrary,
   type ILibrary,
@@ -31,23 +32,31 @@ export class ApplicationConfig {
     return this._libraryManager.getComponentSystem();
   }
 
-  public useComponentSystemLibrary(componentSystemLibrary: IComponentSystemLibrary) {
-    this._libraryManager.setComponentSystem(componentSystemLibrary);
+  public useComponentSystemLibrary(library: IComponentSystemLibrary) {
+    this._libraryManager.setComponentSystem(library);
   }
 
   public getGraphicsLibrary() {
     return this._libraryManager.getGraphics();
   }
 
-  public useGraphicsLibrary(graphicsLibrary: IGraphicsLibrary) {
-    this._libraryManager.setGraphics(graphicsLibrary);
+  public useGraphicsLibrary(library: IGraphicsLibrary) {
+    this._libraryManager.setGraphics(library);
   }
 
   public getNetworkLibrary() {
     return this._libraryManager.getNetwork();
   }
 
-  public useNetworkLibrary(networkLibrary: INetworkLibrary) {
-    this._libraryManager.setNetwork(networkLibrary);
+  public useNetworkLibrary(library: INetworkLibrary) {
+    this._libraryManager.setNetwork(library);
+  }
+
+  public getAssetManagerLibrary() {
+    return this._libraryManager.getAssetManager();
+  }
+
+  public useAssetManagerLibrary(library: IAssetManagerLibrary) {
+    this._libraryManager.setAssetManager(library);
   }
 }

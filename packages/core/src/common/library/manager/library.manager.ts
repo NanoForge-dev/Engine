@@ -1,7 +1,9 @@
 import {
+  ASSET_MANAGER_LIBRARY,
   COMPONENT_SYSTEM_LIBRARY,
   DefaultLibrariesEnum,
   GRAPHICS_LIBRARY,
+  type IAssetManagerLibrary,
   type IComponentSystemLibrary,
   type IGraphicsLibrary,
   type ILibrary,
@@ -32,6 +34,15 @@ export class EditableLibraryManager extends LibraryManager {
     this._set(
       DefaultLibrariesEnum.GRAPHICS,
       GRAPHICS_LIBRARY,
+      library,
+      new EditableLibraryContext(),
+    );
+  }
+
+  public setAssetManager(library: IAssetManagerLibrary): void {
+    this._set(
+      DefaultLibrariesEnum.ASSET_MANAGER,
+      ASSET_MANAGER_LIBRARY,
       library,
       new EditableLibraryContext(),
     );

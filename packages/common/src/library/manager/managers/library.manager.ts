@@ -1,6 +1,8 @@
 import {
+  ASSET_MANAGER_LIBRARY,
   COMPONENT_SYSTEM_LIBRARY,
   GRAPHICS_LIBRARY,
+  type IAssetManagerLibrary,
   type IComponentSystemLibrary,
   type IGraphicsLibrary,
   type INetworkLibrary,
@@ -13,12 +15,14 @@ export enum DefaultLibrariesEnum {
   COMPONENT_SYSTEM,
   GRAPHICS,
   NETWORK,
+  ASSET_MANAGER,
 }
 
 const DEFAULT_LIBRARIES: { index: DefaultLibrariesEnum; sym: symbol }[] = [
   { index: DefaultLibrariesEnum.COMPONENT_SYSTEM, sym: COMPONENT_SYSTEM_LIBRARY },
   { index: DefaultLibrariesEnum.GRAPHICS, sym: GRAPHICS_LIBRARY },
   { index: DefaultLibrariesEnum.NETWORK, sym: NETWORK_LIBRARY },
+  { index: DefaultLibrariesEnum.ASSET_MANAGER, sym: ASSET_MANAGER_LIBRARY },
 ];
 
 export class LibraryManager extends BaseLibraryManager {
@@ -40,5 +44,9 @@ export class LibraryManager extends BaseLibraryManager {
 
   public getNetwork(): LibraryHandle<INetworkLibrary> {
     return this._get<INetworkLibrary>(DefaultLibrariesEnum.NETWORK);
+  }
+
+  public getAssetManager(): LibraryHandle<IAssetManagerLibrary> {
+    return this._get<IAssetManagerLibrary>(DefaultLibrariesEnum.ASSET_MANAGER);
   }
 }
