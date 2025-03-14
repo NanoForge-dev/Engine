@@ -5,12 +5,8 @@ export abstract class Library implements ILibrary {
   abstract get name(): string;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public init(_context: InitContext): Promise<void> {
-    return Promise.resolve();
-  }
+  public async init(_context: InitContext): Promise<void> {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public clear(_context: ClearContext): Promise<void> {
-    return Promise.resolve();
-  }
+  public async clear(_context: ClearContext): Promise<void> {}
 }

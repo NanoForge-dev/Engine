@@ -8,28 +8,27 @@ export class AssetManagerLibrary extends BaseAssetManagerLibrary {
     return "AssetManagerLibrary";
   }
 
-  public init(context: InitContext) {
+  public async init(context: InitContext): Promise<void> {
     this._assets = context.files.assets;
     this._scripts = context.files.scripts;
-    return Promise.resolve();
   }
 
   /**
    * @todo Error management
    */
-  public getAsset(path: string): Promise<string> {
+  public async getAsset(path: string): Promise<string> {
     const res = this._assets.get(this._parsePath(path));
     if (!res) throw new Error("Asset not found.");
-    return Promise.resolve(res);
+    return res;
   }
 
   /**
    * @todo Error management
    */
-  public getScript(path: string): Promise<string> {
+  public async getScript(path: string): Promise<string> {
     const res = this._scripts.get(this._parsePath(path));
     if (!res) throw new Error("Asset not found.");
-    return Promise.resolve(res);
+    return res;
   }
 
   private _parsePath(path: string): string {
