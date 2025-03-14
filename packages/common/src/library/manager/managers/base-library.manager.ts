@@ -34,6 +34,6 @@ export class BaseLibraryManager {
   }
 
   protected _setIndex(sym: symbol, index: number): void {
-    this._librariesIndex[sym] = index;
+    if (Symbol.keyFor(sym)) this._librariesIndex[sym] = index;
   }
 }
