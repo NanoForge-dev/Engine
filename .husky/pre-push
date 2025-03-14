@@ -1,1 +1,2 @@
-bun nx run-many --target=lint,test:unit
+pnpm lint
+pnpm test:unit
