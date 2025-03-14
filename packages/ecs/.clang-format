@@ -1,6 +1,6 @@
 IndentWidth: 4
 
-ColumnLimit: 100
+ColumnLimit: 160
 
 # function names
 AlignAfterOpenBracket: BlockIndent
