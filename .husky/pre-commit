@@ -1,2 +1,3 @@
-bun lint-staged
-bun nx run-many --target=lint
+pnpm lint-staged
+pnpm fix
+pnpm lint
