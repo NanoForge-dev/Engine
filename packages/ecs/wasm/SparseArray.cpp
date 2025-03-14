@@ -28,35 +28,33 @@ namespace nfo {
             .function("size", &SparseArray<emscripten::val>::size)
             .function(
                 "get_index",
-                emscripten::select_overload<SparseArray<emscripten::val>::size_type(
-                    SparseArray<emscripten::val>::const_reference_type
-                ) const>(&SparseArray<emscripten::val>::get_index)
-
+                emscripten::select_overload<SparseArray<emscripten::val>::size_type(SparseArray<emscripten::val>::const_reference_type) const>(
+                    &SparseArray<emscripten::val>::get_index
+                )
             )
             .function(
                 "get_const",
-                emscripten::select_overload<SparseArray<emscripten::val>::const_reference_type(
-                    SparseArray<emscripten::val>::size_type
-                ) const>(&SparseArray<emscripten::val>::get)
+                emscripten::select_overload<SparseArray<emscripten::val>::const_reference_type(SparseArray<emscripten::val>::size_type) const>(
+                    &SparseArray<emscripten::val>::operator[]
+                )
             )
             .function(
                 "get",
-                emscripten::select_overload<SparseArray<emscripten::val>::reference_type(
-                    SparseArray<emscripten::val>::size_type
-                )>(&SparseArray<emscripten::val>::get)
-            )
-            .function(
-                "insert_at",
-                emscripten::select_overload<SparseArray<emscripten::val>::reference_type(
-                    SparseArray<emscripten::val>::size_type,
-                    SparseArray<emscripten::val>::const_reference_type
-                )>(&SparseArray<emscripten::val>::insert_at)
+                emscripten::select_overload<SparseArray<emscripten::val>::reference_type(SparseArray<emscripten::val>::size_type)>(
+                    &SparseArray<emscripten::val>::operator[]
+                )
             )
             .function(
                 "insert_at",
                 emscripten::select_overload<
-                    SparseArray<emscripten::val>::
-                        reference_type(SparseArray<emscripten::val>::size_type, SparseArray<emscripten::val>::value_type &&)>(
+                    SparseArray<emscripten::val>::reference_type(SparseArray<emscripten::val>::size_type, SparseArray<emscripten::val>::const_reference_type)>(
+                    &SparseArray<emscripten::val>::insert_at
+                )
+            )
+            .function(
+                "insert_at",
+                emscripten::select_overload<
+                    SparseArray<emscripten::val>::reference_type(SparseArray<emscripten::val>::size_type, SparseArray<emscripten::val>::value_type &&)>(
                     &SparseArray<emscripten::val>::insert_at
                 )
             )
@@ -64,7 +62,7 @@ namespace nfo {
             .function("empty", &SparseArray<emscripten::val>::empty)
             .function("resize", &SparseArray<emscripten::val>::resize)
             .function("set", &SparseArray<emscripten::val>::set)
-            .function("setByCopy", &SparseArray<emscripten::val>::setByCopy)
-            .function("setByMove", &SparseArray<emscripten::val>::setByMove);
+            .function("setByCopy", emscripten::select_overload<SparseArray<emscripten::val> &(SparseArray<emscripten::val> const &)>(&SparseArray<emscripten::val>::operator=))
+            .function("setByMove", emscripten::select_overload<SparseArray<emscripten::val> &(SparseArray<emscripten::val> &&)>(&SparseArray<emscripten::val>::operator=));
     }
 } // namespace nfo
