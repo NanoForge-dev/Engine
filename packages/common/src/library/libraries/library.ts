@@ -4,7 +4,13 @@ import { type ILibrary } from "./library.type";
 export abstract class Library implements ILibrary {
   abstract get name(): string;
 
-  abstract init(context: InitContext): Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public init(_context: InitContext): Promise<void> {
+    return Promise.resolve();
+  }
 
-  abstract clear(context: ClearContext): Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public clear(_context: ClearContext): Promise<void> {
+    return Promise.resolve();
+  }
 }

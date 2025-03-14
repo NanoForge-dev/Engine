@@ -2,6 +2,7 @@ import {
   type ApplicationContext,
   ClearContext,
   ExecutionContext,
+  type IRunOptions,
   type IRunnerLibrary,
   InitContext,
   type LibraryHandle,
@@ -18,18 +19,18 @@ export class Core {
     this.context = context;
   }
 
-  public run(): void {
-    this.runInit(this.getInitContext());
+  public async run(options: IRunOptions): Promise<void> {
+    this.runInit(this.getInitContext(options));
     const context = this.getExecutionContext();
     const libraries = this.config.libraryManager.getRunnerLibraries();
     while (context.isRunning) {
-      this.runExecute(context, libraries);
+      await this.runExecute(context, libraries);
     }
     this.runClear(this.getClearContext());
   }
 
-  private getInitContext(): InitContext {
-    return new InitContext(this.context, this.config.libraryManager);
+  private getInitContext(options: IRunOptions): InitContext {
+    return new InitContext(this.context, this.config.libraryManager, options);
   }
 
   private getExecutionContext(): ExecutionContext {
@@ -46,9 +47,9 @@ export class Core {
     }
   }
 
-  private runExecute(context: ExecutionContext, libraries: LibraryHandle<IRunnerLibrary>[]) {
+  private async runExecute(context: ExecutionContext, libraries: LibraryHandle<IRunnerLibrary>[]) {
     for (const handle of libraries) {
-      handle.library.run(context);
+      await handle.library.run(context);
     }
   }
 
