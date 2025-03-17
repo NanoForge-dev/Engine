@@ -40,3 +40,6 @@ jobs:
 
       - name: "Run tests"
         run: pnpm test:unit
+
+      - name: "Run linter"
+        run: pnpm lint
