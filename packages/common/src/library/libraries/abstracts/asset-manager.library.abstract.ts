@@ -7,5 +7,7 @@ export abstract class BaseAssetManagerLibrary extends Library implements IAssetM
 
   public abstract getAsset(path: string): Promise<string>;
 
-  public abstract getScript(path: string): Promise<string>;
+  public abstract getWasm(path: string): Promise<string>;
+
+  public abstract getWgsl(path: string): Promise<string>;
 }
