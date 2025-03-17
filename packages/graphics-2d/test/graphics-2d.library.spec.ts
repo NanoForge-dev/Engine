@@ -1,0 +1,21 @@
+import { ApplicationContext, InitContext, LibraryManager } from "@nanoforge/common";
+
+import { Graphics2DLibrary } from "../src";
+
+describe("Graphics 2D Library", () => {
+  const library = new Graphics2DLibrary();
+  const appContext = new ApplicationContext();
+  const libraryManager = new LibraryManager();
+  const context = new InitContext(appContext, libraryManager, {
+    // @ts-ignore
+    canvas: null,
+    files: {
+      assets: new Map([["/test.png", "blob:http://localhost:3000/test.png"]]),
+      scripts: new Map([["/test.wasm", "blob:http://localhost:3000/test.wasm"]]),
+    },
+  });
+
+  it("Should throw if canvas is undefined", async () => {
+    await expect(library.init(context)).rejects.toThrow();
+  });
+});
