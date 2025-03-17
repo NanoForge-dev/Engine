@@ -3,6 +3,7 @@ import {
   type IComponentSystemLibrary,
   type ILibrary,
   type INetworkLibrary,
+  type IRunOptions,
 } from "@nanoforge/common";
 import { ApplicationContext } from "@nanoforge/common/src/context/contexts/application.context";
 
@@ -32,8 +33,10 @@ export abstract class NanoforgeApplication {
     this.applicationConfig.useAssetManagerLibrary(library);
   }
 
-  public run() {
+  public run(options: IRunOptions) {
     const core = new Core(this.applicationConfig, new ApplicationContext());
-    core.run();
+    core.run(options).then(() => {
+      console.info("Game ended successfully.");
+    });
   }
 }
