@@ -34,19 +34,23 @@ export class LibraryManager extends BaseLibraryManager {
     }
   }
 
-  public getComponentSystem(): LibraryHandle<IComponentSystemLibrary> {
-    return this._get<IComponentSystemLibrary>(DefaultLibrariesEnum.COMPONENT_SYSTEM);
+  public getComponentSystem<
+    T extends IComponentSystemLibrary = IComponentSystemLibrary,
+  >(): LibraryHandle<T> {
+    return this._get<T>(DefaultLibrariesEnum.COMPONENT_SYSTEM);
   }
 
-  public getGraphics(): LibraryHandle<IGraphicsLibrary> {
-    return this._get<IGraphicsLibrary>(DefaultLibrariesEnum.GRAPHICS);
+  public getGraphics<T extends IGraphicsLibrary = IGraphicsLibrary>(): LibraryHandle<T> {
+    return this._get<T>(DefaultLibrariesEnum.GRAPHICS);
   }
 
-  public getNetwork(): LibraryHandle<INetworkLibrary> {
-    return this._get<INetworkLibrary>(DefaultLibrariesEnum.NETWORK);
+  public getNetwork<T extends INetworkLibrary = INetworkLibrary>(): LibraryHandle<T> {
+    return this._get<T>(DefaultLibrariesEnum.NETWORK);
   }
 
-  public getAssetManager(): LibraryHandle<IAssetManagerLibrary> {
-    return this._get<IAssetManagerLibrary>(DefaultLibrariesEnum.ASSET_MANAGER);
+  public getAssetManager<
+    T extends IAssetManagerLibrary = IAssetManagerLibrary,
+  >(): LibraryHandle<T> {
+    return this._get<T>(DefaultLibrariesEnum.ASSET_MANAGER);
   }
 }
