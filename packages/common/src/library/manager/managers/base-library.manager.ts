@@ -1,5 +1,5 @@
 import { type LibraryContext } from "../../../context";
-import { type ILibrary } from "../../libraries/library.type";
+import { type ILibrary } from "../../libraries";
 import { LibraryHandle } from "../handle/library.handle";
 
 export class BaseLibraryManager {
@@ -11,7 +11,7 @@ export class BaseLibraryManager {
   /**
    * @todo Add error management
    */
-  public get(sym: symbol): LibraryHandle {
+  public get<T extends ILibrary = ILibrary>(sym: symbol): LibraryHandle<T> {
     const index = this._librariesIndex[sym];
     if (!index) throw new Error(`Library not found: ${Symbol.keyFor(sym)}`);
     return this._get(index, sym);
