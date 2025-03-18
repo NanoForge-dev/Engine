@@ -43,7 +43,7 @@ $(HTML_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
 	$(CC) $(OBJ) $(LDFLAGS) -o $(HTML_NAME)
 
-$(TS_NAME): LDFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s STANDALONE_WASM=1
+$(TS_NAME): LDFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1
 $(TS_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
 	$(CC) $(OBJ) $(LDFLAGS) --emit-tsd $(TS_NAME) -o $(JS_NAME)
