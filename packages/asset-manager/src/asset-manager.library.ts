@@ -1,5 +1,7 @@
 import { BaseAssetManagerLibrary, type InitContext } from "@nanoforge/common";
 
+import { NfFile } from "./file";
+
 export class AssetManagerLibrary extends BaseAssetManagerLibrary {
   private _assets: Map<string, string>;
   private _wasm: Map<string, string>;
@@ -18,28 +20,28 @@ export class AssetManagerLibrary extends BaseAssetManagerLibrary {
   /**
    * @todo Error management
    */
-  public async getAsset(path: string): Promise<string> {
+  public async getAsset(path: string): Promise<NfFile> {
     const res = this._assets.get(this._parsePath(path));
     if (!res) throw new Error("Asset not found.");
-    return res;
+    return new NfFile(res);
   }
 
   /**
    * @todo Error management
    */
-  public async getWasm(path: string): Promise<string> {
+  public async getWasm(path: string): Promise<NfFile> {
     const res = this._wasm.get(this._parsePath(path));
     if (!res) throw new Error("Asset not found.");
-    return res;
+    return new NfFile(res);
   }
 
   /**
    * @todo Error management
    */
-  public async getWgsl(path: string): Promise<string> {
+  public async getWgsl(path: string): Promise<NfFile> {
     const res = this._wgsl.get(this._parsePath(path));
     if (!res) throw new Error("Asset not found.");
-    return res;
+    return new NfFile(res);
   }
 
   private _parsePath(path: string): string {
