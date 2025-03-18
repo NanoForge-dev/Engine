@@ -34,6 +34,10 @@ export class GraphicsCore {
     return this._shaderManager;
   }
 
+  get render(): GraphicsRender {
+    return this._render;
+  }
+
   public async init(): Promise<void> {
     if (!navigator.gpu) {
       throw new Error("WebGPU not supported on this browser.");
