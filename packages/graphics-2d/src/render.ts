@@ -26,4 +26,12 @@ export class GraphicsRender {
       format: this._canvasFormat,
     });
   }
+
+  get canvasContext(): GPUCanvasContext {
+    return this._canvasContext;
+  }
+
+  get canvasFormat(): GPUTextureFormat {
+    return this._canvasFormat;
+  }
 }

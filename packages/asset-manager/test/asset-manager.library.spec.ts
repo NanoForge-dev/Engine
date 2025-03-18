@@ -18,7 +18,7 @@ describe("Asset Manager Library", () => {
   library.init(context);
 
   it("Should get asset", async () => {
-    await expect(library.getAsset("test.png")).resolves.toEqual(
+    expect((await library.getAsset("test.png")).path).toEqual(
       "blob:http://localhost:3000/test.png",
     );
   });
@@ -28,7 +28,7 @@ describe("Asset Manager Library", () => {
   });
 
   it("Should get wasm", async () => {
-    await expect(library.getWasm("test.wasm")).resolves.toEqual(
+    expect((await library.getWasm("test.wasm")).path).toEqual(
       "blob:http://localhost:3000/test.wasm",
     );
   });
@@ -38,7 +38,7 @@ describe("Asset Manager Library", () => {
   });
 
   it("Should get wgsl", async () => {
-    await expect(library.getWgsl("test.wgsl")).resolves.toEqual(
+    expect((await library.getWgsl("test.wgsl")).path).toEqual(
       "blob:http://localhost:3000/test.wgsl",
     );
   });
