@@ -178,6 +178,7 @@ describe("Registry", () => {
       r.addComponent(e, entityComp);
       fail();
     } catch (e) {
+      //@ts-ignore
       expect(m.getExceptionMessage(e)[1].toString()).toBeDefined();
     }
   });

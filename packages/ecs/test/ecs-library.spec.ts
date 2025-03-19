@@ -41,7 +41,7 @@ describe("ECSLibrary", () => {
   test("init and spawn entity", async () => {
     const entity = ecs.createEntity();
     expect(entity).toBeDefined();
-    expect(entity.get_id()).toBe(0);
+    expect(entity.getId()).toBe(0);
   });
 
   test("add component to entity", async () => {
@@ -49,7 +49,7 @@ describe("ECSLibrary", () => {
     const pos = new Position(1, 2);
     ecs.addComponent(entity, pos);
     const components = ecs.getComponents(Position);
-    expect(components.get(entity.get_id())).toStrictEqual(new Position(1, 2));
+    expect(components.get(entity.getId())).toStrictEqual(new Position(1, 2));
     expect(components.size()).toBe(1);
   });
 

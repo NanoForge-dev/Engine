@@ -1,7 +1,8 @@
 import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
 import { BaseComponentSystemLibrary, type InitContext } from "@nanoforge/common";
 
-import { type Entity, type MainModule, Module, type Registry, type SparseArray } from "../lib";
+import type { Entity, MainModule, Registry, SparseArray, Zipper } from "../lib";
+import { Module } from "../lib";
 
 export class ECSLibrary extends BaseComponentSystemLibrary {
   private module: MainModule;
@@ -29,62 +30,70 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
   }
 
   addComponent(entity: Entity, component: any): void {
-    this.registry.add_component(entity, component);
+    this.registry.addComponent(entity, component);
   }
 
   createEntity(): Entity {
-    return this.registry.spawn_entity();
+    return this.registry.spawnEntity();
   }
 
   getComponents(component: any): SparseArray {
-    return this.registry.get_components(component);
+    return this.registry.getComponents(component);
   }
 
   removeComponent(entity: Entity, component: any): void {
-    this.registry.remove_component(entity, component);
+    this.registry.removeComponent(entity, component);
   }
 
   getEntityComponent(entity: Entity, component: any): any | undefined {
-    return this.registry.get_entity_component(entity, component);
+    return this.registry.getEntityComponent(entity, component);
   }
 
   getEntityComponentConst(entity: Entity, component: any): any | undefined {
-    return this.registry.get_entity_component_const(entity, component);
+    return this.registry.getEntityComponentConst(entity, component);
   }
 
   clearEntities(): void {
-    this.registry.clear_entities();
+    this.registry.clearEntities();
   }
 
   runSystems(): void {
-    this.registry.run_systems();
+    this.registry.runSystems();
   }
 
   clearSystems(): void {
-    this.registry.clear_systems();
+    this.registry.clearSystems();
   }
 
   removeSystem(system: any): void {
-    this.registry.remove_system(system);
+    this.registry.removeSystem(system);
   }
 
   registerComponent(component: any): SparseArray {
-    return this.registry.register_component(component);
+    return this.registry.registerComponent(component);
   }
 
   entityFromIndex(index: number): Entity {
-    return this.registry.entity_from_index(index);
+    return this.registry.entityFromIndex(index);
   }
 
   killEntity(entity: Entity): void {
-    this.registry.kill_entity(entity);
+    this.registry.killEntity(entity);
   }
 
   maxEntities(): number {
-    return this.registry.max_entities();
+    return this.registry.maxEntities();
   }
 
   addSystem(system: any): void {
-    this.registry.add_system(system);
+    this.registry.addSystem(system);
+  }
+
+  getZipper(types: [any]): Zipper {
+    return this.registry.getZipper(types);
+  }
+
+  getIndexedZipper(types: [any]): Zipper {
+    return this.registry.getIndexedZipper(types);
   }
 }
