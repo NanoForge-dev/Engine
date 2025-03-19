@@ -25,7 +25,7 @@ describe("SparseArray", () => {
     expect(sa.get(0)).toBe(undefined);
   });
 
-  test("basic iteration", async () => {
+  test("basic iteration with get and size", async () => {
     const m = await Module();
     const sa = new m.SparseArray();
     sa.set(0, 1);
