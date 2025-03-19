@@ -12,12 +12,18 @@
 */
 
 #include <emscripten/bind.h>
+#include <emscripten/val.h>
 
-#include "Entity.hpp"
+#include "Zipper.hpp"
 
 namespace nfo {
-    EMSCRIPTEN_BINDINGS(Entity)
+    EMSCRIPTEN_BINDINGS(Zipper)
     {
-        emscripten::class_<Entity>("Entity").constructor<std::size_t>().function("getId", &Entity::get_id);
+        emscripten::register_map<std::string, SparseArray<emscripten::val> *>("MapStringSparseArray");
+
+        emscripten::class_<Zipper>("Zipper")
+            .constructor<const std::map<std::string, SparseArray<emscripten::val> *> &>()
+            .function("next", &Zipper::next)
+            .function("getValue", &Zipper::get_value);
     }
 } // namespace nfo

@@ -29,17 +29,17 @@ describe("Registry", () => {
     const vel = new Velocity(1, 2);
     const pos = new Position(4, 5);
 
-    const e = r.spawn_entity();
-    expect(e.get_id()).toBe(0);
+    const e = r.spawnEntity();
+    expect(e.getId()).toBe(0);
 
-    r.add_component(e, vel);
-    r.add_component(e, pos);
+    r.addComponent(e, vel);
+    r.addComponent(e, pos);
 
-    const velocities = r.get_components(Velocity);
-    const positions = r.get_components(Position);
+    const velocities = r.getComponents(Velocity);
+    const positions = r.getComponents(Position);
 
-    expect(velocities.get(e.get_id())).toStrictEqual(new Velocity(1, 2));
-    expect(positions.get(e.get_id())).toStrictEqual(new Position(4, 5));
+    expect(velocities.get(e.getId())).toStrictEqual(new Velocity(1, 2));
+    expect(positions.get(e.getId())).toStrictEqual(new Position(4, 5));
   });
 
   test("override components", async () => {
@@ -49,13 +49,13 @@ describe("Registry", () => {
     const vel = new Velocity(1, 2);
     const vel2 = new Velocity(4, 5);
 
-    const e = r.spawn_entity();
+    const e = r.spawnEntity();
 
-    r.add_component(e, vel);
-    expect(r.get_components(Velocity).get(e.get_id())).toStrictEqual(new Velocity(1, 2));
+    r.addComponent(e, vel);
+    expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(1, 2));
 
-    r.add_component(e, vel2);
-    expect(r.get_components(Velocity).get(e.get_id())).toStrictEqual(new Velocity(4, 5));
+    r.addComponent(e, vel2);
+    expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(4, 5));
   });
 
   test("basic remove", async () => {
@@ -63,14 +63,14 @@ describe("Registry", () => {
     const r = new m.Registry();
 
     const vel = new Velocity(1, 2);
-    const e = r.spawn_entity();
+    const e = r.spawnEntity();
 
-    r.add_component(e, vel);
-    expect(r.get_components(Velocity).get(e.get_id())).toStrictEqual(new Velocity(1, 2));
+    r.addComponent(e, vel);
+    expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(1, 2));
 
-    r.remove_component(e, Velocity);
-    expect(r.get_components(Velocity).size()).toEqual(1);
-    expect(r.get_components(Velocity).get(e.get_id())).toBeUndefined();
+    r.removeComponent(e, Velocity);
+    expect(r.getComponents(Velocity).size()).toEqual(1);
+    expect(r.getComponents(Velocity).get(e.getId())).toBeUndefined();
   });
 
   test("basic kill", async () => {
@@ -81,23 +81,23 @@ describe("Registry", () => {
     const vel = new Velocity(1, 2);
     const pos = new Position(4, 5);
 
-    r.spawn_entity();
-    const e = r.spawn_entity();
-    expect(e.get_id()).toBe(1);
+    r.spawnEntity();
+    const e = r.spawnEntity();
+    expect(e.getId()).toBe(1);
 
-    r.add_component(e, vel);
-    r.add_component(e, pos);
+    r.addComponent(e, vel);
+    r.addComponent(e, pos);
 
-    const velocities = r.get_components(Velocity);
-    const positions = r.get_components(Position);
+    const velocities = r.getComponents(Velocity);
+    const positions = r.getComponents(Position);
 
     expect(positions.size()).toEqual(2);
-    expect(velocities.get(e.get_id())).toStrictEqual(new Velocity(1, 2));
-    expect(positions.get(e.get_id())).toStrictEqual(new Position(4, 5));
+    expect(velocities.get(e.getId())).toStrictEqual(new Velocity(1, 2));
+    expect(positions.get(e.getId())).toStrictEqual(new Position(4, 5));
 
-    r.kill_entity(e);
-    expect(r.get_components(Velocity).get(e.get_id())).toBeUndefined();
-    expect(r.get_components(Position).get(e.get_id())).toBeUndefined();
+    r.killEntity(e);
+    expect(r.getComponents(Velocity).get(e.getId())).toBeUndefined();
+    expect(r.getComponents(Position).get(e.getId())).toBeUndefined();
   });
 
   test("system incrementing a variable", async () => {
@@ -106,13 +106,13 @@ describe("Registry", () => {
 
     let counter = 0;
 
-    r.add_system(() => {
+    r.addSystem(() => {
       counter += 1;
     });
 
     for (let i = 0; i <= 15; i++) {
       expect(counter).toBe(i);
-      r.run_systems();
+      r.runSystems();
     }
     expect(counter).toBe(16);
   });
@@ -122,22 +122,22 @@ describe("Registry", () => {
     const r = new m.Registry();
     expect(r).toBeDefined();
 
-    const e = r.spawn_entity();
-    const e2 = r.spawn_entity();
-    expect(e2.get_id()).toBe(1);
-    const e3 = r.spawn_entity();
+    const e = r.spawnEntity();
+    const e2 = r.spawnEntity();
+    expect(e2.getId()).toBe(1);
+    const e3 = r.spawnEntity();
 
-    r.add_component(e, new Velocity(1, 1));
-    r.add_component(e, new Position(-2, -2));
+    r.addComponent(e, new Velocity(1, 1));
+    r.addComponent(e, new Position(-2, -2));
 
-    r.add_component(e2, new Velocity(-1, -1));
-    r.add_component(e2, new Position(2, 2));
+    r.addComponent(e2, new Velocity(-1, -1));
+    r.addComponent(e2, new Position(2, 2));
 
-    r.add_component(e3, new Position(0, 0));
+    r.addComponent(e3, new Position(0, 0));
 
-    r.add_system(() => {
-      const velocities = r.get_components(Velocity);
-      const positions = r.get_components(Position);
+    r.addSystem(() => {
+      const velocities = r.getComponents(Velocity);
+      const positions = r.getComponents(Position);
       for (let i = 0; i < velocities.size() && i < positions.size(); i++) {
         if (velocities.get(i) === undefined || positions.get(i) === undefined) {
           continue;
@@ -147,20 +147,38 @@ describe("Registry", () => {
       }
     });
 
-    expect(r.get_components(Position).size()).toEqual(3);
+    expect(r.getComponents(Position).size()).toEqual(3);
 
-    expect(r.get_components(Position).get(e.get_id())).toStrictEqual(new Position(-2, -2));
-    expect(r.get_components(Position).get(e2.get_id())).toStrictEqual(new Position(2, 2));
-    expect(r.get_components(Position).get(e3.get_id())).toStrictEqual(new Position(0, 0));
-    r.run_systems();
+    expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(-2, -2));
+    expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(2, 2));
+    expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
+    r.runSystems();
 
-    expect(r.get_components(Position).get(e.get_id())).toStrictEqual(new Position(-1, -1));
-    expect(r.get_components(Position).get(e2.get_id())).toStrictEqual(new Position(1, 1));
-    expect(r.get_components(Position).get(e3.get_id())).toStrictEqual(new Position(0, 0));
-    r.run_systems();
+    expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(-1, -1));
+    expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(1, 1));
+    expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
+    r.runSystems();
 
-    expect(r.get_components(Position).get(e.get_id())).toStrictEqual(new Position(0, 0));
-    expect(r.get_components(Position).get(e2.get_id())).toStrictEqual(new Position(0, 0));
-    expect(r.get_components(Position).get(e3.get_id())).toStrictEqual(new Position(0, 0));
+    expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(0, 0));
+    expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(0, 0));
+    expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
+  });
+
+  test("Try unallowed component name", async () => {
+    const m = await Module();
+    const r = new m.Registry();
+    expect(r).toBeDefined();
+
+    const entityComp = { name: "entity" };
+
+    const e = r.spawnEntity();
+    expect(e.getId()).toBe(0);
+
+    try {
+      r.addComponent(e, entityComp);
+      fail();
+    } catch (e) {
+      expect(m.getExceptionMessage(e)[1].toString()).toBeDefined();
+    }
   });
 });

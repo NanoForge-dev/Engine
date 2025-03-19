@@ -21,9 +21,10 @@
 #include <unordered_map>
 
 #include "Entity.hpp"
+#include "IndexedZipper.hpp"
 #include "SparseArray.hpp"
 #include "Utils.hpp"
-
+#include "Zipper.hpp"
 
 namespace nfo {
     class Registry {
@@ -31,9 +32,10 @@ namespace nfo {
         SparseArray<emscripten::val> &register_component(const emscripten::val &c)
         {
             std::string component_type(get_js_class_name(c));
-            if (!_components_arrays.contains(component_type)) {
+            if (component_type == "entity" || component_type == "id")
+                throw std::runtime_error("Component type '" + component_type + "' not supported : you can't use : id, entity, " + UNKNOWN_COMPONENT_TYPE);
+            if (!_components_arrays.contains(component_type))
                 _components_arrays.emplace(component_type, SparseArray<emscripten::val>());
-            }
             if (!_remove_functions.contains(component_type)) {
                 _remove_functions.emplace(component_type, [c](Registry &reg, Entity const &ent) {
                     SparseArray<emscripten::val> &array = reg.get_components(c);
@@ -177,6 +179,30 @@ namespace nfo {
         [[nodiscard]] std::size_t max_entities() const
         {
             return _next_entity;
+        }
+
+        Zipper get_zipper(const emscripten::val &comps)
+        {
+            if (!comps.isArray())
+                throw std::runtime_error("get_zipper: comps is not an array");
+
+            std::map<std::string, SparseArray<emscripten::val> *> arrays;
+            for (int i = 0; i < comps["length"].as<unsigned int>(); i++) {
+                arrays[get_js_class_name(comps[i])] = &get_components(comps[i]);
+            }
+            return Zipper(arrays);
+        }
+
+        IndexedZipper get_indexed_zipper(const emscripten::val &comps)
+        {
+            if (!comps.isArray())
+                throw std::runtime_error("get_zipper: comps is not an array");
+
+            std::map<std::string, SparseArray<emscripten::val> *> arrays;
+            for (int i = 0; i < comps["length"].as<unsigned int>(); i++) {
+                arrays[get_js_class_name(comps[i])] = &get_components(comps[i]);
+            }
+            return IndexedZipper(arrays);
         }
 
       private:
