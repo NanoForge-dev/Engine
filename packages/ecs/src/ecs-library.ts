@@ -1,22 +1,23 @@
-import { type Entity, type MainModule, Module, type Registry, type SparseArray } from "@lib";
 import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
 import { BaseComponentSystemLibrary, type InitContext } from "@nanoforge/common";
 
+import { type Entity, type MainModule, Module, type Registry, type SparseArray } from "../lib";
+
 export class ECSLibrary extends BaseComponentSystemLibrary {
-  name: string = "ECSLibrary";
-  module: MainModule;
-  registry: Registry;
-  path: string = "libecs.wasm";
+  private module: MainModule;
+  private registry: Registry;
+  private readonly path: string = "libecs.wasm";
+
+  get name(): string {
+    return "ECSLibrary";
+  }
 
   async init(context: InitContext): Promise<void> {
     const wasmFile = await context.libraries
       .getAssetManager<AssetManagerLibrary>()
       .library.getWasm(this.path);
-    Module({ locateFile: () => wasmFile.path }).then((module) => {
-      this.module = module;
-      this.registry = new module.Registry();
-      return Promise.resolve();
-    });
+    this.module = await Module({ locateFile: () => wasmFile.path });
+    this.registry = new this.module.Registry();
   }
 
   async run(): Promise<void> {
