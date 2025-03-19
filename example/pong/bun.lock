@@ -15,6 +15,13 @@
         "prettier": "^3.5.3",
         "typescript-eslint": "^8.26.0",
       },
+      "optionalDependencies": {
+        "@nanoforge/asset-manager": "latest",
+        "@nanoforge/common": "latest",
+        "@nanoforge/core": "latest",
+        "@nanoforge/ecs": "latest",
+        "@nanoforge/graphics-2d": "latest",
+      },
       "peerDependencies": {
         "typescript": "^5",
       },
