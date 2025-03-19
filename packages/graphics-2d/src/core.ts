@@ -1,6 +1,7 @@
 import { type InitContext } from "@nanoforge/common";
 
 import { GraphicsRender } from "./render";
+import { NfgWindow } from "./render/window";
 import { ShaderManager } from "./shader/shader.manager";
 
 export class GraphicsCore {
@@ -8,6 +9,7 @@ export class GraphicsCore {
 
   private readonly _shaderManager: ShaderManager;
   private _render: GraphicsRender;
+  private _window: NfgWindow;
 
   private _adapter: GPUAdapter;
   private _device: GPUDevice;
@@ -38,6 +40,10 @@ export class GraphicsCore {
     return this._render;
   }
 
+  get window(): NfgWindow {
+    return this._window;
+  }
+
   public async init(): Promise<void> {
     if (!navigator.gpu) {
       throw new Error("WebGPU not supported on this browser.");
@@ -56,5 +62,6 @@ export class GraphicsCore {
     this._device = device;
 
     this._render = new GraphicsRender(this, this._initContext);
+    this._window = new NfgWindow(this._render);
   }
 }

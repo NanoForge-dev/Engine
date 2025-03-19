@@ -19,8 +19,11 @@ export class Core {
     this.context = context;
   }
 
-  public async run(options: IRunOptions): Promise<void> {
+  public async init(options: IRunOptions): Promise<void> {
     this.runInit(this.getInitContext(options));
+  }
+
+  public async run(): Promise<void> {
     const context = this.getExecutionContext();
     const libraries = this.config.libraryManager.getRunnerLibraries();
     while (context.isRunning) {
