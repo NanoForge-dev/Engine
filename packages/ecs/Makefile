@@ -52,15 +52,14 @@ $(TS_NAME): $(OBJ)
 
 clean:
 	$(RM) $(OBJ)
-	$(RM) -r $(OUT_DIR)
 	$(RM) $(JS_NAME) $(WASM_NAME) $(HTML_NAME) $(TS_NAME)
 
 fclean: clean
 
-tests: LDFLAGS += -s MODULARIZE=1 -s STANDALONE_WASM=1
+tests: LDFLAGS += -s MODULARIZE=1
 tests: $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) $(LDFLAGS) -o $(JS_NAME)
+	$(CC) $(OBJ) $(LDFLAGS) --emit-tsd $(TS_NAME) -o $(JS_NAME)
 
 re: fclean all
 
