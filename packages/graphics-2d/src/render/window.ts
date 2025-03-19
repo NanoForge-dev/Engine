@@ -9,6 +9,14 @@ export class NfgWindow {
     this._render = render;
   }
 
+  get width(): number {
+    return this._render.canvas.width;
+  }
+
+  get height(): number {
+    return this._render.canvas.height;
+  }
+
   public draw(component: NfgComponent) {
     this._components.push(component);
   }
