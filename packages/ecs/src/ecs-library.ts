@@ -1,33 +1,26 @@
-import type { ILibrary } from "@nanoforge/common";
+import { type Entity, type MainModule, Module, type Registry, type SparseArray } from "@lib";
+import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
+import { BaseComponentSystemLibrary, type InitContext } from "@nanoforge/common";
 
-import Module from "../public/libecs.js";
-import type { Entity, MainModule, Registry, SparseArray } from "../public/libecs.js";
-
-function cleanPath(p: string): string {
-  if (p.endsWith("/")) {
-    return p.slice(0, p.length - 1);
-  }
-  return p;
-}
-
-export class ECSLibrary implements ILibrary {
-  name: string = "ECS";
+export class ECSLibrary extends BaseComponentSystemLibrary {
+  name: string = "ECSLibrary";
   module: MainModule;
   registry: Registry;
-  path: string;
+  path: string = "libecs.wasm";
 
-  constructor(path: string) {
-    this.path = path;
+  async init(context: InitContext): Promise<void> {
+    const wasmFile = await context.libraries
+      .getAssetManager<AssetManagerLibrary>()
+      .library.getWasm(this.path);
+    Module({ locateFile: () => wasmFile.path }).then((module) => {
+      this.module = module;
+      this.registry = new module.Registry();
+      return Promise.resolve();
+    });
   }
 
-  init(): Promise<void> {
-    return Module({ locateFile: (file: string) => `${cleanPath(this.path)}/${file}` }).then(
-      (module) => {
-        this.module = module;
-        this.registry = new module.Registry();
-        return Promise.resolve();
-      },
-    );
+  async run(): Promise<void> {
+    this.runSystems();
   }
 
   clear(): Promise<void> {
