@@ -1,6 +1,4 @@
-import { type IFile } from "@nanoforge/common";
-
-export class NfFile implements IFile {
+export class NfFile {
   private readonly _path: string;
 
   constructor(path: string) {

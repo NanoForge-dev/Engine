@@ -11,7 +11,8 @@ describe("Graphics 2D Library", () => {
     canvas: null,
     files: {
       assets: new Map([["/test.png", "blob:http://localhost:3000/test.png"]]),
-      scripts: new Map([["/test.wasm", "blob:http://localhost:3000/test.wasm"]]),
+      wasm: new Map([["/test.wasm", "blob:http://localhost:3000/test.wasm"]]),
+      wgsl: new Map([["/test.wgsl", "blob:http://localhost:3000/test.wgsl"]]),
     },
   });
 

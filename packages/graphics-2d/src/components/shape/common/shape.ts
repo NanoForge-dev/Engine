@@ -1,10 +1,3 @@
-import { type GraphicsCore } from "../../../core";
-import { type ShaderManager } from "../../../shader/shader.manager";
+import { NfgComponent } from "../../component";
 
-export class NfShape {
-  private readonly _shaderManager: ShaderManager;
-
-  constructor(core: GraphicsCore) {
-    this._shaderManager = core.shaderManager;
-  }
-}
+export abstract class NfgShape extends NfgComponent {}
