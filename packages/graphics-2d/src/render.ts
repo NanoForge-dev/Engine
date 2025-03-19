@@ -5,11 +5,14 @@ import { type GraphicsCore } from "./core";
 
 export class GraphicsRender {
   private readonly _core: GraphicsCore;
+  private readonly _canvas: HTMLCanvasElement;
   private readonly _canvasContext: GPUCanvasContext;
   private readonly _canvasFormat: GPUTextureFormat;
 
   constructor(core: GraphicsCore, initContext: InitContext) {
     this._core = core;
+
+    this._canvas = initContext.canvas;
 
     const context = initContext.canvas.getContext("webgpu");
     if (!context) {
@@ -23,6 +26,10 @@ export class GraphicsRender {
       device: this._core.device,
       format: this._canvasFormat,
     });
+  }
+
+  get canvas(): HTMLCanvasElement {
+    return this._canvas;
   }
 
   get canvasFormat(): GPUTextureFormat {
