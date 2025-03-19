@@ -27,13 +27,13 @@ namespace nfo {
             .function("erase", &SparseArray<emscripten::val>::erase)
             .function("size", &SparseArray<emscripten::val>::size)
             .function(
-                "get_index",
+                "getIndex",
                 emscripten::select_overload<SparseArray<emscripten::val>::size_type(SparseArray<emscripten::val>::const_reference_type) const>(
                     &SparseArray<emscripten::val>::get_index
                 )
             )
             .function(
-                "get_const",
+                "getConst",
                 emscripten::select_overload<SparseArray<emscripten::val>::const_reference_type(SparseArray<emscripten::val>::size_type) const>(
                     &SparseArray<emscripten::val>::operator[]
                 )
@@ -45,14 +45,14 @@ namespace nfo {
                 )
             )
             .function(
-                "insert_at",
+                "insertAt",
                 emscripten::select_overload<
                     SparseArray<emscripten::val>::reference_type(SparseArray<emscripten::val>::size_type, SparseArray<emscripten::val>::const_reference_type)>(
                     &SparseArray<emscripten::val>::insert_at
                 )
             )
             .function(
-                "insert_at",
+                "insertAt",
                 emscripten::select_overload<
                     SparseArray<emscripten::val>::reference_type(SparseArray<emscripten::val>::size_type, SparseArray<emscripten::val>::value_type &&)>(
                     &SparseArray<emscripten::val>::insert_at
@@ -62,7 +62,13 @@ namespace nfo {
             .function("empty", &SparseArray<emscripten::val>::empty)
             .function("resize", &SparseArray<emscripten::val>::resize)
             .function("set", &SparseArray<emscripten::val>::set)
-            .function("setByCopy", emscripten::select_overload<SparseArray<emscripten::val> &(SparseArray<emscripten::val> const &)>(&SparseArray<emscripten::val>::operator=))
-            .function("setByMove", emscripten::select_overload<SparseArray<emscripten::val> &(SparseArray<emscripten::val> &&)>(&SparseArray<emscripten::val>::operator=));
+            .function(
+                "setByCopy",
+                emscripten::select_overload<SparseArray<emscripten::val> &(SparseArray<emscripten::val> const &)>(&SparseArray<emscripten::val>::operator=)
+            )
+            .function(
+                "setByMove",
+                emscripten::select_overload<SparseArray<emscripten::val> &(SparseArray<emscripten::val> &&)>(&SparseArray<emscripten::val>::operator=)
+            );
     }
 } // namespace nfo

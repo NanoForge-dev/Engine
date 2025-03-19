@@ -13,9 +13,11 @@
 
 #pragma once
 
+#include <iostream>
 #include <optional>
-#include <utility>
 #include <ranges>
+#include <utility>
+#include <__ostream/basic_ostream.h>
 
 namespace nfo {
     template <typename Component>
@@ -127,9 +129,7 @@ namespace nfo {
 
         [[nodiscard]] bool empty() const
         {
-            return _data.empty() || std::ranges::all_of(_data, [](const auto &v) {
-                       return !v.has_value();
-                   });
+            return _data.empty() || std::ranges::all_of(_data, [](const auto &v) { return !v.has_value(); });
         }
 
         reference_type insert_at(size_type idx, const_reference_type value)
