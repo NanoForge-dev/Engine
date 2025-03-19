@@ -29,7 +29,7 @@
 namespace nfo {
     class Registry {
       public:
-        SparseArray<emscripten::val> &register_component(const emscripten::val &c)
+        SparseArray<emscripten::val> &register_component(const Component &c)
         {
             std::string component_type(get_js_class_name(c));
             if (component_type == "entity" || component_type == "id")
@@ -55,7 +55,7 @@ namespace nfo {
             return std::any_cast<SparseArray<emscripten::val> &>(_components_arrays[component_type]);
         }
 
-        SparseArray<emscripten::val> &get_components(const emscripten::val &c)
+        SparseArray<emscripten::val> &get_components(const Component &c)
         {
             const std::string component_type(get_js_class_name(c));
             if (!_components_arrays.contains(component_type))
@@ -64,7 +64,7 @@ namespace nfo {
             return std::any_cast<SparseArray<emscripten::val> &>(components);
         }
 
-        [[nodiscard]] SparseArray<emscripten::val> const &get_components(const emscripten::val &c) const
+        [[nodiscard]] SparseArray<emscripten::val> const &get_components(const Component &c) const
         {
             const std::string component_type(get_js_class_name(c));
             if (!_components_arrays.contains(component_type))
@@ -73,7 +73,7 @@ namespace nfo {
             return std::any_cast<const SparseArray<emscripten::val> &>(components);
         }
 
-        std::optional<emscripten::val> &get_entity_component(const Entity e, const emscripten::val &c)
+        std::optional<emscripten::val> &get_entity_component(const Entity e, const Component &c)
         {
             const std::string component_type(get_js_class_name(c));
             if (!_components_arrays.contains(component_type))
@@ -82,7 +82,7 @@ namespace nfo {
             return std::any_cast<SparseArray<emscripten::val> &>(components)[e];
         }
 
-        [[nodiscard]] std::optional<emscripten::val> const &get_entity_component(const Entity e, const emscripten::val &c) const
+        [[nodiscard]] std::optional<emscripten::val> const &get_entity_component(const Entity e, const Component &c) const
         {
             const std::string component_type(get_js_class_name(c));
             if (!_components_arrays.contains(component_type))
@@ -125,7 +125,7 @@ namespace nfo {
             _components_arrays.clear();
         }
 
-        SparseArray<emscripten::val>::reference_type add_component(Entity const &to, emscripten::val &&c)
+        SparseArray<emscripten::val>::reference_type add_component(Entity const &to, Component &&c)
         {
             const std::string component_type(get_js_class_name(c));
             if (!_components_arrays.contains(component_type)) {
@@ -134,7 +134,7 @@ namespace nfo {
             return get_components(c).insert_at(to, c);
         }
 
-        void remove_component(Entity const &from, emscripten::val &&c)
+        void remove_component(Entity const &from, Component &&c)
         {
             const std::string component_type(get_js_class_name(c));
             if (!_components_arrays.contains(component_type))
@@ -188,7 +188,7 @@ namespace nfo {
 
             std::map<std::string, SparseArray<emscripten::val> *> arrays;
             for (int i = 0; i < comps["length"].as<unsigned int>(); i++) {
-                arrays[get_js_class_name(comps[i])] = &get_components(comps[i]);
+                arrays[get_js_class_name(comps[i])] = &get_components(Component(comps[i]));
             }
             return Zipper(arrays);
         }
@@ -200,7 +200,7 @@ namespace nfo {
 
             std::map<std::string, SparseArray<emscripten::val> *> arrays;
             for (int i = 0; i < comps["length"].as<unsigned int>(); i++) {
-                arrays[get_js_class_name(comps[i])] = &get_components(comps[i]);
+                arrays[get_js_class_name(comps[i])] = &get_components(Component(comps[i]));
             }
             return IndexedZipper(arrays);
         }

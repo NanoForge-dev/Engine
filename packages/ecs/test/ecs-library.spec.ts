@@ -4,6 +4,7 @@ import { EditableLibraryManager } from "@nanoforge/core/src/common/library/manag
 import { ECSLibrary } from "@nanoforge/ecs/src/ecs-library";
 
 class Position {
+  name: string = "Position";
   constructor(
     public x: number,
     public y: number,
