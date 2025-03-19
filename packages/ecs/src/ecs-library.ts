@@ -4,6 +4,8 @@ import { BaseComponentSystemLibrary, type InitContext } from "@nanoforge/common"
 import type { Entity, MainModule, Registry, SparseArray, Zipper } from "../lib";
 import { Module } from "../lib";
 
+type Component = { name: string; [key: string]: any };
+
 export class ECSLibrary extends BaseComponentSystemLibrary {
   private module: MainModule;
   private registry: Registry;
@@ -29,7 +31,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     return Promise.resolve();
   }
 
-  addComponent(entity: Entity, component: any): void {
+  addComponent(entity: Entity, component: Component): void {
     this.registry.addComponent(entity, component);
   }
 
@@ -37,19 +39,19 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     return this.registry.spawnEntity();
   }
 
-  getComponents(component: any): SparseArray {
+  getComponents(component: Component): SparseArray {
     return this.registry.getComponents(component);
   }
 
-  removeComponent(entity: Entity, component: any): void {
+  removeComponent(entity: Entity, component: Component): void {
     this.registry.removeComponent(entity, component);
   }
 
-  getEntityComponent(entity: Entity, component: any): any | undefined {
+  getEntityComponent(entity: Entity, component: Component): any | undefined {
     return this.registry.getEntityComponent(entity, component);
   }
 
-  getEntityComponentConst(entity: Entity, component: any): any | undefined {
+  getEntityComponentConst(entity: Entity, component: Component): any | undefined {
     return this.registry.getEntityComponentConst(entity, component);
   }
 
@@ -89,11 +91,11 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     this.registry.addSystem(system);
   }
 
-  getZipper(types: [any]): Zipper {
+  getZipper(types: [Component]): Zipper {
     return this.registry.getZipper(types);
   }
 
-  getIndexedZipper(types: [any]): Zipper {
+  getIndexedZipper(types: [Component]): Zipper {
     return this.registry.getIndexedZipper(types);
   }
 }

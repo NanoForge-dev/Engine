@@ -77,21 +77,21 @@ export interface IndexedZipper extends ClassHandle {
 }
 
 export interface Registry extends ClassHandle {
+  registerComponent(_0: {name: string, [key: string]: any}): SparseArray;
+  getComponentsConst(_0: {name: string, [key: string]: any}): SparseArray;
+  getComponents(_0: {name: string, [key: string]: any}): SparseArray;
   spawnEntity(): Entity;
   killEntity(_0: Entity): void;
   clearEntities(): void;
+  removeComponent(_0: Entity, _1: {name: string, [key: string]: any}): void;
   runSystems(): void;
   clearSystems(): void;
   entityFromIndex(_0: number): Entity;
   removeSystem(_0: number): void;
   maxEntities(): number;
-  registerComponent(_0: any): SparseArray;
-  getComponentsConst(_0: any): SparseArray;
-  getComponents(_0: any): SparseArray;
-  getEntityComponentConst(_0: Entity, _1: any): any | undefined;
-  getEntityComponent(_0: Entity, _1: any): any | undefined;
-  addComponent(_0: Entity, _1: any): any | undefined;
-  removeComponent(_0: Entity, _1: any): void;
+  getEntityComponentConst(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
+  getEntityComponent(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
+  addComponent(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
   addSystem(_0: any): void;
   getZipper(_0: any): Zipper;
   getIndexedZipper(_0: any): IndexedZipper;
