@@ -11,5 +11,6 @@ export const main = async (options: IRunOptions) => {
   app.useAssetManager(new AssetManagerLibrary());
   app.useComponentSystem(new ECSLibrary());
 
-  app.run(options);
+  await app.init(options);
+  app.run();
 };

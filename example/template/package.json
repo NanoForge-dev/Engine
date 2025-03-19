@@ -33,13 +33,6 @@
     "taze": "taze major -w",
     "lint-staged": "lint-staged"
   },
-  "dependencies": {
-    "@nanoforge/common": "@nanoforge/common",
-    "@nanoforge/core": "@nanoforge/core",
-    "@nanoforge/asset-manager": "@nanoforge/asset-manager",
-    "@nanoforge/ecs": "@nanoforge/ecs",
-    "@nanoforge/graphics-2d": "@nanoforge/graphics-2d"
-  },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
@@ -54,6 +47,13 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "@nanoforge/common": "latest",
+    "@nanoforge/core": "latest",
+    "@nanoforge/asset-manager": "latest",
+    "@nanoforge/ecs": "latest",
+    "@nanoforge/graphics-2d": "latest"
   },
   "engines": {
     "node": "23.6.0",
