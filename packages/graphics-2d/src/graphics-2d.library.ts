@@ -21,6 +21,7 @@ export class Graphics2DLibrary extends BaseGraphicsLibrary {
       throw new Error("Can't initialize the canvas context");
     }
     this._core = new GraphicsCore(context);
+    await this._core.init();
     this._factory = new GraphicsFactory(this._core);
   }
 
