@@ -20,7 +20,7 @@ export class Core {
   }
 
   public async init(options: IRunOptions): Promise<void> {
-    this.runInit(this.getInitContext(options));
+    await this.runInit(this.getInitContext(options));
   }
 
   public async run(): Promise<void> {
@@ -44,21 +44,21 @@ export class Core {
     return new ClearContext(this.context, this.config.libraryManager);
   }
 
-  private runInit(context: InitContext) {
+  private async runInit(context: InitContext): Promise<void> {
     for (const handle of this.config.libraryManager.getLibraries()) {
-      handle.library.init(context);
+      if (handle) await handle.library.init(context);
     }
   }
 
   private async runExecute(context: ExecutionContext, libraries: LibraryHandle<IRunnerLibrary>[]) {
     for (const handle of libraries) {
-      await handle.library.run(context);
+      if (handle) await handle.library.run(context);
     }
   }
 
   private runClear(context: ClearContext) {
     for (const handle of this.config.libraryManager.getLibraries()) {
-      handle.library.clear(context);
+      if (handle) handle.library.clear(context);
     }
   }
 }
