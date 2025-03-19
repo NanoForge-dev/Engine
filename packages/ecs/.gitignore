@@ -267,6 +267,8 @@ src/**/*.js
 src/**/*.d.ts
 
 # pubilc directory
-public/
+lib/libecs.wasm
+lib/index.d.ts
+lib/index.js
 compile_commands.json
 emsdk/

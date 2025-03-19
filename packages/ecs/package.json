@@ -34,7 +34,7 @@
     "fix": "eslint . --fix && prettier --write .",
     "taze": "taze major -w",
     "lint-staged": "lint-staged",
-    "test:unit": "make fclean && make tests -j 16 && jest --config ./jest.config.json"
+    "test:unit": "make fclean && make tests -j 16 && pnpm clean:script && pnpm build:script && jest --config ./jest.config.json"
   },
   "dependencies": {
     "@nanoforge/common": "workspace:^"

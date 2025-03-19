@@ -20,6 +20,7 @@ namespace nfo {
     EMSCRIPTEN_BINDINGS(Zipper)
     {
         emscripten::register_map<std::string, SparseArray<emscripten::val> *>("MapStringSparseArray");
+        emscripten::register_vector<std::string>("VectorString");
 
         emscripten::class_<Zipper>("Zipper")
             .constructor<const std::map<std::string, SparseArray<emscripten::val> *> &>()

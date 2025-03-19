@@ -1,4 +1,4 @@
-import Module from "../../public/libecs";
+import Module from "../../lib/libecs.js";
 
 class Velocity {
   x: number;
@@ -178,6 +178,7 @@ describe("Registry", () => {
       r.addComponent(e, entityComp);
       fail();
     } catch (e) {
+      //@ts-ignore
       expect(m.getExceptionMessage(e)[1].toString()).toBeDefined();
     }
   });

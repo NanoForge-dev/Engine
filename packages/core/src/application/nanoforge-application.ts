@@ -1,11 +1,11 @@
 import {
+  ApplicationContext,
   type IAssetManagerLibrary,
   type IComponentSystemLibrary,
   type ILibrary,
   type INetworkLibrary,
   type IRunOptions,
 } from "@nanoforge/common";
-import { ApplicationContext } from "@nanoforge/common/src/context/contexts/application.context";
 
 import { Core } from "../core/core";
 import { ApplicationConfig } from "./application-config";
