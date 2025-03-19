@@ -1,6 +1,7 @@
 import Module from "../../lib/libecs.js";
 
 class Velocity {
+  name: string = "Velocity";
   x: number;
   y: number;
 
@@ -11,6 +12,7 @@ class Velocity {
 }
 
 class Position {
+  name: string = "Position";
   x: number;
   y: number;
 
