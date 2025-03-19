@@ -42,19 +42,22 @@ export class NfgCircle extends NfgShape {
     this._color = options?.color ?? { r: 0, g: 0, b: 0, a: 1 };
   }
 
-  public setPosition(pos: IVertex2D): void {
+  public setPosition(pos: IVertex2D): NfgCircle {
     this._pos = pos;
     this._updateVertices();
+    return this;
   }
 
-  public setRadius(radius: number): void {
+  public setRadius(radius: number): NfgCircle {
     this._radius = radius;
     this._updateVertices();
+    return this;
   }
 
-  public setColor(color: IColor): void {
+  public setColor(color: IColor): NfgCircle {
     this._color = color;
     this._updateVertices();
+    return this;
   }
 
   protected async _init(): Promise<void> {
