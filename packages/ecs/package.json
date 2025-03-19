@@ -24,7 +24,7 @@
   "scripts": {
     "build": "pnpm build:wasm && pnpm build:script",
     "build:script": "tsc -b .",
-    "build:wasm": "make",
+    "build:wasm": "make re",
     "clean": "pnpm clean:wasm && pnpm clean:script",
     "clean:script": "pnpm clean:types && pnpm clean:scripts && rm -f tsconfig.build.tsbuildinfo",
     "clean:wasm": "make fclean",
