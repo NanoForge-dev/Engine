@@ -18,11 +18,10 @@
     "baseUrl": ".",
     "paths": {
       "@nanoforge/common": ["./packages/common"],
-      "@nanoforge/common/*": ["./packages/common/*"],
       "@nanoforge/core": ["./packages/core"],
-      "@nanoforge/core/*": ["./packages/core/*"],
+      "@nanoforge/asset-manager": ["./packages/asset-manager"],
       "@nanoforge/ecs": ["./packages/ecs"],
-      "@nanoforge/ecs/*": ["./packages/ecs/*"],
+      "@nanoforge/graphics-2d": ["./packages/graphics-2d"]
     }
   },
   "include": ["packages/**/*", "integration/**/*"],
