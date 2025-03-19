@@ -12,6 +12,7 @@ import { ApplicationConfig } from "./application-config";
 
 export abstract class NanoforgeApplication {
   protected applicationConfig: ApplicationConfig;
+  private _core: Core;
 
   constructor() {
     this.applicationConfig = new ApplicationConfig();
@@ -33,9 +34,13 @@ export abstract class NanoforgeApplication {
     this.applicationConfig.useAssetManagerLibrary(library);
   }
 
-  public run(options: IRunOptions) {
-    const core = new Core(this.applicationConfig, new ApplicationContext());
-    core.run(options).then(() => {
+  public async init(options: IRunOptions): Promise<void> {
+    this._core = new Core(this.applicationConfig, new ApplicationContext());
+    await this._core.init(options);
+  }
+
+  public run() {
+    this._core.run().then(() => {
       console.info("Game ended successfully.");
     });
   }

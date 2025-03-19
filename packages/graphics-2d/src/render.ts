@@ -1,5 +1,6 @@
 import { type InitContext } from "@nanoforge/common";
 
+import { type NfgComponent } from "./components/component";
 import { type GraphicsCore } from "./core";
 
 export class GraphicsRender {
@@ -27,11 +28,44 @@ export class GraphicsRender {
     });
   }
 
-  get canvasContext(): GPUCanvasContext {
-    return this._canvasContext;
+  get canvas(): HTMLCanvasElement {
+    return this._canvas;
   }
 
   get canvasFormat(): GPUTextureFormat {
     return this._canvasFormat;
+  }
+
+  render(components: NfgComponent[]): void {
+    const [encoder, pass] = this._beginRender();
+    this._renderComponents(pass, components);
+    this._endRender(encoder);
+  }
+
+  private _beginRender(): [GPUCommandEncoder, GPURenderPassEncoder] {
+    const encoder = this._core.device.createCommandEncoder();
+
+    const pass = encoder.beginRenderPass({
+      colorAttachments: [
+        {
+          view: this._canvasContext.getCurrentTexture().createView(),
+          loadOp: "clear",
+          clearValue: { r: 0, g: 0, b: 0.4, a: 1.0 },
+          storeOp: "store",
+        },
+      ],
+    });
+
+    return [encoder, pass];
+  }
+
+  private _renderComponents(pass: GPURenderPassEncoder, components: NfgComponent[]): void {
+    for (const component of components) {
+      component.draw(pass);
+    }
+  }
+
+  private _endRender(encoder: GPUCommandEncoder): void {
+    this._core.device.queue.submit([encoder.finish()]);
   }
 }
