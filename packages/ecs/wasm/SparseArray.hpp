@@ -17,7 +17,6 @@
 #include <optional>
 #include <ranges>
 #include <utility>
-#include <__ostream/basic_ostream.h>
 
 namespace nfo {
     template <typename Component>

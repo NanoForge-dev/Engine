@@ -1,4 +1,4 @@
-import Module from "../../public/libecs";
+import Module from "../../lib/libecs.js";
 
 class Velocity {
   x: number;
@@ -76,7 +76,7 @@ describe("Zipper", () => {
     expect(r).toBeDefined();
 
     for (let i = 0; i < 20; i++) {
-      const e = r.spawnEntity(i);
+      const e = r.spawnEntity();
       if (i % 5 === 0) {
         r.addComponent(e, new Velocity(0, i));
       }
@@ -106,7 +106,7 @@ describe("Zipper", () => {
     expect(r).toBeDefined();
 
     for (let i = 0; i < 20; i++) {
-      const e = r.spawnEntity(i);
+      const e = r.spawnEntity();
       if (i % 5 === 0) {
         r.addComponent(e, new Velocity(0, i));
       }
