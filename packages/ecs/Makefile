@@ -7,7 +7,7 @@ SRC = wasm/SparseArray.cpp\
 
 NAME := libecs
 
-OUT_DIR = public
+OUT_DIR = lib
 JS_NAME = $(OUT_DIR)/$(NAME).js
 HTML_NAME = $(OUT_DIR)/$(NAME).html
 WASM_NAME = $(OUT_DIR)/$(NAME).wasm
@@ -23,7 +23,7 @@ OBJ = $(SRC:.cpp=.o)
 %.o: %.cpp
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-all: $(WASM_NAME)
+all: $(TS_NAME)
 
 js: $(JS_NAME)
 

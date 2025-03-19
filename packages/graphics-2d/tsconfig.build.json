@@ -6,9 +6,7 @@
     "rootDir": ".",
     "paths": {
       "@nanoforge/common": ["../common"],
-      "@nanoforge/common/*": ["../common/*"],
-      "@nanoforge/asset-manager": ["../asset-manager"],
-      "@nanoforge/asset-manager/*": ["../asset-manager/*"]
+      "@nanoforge/asset-manager": ["../asset-manager"]
     }
   },
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],

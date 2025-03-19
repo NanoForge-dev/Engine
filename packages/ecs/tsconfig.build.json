@@ -4,14 +4,18 @@
     "outDir": ".",
     "rootDir": ".",
     "paths": {
+      "@lib": ["lib"],
       "@nanoforge/common": ["../common"],
-      "@nanoforge/common/*": ["../common/*"]
+      "@nanoforge/asset-manager": ["../asset-manager"]
     }
   },
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts"],
   "references": [
     {
       "path": "../common/tsconfig.build.json"
+    },
+    {
+      "path": "../asset-manager/tsconfig.build.json"
     }
   ]
 }
