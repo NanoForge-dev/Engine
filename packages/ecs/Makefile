@@ -1,6 +1,8 @@
 SRC = wasm/SparseArray.cpp\
 	wasm/Entity.cpp\
 	wasm/Utils.cpp\
+	wasm/Zipper.cpp\
+	wasm/IndexedZipper.cpp\
 	wasm/Registry.cpp
 
 NAME := libecs
@@ -12,7 +14,7 @@ WASM_NAME = $(OUT_DIR)/$(NAME).wasm
 TS_NAME = $(NAME).d.ts
 
 CFLAGS = -std=c++20
-LDFLAGS = -O3 --no-entry --bind
+LDFLAGS = -O3 --no-entry --bind -sNO_DISABLE_EXCEPTION_CATCHING -sEXPORT_EXCEPTION_HANDLING_HELPERS
 
 CC = em++
 
