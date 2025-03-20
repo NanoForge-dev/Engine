@@ -25,6 +25,7 @@ export class GraphicsRender {
     this._canvasContext.configure({
       device: this._core.device,
       format: this._canvasFormat,
+      alphaMode: "premultiplied",
     });
   }
 
@@ -39,10 +40,11 @@ export class GraphicsRender {
   render(components: NfgComponent[]): void {
     const [encoder, pass] = this._beginRender();
     this._renderComponents(pass, components);
-    this._endRender(encoder);
+    this._endRender(pass, encoder);
   }
 
   private _beginRender(): [GPUCommandEncoder, GPURenderPassEncoder] {
+    console.log(1);
     const encoder = this._core.device.createCommandEncoder();
 
     const pass = encoder.beginRenderPass({
@@ -65,7 +67,13 @@ export class GraphicsRender {
     }
   }
 
-  private _endRender(encoder: GPUCommandEncoder): void {
+  private _endRender(pass: GPURenderPassEncoder, encoder: GPUCommandEncoder): void {
+    pass.end();
+    console.log(pass);
     this._core.device.queue.submit([encoder.finish()]);
+    this._core.device.queue.onSubmittedWorkDone().then(() => {
+      console.log("Done");
+    });
+    console.log(this._core.device.queue);
   }
 }

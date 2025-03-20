@@ -5,8 +5,8 @@ var<private> VERTICES: array<vec2<f32>, 3> = array<vec2<f32>, 3>(
 );
 
 struct View {
-    position: vec2<f32>,
-    scale: f32,
+    position: vec4<f32>,
+    scale: vec2<f32>,
     size: vec2<f32>,
 };
 
@@ -46,24 +46,24 @@ fn vertex_main(
 
     var position = instance.position;
     var radius = instance.radius;
-    if radius * y < 1.414214 * view.scale {
-        let a = (position - view.position) / view.scale;
+    if radius * y < 1.414214 * view.scale.x {
+        let a = (position - view.position.xy) / view.scale.x;
         let b = (floor(a * y) + 0.5) / y;
-        let c = b * view.scale + view.position;
+        let c = b * view.scale.x + view.position.xy;
         position = c;
-        radius = 1.414214 * view.scale / y;
+        radius = 1.414214 * view.scale.x / y;
     }
 
     let world_space = local_space * radius + position;
 
-    let view_space = (world_space - view.position) / view.scale;
+    let view_space = (world_space - view.position.xy) / view.scale.x;
 
     let clip_space = vec4<f32>(view_space.x * aspect, view_space.y, 0.0, 1.0);
 
     out.clip_space  = clip_space;
     out.local_space = local_space;
     out.color       = vec4(pow(instance.color.rgb, vec3(2.2)), instance.color.a);
-    out.pixel_size  = view.scale / (radius * y);
+    out.pixel_size  = view.scale.x / (radius * y);
     return out;
 }
 
@@ -72,15 +72,3 @@ fn fragment_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let alpha = 1.0 - smoothstep(1.0 - 3.0 * in.pixel_size, 1.0, length(in.local_space));
     return vec4<f32>(in.color.rgb, in.color.a * alpha);
 }
-
-// @fragment
-// fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-//     let alpha = 1.0 - smoothstep(1.0 - 3.0 * in.pixel_size, 1.0, length(in.local_space));
-//     let ambient = vec3<f32>(0.2, 0.5, 1.0);
-//     let ambient_strength = 0.02;
-//     let light_dir = vec3<f32>(1.0, 1.0, 2.0) / sqrt(6.0);
-//     let x = in.local_space.x; let y = in.local_space.y;
-//     let normal = vec3<f32>(x, y, sqrt(1.0 - x*x - y*y));
-//     let brightness = (0.5 + max(dot(light_dir, normal), -0.5)) / 1.5;
-//     return vec4<f32>(ambient * ambient_strength + in.color.rgb * ((1.0 - ambient_strength) * brightness * brightness * brightness), in.color.a * alpha);
-// }
