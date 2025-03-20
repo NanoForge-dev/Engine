@@ -1,4 +1,5 @@
 import type { NfgCircle } from "@nanoforge/graphics-2d";
+import { type NfgRectangle } from "@nanoforge/graphics-2d/src/components/shape/shapes/rectangle.shape";
 
 export class Velocity {
   name = "Velocity";
@@ -27,6 +28,15 @@ export class CircleComponent {
   component: NfgCircle;
 
   constructor(component: NfgCircle) {
+    this.component = component;
+  }
+}
+
+export class RectangleComponent {
+  name = "RectangleComponent";
+  component: NfgRectangle;
+
+  constructor(component: NfgRectangle) {
     this.component = component;
   }
 }
