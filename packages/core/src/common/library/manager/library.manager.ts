@@ -6,7 +6,9 @@ import {
   type IAssetManagerLibrary,
   type IComponentSystemLibrary,
   type IGraphicsLibrary,
+  type IInputLibrary,
   type ILibrary,
+  INPUT_LIBRARY,
   type INetworkLibrary,
   type IRunnerLibrary,
   type LibraryHandle,
@@ -50,6 +52,10 @@ export class EditableLibraryManager extends LibraryManager {
 
   public setNetwork(library: INetworkLibrary): void {
     this._set(DefaultLibrariesEnum.NETWORK, NETWORK_LIBRARY, library, new EditableLibraryContext());
+  }
+
+  public setInput(library: IInputLibrary): void {
+    this._set(DefaultLibrariesEnum.INPUT, INPUT_LIBRARY, library, new EditableLibraryContext());
   }
 
   public getLibraries(): LibraryHandle<ILibrary>[] {
