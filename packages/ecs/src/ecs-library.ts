@@ -1,10 +1,11 @@
 import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
 import { BaseComponentSystemLibrary, type InitContext } from "@nanoforge/common";
 
-import type { Entity, MainModule, Registry, SparseArray, Zipper } from "../lib";
+import type { Entity, IndexedZipper, MainModule, Registry, SparseArray, Zipper } from "../lib";
 import { Module } from "../lib";
 
-type Component = { name: string; [key: string]: any };
+export type Component = { name: string; [key: string]: any };
+export type System = (registry: Registry) => void;
 
 export class ECSLibrary extends BaseComponentSystemLibrary {
   private module: MainModule;
@@ -87,7 +88,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     return this.registry.maxEntities();
   }
 
-  addSystem(system: any): void {
+  addSystem(system: System): void {
     this.registry.addSystem(system);
   }
 
@@ -95,7 +96,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     return this.registry.getZipper(types);
   }
 
-  getIndexedZipper(types: [Component]): Zipper {
+  getIndexedZipper(types: [Component]): IndexedZipper {
     return this.registry.getIndexedZipper(types);
   }
 }

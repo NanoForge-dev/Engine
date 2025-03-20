@@ -18,9 +18,12 @@
 #include "Registry.hpp"
 
 namespace nfo {
+    EMSCRIPTEN_DECLARE_VAL_TYPE(System);
+
     EMSCRIPTEN_BINDINGS(Registry)
     {
         emscripten::register_type<Component>("{name: string, [key: string]: any}");
+        emscripten::register_type<System>("(registry: Registry) => void");
 
         emscripten::class_<Registry>("Registry")
             .constructor()
@@ -47,7 +50,7 @@ namespace nfo {
                 emscripten::select_overload<SparseArray<emscripten::val>::reference_type &(const Entity &, Component &&), Registry>(&Registry::add_component)
             )
             .function("removeComponent", emscripten::select_overload<void(const Entity &, Component &&), Registry>(&Registry::remove_component))
-            .function("addSystem", emscripten::select_overload<void(emscripten::val &&), Registry>(&Registry::add_system))
+            .function("addSystem", emscripten::select_overload<void(System &&), Registry>(&Registry::add_system))
             .function("runSystems", &Registry::run_systems)
             .function("removeSystem", &Registry::remove_system)
             .function("clearSystems", &Registry::clear_systems)
