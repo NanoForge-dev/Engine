@@ -1,6 +1,6 @@
 import { type InitContext } from "@nanoforge/common";
 
-import { type NfgComponent } from "./components/component";
+import { type NfgComponent } from "./components";
 import { type GraphicsCore } from "./core";
 
 export class GraphicsRender {
@@ -44,7 +44,6 @@ export class GraphicsRender {
   }
 
   private _beginRender(): [GPUCommandEncoder, GPURenderPassEncoder] {
-    console.log(1);
     const encoder = this._core.device.createCommandEncoder();
 
     const pass = encoder.beginRenderPass({
@@ -69,11 +68,6 @@ export class GraphicsRender {
 
   private _endRender(pass: GPURenderPassEncoder, encoder: GPUCommandEncoder): void {
     pass.end();
-    console.log(pass);
     this._core.device.queue.submit([encoder.finish()]);
-    this._core.device.queue.onSubmittedWorkDone().then(() => {
-      console.log("Done");
-    });
-    console.log(this._core.device.queue);
   }
 }
