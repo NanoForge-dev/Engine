@@ -1,6 +1,7 @@
 import Module from "../../lib/libecs.js";
 
 class Velocity {
+  name: string = "Velocity";
   x: number;
   y: number;
 
@@ -11,6 +12,7 @@ class Velocity {
 }
 
 class Position {
+  name: string = "Position";
   x: number;
   y: number;
 
@@ -21,16 +23,6 @@ class Position {
 }
 
 describe("Zipper", () => {
-  test("basic instantation", async () => {
-    const m = await Module();
-    const v = new m.MapStringSparseArray();
-
-    const zip = new m.Zipper(v);
-
-    expect(zip).toBeDefined();
-    expect(zip.getValue()).toBeUndefined();
-  });
-
   test("single simple sparse array instantation", async () => {
     const m = await Module();
     const r = new m.Registry();
@@ -42,12 +34,15 @@ describe("Zipper", () => {
     }
 
     const zip = r.getZipper([Velocity]);
-    expect(zip).toBeDefined();
 
-    for (let i = 0; i < 5; i++, zip.next()) {
-      expect(zip.getValue()).toStrictEqual({ Velocity: new Velocity(i, i) });
-    }
-    expect(zip.getValue()).toBeUndefined();
+    expect(zip).toBeDefined();
+    expect(zip).toStrictEqual([
+      { Velocity: new Velocity(0, 0) },
+      { Velocity: new Velocity(1, 1) },
+      { Velocity: new Velocity(2, 2) },
+      { Velocity: new Velocity(3, 3) },
+      { Velocity: new Velocity(4, 4) },
+    ]);
   });
 
   test("single complex sparse array instantation", async () => {
@@ -63,11 +58,11 @@ describe("Zipper", () => {
     const zip = r.getZipper([Velocity]);
     expect(zip).toBeDefined();
 
-    for (let i = 0; i < 5; i++) {
-      expect(zip.getValue()).toStrictEqual({ Velocity: new Velocity(i, i) });
-      zip.next();
-    }
-    expect(zip.getValue()).toBeUndefined();
+    expect(zip[0]).toStrictEqual({ Velocity: new Velocity(0, 0) });
+    expect(zip[5]).toStrictEqual({ Velocity: new Velocity(1, 1) });
+    expect(zip[10]).toStrictEqual({ Velocity: new Velocity(2, 2) });
+    expect(zip[15]).toStrictEqual({ Velocity: new Velocity(3, 3) });
+    expect(zip[20]).toStrictEqual({ Velocity: new Velocity(4, 4) });
   });
 
   test("multiple complex sparse array instantation", async () => {
@@ -77,12 +72,8 @@ describe("Zipper", () => {
 
     for (let i = 0; i < 20; i++) {
       const e = r.spawnEntity();
-      if (i % 5 === 0) {
-        r.addComponent(e, new Velocity(0, i));
-      }
-      if (i % 3 === 0) {
-        r.addComponent(e, new Position(i, 0));
-      }
+      if (i % 5 === 0) r.addComponent(e, new Velocity(0, i));
+      if (i % 3 === 0) r.addComponent(e, new Position(i, 0));
     }
 
     const zip = r.getZipper([Velocity, Position]);
@@ -90,17 +81,15 @@ describe("Zipper", () => {
 
     for (let i = 0; i < 20; i++) {
       if (i % 3 === 0 && i % 5 === 0) {
-        expect(zip.getValue()).toStrictEqual({
+        expect(zip[i]).toStrictEqual({
           Velocity: new Velocity(0, i),
           Position: new Position(i, 0),
         });
-        zip.next();
       }
     }
-    expect(zip.getValue()).toBeUndefined();
   });
 
-  test("simple zipper modification", async () => {
+  test("simple indexed zipper modification", async () => {
     const m = await Module();
     const r = new m.Registry();
     expect(r).toBeDefined();
@@ -117,21 +106,18 @@ describe("Zipper", () => {
 
     for (let i = 0; i < 20; i++) {
       if (i % 5 === 0) {
-        const vel = zip.getValue()["Velocity"];
+        const vel = zip[i]["Velocity"];
         vel.y *= 2;
-        zip.next();
       }
     }
 
     zip = r.getZipper([Velocity]);
     for (let i = 0; i < 20; i++) {
       if (i % 5 === 0) {
-        expect(zip.getValue()).toStrictEqual({
+        expect(zip[i]).toStrictEqual({
           Velocity: new Velocity(0, i * 2),
         });
-        zip.next();
       }
     }
-    expect(zip.getValue()).toBeUndefined();
   });
 });

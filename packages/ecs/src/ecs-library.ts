@@ -1,8 +1,11 @@
 import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
 import { BaseComponentSystemLibrary, type InitContext } from "@nanoforge/common";
 
-import type { Entity, MainModule, Registry, SparseArray, Zipper } from "../lib";
+import type { Entity, MainModule, Registry, SparseArray } from "../lib";
 import { Module } from "../lib";
+
+export type Component = { name: string; [key: string]: any };
+export type System = (registry: Registry) => void;
 
 export class ECSLibrary extends BaseComponentSystemLibrary {
   private module: MainModule;
@@ -29,7 +32,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     return Promise.resolve();
   }
 
-  addComponent(entity: Entity, component: any): void {
+  addComponent(entity: Entity, component: Component): void {
     this.registry.addComponent(entity, component);
   }
 
@@ -37,19 +40,19 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     return this.registry.spawnEntity();
   }
 
-  getComponents(component: any): SparseArray {
+  getComponents(component: Component): SparseArray {
     return this.registry.getComponents(component);
   }
 
-  removeComponent(entity: Entity, component: any): void {
+  removeComponent(entity: Entity, component: Component): void {
     this.registry.removeComponent(entity, component);
   }
 
-  getEntityComponent(entity: Entity, component: any): any | undefined {
+  getEntityComponent(entity: Entity, component: Component): Component | undefined {
     return this.registry.getEntityComponent(entity, component);
   }
 
-  getEntityComponentConst(entity: Entity, component: any): any | undefined {
+  getEntityComponentConst(entity: Entity, component: Component): Component | undefined {
     return this.registry.getEntityComponentConst(entity, component);
   }
 
@@ -85,15 +88,11 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     return this.registry.maxEntities();
   }
 
-  addSystem(system: any): void {
+  addSystem(system: System): void {
     this.registry.addSystem(system);
   }
 
-  getZipper(types: [any]): Zipper {
+  getZipper(types: [Component]): [any] {
     return this.registry.getZipper(types);
-  }
-
-  getIndexedZipper(types: [any]): Zipper {
-    return this.registry.getIndexedZipper(types);
   }
 }

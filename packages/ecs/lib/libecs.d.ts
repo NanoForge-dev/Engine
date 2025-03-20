@@ -15,7 +15,6 @@ declare namespace RuntimeExports {
 interface WasmModule {
 }
 
-type EmbindString = ArrayBuffer|Uint8Array|Uint8ClampedArray|Int8Array|string;
 export interface ClassHandle {
   isAliasOf(other: ClassHandle): boolean;
   delete(): void;
@@ -51,50 +50,24 @@ export interface Entity extends ClassHandle {
   getId(): number;
 }
 
-export interface MapStringSparseArray extends ClassHandle {
-  keys(): VectorString;
-  size(): number;
-  get(_0: EmbindString): SparseArray | undefined;
-  set(_0: EmbindString, _1: SparseArray | null): void;
-}
-
-export interface VectorString extends ClassHandle {
-  size(): number;
-  get(_0: number): EmbindString | undefined;
-  push_back(_0: EmbindString): void;
-  resize(_0: number, _1: EmbindString): void;
-  set(_0: number, _1: EmbindString): boolean;
-}
-
-export interface Zipper extends ClassHandle {
-  next(): any;
-  getValue(): any;
-}
-
-export interface IndexedZipper extends ClassHandle {
-  next(): any;
-  getValue(): any;
-}
-
 export interface Registry extends ClassHandle {
+  registerComponent(_0: {name: string, [key: string]: any}): SparseArray;
+  getComponentsConst(_0: {name: string, [key: string]: any}): SparseArray;
+  getComponents(_0: {name: string, [key: string]: any}): SparseArray;
   spawnEntity(): Entity;
   killEntity(_0: Entity): void;
   clearEntities(): void;
+  removeComponent(_0: Entity, _1: {name: string, [key: string]: any}): void;
+  addSystem(_0: (registry: Registry) => void): void;
   runSystems(): void;
   clearSystems(): void;
   entityFromIndex(_0: number): Entity;
   removeSystem(_0: number): void;
   maxEntities(): number;
-  registerComponent(_0: any): SparseArray;
-  getComponentsConst(_0: any): SparseArray;
-  getComponents(_0: any): SparseArray;
-  getEntityComponentConst(_0: Entity, _1: any): any | undefined;
-  getEntityComponent(_0: Entity, _1: any): any | undefined;
-  addComponent(_0: Entity, _1: any): any | undefined;
-  removeComponent(_0: Entity, _1: any): void;
-  addSystem(_0: any): void;
-  getZipper(_0: any): Zipper;
-  getIndexedZipper(_0: any): IndexedZipper;
+  getEntityComponentConst(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
+  getEntityComponent(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
+  addComponent(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
+  getZipper(_0: any): any;
 }
 
 interface EmbindModule {
@@ -106,18 +79,6 @@ interface EmbindModule {
   };
   Entity: {
     new(_0: number): Entity;
-  };
-  MapStringSparseArray: {
-    new(): MapStringSparseArray;
-  };
-  VectorString: {
-    new(): VectorString;
-  };
-  Zipper: {
-    new(_0: MapStringSparseArray): Zipper;
-  };
-  IndexedZipper: {
-    new(_0: MapStringSparseArray): IndexedZipper;
   };
   Registry: {
     new(): Registry;

@@ -1,8 +1,6 @@
 SRC = wasm/SparseArray.cpp\
 	wasm/Entity.cpp\
 	wasm/Utils.cpp\
-	wasm/Zipper.cpp\
-	wasm/IndexedZipper.cpp\
 	wasm/Registry.cpp
 
 NAME := libecs
