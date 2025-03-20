@@ -2,6 +2,7 @@ import {
   type IAssetManagerLibrary,
   type IComponentSystemLibrary,
   type IGraphicsLibrary,
+  type IInputLibrary,
   type ILibrary,
   type INetworkLibrary,
   type LibraryHandle,
@@ -58,5 +59,13 @@ export class ApplicationConfig {
 
   public useAssetManagerLibrary(library: IAssetManagerLibrary) {
     this._libraryManager.setAssetManager(library);
+  }
+
+  public getInputLibrary() {
+    return this._libraryManager.getInput();
+  }
+
+  public useInputLibrary(library: IInputLibrary) {
+    this._libraryManager.setInput(library);
   }
 }
