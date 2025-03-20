@@ -1,6 +1,6 @@
 import { ApplicationContext, InitContext, LibraryManager } from "@nanoforge/common";
 
-import { Graphics2DLibrary } from "../src";
+import { Graphics2DLibrary } from "../src/graphics-2d.library";
 
 describe("Graphics 2D Library", () => {
   const library = new Graphics2DLibrary();
