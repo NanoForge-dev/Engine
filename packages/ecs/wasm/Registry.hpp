@@ -21,10 +21,8 @@
 #include <unordered_map>
 
 #include "Entity.hpp"
-#include "IndexedZipper.hpp"
 #include "SparseArray.hpp"
 #include "Utils.hpp"
-#include "Zipper.hpp"
 
 namespace nfo {
     class Registry {
@@ -181,28 +179,34 @@ namespace nfo {
             return _next_entity;
         }
 
-        Zipper get_zipper(const emscripten::val &comps)
+        emscripten::val get_zipper(const emscripten::val &comps)
         {
             if (!comps.isArray())
-                throw std::runtime_error("get_zipper: comps is not an array");
+                throw std::runtime_error("getZipper: need an array of comps as parameter");
 
+            std::size_t max = SIZE_MAX;
             std::map<std::string, SparseArray<emscripten::val> *> arrays;
             for (int i = 0; i < comps["length"].as<unsigned int>(); i++) {
-                arrays[get_js_class_name(comps[i])] = &get_components(Component(comps[i]));
+                SparseArray<emscripten::val> &components = get_components(Component(comps[i]));
+                arrays[get_js_class_name(comps[i])] = &components;
+                max = (std::min)(components.size(), max);
             }
-            return Zipper(arrays);
-        }
 
-        IndexedZipper get_indexed_zipper(const emscripten::val &comps)
-        {
-            if (!comps.isArray())
-                throw std::runtime_error("get_zipper: comps is not an array");
-
-            std::map<std::string, SparseArray<emscripten::val> *> arrays;
-            for (int i = 0; i < comps["length"].as<unsigned int>(); i++) {
-                arrays[get_js_class_name(comps[i])] = &get_components(Component(comps[i]));
+            emscripten::val arr = emscripten::val::array();
+            for (std::size_t idx = 0; idx < max; idx++) {
+                emscripten::val obj = emscripten::val::object();
+                bool need_to_add = true;
+                for (const auto &[name, sparse_array] : arrays) {
+                    if (!(*sparse_array)[idx].has_value()) {
+                        need_to_add = false;
+                        break;
+                    }
+                    obj.set(name, (*sparse_array)[idx].value());
+                }
+                if (need_to_add)
+                    arr.set(idx, obj);
             }
-            return IndexedZipper(arrays);
+            return arr;
         }
 
       private:
