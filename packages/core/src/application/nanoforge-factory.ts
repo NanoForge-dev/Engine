@@ -1,13 +1,14 @@
+import { type IApplicationOptions } from "./application-options.type";
 import { NanoforgeClient } from "./nanoforge-client";
 import { NanoforgeServer } from "./nanoforge-server";
 
 class NanoforgeFactoryStatic {
-  createClient(): NanoforgeClient {
-    return new NanoforgeClient();
+  createClient(options?: Partial<IApplicationOptions>): NanoforgeClient {
+    return new NanoforgeClient(options);
   }
 
-  createServer(): NanoforgeServer {
-    return new NanoforgeServer();
+  createServer(options?: Partial<IApplicationOptions>): NanoforgeServer {
+    return new NanoforgeServer(options);
   }
 }
 
