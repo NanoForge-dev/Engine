@@ -5,6 +5,7 @@ import {
   type IAssetManagerLibrary,
   type IComponentSystemLibrary,
   type IGraphicsLibrary,
+  type IInputLibrary,
   type INetworkLibrary,
   NETWORK_LIBRARY,
 } from "../../libraries";
@@ -13,6 +14,7 @@ import { BaseLibraryManager } from "./base-library.manager";
 
 export enum DefaultLibrariesEnum {
   ASSET_MANAGER,
+  INPUT,
   COMPONENT_SYSTEM,
   NETWORK,
   GRAPHICS,
@@ -46,6 +48,10 @@ export class LibraryManager extends BaseLibraryManager {
 
   public getNetwork<T extends INetworkLibrary = INetworkLibrary>(): LibraryHandle<T> {
     return this._get<T>(DefaultLibrariesEnum.NETWORK);
+  }
+
+  public getInput<T extends IInputLibrary = IInputLibrary>(): LibraryHandle<T> {
+    return this._get<T>(DefaultLibrariesEnum.INPUT);
   }
 
   public getAssetManager<
