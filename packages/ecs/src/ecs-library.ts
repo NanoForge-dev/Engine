@@ -3,6 +3,7 @@ import { BaseComponentSystemLibrary, type InitContext } from "@nanoforge/common"
 
 import type { Entity, MainModule, Registry, SparseArray } from "../lib";
 import { Module } from "../lib";
+import { type ClassType } from "./types";
 
 export type Component = { name: string; [key: string]: any };
 export type System = (registry: Registry) => void;
@@ -92,7 +93,11 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     this.registry.addSystem(system);
   }
 
-  getZipper(types: [Component]): [any] {
-    return this.registry.getZipper(types);
+  getZipper<T extends Record<string, ClassType<unknown>>>(
+    types: T,
+  ): { [K in keyof T]: InstanceType<T[K]> }[] {
+    return this.registry.getZipper(Object.values(types)) as unknown as {
+      [K in keyof T]: InstanceType<T[K]>;
+    }[];
   }
 }
