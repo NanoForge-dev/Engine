@@ -1,5 +1,7 @@
+import { type IVertex2D } from "../../common";
 import { type IColorOption } from "../base/color.type";
-import { type IPositionOption } from "../base/position.type";
-import { type ISizeOption } from "../base/size.type";
 
-export interface IRectangleOptions extends IColorOption, IPositionOption, ISizeOption {}
+export interface IRectangleOptions extends IColorOption {
+  min: IVertex2D;
+  max: IVertex2D;
+}
