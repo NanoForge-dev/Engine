@@ -40,7 +40,7 @@ export abstract class NfgComponent {
 
   public async init(): Promise<typeof this> {
     await this._init();
-    this._updateUniforms();
+    this.updateUniforms();
     this._updatePipeline();
     return this;
   }
@@ -50,6 +50,27 @@ export abstract class NfgComponent {
     pass.setBindGroup(0, this._bindGroup);
     pass.setVertexBuffer(0, this._vertexBuffer);
     pass.draw(this._vertices.length / this._vertexLength, this._duplicate);
+  }
+
+  public updateUniforms(): void {
+    const uniformArray = new Float32Array([
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      this._core.initContext.canvas.width,
+      this._core.initContext.canvas.height,
+    ]);
+    console.log(this._core.initContext.canvas.width, this._core.initContext.canvas.height);
+    if (!this._uniformBuffer)
+      this._uniformBuffer = this._core.device.createBuffer({
+        label: "View Uniforms",
+        size: uniformArray.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
+    this._core.device.queue.writeBuffer(this._uniformBuffer, 0, uniformArray);
   }
 
   protected abstract _init(): Promise<void>;
@@ -94,25 +115,6 @@ export abstract class NfgComponent {
       },
     });
     this._updateBindGroup();
-  }
-
-  protected _updateUniforms(): void {
-    const uniformArray = new Float32Array([
-      0,
-      0,
-      0,
-      1,
-      1,
-      1,
-      this._core.initContext.canvas.width,
-      this._core.initContext.canvas.height,
-    ]);
-    this._uniformBuffer = this._core.device.createBuffer({
-      label: "View Uniforms",
-      size: uniformArray.byteLength,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, // Une uniform est une valeur constante pour le gpu
-    });
-    this._core.device.queue.writeBuffer(this._uniformBuffer, 0, uniformArray);
   }
 
   protected _updateBindGroup(): void {
