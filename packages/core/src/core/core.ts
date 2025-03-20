@@ -9,31 +9,42 @@ import {
 } from "@nanoforge/common";
 
 import { type ApplicationConfig } from "../application/application-config";
+import type { IApplicationOptions } from "../application/application-options.type";
 
 export class Core {
   private readonly config: ApplicationConfig;
   private readonly context: ApplicationContext;
+  private options: IApplicationOptions;
 
   constructor(config: ApplicationConfig, context: ApplicationContext) {
     this.config = config;
     this.context = context;
   }
 
-  public async init(options: IRunOptions): Promise<void> {
+  public async init(options: IRunOptions, appOptions: IApplicationOptions): Promise<void> {
+    this.options = appOptions;
     await this.runInit(this.getInitContext(options));
   }
 
   public async run(): Promise<void> {
     const context = this.getExecutionContext();
     const libraries = this.config.libraryManager.getRunnerLibraries();
+    let requestAnimationFrameHandle: number;
+
     const runner = async () => {
+      await this.runExecute(context, libraries);
+    };
+
+    const render = () => {
       if (!context.isRunning) {
+        clearInterval(intervalHandle);
         return;
       }
-      await this.runExecute(context, libraries);
-      requestAnimationFrame(runner);
+      cancelAnimationFrame(requestAnimationFrameHandle);
+      requestAnimationFrameHandle = requestAnimationFrame(runner);
     };
-    requestAnimationFrame(runner);
+
+    const intervalHandle = setInterval(render, 1000 / this.options.tickRate);
   }
 
   private getInitContext(options: IRunOptions): InitContext {
