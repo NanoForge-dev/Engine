@@ -14,6 +14,7 @@ export abstract class NfgComponent {
   private readonly _pipelineLayout: GPUPipelineLayout;
   private readonly _label: string;
   private _bindGroup: GPUBindGroup;
+  protected _duplicate: number = 1;
 
   constructor(core: GraphicsCore) {
     this._core = core;
@@ -48,7 +49,7 @@ export abstract class NfgComponent {
     pass.setPipeline(this._pipeline);
     pass.setBindGroup(0, this._bindGroup);
     pass.setVertexBuffer(0, this._vertexBuffer);
-    pass.draw(this._vertices.length / this._vertexLength);
+    pass.draw(this._vertices.length / this._vertexLength, this._duplicate);
   }
 
   protected abstract _init(): Promise<void>;
