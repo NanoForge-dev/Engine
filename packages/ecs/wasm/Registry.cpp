@@ -55,7 +55,6 @@ namespace nfo {
             .function("removeSystem", &Registry::remove_system)
             .function("clearSystems", &Registry::clear_systems)
             .function("getZipper", &Registry::get_zipper)
-            .function("getIndexedZipper", &Registry::get_indexed_zipper)
             .function("maxEntities", &Registry::max_entities);
     }
 } // namespace nfo
