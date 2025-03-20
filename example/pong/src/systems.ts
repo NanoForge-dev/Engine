@@ -1,4 +1,4 @@
-import { Bounce, CircleComponent, Position, Velocity } from "./components";
+import { Bounce, CircleComponent, Position, RectangleComponent, Velocity } from "./components";
 import { ecsLibrary, graphics } from "./index";
 
 let lastFrame = 0;
@@ -15,19 +15,17 @@ export function move() {
 export function bounce() {
   const entities = ecsLibrary.getZipper([Position, Bounce, Velocity]);
 
-  //const window = graphics.getWindow();
-
   entities.forEach((entity) => {
-    if (entity.Position.x >= 1 || entity.Position.x <= 0) {
+    if (entity.Position.x >= 1.6 || entity.Position.x <= -1.6) {
       entity.Velocity.x = -entity.Velocity.x;
     }
-    if (entity.Position.y >= 1 || entity.Position.y <= 0) {
+    if (entity.Position.y >= 1 || entity.Position.y <= -1) {
       entity.Velocity.y = -entity.Velocity.y;
     }
   });
 }
 
-export function draw() {
+export function drawCircle() {
   const entities = ecsLibrary.getZipper([CircleComponent, Position]);
 
   entities.forEach((entity) => {
@@ -35,6 +33,14 @@ export function draw() {
     console.log(entity.CircleComponent);
     entity.CircleComponent.component.setPosition(pos);
     graphics.getWindow().draw(entity.CircleComponent.component);
+  });
+}
+
+export function drawRectangle() {
+  const entities = ecsLibrary.getZipper([RectangleComponent]);
+
+  entities.forEach((entity) => {
+    graphics.getWindow().draw(entity.RectangleComponent.component);
   });
 }
 
