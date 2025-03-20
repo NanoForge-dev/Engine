@@ -48,11 +48,11 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     this.registry.removeComponent(entity, component);
   }
 
-  getEntityComponent(entity: Entity, component: Component): any | undefined {
+  getEntityComponent(entity: Entity, component: Component): Component | undefined {
     return this.registry.getEntityComponent(entity, component);
   }
 
-  getEntityComponentConst(entity: Entity, component: Component): any | undefined {
+  getEntityComponentConst(entity: Entity, component: Component): Component | undefined {
     return this.registry.getEntityComponentConst(entity, component);
   }
 
