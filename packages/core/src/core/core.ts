@@ -26,14 +26,14 @@ export class Core {
   public async run(): Promise<void> {
     const context = this.getExecutionContext();
     const libraries = this.config.libraryManager.getRunnerLibraries();
-    const interval = setInterval(async () => {
+    const runner = async () => {
       if (!context.isRunning) {
-        clearInterval(interval);
-        this.runClear(this.getClearContext());
         return;
       }
       await this.runExecute(context, libraries);
-    }, 200);
+      requestAnimationFrame(runner);
+    };
+    requestAnimationFrame(runner);
   }
 
   private getInitContext(options: IRunOptions): InitContext {
