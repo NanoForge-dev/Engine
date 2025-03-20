@@ -1,4 +1,4 @@
-import { NfgCircle } from "./components/shape/shapes/circle.shape";
+import { NfgCircle } from "./components";
 import { type GraphicsCore } from "./core";
 import { type ICircleOptions } from "./types";
 
@@ -9,7 +9,7 @@ export class GraphicsFactory {
     this._core = core;
   }
 
-  createCircle(options?: Partial<ICircleOptions>): NfgCircle {
-    return new NfgCircle(this._core, options);
+  createCircle(options?: Partial<ICircleOptions>): Promise<NfgCircle> {
+    return new NfgCircle(this._core, options).init();
   }
 }

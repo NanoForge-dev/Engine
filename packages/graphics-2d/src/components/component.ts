@@ -25,7 +25,7 @@ export abstract class NfgComponent {
       entries: [
         {
           binding: 0,
-          visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT,
+          visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
           buffer: {},
         },
       ],
@@ -37,7 +37,7 @@ export abstract class NfgComponent {
     });
   }
 
-  public async init(): Promise<NfgComponent> {
+  public async init(): Promise<typeof this> {
     await this._init();
     this._updateUniforms();
     this._updatePipeline();
@@ -54,11 +54,22 @@ export abstract class NfgComponent {
   protected abstract _init(): Promise<void>;
 
   protected _setVertices(raw: number[]): void {
+    const len = this._vertices?.byteLength ?? -1;
     this._vertices = new Float32Array(raw);
-    this._updateVertexBuffer();
+    if (len !== this._vertices.byteLength) this._updateVertexBuffer();
+    else this._writeVertexBuffer();
   }
 
   protected _updateVertexBuffer(): void {
+    this._vertexBuffer = this._core.device.createBuffer({
+      label: `${this._label} vertices`,
+      size: this._vertices.byteLength,
+      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+    });
+    this._writeVertexBuffer();
+  }
+
+  protected _writeVertexBuffer(): void {
     this._core.device.queue.writeBuffer(this._vertexBuffer, 0, this._vertices);
   }
 
@@ -88,6 +99,9 @@ export abstract class NfgComponent {
     const uniformArray = new Float32Array([
       0,
       0,
+      0,
+      1,
+      1,
       1,
       this._core.initContext.canvas.width,
       this._core.initContext.canvas.height,

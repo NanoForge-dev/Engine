@@ -38,9 +38,12 @@ export class ShaderManager {
       throw new Error("Could not find shader");
     }
     const shaderFile = await this._assetManager.getWgsl(path);
-    this._core.device.createShaderModule({
-      label: SHADER_NAMES[shader],
-      code: await shaderFile.getText(),
-    });
+    this._shaders.set(
+      shader,
+      this._core.device.createShaderModule({
+        label: SHADER_NAMES[shader],
+        code: await shaderFile.getText(),
+      }),
+    );
   }
 }

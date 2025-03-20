@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd ../..
+pnpm clean
 pnpm build
 cd -
 mkdir -p node_modules/@nanoforge
