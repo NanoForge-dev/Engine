@@ -38,8 +38,9 @@ export class NfgCircle extends NfgShape {
     this._vertexLength = 7;
 
     this._pos = options?.pos ?? { x: 0, y: 0 };
-    this._radius = options?.radius ?? 1;
+    this._radius = options?.radius ?? 0.1;
     this._color = options?.color ?? { r: 0, g: 0, b: 0, a: 1 };
+    this._updateVertices();
   }
 
   public setPosition(pos: IVertex2D): NfgCircle {
@@ -66,6 +67,20 @@ export class NfgCircle extends NfgShape {
 
   protected _updateVertices(): void {
     this._setVertices([
+      this._pos.x,
+      this._pos.y,
+      this._radius,
+      this._color.r,
+      this._color.g,
+      this._color.b,
+      this._color.a,
+      this._pos.x,
+      this._pos.y,
+      this._radius,
+      this._color.r,
+      this._color.g,
+      this._color.b,
+      this._color.a,
       this._pos.x,
       this._pos.y,
       this._radius,
