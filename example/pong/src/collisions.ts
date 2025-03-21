@@ -9,16 +9,16 @@ export function checkCollisions(entity: any) {
 
   for (const e of entities) {
     if (e === undefined) continue;
-    const { x: ox, y: oy } = e.Position;
-    const { width: ow, height: oh } = e.Hitbox;
+    const { x: ex, y: ey } = e.Position;
+    const { width: ew, height: eh } = e.Hitbox;
 
     if (
       e.Position != entity.Position &&
       e.Hitbox != entity.Hitbox &&
-      x < ox + ow &&
-      x + width > ox &&
-      y < oy + oh &&
-      y + height > oy
+      x < ex + ew &&
+      x + width > ex &&
+      y < ey + eh &&
+      y + height > ey
     ) {
       return true;
     }
