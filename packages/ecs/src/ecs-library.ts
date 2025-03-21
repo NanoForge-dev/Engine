@@ -36,7 +36,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     this.registry.addComponent(entity, component);
   }
 
-  createEntity(): Entity {
+  spawnEntity(): Entity {
     return this.registry.spawnEntity();
   }
 
