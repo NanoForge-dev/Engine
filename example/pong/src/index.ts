@@ -15,7 +15,15 @@ import {
   RectangleComponent,
   Velocity,
 } from "./components";
-import { bounce, controlPlayer, drawCircle, drawRectangle, move, moveRectangle } from "./systems";
+import {
+  bounce,
+  controlPlayer,
+  drawBackground,
+  drawCircle,
+  drawRectangle,
+  move,
+  moveRectangle,
+} from "./systems";
 
 export const ecsLibrary = new ECSLibrary();
 
@@ -34,6 +42,7 @@ export const main = async (options: IRunOptions) => {
   const ball = ecsLibrary.createEntity();
   ecsLibrary.addComponent(ball, new Velocity(0.05, 0));
   ecsLibrary.addComponent(ball, new Position(0.5, 0));
+  ecsLibrary.addComponent(ball, new Hitbox(0.1, 0.1));
   ecsLibrary.addComponent(ball, new Bounce());
   ecsLibrary.addComponent(
     ball,
@@ -50,8 +59,8 @@ export const main = async (options: IRunOptions) => {
     bg,
     new RectangleComponent(
       await graphics.factory.createRectangle({
-        min: { x: -2, y: -1 },
-        max: { x: 2, y: 1 },
+        min: { x: -2.2, y: -1 },
+        max: { x: 2.2, y: 1 },
         color: { r: 0, g: 0, b: 0, a: 0 },
       }),
     ),
@@ -66,8 +75,8 @@ export const main = async (options: IRunOptions) => {
       }),
     ),
   );
-  ecsLibrary.addComponent(topWall, new Position(-1.8, 0.9));
-  ecsLibrary.addComponent(topWall, new Hitbox(3.6, 0.1));
+  ecsLibrary.addComponent(topWall, new Position(-2, 0.9));
+  ecsLibrary.addComponent(topWall, new Hitbox(4, 0.1));
 
   const botWall = ecsLibrary.createEntity();
   ecsLibrary.addComponent(
@@ -78,13 +87,13 @@ export const main = async (options: IRunOptions) => {
       }),
     ),
   );
-  ecsLibrary.addComponent(botWall, new Position(-1.8, -1));
-  ecsLibrary.addComponent(botWall, new Hitbox(3.6, 0.1));
+  ecsLibrary.addComponent(botWall, new Position(-2, -1));
+  ecsLibrary.addComponent(botWall, new Hitbox(4, 0.1));
 
   const player1 = ecsLibrary.createEntity();
-  ecsLibrary.addComponent(player1, new Position(-1.8, -0.3));
+  ecsLibrary.addComponent(player1, new Position(-2, -0.15));
   ecsLibrary.addComponent(player1, new Velocity(0, 0.075));
-  ecsLibrary.addComponent(player1, new Hitbox(0.1, 0.5));
+  ecsLibrary.addComponent(player1, new Hitbox(0.075, 0.3));
   ecsLibrary.addComponent(player1, new Controller(InputEnum.KeyW, InputEnum.KeyS));
   ecsLibrary.addComponent(
     player1,
@@ -96,9 +105,9 @@ export const main = async (options: IRunOptions) => {
   );
 
   const player2 = ecsLibrary.createEntity();
-  ecsLibrary.addComponent(player2, new Position(1.7, -0.3));
+  ecsLibrary.addComponent(player2, new Position(1.925, -0.15));
   ecsLibrary.addComponent(player2, new Velocity(0, 0.075));
-  ecsLibrary.addComponent(player2, new Hitbox(0.1, 0.5));
+  ecsLibrary.addComponent(player2, new Hitbox(0.075, 0.3));
   ecsLibrary.addComponent(player2, new Controller(InputEnum.ArrowUp, InputEnum.ArrowDown));
   ecsLibrary.addComponent(
     player2,
@@ -112,8 +121,11 @@ export const main = async (options: IRunOptions) => {
   ecsLibrary.addSystem(move);
   ecsLibrary.addSystem(controlPlayer);
   ecsLibrary.addSystem(moveRectangle);
-  ecsLibrary.addSystem(drawRectangle);
+  ecsLibrary.addSystem(() => {
+    drawBackground(bg);
+  });
   ecsLibrary.addSystem(drawCircle);
+  ecsLibrary.addSystem(drawRectangle);
   ecsLibrary.addSystem(bounce);
 
   app.run();

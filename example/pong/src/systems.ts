@@ -20,13 +20,13 @@ export function move() {
 }
 
 export function bounce() {
-  const entities = ecsLibrary.getZipper([Bounce, Position, Velocity]);
+  const entities = ecsLibrary.getZipper([Bounce, Position, Velocity, Hitbox]);
 
   entities.forEach((entity) => {
-    if (entity.Position.x >= 1.6 || entity.Position.x <= -1.6) {
+    if (checkCollisions(entity)) {
       entity.Velocity.x = -entity.Velocity.x;
     }
-    if (entity.Position.y >= 1 || entity.Position.y <= -1) {
+    if (checkCollisions(entity)) {
       entity.Velocity.y = -entity.Velocity.y;
     }
   });
@@ -75,9 +75,16 @@ export function moveRectangle() {
 }
 
 export function drawRectangle() {
-  const entities = ecsLibrary.getZipper([RectangleComponent]);
+  const entities = ecsLibrary.getZipper([RectangleComponent, Hitbox]);
 
   entities.forEach((entity) => {
     graphics.getWindow().draw(entity.RectangleComponent.component);
   });
+}
+
+export function drawBackground(bg: any) {
+  const rect = ecsLibrary.getEntityComponent(bg, RectangleComponent);
+  if (rect) {
+    graphics.getWindow().draw(rect.component);
+  }
 }
