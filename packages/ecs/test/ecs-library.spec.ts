@@ -40,13 +40,13 @@ describe("ECSLibrary", () => {
   });
 
   test("init and spawn entity", async () => {
-    const entity = ecs.createEntity();
+    const entity = ecs.spawnEntity();
     expect(entity).toBeDefined();
     expect(entity.getId()).toBe(0);
   });
 
   test("add component to entity", async () => {
-    const entity = ecs.createEntity();
+    const entity = ecs.spawnEntity();
     const pos = new Position(1, 2);
     ecs.addComponent(entity, pos);
     const components = ecs.getComponents(Position);
