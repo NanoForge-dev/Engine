@@ -32,14 +32,14 @@ export const main = async (options: IRunOptions) => {
   await app.init(options);
 
   const ball = ecsLibrary.createEntity();
-  ecsLibrary.addComponent(ball, new Velocity(0.04, 0));
+  ecsLibrary.addComponent(ball, new Velocity(0.05, 0));
   ecsLibrary.addComponent(ball, new Position(0.5, 0));
   ecsLibrary.addComponent(ball, new Bounce());
   ecsLibrary.addComponent(
     ball,
     new CircleComponent(
       await graphics.factory.createCircle({
-        radius: 0.1,
+        radius: 0.05,
         color: { r: 1, g: 0, b: 0, a: 1 },
       }),
     ),
@@ -66,7 +66,7 @@ export const main = async (options: IRunOptions) => {
       }),
     ),
   );
-  ecsLibrary.addComponent(topWall, new Position(-1.8, 0.91));
+  ecsLibrary.addComponent(topWall, new Position(-1.8, 0.9));
   ecsLibrary.addComponent(topWall, new Hitbox(3.6, 0.1));
 
   const botWall = ecsLibrary.createEntity();
@@ -83,7 +83,7 @@ export const main = async (options: IRunOptions) => {
 
   const player1 = ecsLibrary.createEntity();
   ecsLibrary.addComponent(player1, new Position(-1.8, -0.3));
-  ecsLibrary.addComponent(player1, new Velocity(0, 0.1));
+  ecsLibrary.addComponent(player1, new Velocity(0, 0.075));
   ecsLibrary.addComponent(player1, new Hitbox(0.1, 0.5));
   ecsLibrary.addComponent(player1, new Controller(InputEnum.KeyW, InputEnum.KeyS));
   ecsLibrary.addComponent(
@@ -97,7 +97,7 @@ export const main = async (options: IRunOptions) => {
 
   const player2 = ecsLibrary.createEntity();
   ecsLibrary.addComponent(player2, new Position(1.7, -0.3));
-  ecsLibrary.addComponent(player2, new Velocity(0, 0.1));
+  ecsLibrary.addComponent(player2, new Velocity(0, 0.075));
   ecsLibrary.addComponent(player2, new Hitbox(0.1, 0.5));
   ecsLibrary.addComponent(player2, new Controller(InputEnum.ArrowUp, InputEnum.ArrowDown));
   ecsLibrary.addComponent(

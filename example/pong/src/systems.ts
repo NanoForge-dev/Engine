@@ -38,13 +38,15 @@ export function controlPlayer() {
   entities.forEach((entity) => {
     if (inputs.isKeyPressed(entity.Controller.up) && !checkCollisions(entity)) {
       entity.Position.y += entity.Velocity.y;
-    } else {
-      entity.Position.y -= entity.Velocity.y;
+      if (checkCollisions(entity)) {
+        entity.Position.y -= entity.Velocity.y;
+      }
     }
     if (inputs.isKeyPressed(entity.Controller.down) && !checkCollisions(entity)) {
       entity.Position.y -= entity.Velocity.y;
-    } else {
-      entity.Position.y += entity.Velocity.y;
+      if (checkCollisions(entity)) {
+        entity.Position.y += entity.Velocity.y;
+      }
     }
   });
 }
