@@ -15,15 +15,7 @@ import {
   RectangleComponent,
   Velocity,
 } from "./components";
-import {
-  bounce,
-  controlPlayer,
-  drawCircle,
-  drawRectangle,
-  framerate,
-  move,
-  moveRectangle,
-} from "./systems";
+import { bounce, controlPlayer, drawCircle, drawRectangle, move, moveRectangle } from "./systems";
 
 export const ecsLibrary = new ECSLibrary();
 
@@ -123,7 +115,6 @@ export const main = async (options: IRunOptions) => {
   ecsLibrary.addSystem(drawRectangle);
   ecsLibrary.addSystem(drawCircle);
   ecsLibrary.addSystem(bounce);
-  ecsLibrary.addSystem(() => framerate(30));
 
   app.run();
 };
