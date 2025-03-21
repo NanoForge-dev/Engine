@@ -10,8 +10,6 @@ import {
 } from "./components";
 import { ecsLibrary, graphics, inputs } from "./index";
 
-let lastFrame = 0;
-
 export function move() {
   const entities = ecsLibrary.getZipper([Bounce, Position, Velocity]);
 
@@ -80,16 +78,4 @@ export function drawRectangle() {
   entities.forEach((entity) => {
     graphics.getWindow().draw(entity.RectangleComponent.component);
   });
-}
-
-export function framerate(rate: number) {
-  const frameDuration = 1000 / rate;
-  let currentFrame = performance.now();
-  let elapsedTime = currentFrame - lastFrame;
-
-  while (elapsedTime < frameDuration) {
-    currentFrame = performance.now();
-    elapsedTime = currentFrame - lastFrame;
-  }
-  lastFrame = performance.now();
 }
