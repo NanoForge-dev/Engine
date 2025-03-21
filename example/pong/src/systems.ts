@@ -1,10 +1,19 @@
-import { Bounce, CircleComponent, Position, RectangleComponent, Velocity } from "./components";
-import { ecsLibrary, graphics } from "./index";
+import { checkCollisions } from "./collisions";
+import {
+  Bounce,
+  CircleComponent,
+  Controller,
+  Hitbox,
+  Position,
+  RectangleComponent,
+  Velocity,
+} from "./components";
+import { ecsLibrary, graphics, inputs } from "./index";
 
 let lastFrame = 0;
 
 export function move() {
-  const entities = ecsLibrary.getZipper([Position, Velocity]);
+  const entities = ecsLibrary.getZipper([Bounce, Position, Velocity]);
 
   entities.forEach((entity) => {
     entity.Position.x += entity.Velocity.x;
@@ -13,7 +22,7 @@ export function move() {
 }
 
 export function bounce() {
-  const entities = ecsLibrary.getZipper([Position, Bounce, Velocity]);
+  const entities = ecsLibrary.getZipper([Bounce, Position, Velocity]);
 
   entities.forEach((entity) => {
     if (entity.Position.x >= 1.6 || entity.Position.x <= -1.6) {
@@ -25,14 +34,43 @@ export function bounce() {
   });
 }
 
+export function controlPlayer() {
+  const entities = ecsLibrary.getZipper([Controller, Position, Hitbox, Velocity]);
+
+  entities.forEach((entity) => {
+    if (inputs.isKeyPressed(entity.Controller.up) && !checkCollisions(entity)) {
+      entity.Position.y += entity.Velocity.y;
+    } else {
+      entity.Position.y -= entity.Velocity.y;
+    }
+    if (inputs.isKeyPressed(entity.Controller.down) && !checkCollisions(entity)) {
+      entity.Position.y -= entity.Velocity.y;
+    } else {
+      entity.Position.y += entity.Velocity.y;
+    }
+  });
+}
+
 export function drawCircle() {
   const entities = ecsLibrary.getZipper([CircleComponent, Position]);
 
   entities.forEach((entity) => {
     const pos = entity.Position;
-    console.log(entity.CircleComponent);
     entity.CircleComponent.component.setPosition(pos);
     graphics.getWindow().draw(entity.CircleComponent.component);
+  });
+}
+
+export function moveRectangle() {
+  const entities = ecsLibrary.getZipper([RectangleComponent, Position, Hitbox]);
+
+  entities.forEach((entity) => {
+    const pos = entity.Position;
+    entity.RectangleComponent.component.setMin({ x: pos.x, y: pos.y });
+    entity.RectangleComponent.component.setMax({
+      x: pos.x + entity.Hitbox.width,
+      y: pos.y + entity.Hitbox.height,
+    });
   });
 }
 
