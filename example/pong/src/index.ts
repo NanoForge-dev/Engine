@@ -31,7 +31,7 @@ export const main = async (options: IRunOptions) => {
 
   await app.init(options);
 
-  const ball = ecsLibrary.createEntity();
+  const ball = ecsLibrary.spawnEntity();
   ecsLibrary.addComponent(ball, new Velocity(0.04, 0));
   ecsLibrary.addComponent(ball, new Position(0.5, 0));
   ecsLibrary.addComponent(ball, new Bounce());
@@ -45,7 +45,7 @@ export const main = async (options: IRunOptions) => {
     ),
   );
 
-  const bg = ecsLibrary.createEntity();
+  const bg = ecsLibrary.spawnEntity();
   ecsLibrary.addComponent(
     bg,
     new RectangleComponent(
@@ -57,7 +57,7 @@ export const main = async (options: IRunOptions) => {
     ),
   );
 
-  const topWall = ecsLibrary.createEntity();
+  const topWall = ecsLibrary.spawnEntity();
   ecsLibrary.addComponent(
     topWall,
     new RectangleComponent(
@@ -69,7 +69,7 @@ export const main = async (options: IRunOptions) => {
   ecsLibrary.addComponent(topWall, new Position(-1.8, 0.91));
   ecsLibrary.addComponent(topWall, new Hitbox(3.6, 0.1));
 
-  const botWall = ecsLibrary.createEntity();
+  const botWall = ecsLibrary.spawnEntity();
   ecsLibrary.addComponent(
     botWall,
     new RectangleComponent(
@@ -81,7 +81,7 @@ export const main = async (options: IRunOptions) => {
   ecsLibrary.addComponent(botWall, new Position(-1.8, -1));
   ecsLibrary.addComponent(botWall, new Hitbox(3.6, 0.1));
 
-  const player1 = ecsLibrary.createEntity();
+  const player1 = ecsLibrary.spawnEntity();
   ecsLibrary.addComponent(player1, new Position(-1.8, -0.3));
   ecsLibrary.addComponent(player1, new Velocity(0, 0.1));
   ecsLibrary.addComponent(player1, new Hitbox(0.1, 0.5));
@@ -95,7 +95,7 @@ export const main = async (options: IRunOptions) => {
     ),
   );
 
-  const player2 = ecsLibrary.createEntity();
+  const player2 = ecsLibrary.spawnEntity();
   ecsLibrary.addComponent(player2, new Position(1.7, -0.3));
   ecsLibrary.addComponent(player2, new Velocity(0, 0.1));
   ecsLibrary.addComponent(player2, new Hitbox(0.1, 0.5));
