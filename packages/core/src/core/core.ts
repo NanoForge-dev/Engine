@@ -6,10 +6,12 @@ import {
   type IRunnerLibrary,
   InitContext,
   type LibraryHandle,
+  LibraryStatusEnum,
 } from "@nanoforge/common";
 
 import { type ApplicationConfig } from "../application/application-config";
 import type { IApplicationOptions } from "../application/application-options.type";
+import { type EditableLibraryContext } from "../common/context/contexts/library.editable-context";
 
 export class Core {
   private readonly config: ApplicationConfig;
@@ -28,7 +30,7 @@ export class Core {
 
   public async run(): Promise<void> {
     const context = this.getExecutionContext();
-    const libraries = this.config.libraryManager.getRunnerLibraries();
+    const libraries = this.config.libraryManager.getExecutionLibraries();
     let requestAnimationFrameHandle: number;
 
     const runner = async () => {
@@ -38,6 +40,7 @@ export class Core {
     const render = () => {
       if (!context.isRunning) {
         clearInterval(intervalHandle);
+        this.runClear(this.getClearContext());
         return;
       }
       cancelAnimationFrame(requestAnimationFrameHandle);
@@ -60,20 +63,22 @@ export class Core {
   }
 
   private async runInit(context: InitContext): Promise<void> {
-    for (const handle of this.config.libraryManager.getLibraries()) {
-      if (handle) await handle.library.init(context);
+    for (const handle of this.config.libraryManager.getInitLibraries()) {
+      await handle.library.init(context);
+      (handle.context as EditableLibraryContext).setStatus(LibraryStatusEnum.LOADED);
     }
   }
 
   private async runExecute(context: ExecutionContext, libraries: LibraryHandle<IRunnerLibrary>[]) {
     for (const handle of libraries) {
-      if (handle) await handle.library.run(context);
+      await handle.library.run(context);
     }
   }
 
-  private runClear(context: ClearContext) {
-    for (const handle of this.config.libraryManager.getLibraries()) {
-      if (handle) handle.library.clear(context);
+  private async runClear(context: ClearContext) {
+    for (const handle of this.config.libraryManager.getClearLibraries()) {
+      await handle.library.clear(context);
+      (handle.context as EditableLibraryContext).setStatus(LibraryStatusEnum.CLEAR);
     }
   }
 }
