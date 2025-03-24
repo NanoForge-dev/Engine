@@ -1,5 +1,9 @@
-import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
-import { BaseComponentSystemLibrary, type InitContext } from "@nanoforge/common";
+import { AssetManagerLibrary } from "@nanoforge/asset-manager";
+import {
+  ASSET_MANAGER_LIBRARY,
+  BaseComponentSystemLibrary,
+  type InitContext,
+} from "@nanoforge/common";
 
 import type { Entity, MainModule, Registry, SparseArray } from "../lib";
 import { Module } from "../lib";
@@ -11,6 +15,15 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
   private module: MainModule;
   private registry: Registry;
   private readonly path: string = "libecs.wasm";
+
+  constructor() {
+    super({
+      dependencies: [ASSET_MANAGER_LIBRARY],
+      detailedDependencies: {
+        implementationDependencies: [AssetManagerLibrary],
+      },
+    });
+  }
 
   get name(): string {
     return "ECSLibrary";
@@ -26,10 +39,6 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
 
   async run(): Promise<void> {
     this.runSystems();
-  }
-
-  clear(): Promise<void> {
-    return Promise.resolve();
   }
 
   addComponent(entity: Entity, component: Component): void {

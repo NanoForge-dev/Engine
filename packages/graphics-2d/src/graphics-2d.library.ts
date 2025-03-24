@@ -1,4 +1,5 @@
-import { BaseGraphicsLibrary, type InitContext } from "@nanoforge/common";
+import { AssetManagerLibrary } from "@nanoforge/asset-manager";
+import { ASSET_MANAGER_LIBRARY, BaseGraphicsLibrary, type InitContext } from "@nanoforge/common";
 
 import { GraphicsCore } from "./core";
 import { GraphicsFactory } from "./factory";
@@ -7,6 +8,15 @@ import { type NfgWindow } from "./render/window";
 export class Graphics2DLibrary extends BaseGraphicsLibrary {
   private _core: GraphicsCore;
   private _factory: GraphicsFactory;
+
+  constructor() {
+    super({
+      dependencies: [ASSET_MANAGER_LIBRARY],
+      detailedDependencies: {
+        implementationDependencies: [AssetManagerLibrary],
+      },
+    });
+  }
 
   get name(): string {
     return "Graphics2DLibrary";
