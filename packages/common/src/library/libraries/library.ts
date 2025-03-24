@@ -1,21 +1,26 @@
 import { type ClearContext, type InitContext } from "../../context";
-import { DependenciesHandler } from "../dependencies/dependencies-handler";
+import { RelationshipHandler } from "../relationship/relationship-handler";
+import { DEFAULT_LIBRARY_OPTIONS } from "./consts/library-options-default.const";
 import { type ILibrary, type ILibraryOptions } from "./library.type";
 
 export abstract class Library implements ILibrary {
-  protected _dependencies: DependenciesHandler;
+  protected _relationship: RelationshipHandler;
 
-  constructor(options?: ILibraryOptions) {
-    this._dependencies = new DependenciesHandler(
-      options?.detailedDependencies?.initDependencies ?? options?.dependencies,
-      options?.detailedDependencies?.runtimeDependencies ?? options?.dependencies,
-      options?.detailedDependencies?.clearDependencies ?? options?.dependencies,
-      options?.detailedDependencies?.implementationDependencies,
+  constructor(rawOptions?: Partial<ILibraryOptions>) {
+    const options = {
+      ...DEFAULT_LIBRARY_OPTIONS,
+      ...rawOptions,
+    };
+
+    this._relationship = new RelationshipHandler(
+      options.dependencies,
+      options.runBefore,
+      options.runAfter,
     );
   }
 
-  get dependencies(): DependenciesHandler {
-    return this._dependencies;
+  get relationship(): RelationshipHandler {
+    return this._relationship;
   }
 
   abstract get name(): string;

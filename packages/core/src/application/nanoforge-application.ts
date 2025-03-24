@@ -47,8 +47,6 @@ export abstract class NanoforgeApplication {
   }
 
   public run() {
-    this._core.run().then(() => {
-      console.info("Game ended successfully.");
-    });
+    this._core.run();
   }
 }
