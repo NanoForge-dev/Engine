@@ -1,8 +1,11 @@
 import { type ApplicationContext, type ClearContext } from "../../context";
+import { type DependenciesHandler } from "../dependencies/dependencies-handler";
 import { type IDependencies } from "../dependencies/dependencies.type";
 
 export interface ILibrary {
   get name(): string;
+
+  get dependencies(): DependenciesHandler;
 
   init(context: ApplicationContext): Promise<void>;
 
@@ -11,5 +14,5 @@ export interface ILibrary {
 
 export interface ILibraryOptions {
   dependencies?: symbol[];
-  detailedDependencies?: IDependencies;
+  detailedDependencies?: Partial<IDependencies>;
 }
