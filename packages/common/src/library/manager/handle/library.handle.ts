@@ -1,5 +1,5 @@
 import { type LibraryContext } from "../../../context";
-import { type ILibrary } from "../../libraries/library.type";
+import { type ILibrary } from "../../libraries";
 
 export class LibraryHandle<T extends ILibrary = ILibrary> {
   private readonly _symbol: symbol;

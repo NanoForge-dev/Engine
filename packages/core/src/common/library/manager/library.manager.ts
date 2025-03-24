@@ -17,6 +17,7 @@ import {
 } from "@nanoforge/common";
 
 import { EditableLibraryContext } from "../../context/contexts/library.editable-context";
+import { Relationship } from "../relationship-functions";
 
 export class EditableLibraryManager extends LibraryManager {
   public set(sym: symbol, library: ILibrary) {
@@ -58,20 +59,20 @@ export class EditableLibraryManager extends LibraryManager {
     this._set(DefaultLibrariesEnum.INPUT, INPUT_LIBRARY, library, new EditableLibraryContext());
   }
 
-  public getLibraries(): LibraryHandle<ILibrary>[] {
+  public getLibraries(): LibraryHandle[] {
     return this._libraries;
   }
 
-  public getInitLibraries(): LibraryHandle<ILibrary>[] {
-    return this._libraries;
+  public getInitLibraries(): LibraryHandle[] {
+    return Relationship.getLibrariesByDependencies(this._libraries);
   }
 
   public getExecutionLibraries(): LibraryHandle<IRunnerLibrary>[] {
-    return this._getRunnerLibraries();
+    return Relationship.getLibrariesByRun(this._getRunnerLibraries());
   }
 
-  public getClearLibraries(): LibraryHandle<ILibrary>[] {
-    return this._libraries;
+  public getClearLibraries(): LibraryHandle[] {
+    return Relationship.getLibrariesByDependencies(this._libraries, true);
   }
 
   private _getRunnerLibraries(): LibraryHandle<IRunnerLibrary>[] {

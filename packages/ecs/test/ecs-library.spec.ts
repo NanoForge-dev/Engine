@@ -1,5 +1,5 @@
 import { AssetManagerLibrary } from "@nanoforge/asset-manager";
-import { ApplicationContext, InitContext } from "@nanoforge/common";
+import { ApplicationContext, ClearContext, InitContext } from "@nanoforge/common";
 import { EditableLibraryManager } from "@nanoforge/core/src/common/library/manager/library.manager";
 import { ECSLibrary } from "@nanoforge/ecs/src/ecs-library";
 
@@ -19,7 +19,7 @@ describe("ECSLibrary", () => {
   const assetManager = new AssetManagerLibrary();
   const appContext = new ApplicationContext();
   const libraryManager = new EditableLibraryManager();
-  const context = new InitContext(appContext, libraryManager, {
+  const initContext = new InitContext(appContext, libraryManager, {
     // @ts-ignore
     canvas: null,
     files: {
@@ -28,15 +28,17 @@ describe("ECSLibrary", () => {
       wgsl: new Map(),
     },
   });
+
+  const clearContext = new ClearContext(appContext, libraryManager);
   libraryManager.setAssetManager(assetManager);
 
   beforeAll(async () => {
-    await assetManager.init(context);
+    await assetManager.init(initContext);
   });
 
   beforeEach(async () => {
     ecs = new ECSLibrary();
-    await ecs.init(context);
+    await ecs.init(initContext);
   });
 
   test("init and spawn entity", async () => {
@@ -55,6 +57,6 @@ describe("ECSLibrary", () => {
   });
 
   test("clear", async () => {
-    await ecs.clear();
+    await ecs.clear(clearContext);
   });
 });
