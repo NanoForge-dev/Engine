@@ -63,7 +63,7 @@ export abstract class NfgComponent {
       this._core.initContext.canvas.width,
       this._core.initContext.canvas.height,
     ]);
-    console.log(this._core.initContext.canvas.width, this._core.initContext.canvas.height);
+
     if (!this._uniformBuffer)
       this._uniformBuffer = this._core.device.createBuffer({
         label: "View Uniforms",

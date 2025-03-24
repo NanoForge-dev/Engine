@@ -1,4 +1,3 @@
-import { AssetManagerLibrary } from "@nanoforge/asset-manager";
 import { ASSET_MANAGER_LIBRARY, BaseGraphicsLibrary, type InitContext } from "@nanoforge/common";
 
 import { GraphicsCore } from "./core";
@@ -12,9 +11,6 @@ export class Graphics2DLibrary extends BaseGraphicsLibrary {
   constructor() {
     super({
       dependencies: [ASSET_MANAGER_LIBRARY],
-      detailedDependencies: {
-        implementationDependencies: [AssetManagerLibrary],
-      },
     });
   }
 

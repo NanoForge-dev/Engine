@@ -1,7 +1,8 @@
-import { AssetManagerLibrary } from "@nanoforge/asset-manager";
+import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
 import {
   ASSET_MANAGER_LIBRARY,
   BaseComponentSystemLibrary,
+  GRAPHICS_LIBRARY,
   type InitContext,
 } from "@nanoforge/common";
 
@@ -19,9 +20,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
   constructor() {
     super({
       dependencies: [ASSET_MANAGER_LIBRARY],
-      detailedDependencies: {
-        implementationDependencies: [AssetManagerLibrary],
-      },
+      runAfter: [GRAPHICS_LIBRARY],
     });
   }
 
