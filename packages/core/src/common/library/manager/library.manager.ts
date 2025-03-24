@@ -62,7 +62,19 @@ export class EditableLibraryManager extends LibraryManager {
     return this._libraries;
   }
 
-  public getRunnerLibraries(): LibraryHandle<IRunnerLibrary>[] {
+  public getInitLibraries(): LibraryHandle<ILibrary>[] {
+    return this._libraries;
+  }
+
+  public getExecutionLibraries(): LibraryHandle<IRunnerLibrary>[] {
+    return this._getRunnerLibraries();
+  }
+
+  public getClearLibraries(): LibraryHandle<ILibrary>[] {
+    return this._libraries;
+  }
+
+  private _getRunnerLibraries(): LibraryHandle<IRunnerLibrary>[] {
     return this._libraries.filter(
       (handle) => handle && typeof handle.library["run"] === "function",
     ) as LibraryHandle<IRunnerLibrary>[];
