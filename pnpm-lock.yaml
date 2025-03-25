@@ -171,6 +171,16 @@ importers:
         version: 8.28.0(eslint@9.23.0(jiti@2.4.2))(typescript@5.8.2)
 
   packages/core:
+    dependencies:
+      '@nanoforge/asset-manager':
+        specifier: workspace:^
+        version: link:../asset-manager
+      '@nanoforge/common':
+        specifier: workspace:^
+        version: link:../common
+      '@nanoforge/input':
+        specifier: workspace:^
+        version: link:../input
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.0
