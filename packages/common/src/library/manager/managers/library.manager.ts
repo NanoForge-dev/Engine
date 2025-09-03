@@ -7,7 +7,9 @@ import {
   type IGraphicsLibrary,
   type IInputLibrary,
   type INetworkLibrary,
+  type ISoundLibrary,
   NETWORK_LIBRARY,
+  SOUND_LIBRARY,
 } from "../../libraries";
 import { type LibraryHandle } from "../handle/library.handle";
 import { BaseLibraryManager } from "./base-library.manager";
@@ -18,6 +20,7 @@ export enum DefaultLibrariesEnum {
   GRAPHICS,
   INPUT,
   NETWORK,
+  SOUND,
 }
 
 const DEFAULT_LIBRARIES: { index: DefaultLibrariesEnum; sym: symbol }[] = [
@@ -25,6 +28,7 @@ const DEFAULT_LIBRARIES: { index: DefaultLibrariesEnum; sym: symbol }[] = [
   { index: DefaultLibrariesEnum.COMPONENT_SYSTEM, sym: COMPONENT_SYSTEM_LIBRARY },
   { index: DefaultLibrariesEnum.GRAPHICS, sym: GRAPHICS_LIBRARY },
   { index: DefaultLibrariesEnum.NETWORK, sym: NETWORK_LIBRARY },
+  { index: DefaultLibrariesEnum.SOUND, sym: SOUND_LIBRARY },
 ];
 
 export class LibraryManager extends BaseLibraryManager {
@@ -58,5 +62,9 @@ export class LibraryManager extends BaseLibraryManager {
     T extends IAssetManagerLibrary = IAssetManagerLibrary,
   >(): LibraryHandle<T> {
     return this._get<T>(DefaultLibrariesEnum.ASSET_MANAGER);
+  }
+
+  public getSound<T extends ISoundLibrary = ISoundLibrary>(): LibraryHandle<T> {
+    return this._get<T>(DefaultLibrariesEnum.SOUND);
   }
 }
