@@ -1,0 +1,1 @@
+export { NfNotFound } from "./notFound";
