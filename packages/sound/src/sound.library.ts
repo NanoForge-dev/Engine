@@ -16,7 +16,11 @@ export class SoundLibrary extends BaseSoundLibrary {
     const soundElement = this.sounds.get(sound);
 
     if (soundElement) {
-      soundElement.play();
+      try {
+        soundElement.play();
+      } catch (e) {
+        console.error(`Got error: ${e}`);
+      }
     } else {
       throw new NfNotFound(sound);
     }

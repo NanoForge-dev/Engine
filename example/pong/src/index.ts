@@ -5,6 +5,7 @@ import { ECSLibrary } from "@nanoforge/ecs";
 import { Graphics2DLibrary } from "@nanoforge/graphics-2d";
 import { InputLibrary } from "@nanoforge/input";
 import { InputEnum } from "@nanoforge/input";
+import { SoundLibrary } from "@nanoforge/sound";
 
 import {
   Bounce,
@@ -22,14 +23,19 @@ export const ecsLibrary = new ECSLibrary();
 export const app = NanoforgeFactory.createClient();
 export const graphics = new Graphics2DLibrary();
 export const inputs = new InputLibrary();
+export const sounds = new SoundLibrary();
+export const assetManager = new AssetManagerLibrary();
 
 export const main = async (options: IRunOptions) => {
   app.useGraphics(graphics);
   app.useComponentSystem(ecsLibrary);
-  app.useAssetManager(new AssetManagerLibrary());
+  app.useAssetManager(assetManager);
   app.useInput(inputs);
+  app.useSound(sounds);
 
   await app.init(options);
+
+  sounds.load("test", "https://universal-soundbank.com/sounds/18782.mp3");
 
   const ball = ecsLibrary.spawnEntity();
   ecsLibrary.addComponent(ball, new Velocity(0.04, 0));

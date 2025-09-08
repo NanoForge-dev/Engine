@@ -53,7 +53,8 @@
     "@nanoforge/core": "latest",
     "@nanoforge/asset-manager": "latest",
     "@nanoforge/ecs": "latest",
-    "@nanoforge/graphics-2d": "latest"
+    "@nanoforge/graphics-2d": "latest",
+    "@nanoforge/sound": "latest"
   },
   "engines": {
     "node": "23.6.0",
