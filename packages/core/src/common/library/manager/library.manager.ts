@@ -11,9 +11,11 @@ import {
   INPUT_LIBRARY,
   type INetworkLibrary,
   type IRunnerLibrary,
+  type ISoundLibrary,
   type LibraryHandle,
   LibraryManager,
   NETWORK_LIBRARY,
+  SOUND_LIBRARY,
 } from "@nanoforge/common";
 
 import { EditableLibraryContext } from "../../context/contexts/library.editable-context";
@@ -57,6 +59,10 @@ export class EditableLibraryManager extends LibraryManager {
 
   public setInput(library: IInputLibrary): void {
     this._set(DefaultLibrariesEnum.INPUT, INPUT_LIBRARY, library, new EditableLibraryContext());
+  }
+
+  public setSound(library: ISoundLibrary): void {
+    this._set(DefaultLibrariesEnum.SOUND, SOUND_LIBRARY, library, new EditableLibraryContext());
   }
 
   public getLibraries(): LibraryHandle[] {

@@ -5,6 +5,7 @@ import {
   type IInputLibrary,
   type ILibrary,
   type INetworkLibrary,
+  type ISoundLibrary,
   type LibraryHandle,
 } from "@nanoforge/common";
 
@@ -67,5 +68,13 @@ export class ApplicationConfig {
 
   public useInputLibrary(library: IInputLibrary) {
     this._libraryManager.setInput(library);
+  }
+
+  public getSoundLibrary() {
+    return this._libraryManager.getSound();
+  }
+
+  public useSoundLibrary(library: ISoundLibrary) {
+    this._libraryManager.setSound(library);
   }
 }
