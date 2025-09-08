@@ -8,7 +8,7 @@ import {
   RectangleComponent,
   Velocity,
 } from "./components";
-import { ecsLibrary, graphics, inputs } from "./index";
+import { ecsLibrary, graphics, inputs, sounds } from "./index";
 
 export function move() {
   const entities = ecsLibrary.getZipper([Bounce, Position, Velocity]);
@@ -25,9 +25,13 @@ export function bounce() {
   entities.forEach((entity) => {
     if (entity.Position.x >= 1.6 || entity.Position.x <= -1.6) {
       entity.Velocity.x = -entity.Velocity.x;
+
+      sounds.play("test");
     }
     if (entity.Position.y >= 1 || entity.Position.y <= -1) {
       entity.Velocity.y = -entity.Velocity.y;
+
+      sounds.play("test");
     }
   });
 }
