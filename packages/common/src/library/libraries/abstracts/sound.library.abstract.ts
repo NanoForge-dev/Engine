@@ -6,4 +6,9 @@ export abstract class BaseSoundLibrary extends Library implements ISoundLibrary 
   public abstract init(context: InitContext): Promise<void>;
 
   public abstract play(sound: string): void;
+
+  /**
+   * mutes or unmutes the sound.
+   */
+  public abstract mute(): void;
 }
