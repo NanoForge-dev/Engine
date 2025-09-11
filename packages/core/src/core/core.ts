@@ -50,6 +50,15 @@ export class Core {
     const intervalHandle = setInterval(render, 1000 / this.options.tickRate);
   }
 
+  /**
+   * mutes / unmutes sounds.
+   */
+  public mute(): void {
+    const soundLibrary = this.config.getSoundLibrary();
+
+    soundLibrary.library.mute();
+  }
+
   private getInitContext(options: IRunOptions): InitContext {
     return new InitContext(this.context, this.config.libraryManager, options);
   }
