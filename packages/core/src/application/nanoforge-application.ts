@@ -49,4 +49,8 @@ export abstract class NanoforgeApplication {
   public run() {
     this._core.run();
   }
+
+  public mute() {
+    this._core.mute();
+  }
 }
