@@ -1,6 +1,6 @@
-import { type NfException } from "./nfException";
+import { type INfException } from "./nfException";
 
-export class NfNotFound implements NfException {
+export class NfNotFound implements INfException {
   get code(): number {
     return 404;
   }
@@ -11,6 +11,6 @@ export class NfNotFound implements NfException {
   cause?: unknown;
 
   constructor(item: string) {
-    this.message = item + "not found.";
+    this.message = `${item} not found.`;
   }
 }
