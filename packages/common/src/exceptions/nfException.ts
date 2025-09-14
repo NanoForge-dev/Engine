@@ -1,3 +1,3 @@
-export interface NfException extends Error {
+export interface INfException extends Error {
   get code(): number;
 }
