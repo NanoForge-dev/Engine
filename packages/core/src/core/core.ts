@@ -1,7 +1,6 @@
 import {
   type ApplicationContext,
   ClearContext,
-  ExecutionContext,
   type IRunOptions,
   type IRunnerLibrary,
   InitContext,
@@ -11,6 +10,7 @@ import {
 
 import { type ApplicationConfig } from "../application/application-config";
 import type { IApplicationOptions } from "../application/application-options.type";
+import { EditableExecutionContext } from "../common/context/contexts/executions/execution.editable-context";
 import { type EditableLibraryContext } from "../common/context/contexts/library.editable-context";
 
 export class Core {
@@ -63,8 +63,8 @@ export class Core {
     return new InitContext(this.context, this.config.libraryManager, options);
   }
 
-  private getExecutionContext(): ExecutionContext {
-    return new ExecutionContext(this.context, this.config.libraryManager);
+  private getExecutionContext<T extends IRunnerLibrary>(): EditableExecutionContext<T> {
+    return new EditableExecutionContext(this.context, this.config.libraryManager);
   }
 
   private getClearContext(): ClearContext {
@@ -78,8 +78,12 @@ export class Core {
     }
   }
 
-  private async runExecute(context: ExecutionContext, libraries: LibraryHandle<IRunnerLibrary>[]) {
+  private async runExecute(
+    context: EditableExecutionContext<IRunnerLibrary>,
+    libraries: LibraryHandle<IRunnerLibrary>[],
+  ) {
     for (const handle of libraries) {
+      context.setCurrentLibrary(handle.library);
       await handle.library.run(context);
     }
   }

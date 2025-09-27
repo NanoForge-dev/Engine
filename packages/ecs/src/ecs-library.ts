@@ -100,7 +100,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     this.registry.addSystem(system);
   }
 
-  getZipper(types: [Component]): [any] {
+  getZipper(types: [Component, ...Component[]]): [any, ...any[]] {
     return this.registry.getZipper(types);
   }
 }
