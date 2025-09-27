@@ -6,5 +6,5 @@ export abstract class BaseComponentSystemLibrary
   extends Library
   implements IComponentSystemLibrary
 {
-  abstract run(context: ExecutionContext): Promise<void>;
+  abstract run(context: ExecutionContext<this>): Promise<void>;
 }
