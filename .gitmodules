@@ -1,3 +1,3 @@
 [submodule "libs/RedGPU"]
 	path = libs/RedGPU
-	url = https://github.com/redcamel/RedGPU
+	url = https://github.com/Exeloo/RedGPU.git
