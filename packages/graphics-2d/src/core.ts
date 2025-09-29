@@ -1,67 +1,36 @@
-import { type InitContext } from "@nanoforge/common";
-
-import { GraphicsRender } from "./render";
-import { NfgWindow } from "./render/window";
-import { ShaderManager } from "./shader/shader.manager";
+import * as RedGPU from "redgpu";
+import { type RedGPUContext } from "redgpu";
+import { type Scene, type View2D } from "redgpu";
 
 export class GraphicsCore {
-  private readonly _initContext: InitContext;
+  private _redGPUContext: RedGPUContext;
+  private _scene: Scene;
+  private _view: View2D;
+  private _renderer: RedGPU.Renderer;
 
-  private readonly _shaderManager: ShaderManager;
-  private _render: GraphicsRender;
-  private _window: NfgWindow;
+  public async init(canvas: HTMLCanvasElement): Promise<void> {
+    await RedGPU.init(
+      canvas,
+      (_redGPUContext: RedGPU.RedGPUContext) => {
+        this._redGPUContext = _redGPUContext;
 
-  private _adapter: GPUAdapter;
-  private _device: GPUDevice;
+        const _scene = new RedGPU.Display.Scene("main");
+        const _view = new RedGPU.Display.View2D(_redGPUContext, _scene);
+        _redGPUContext.addView(_view);
 
-  constructor(context: InitContext) {
-    this._initContext = context;
-
-    this._shaderManager = new ShaderManager(this);
+        this._scene = _scene;
+        this._view = _view;
+        this._renderer = new RedGPU.Renderer();
+      },
+      (failReason: string) => {
+        throw new Error(failReason);
+      },
+    );
   }
 
-  get initContext(): InitContext {
-    return this._initContext;
-  }
-
-  get adapter(): GPUAdapter {
-    return this._adapter;
-  }
-
-  get device(): GPUDevice {
-    return this._device;
-  }
-
-  get shaderManager(): ShaderManager {
-    return this._shaderManager;
-  }
-
-  get render(): GraphicsRender {
-    return this._render;
-  }
-
-  get window(): NfgWindow {
-    return this._window;
-  }
-
-  public async init(): Promise<void> {
-    if (!navigator.gpu) {
-      throw new Error("WebGPU not supported on this browser.");
+  public async render(): Promise<void> {
+    if (this._renderer && this._redGPUContext) {
+      this._renderer.renderFrame(this._redGPUContext, 0);
     }
-
-    const adapter = await navigator.gpu.requestAdapter();
-    if (!adapter) {
-      throw new Error("No appropriate GPUAdapter found.");
-    }
-    this._adapter = adapter;
-
-    const device = await this._adapter.requestDevice();
-    if (!device) {
-      throw new Error("No appropriate GPUDevice found.");
-    }
-    this._device = device;
-
-    this._render = new GraphicsRender(this, this._initContext);
-    this._window = new NfgWindow(this._render);
   }
 }

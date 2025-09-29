@@ -44,7 +44,7 @@ export const main = async (options: IRunOptions) => {
   ecsLibrary.addComponent(
     ball,
     new CircleComponent(
-      await graphics.factory.createCircle({
+      await graphics.Shape.Circle({
         radius: 0.1,
         color: { r: 1, g: 0, b: 0, a: 1 },
       }),
@@ -55,7 +55,7 @@ export const main = async (options: IRunOptions) => {
   ecsLibrary.addComponent(
     bg,
     new RectangleComponent(
-      await graphics.factory.createRectangle({
+      await graphics.Shape.Rectangle({
         min: { x: -2, y: -1 },
         max: { x: 2, y: 1 },
         color: { r: 0, g: 0, b: 0, a: 0 },
@@ -118,9 +118,9 @@ export const main = async (options: IRunOptions) => {
   ecsLibrary.addSystem(move);
   ecsLibrary.addSystem(controlPlayer);
   ecsLibrary.addSystem(moveRectangle);
+  ecsLibrary.addSystem(bounce);
   ecsLibrary.addSystem(drawRectangle);
   ecsLibrary.addSystem(drawCircle);
-  ecsLibrary.addSystem(bounce);
 
   app.run();
 };

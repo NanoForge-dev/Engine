@@ -21,6 +21,7 @@
         "@nanoforge/core": "latest",
         "@nanoforge/ecs": "latest",
         "@nanoforge/graphics-2d": "latest",
+        "@nanoforge/sound": "latest",
       },
       "peerDependencies": {
         "typescript": "^5",

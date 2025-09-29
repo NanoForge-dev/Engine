@@ -80,6 +80,6 @@ export function drawRectangle() {
   const entities = ecsLibrary.getZipper([RectangleComponent]);
 
   entities.forEach((entity) => {
-    graphics.getWindow().draw(entity.RectangleComponent.component);
+    graphics.draw(entity.RectangleComponent.component);
   });
 }

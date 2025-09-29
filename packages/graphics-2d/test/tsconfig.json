@@ -1,6 +1,6 @@
 {
   "extends": "../../../tsconfig.spec.json",
   "compilerOptions": {
-    "types": ["jest", "node", "@webgpu/types"]
+    "types": ["jest", "node"]
   }
 }

@@ -34,7 +34,8 @@
   },
   "dependencies": {
     "@nanoforge/asset-manager": "workspace:^",
-    "@nanoforge/common": "workspace:^"
+    "@nanoforge/common": "workspace:^",
+    "redgpu": "workspace:^"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
@@ -43,7 +44,6 @@
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.13",
-    "@webgpu/types": "^0.1.59",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-format": "^1.0.1",
