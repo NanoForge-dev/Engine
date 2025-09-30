@@ -1,8 +1,10 @@
-import { NfNotFound } from "@nanoforge/common/src/exceptions";
+import { BaseMusicLibrary } from "@nanoforge/common";
+import { NfNotFound } from "@nanoforge/common/src/exception";
 
-export class MusicLibrary {
+export class MusicLibrary extends BaseMusicLibrary {
   private muted: boolean;
   private musics: Map<string, HTMLAudioElement>;
+  private current: HTMLAudioElement | null = null;
 
   get name(): string {
     return "NfMusic";
@@ -28,13 +30,16 @@ export class MusicLibrary {
     const musicElement = this.musics.get(music);
 
     if (musicElement) {
-      musicElement
-        .play()
+      this.current?.pause();
+      this.current = musicElement;
+      this.current
+        ?.play()
         .then(() => {})
         .catch((e) => {
           console.error(`Got error: ${e}`);
         });
     } else {
+      this.current = null;
       throw new NfNotFound(music);
     }
   }

@@ -6,8 +6,10 @@ import {
   type IComponentSystemLibrary,
   type IGraphicsLibrary,
   type IInputLibrary,
+  type IMusicLibrary,
   type INetworkLibrary,
   type ISoundLibrary,
+  MUSIC_LIBRARY,
   NETWORK_LIBRARY,
   SOUND_LIBRARY,
 } from "../../libraries";
@@ -21,6 +23,7 @@ export enum DefaultLibrariesEnum {
   INPUT,
   NETWORK,
   SOUND,
+  MUSIC,
 }
 
 const DEFAULT_LIBRARIES: { index: DefaultLibrariesEnum; sym: symbol }[] = [
@@ -29,6 +32,7 @@ const DEFAULT_LIBRARIES: { index: DefaultLibrariesEnum; sym: symbol }[] = [
   { index: DefaultLibrariesEnum.GRAPHICS, sym: GRAPHICS_LIBRARY },
   { index: DefaultLibrariesEnum.NETWORK, sym: NETWORK_LIBRARY },
   { index: DefaultLibrariesEnum.SOUND, sym: SOUND_LIBRARY },
+  { index: DefaultLibrariesEnum.MUSIC, sym: MUSIC_LIBRARY },
 ];
 
 export class LibraryManager extends BaseLibraryManager {
@@ -66,5 +70,9 @@ export class LibraryManager extends BaseLibraryManager {
 
   public getSound<T extends ISoundLibrary = ISoundLibrary>(): LibraryHandle<T> {
     return this._get<T>(DefaultLibrariesEnum.SOUND);
+  }
+
+  public getMusic<T extends IMusicLibrary = IMusicLibrary>(): LibraryHandle<T> {
+    return this._get<T>(DefaultLibrariesEnum.MUSIC);
   }
 }
