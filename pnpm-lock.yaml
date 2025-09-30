@@ -230,6 +230,12 @@ importers:
       '@nanoforge/input':
         specifier: workspace:^
         version: link:../input
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.2
+        version: 0.14.2
     devDependencies:
       '@commitlint/cli':
         specifier: ^20.0.0
