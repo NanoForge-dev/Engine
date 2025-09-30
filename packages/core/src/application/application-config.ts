@@ -4,6 +4,7 @@ import {
   type IGraphicsLibrary,
   type IInputLibrary,
   type ILibrary,
+  type IMusicLibrary,
   type INetworkLibrary,
   type ISoundLibrary,
   type LibraryHandle,
@@ -76,5 +77,17 @@ export class ApplicationConfig {
 
   public useSoundLibrary(library: ISoundLibrary) {
     this._libraryManager.setSound(library);
+  }
+
+  public getMusicLibrary() {
+    return this._libraryManager.getMusic();
+  }
+
+  public useMusicLibrary(library: IMusicLibrary) {
+    this._libraryManager.setMusic(library);
+  }
+
+  public getMutableLibraries() {
+    return this._libraryManager.getMutableLibraries();
   }
 }

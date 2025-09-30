@@ -53,6 +53,13 @@ export class Core {
     const intervalHandle = setInterval(render, 1000 / this.options.tickRate);
   }
 
+  /**
+   * mutes / unmutes mutable libraries all at once.
+   */
+  public mute(): void {
+    this.config.getMutableLibraries().map((x) => x.library.mute());
+  }
+
   private getInitContext(options: IRunOptions): InitContext {
     return new InitContext(this.context, this.config.libraryManager, this._configRegistry, options);
   }
