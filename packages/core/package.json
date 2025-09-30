@@ -34,7 +34,9 @@
   "dependencies": {
     "@nanoforge/asset-manager": "workspace:^",
     "@nanoforge/common": "workspace:^",
-    "@nanoforge/input": "workspace:^"
+    "@nanoforge/input": "workspace:^",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.0.0",
