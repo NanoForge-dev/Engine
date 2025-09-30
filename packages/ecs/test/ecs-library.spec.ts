@@ -1,6 +1,7 @@
 import { AssetManagerLibrary } from "@nanoforge/asset-manager";
 import { ApplicationContext, ClearContext, InitContext } from "@nanoforge/common";
 import { EditableLibraryManager } from "@nanoforge/core/src/common/library/manager/library.manager";
+import { ConfigRegistry } from "@nanoforge/core/src/config/config-registry";
 import { ECSLibrary } from "@nanoforge/ecs/src/ecs-library";
 
 class Position {
@@ -19,7 +20,8 @@ describe("ECSLibrary", () => {
   const assetManager = new AssetManagerLibrary();
   const appContext = new ApplicationContext();
   const libraryManager = new EditableLibraryManager();
-  const initContext = new InitContext(appContext, libraryManager, {
+  const configRegistry = new ConfigRegistry({});
+  const initContext = new InitContext(appContext, libraryManager, configRegistry, {
     // @ts-ignore
     canvas: null,
     files: {

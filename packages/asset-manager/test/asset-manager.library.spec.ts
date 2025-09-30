@@ -1,4 +1,9 @@
-import { ApplicationContext, InitContext, LibraryManager } from "@nanoforge/common";
+import {
+  ApplicationContext,
+  type IConfigRegistry,
+  InitContext,
+  LibraryManager,
+} from "@nanoforge/common";
 
 import { AssetManagerLibrary } from "../src";
 
@@ -6,7 +11,8 @@ describe("Asset Manager Library", () => {
   const library = new AssetManagerLibrary();
   const appContext = new ApplicationContext();
   const libraryManager = new LibraryManager();
-  const context = new InitContext(appContext, libraryManager, {
+  const configRegistry = {} as IConfigRegistry;
+  const context = new InitContext(appContext, libraryManager, configRegistry, {
     // @ts-ignore
     canvas: null,
     files: {
