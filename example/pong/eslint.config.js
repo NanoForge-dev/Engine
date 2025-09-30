@@ -4,13 +4,16 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default [
-  { files: ["src/**/*.{js,mjs,cjs,ts}"] },
+  {
+    files: ["src/**/*.{ts}"],
+  },
   { languageOptions: { globals: globals.node } },
 
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   ...tseslint.configs.strict,
   eslintConfigPrettier,
+  { ignores: ["**/*.js"] },
   {
     rules: {
       "@typescript-eslint/consistent-type-imports": [
