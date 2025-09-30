@@ -8,12 +8,15 @@ import {
   type IGraphicsLibrary,
   type IInputLibrary,
   type ILibrary,
+  type IMusicLibrary,
+  type IMutableLibrary,
   INPUT_LIBRARY,
   type INetworkLibrary,
   type IRunnerLibrary,
   type ISoundLibrary,
   type LibraryHandle,
   LibraryManager,
+  MUSIC_LIBRARY,
   NETWORK_LIBRARY,
   SOUND_LIBRARY,
 } from "@nanoforge/common";
@@ -65,6 +68,10 @@ export class EditableLibraryManager extends LibraryManager {
     this._set(DefaultLibrariesEnum.SOUND, SOUND_LIBRARY, library, new EditableLibraryContext());
   }
 
+  public setMusic(library: IMusicLibrary): void {
+    this._set(DefaultLibrariesEnum.MUSIC, MUSIC_LIBRARY, library, new EditableLibraryContext());
+  }
+
   public getLibraries(): LibraryHandle[] {
     return this._libraries;
   }
@@ -79,6 +86,12 @@ export class EditableLibraryManager extends LibraryManager {
 
   public getClearLibraries(): LibraryHandle[] {
     return Relationship.getLibrariesByDependencies(this._libraries, true);
+  }
+
+  public getMutableLibraries(): LibraryHandle<IMutableLibrary>[] {
+    return this._libraries.filter(
+      (handle) => handle && typeof handle.library["mute"] === "function",
+    ) as LibraryHandle<IMutableLibrary>[];
   }
 
   private _getRunnerLibraries(): LibraryHandle<IRunnerLibrary>[] {

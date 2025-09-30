@@ -6,3 +6,5 @@ export { IGraphicsLibrary } from "./finals/graphics.library.type";
 export { IInputLibrary } from "./finals/input.library.type";
 export { ISoundLibrary } from "./finals/sound.library.type";
 export { INetworkLibrary } from "./finals/network.library.type";
+export { IMusicLibrary } from "./finals/music.library.type";
+export { IMutableLibrary } from "./bases/mutable.library.type";

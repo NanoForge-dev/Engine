@@ -1,7 +1,7 @@
 {
   "name": "@nanoforge/music",
   "version": "1.0.0",
-  "description": "NanoForge Engine - musci",
+  "description": "NanoForge Engine - music",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
   "license": "MIT",
   "contributors": [
@@ -19,7 +19,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
-    "directory": "packages/musci"
+    "directory": "packages/music"
   },
   "scripts": {
     "build": "tsc -b .",
