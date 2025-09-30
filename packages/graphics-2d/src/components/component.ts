@@ -92,7 +92,11 @@ export abstract class NfgComponent {
   }
 
   protected _writeVertexBuffer(): void {
-    this._core.device.queue.writeBuffer(this._vertexBuffer, 0, this._vertices);
+    this._core.device.queue.writeBuffer(
+      this._vertexBuffer,
+      0,
+      this._vertices as unknown as SharedArrayBuffer,
+    );
   }
 
   protected _updatePipeline(): void {
