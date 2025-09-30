@@ -21,6 +21,7 @@ export abstract class NanoforgeApplication {
 
     this._options = {
       tickRate: 60,
+      environment: {},
       ...(options ?? {}),
     };
   }
@@ -41,16 +42,12 @@ export abstract class NanoforgeApplication {
     this.applicationConfig.useAssetManagerLibrary(library);
   }
 
-  public async init(options: IRunOptions): Promise<void> {
+  public init(options: IRunOptions): Promise<void> {
     this._core = new Core(this.applicationConfig, new ApplicationContext());
-    await this._core.init(options, this._options);
+    return this._core.init(options, this._options);
   }
 
   public run() {
-    this._core.run();
-  }
-
-  public mute() {
-    this._core.mute();
+    return this._core.run();
   }
 }
