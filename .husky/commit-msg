@@ -1,1 +1,1 @@
-bun --no-install commitlint --edit "$1"
+pnpm --no-install commitlint --edit "$1"
