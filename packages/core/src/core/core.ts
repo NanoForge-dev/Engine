@@ -12,11 +12,13 @@ import { type ApplicationConfig } from "../application/application-config";
 import type { IApplicationOptions } from "../application/application-options.type";
 import { EditableExecutionContext } from "../common/context/contexts/executions/execution.editable-context";
 import { type EditableLibraryContext } from "../common/context/contexts/library.editable-context";
+import { ConfigRegistry } from "../config/config-registry";
 
 export class Core {
   private readonly config: ApplicationConfig;
   private readonly context: ApplicationContext;
   private options: IApplicationOptions;
+  private _configRegistry: ConfigRegistry;
 
   constructor(config: ApplicationConfig, context: ApplicationContext) {
     this.config = config;
@@ -25,6 +27,7 @@ export class Core {
 
   public async init(options: IRunOptions, appOptions: IApplicationOptions): Promise<void> {
     this.options = appOptions;
+    this._configRegistry = new ConfigRegistry(appOptions.environment);
     await this.runInit(this.getInitContext(options));
   }
 
@@ -50,17 +53,8 @@ export class Core {
     const intervalHandle = setInterval(render, 1000 / this.options.tickRate);
   }
 
-  /**
-   * mutes / unmutes sounds.
-   */
-  public mute(): void {
-    const soundLibrary = this.config.getSoundLibrary();
-
-    soundLibrary.library.mute();
-  }
-
   private getInitContext(options: IRunOptions): InitContext {
-    return new InitContext(this.context, this.config.libraryManager, options);
+    return new InitContext(this.context, this.config.libraryManager, this._configRegistry, options);
   }
 
   private getExecutionContext<T extends IRunnerLibrary>(): EditableExecutionContext<T> {
