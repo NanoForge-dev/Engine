@@ -49,22 +49,28 @@
     "typescript": "^5"
   },
   "optionalDependencies": {
-    "@nanoforge/common": "latest",
-    "@nanoforge/core": "latest",
-    "@nanoforge/asset-manager": "latest",
-    "@nanoforge/ecs": "latest",
-    "@nanoforge/graphics-2d": "latest",
-    "@nanoforge/sound": "latest"
+    "@nanoforge/common": "workspace:^",
+    "@nanoforge/core": "workspace:^",
+    "@nanoforge/asset-manager": "workspace:^",
+    "@nanoforge/config": "workspace:^",
+    "@nanoforge/ecs": "workspace:^",
+    "@nanoforge/graphics-2d": "workspace:^",
+    "@nanoforge/sound": "workspace:^"
   },
   "engines": {
     "node": "23.6.0",
-    "bun": "1.2.4"
+    "bun": "1.2.23"
   },
-  "packageManager": "bun@1.2.4",
+  "packageManager": "bun@1.2.23",
   "lint-staged": {
     "**/*.{js,ts,html,css}": [
       "eslint --fix",
       "prettier --write"
     ]
-  }
+  },
+  "workspaces": [
+    ".",
+    "../../packages/*",
+    "../../libs/*"
+  ]
 }
