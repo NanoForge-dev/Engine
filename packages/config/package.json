@@ -1,0 +1,64 @@
+{
+  "name": "@nanoforge/config",
+  "version": "1.0.0",
+  "description": "NanoForge Engine - Config",
+  "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "license": "MIT",
+  "contributors": [
+    "Bill",
+    "Exelo",
+    "Fexkoser",
+    "Tchips"
+  ],
+  "funding": {
+    "type": "individual",
+    "url": ""
+  },
+  "type": "module",
+  "main": "src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanoForge-dev/Engine.git",
+    "directory": "packages/config"
+  },
+  "scripts": {
+    "build": "tsc -b .",
+    "clean": "pnpm clean:types && pnpm clean:scripts && rm -f tsconfig.build.tsbuildinfo",
+    "clean:types": "find src -name '*.d.ts' -delete",
+    "clean:scripts": "find src -name '*.js' -delete",
+    "lint": "eslint . && prettier --check .",
+    "fix": "eslint . --fix && prettier --write .",
+    "taze": "taze major -w",
+    "lint-staged": "lint-staged"
+  },
+  "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@eslint/js": "^9.23.0",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-format": "^1.0.1",
+    "eslint-plugin-prettier": "^5.2.5",
+    "globals": "^16.0.0",
+    "lint-staged": "^15.5.0",
+    "prettier": "^3.5.3",
+    "taze": "^19.0.2",
+    "typescript-eslint": "^8.28.0"
+  },
+  "engines": {
+    "node": "23.6.0",
+    "pnpm": "10.6.5"
+  },
+  "packageManager": "pnpm@10.6.5",
+  "lint-staged": {
+    "**/*.{js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}
