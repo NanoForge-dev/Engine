@@ -39,9 +39,6 @@ importers:
       lerna:
         specifier: ^8.2.4
         version: 8.2.4(@types/node@22.18.7)(encoding@0.1.13)
-      lint-staged:
-        specifier: ^16.2.3
-        version: 16.2.3
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
