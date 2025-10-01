@@ -1,3 +1,4 @@
 pnpm clean
-pnpm lerna run lint,test:unit
+pnpm lint
 pnpm build
+pnpm test
