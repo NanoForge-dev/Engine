@@ -33,42 +33,24 @@
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write .",
     "taze": "taze major -w",
-    "lint-staged": "lint-staged",
     "test:unit": "make fclean && make tests -j 16 && pnpm clean:script && pnpm build:script && jest --config ./jest.config.json"
   },
   "dependencies": {
     "@nanoforge/common": "workspace:^"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.0.0",
-    "@commitlint/config-conventional": "^20.0.0",
-    "@eslint/js": "^9.36.0",
-    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@nanoforge/utils-eslint-config": "workspace:^",
+    "@nanoforge/utils-prettier-config": "workspace:^",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.18.7",
-    "eslint": "^9.36.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-format": "^1.0.2",
-    "eslint-plugin-jest": "^29.0.1",
-    "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.4.0",
     "jest": "^30.2.0",
-    "lint-staged": "^16.2.3",
-    "prettier": "^3.6.2",
     "taze": "^19.7.0",
     "ts-jest": "^29.4.4",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.45.0"
+    "typescript": "^5.9.2"
   },
   "engines": {
     "node": "23.6.0",
     "pnpm": "10.17.1"
   },
-  "packageManager": "pnpm@10.17.1",
-  "lint-staged": {
-    "**/*.{js,ts}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  }
+  "packageManager": "pnpm@10.17.1"
 }

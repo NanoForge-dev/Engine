@@ -18,9 +18,12 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^20.0.0
         version: 20.0.0
-      '@eslint/js':
-        specifier: ^9.36.0
-        version: 9.36.0
+      '@nanoforge/utils-eslint-config':
+        specifier: workspace:^
+        version: link:utils/eslint-config
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:utils/prettier-config
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^5.2.2
         version: 5.2.2(prettier@3.6.2)
@@ -30,18 +33,6 @@ importers:
       eslint:
         specifier: ^9.36.0
         version: 9.36.0(jiti@2.6.0)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-format:
-        specifier: ^1.0.2
-        version: 1.0.2(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.36.0(jiti@2.6.0)))(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
-      globals:
-        specifier: ^16.4.0
-        version: 16.4.0
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -60,9 +51,6 @@ importers:
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
-      typescript-eslint:
-        specifier: ^8.45.0
-        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
 
   packages/asset-manager:
     dependencies:
@@ -70,51 +58,21 @@ importers:
         specifier: workspace:^
         version: link:../common
     devDependencies:
-      '@commitlint/cli':
-        specifier: ^20.0.0
-        version: 20.0.0(@types/node@22.18.7)(typescript@5.9.2)
-      '@commitlint/config-conventional':
-        specifier: ^20.0.0
-        version: 20.0.0
-      '@eslint/js':
-        specifier: ^9.36.0
-        version: 9.36.0
-      '@trivago/prettier-plugin-sort-imports':
-        specifier: ^5.2.2
-        version: 5.2.2(prettier@3.6.2)
+      '@nanoforge/utils-eslint-config':
+        specifier: workspace:^
+        version: link:../../utils/eslint-config
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../../utils/prettier-config
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
       '@types/node':
         specifier: ^22.18.7
         version: 22.18.7
-      eslint:
-        specifier: ^9.36.0
-        version: 9.36.0(jiti@2.6.0)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-format:
-        specifier: ^1.0.2
-        version: 1.0.2(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-jest:
-        specifier: ^29.0.1
-        version: 29.0.1(@typescript-eslint/eslint-plugin@8.45.0(@typescript-eslint/parser@8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(jest@30.2.0(@types/node@22.18.7))(typescript@5.9.2)
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.36.0(jiti@2.6.0)))(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
-      globals:
-        specifier: ^16.4.0
-        version: 16.4.0
       jest:
         specifier: ^30.2.0
         version: 30.2.0(@types/node@22.18.7)
-      lint-staged:
-        specifier: ^16.2.3
-        version: 16.2.3
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
       taze:
         specifier: ^19.7.0
         version: 19.7.0
@@ -124,51 +82,18 @@ importers:
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
-      typescript-eslint:
-        specifier: ^8.45.0
-        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
 
   packages/common:
     devDependencies:
-      '@commitlint/cli':
-        specifier: ^20.0.0
-        version: 20.0.0(@types/node@22.18.7)(typescript@5.9.2)
-      '@commitlint/config-conventional':
-        specifier: ^20.0.0
-        version: 20.0.0
-      '@eslint/js':
-        specifier: ^9.36.0
-        version: 9.36.0
-      '@trivago/prettier-plugin-sort-imports':
-        specifier: ^5.2.2
-        version: 5.2.2(prettier@3.6.2)
-      eslint:
-        specifier: ^9.36.0
-        version: 9.36.0(jiti@2.6.0)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-format:
-        specifier: ^1.0.2
-        version: 1.0.2(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.36.0(jiti@2.6.0)))(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
-      globals:
-        specifier: ^16.4.0
-        version: 16.4.0
-      lint-staged:
-        specifier: ^16.2.3
-        version: 16.2.3
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
+      '@nanoforge/utils-eslint-config':
+        specifier: workspace:^
+        version: link:../../utils/eslint-config
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../../utils/prettier-config
       taze:
         specifier: ^19.7.0
         version: 19.7.0
-      typescript-eslint:
-        specifier: ^8.45.0
-        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
 
   packages/config:
     dependencies:
@@ -179,45 +104,15 @@ importers:
         specifier: ^0.14.2
         version: 0.14.2
     devDependencies:
-      '@commitlint/cli':
-        specifier: ^20.0.0
-        version: 20.0.0(@types/node@22.18.7)(typescript@5.9.2)
-      '@commitlint/config-conventional':
-        specifier: ^20.0.0
-        version: 20.0.0
-      '@eslint/js':
-        specifier: ^9.36.0
-        version: 9.36.0
-      '@trivago/prettier-plugin-sort-imports':
-        specifier: ^5.2.2
-        version: 5.2.2(prettier@3.6.2)
-      eslint:
-        specifier: ^9.36.0
-        version: 9.36.0(jiti@2.6.0)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-format:
-        specifier: ^1.0.2
-        version: 1.0.2(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.36.0(jiti@2.6.0)))(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
-      globals:
-        specifier: ^16.4.0
-        version: 16.4.0
-      lint-staged:
-        specifier: ^16.2.3
-        version: 16.2.3
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
+      '@nanoforge/utils-eslint-config':
+        specifier: workspace:^
+        version: link:../../utils/eslint-config
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../../utils/prettier-config
       taze:
         specifier: ^19.7.0
         version: 19.7.0
-      typescript-eslint:
-        specifier: ^8.45.0
-        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
 
   packages/core:
     dependencies:
@@ -237,45 +132,15 @@ importers:
         specifier: ^0.14.2
         version: 0.14.2
     devDependencies:
-      '@commitlint/cli':
-        specifier: ^20.0.0
-        version: 20.0.0(@types/node@22.18.7)(typescript@5.9.2)
-      '@commitlint/config-conventional':
-        specifier: ^20.0.0
-        version: 20.0.0
-      '@eslint/js':
-        specifier: ^9.36.0
-        version: 9.36.0
-      '@trivago/prettier-plugin-sort-imports':
-        specifier: ^5.2.2
-        version: 5.2.2(prettier@3.6.2)
-      eslint:
-        specifier: ^9.36.0
-        version: 9.36.0(jiti@2.6.0)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-format:
-        specifier: ^1.0.2
-        version: 1.0.2(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.36.0(jiti@2.6.0)))(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
-      globals:
-        specifier: ^16.4.0
-        version: 16.4.0
-      lint-staged:
-        specifier: ^16.2.3
-        version: 16.2.3
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
+      '@nanoforge/utils-eslint-config':
+        specifier: workspace:^
+        version: link:../../utils/eslint-config
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../../utils/prettier-config
       taze:
         specifier: ^19.7.0
         version: 19.7.0
-      typescript-eslint:
-        specifier: ^8.45.0
-        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
 
   packages/ecs:
     dependencies:
@@ -283,51 +148,21 @@ importers:
         specifier: workspace:^
         version: link:../common
     devDependencies:
-      '@commitlint/cli':
-        specifier: ^20.0.0
-        version: 20.0.0(@types/node@22.18.7)(typescript@5.9.2)
-      '@commitlint/config-conventional':
-        specifier: ^20.0.0
-        version: 20.0.0
-      '@eslint/js':
-        specifier: ^9.36.0
-        version: 9.36.0
-      '@trivago/prettier-plugin-sort-imports':
-        specifier: ^5.2.2
-        version: 5.2.2(prettier@3.6.2)
+      '@nanoforge/utils-eslint-config':
+        specifier: workspace:^
+        version: link:../../utils/eslint-config
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../../utils/prettier-config
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
       '@types/node':
         specifier: ^22.18.7
         version: 22.18.7
-      eslint:
-        specifier: ^9.36.0
-        version: 9.36.0(jiti@2.6.0)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-format:
-        specifier: ^1.0.2
-        version: 1.0.2(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-jest:
-        specifier: ^29.0.1
-        version: 29.0.1(@typescript-eslint/eslint-plugin@8.45.0(@typescript-eslint/parser@8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(jest@30.2.0(@types/node@22.18.7))(typescript@5.9.2)
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.36.0(jiti@2.6.0)))(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
-      globals:
-        specifier: ^16.4.0
-        version: 16.4.0
       jest:
         specifier: ^30.2.0
         version: 30.2.0(@types/node@22.18.7)
-      lint-staged:
-        specifier: ^16.2.3
-        version: 16.2.3
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
       taze:
         specifier: ^19.7.0
         version: 19.7.0
@@ -337,9 +172,6 @@ importers:
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
-      typescript-eslint:
-        specifier: ^8.45.0
-        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
 
   packages/graphics-2d:
     dependencies:
@@ -350,18 +182,12 @@ importers:
         specifier: workspace:^
         version: link:../common
     devDependencies:
-      '@commitlint/cli':
-        specifier: ^20.0.0
-        version: 20.0.0(@types/node@22.18.7)(typescript@5.9.2)
-      '@commitlint/config-conventional':
-        specifier: ^20.0.0
-        version: 20.0.0
-      '@eslint/js':
-        specifier: ^9.36.0
-        version: 9.36.0
-      '@trivago/prettier-plugin-sort-imports':
-        specifier: ^5.2.2
-        version: 5.2.2(prettier@3.6.2)
+      '@nanoforge/utils-eslint-config':
+        specifier: workspace:^
+        version: link:../../utils/eslint-config
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../../utils/prettier-config
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
@@ -371,33 +197,9 @@ importers:
       '@webgpu/types':
         specifier: ^0.1.65
         version: 0.1.65
-      eslint:
-        specifier: ^9.36.0
-        version: 9.36.0(jiti@2.6.0)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-format:
-        specifier: ^1.0.2
-        version: 1.0.2(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-jest:
-        specifier: ^29.0.1
-        version: 29.0.1(@typescript-eslint/eslint-plugin@8.45.0(@typescript-eslint/parser@8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(jest@30.2.0(@types/node@22.18.7))(typescript@5.9.2)
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.36.0(jiti@2.6.0)))(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
-      globals:
-        specifier: ^16.4.0
-        version: 16.4.0
       jest:
         specifier: ^30.2.0
         version: 30.2.0(@types/node@22.18.7)
-      lint-staged:
-        specifier: ^16.2.3
-        version: 16.2.3
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
       taze:
         specifier: ^19.7.0
         version: 19.7.0
@@ -407,9 +209,6 @@ importers:
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
-      typescript-eslint:
-        specifier: ^8.45.0
-        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
 
   packages/input:
     dependencies:
@@ -417,54 +216,21 @@ importers:
         specifier: workspace:^
         version: link:../common
     devDependencies:
-      '@commitlint/cli':
-        specifier: ^20.0.0
-        version: 20.0.0(@types/node@22.18.7)(typescript@5.9.2)
-      '@commitlint/config-conventional':
-        specifier: ^20.0.0
-        version: 20.0.0
-      '@eslint/js':
-        specifier: ^9.36.0
-        version: 9.36.0
-      '@trivago/prettier-plugin-sort-imports':
-        specifier: ^5.2.2
-        version: 5.2.2(prettier@3.6.2)
+      '@nanoforge/utils-eslint-config':
+        specifier: workspace:^
+        version: link:../../utils/eslint-config
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../../utils/prettier-config
       '@types/node':
         specifier: ^22.18.7
         version: 22.18.7
-      eslint:
-        specifier: ^9.36.0
-        version: 9.36.0(jiti@2.6.0)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-format:
-        specifier: ^1.0.2
-        version: 1.0.2(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-jest:
-        specifier: ^29.0.1
-        version: 29.0.1(@typescript-eslint/eslint-plugin@8.45.0(@typescript-eslint/parser@8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(jest@30.2.0(@types/node@22.18.7))(typescript@5.9.2)
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.36.0(jiti@2.6.0)))(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
-      globals:
-        specifier: ^16.4.0
-        version: 16.4.0
-      lint-staged:
-        specifier: ^16.2.3
-        version: 16.2.3
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
       taze:
         specifier: ^19.7.0
         version: 19.7.0
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
-      typescript-eslint:
-        specifier: ^8.45.0
-        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
 
   packages/music:
     dependencies:
@@ -527,21 +293,30 @@ importers:
         specifier: workspace:^
         version: link:../common
     devDependencies:
-      '@commitlint/cli':
-        specifier: ^20.0.0
-        version: 20.0.0(@types/node@22.18.7)(typescript@5.9.2)
-      '@commitlint/config-conventional':
-        specifier: ^20.0.0
-        version: 20.0.0
-      '@eslint/js':
-        specifier: ^9.36.0
-        version: 9.36.0
-      '@trivago/prettier-plugin-sort-imports':
-        specifier: ^5.2.2
-        version: 5.2.2(prettier@3.6.2)
+      '@nanoforge/utils-eslint-config':
+        specifier: workspace:^
+        version: link:../../utils/eslint-config
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../../utils/prettier-config
       '@types/node':
         specifier: ^22.18.7
         version: 22.18.7
+      taze:
+        specifier: ^19.7.0
+        version: 19.7.0
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+
+  utils/eslint-config:
+    devDependencies:
+      '@eslint/js':
+        specifier: ^9.36.0
+        version: 9.36.0
+      '@nanoforge/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../prettier-config
       eslint:
         specifier: ^9.36.0
         version: 9.36.0(jiti@2.6.0)
@@ -560,6 +335,18 @@ importers:
       globals:
         specifier: ^16.4.0
         version: 16.4.0
+      taze:
+        specifier: ^19.7.0
+        version: 19.7.0
+      typescript-eslint:
+        specifier: ^8.45.0
+        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
+
+  utils/prettier-config:
+    devDependencies:
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^5.2.2
+        version: 5.2.2(prettier@3.6.2)
       lint-staged:
         specifier: ^16.2.3
         version: 16.2.3
@@ -569,12 +356,6 @@ importers:
       taze:
         specifier: ^19.7.0
         version: 19.7.0
-      typescript:
-        specifier: ^5.9.2
-        version: 5.9.2
-      typescript-eslint:
-        specifier: ^8.45.0
-        version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
 
 packages:
 
