@@ -1,6 +1,7 @@
-import type { NfgCircle } from "@nanoforge/graphics-2d";
-import type { NfgRectangle } from "@nanoforge/graphics-2d/src/components/shape/shapes/rectangle.shape";
+import type { Graphics } from "@nanoforge/graphics-2d";
 import type { InputEnum } from "@nanoforge/input";
+
+import { layer } from "./index";
 
 export class Velocity {
   name = "Velocity";
@@ -37,19 +38,21 @@ export class Hitbox {
 
 export class CircleComponent {
   name = "CircleComponent";
-  component: NfgCircle;
+  component: Graphics.Circle;
 
-  constructor(component: NfgCircle) {
+  constructor(component: Graphics.Circle) {
     this.component = component;
+    layer.add(this.component);
   }
 }
 
 export class RectangleComponent {
   name = "RectangleComponent";
-  component: NfgRectangle;
+  component: Graphics.Rect;
 
-  constructor(component: NfgRectangle) {
+  constructor(component: Graphics.Rect) {
     this.component = component;
+    layer.add(this.component);
   }
 }
 
