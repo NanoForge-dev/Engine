@@ -1,41 +1,28 @@
-import { ASSET_MANAGER_LIBRARY, BaseGraphicsLibrary, type InitContext } from "@nanoforge/common";
+import { BaseGraphicsLibrary, type InitContext } from "@nanoforge/common";
 
-import { GraphicsCore } from "./core";
-import { GraphicsFactory } from "./factory";
-import { type NfgWindow } from "./render/window";
+import { Graphics } from ".";
 
 export class Graphics2DLibrary extends BaseGraphicsLibrary {
-  private _core: GraphicsCore;
-  private _factory: GraphicsFactory;
-
-  constructor() {
-    super({
-      dependencies: [ASSET_MANAGER_LIBRARY],
-    });
-  }
+  private _stage: Graphics.Stage;
 
   get name(): string {
     return "Graphics2DLibrary";
   }
 
-  get factory(): GraphicsFactory {
-    return this._factory;
+  get stage(): Graphics.Stage {
+    return this._stage;
   }
 
   public async init(context: InitContext): Promise<void> {
     if (!context.canvas) {
       throw new Error("Can't initialize the canvas context");
     }
-    this._core = new GraphicsCore(context);
-    await this._core.init();
-    this._factory = new GraphicsFactory(this._core);
+    this._stage = new Graphics.Stage({
+      container: context.canvas.parentElement as HTMLDivElement,
+      width: context.canvas.width,
+      height: context.canvas.height,
+    });
   }
 
-  public async run(): Promise<void> {
-    this._core.window.render();
-  }
-
-  public getWindow(): NfgWindow {
-    return this._core.window;
-  }
+  public async run(): Promise<void> {}
 }

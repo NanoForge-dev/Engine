@@ -178,6 +178,9 @@ importers:
       '@nanoforge/common':
         specifier: workspace:^
         version: link:../common
+      konva:
+        specifier: ^10.0.2
+        version: 10.0.2
     devDependencies:
       '@nanoforge/utils-eslint-config':
         specifier: workspace:^
@@ -2763,6 +2766,9 @@ packages:
   kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
     engines: {node: '>=0.10.0'}
+
+  konva@10.0.2:
+    resolution: {integrity: sha512-NrZED6YG5BX5h3Xu8EZgLqhQ/+ZhxANYXmlIhMOfpBf+0ToExcdwE+Y46LyJOO/JR7FVeR3YTqon3eirnuo44A==}
 
   lerna@8.2.4:
     resolution: {integrity: sha512-0gaVWDIVT7fLfprfwpYcQajb7dBJv3EGavjG7zvJ+TmGx3/wovl5GklnSwM2/WeE0Z2wrIz7ndWhBcDUHVjOcQ==}
@@ -7037,6 +7043,8 @@ snapshots:
       json-buffer: 3.0.1
 
   kind-of@6.0.3: {}
+
+  konva@10.0.2: {}
 
   lerna@8.2.4(@types/node@22.18.7)(encoding@0.1.13):
     dependencies:
