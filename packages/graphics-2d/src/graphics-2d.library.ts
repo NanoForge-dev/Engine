@@ -19,8 +19,8 @@ export class Graphics2DLibrary extends BaseGraphicsLibrary {
     }
     this._stage = new Graphics.Stage({
       container: context.canvas.parentElement as HTMLDivElement,
-      width: context.canvas.width,
-      height: context.canvas.height,
+      width: window.innerWidth,
+      height: window.innerHeight,
     });
   }
 

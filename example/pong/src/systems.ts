@@ -8,7 +8,7 @@ import {
   RectangleComponent,
   Velocity,
 } from "./components";
-import { ecsLibrary, graphics, inputs, sounds } from "./index";
+import { ecsLibrary, inputs, sounds } from "./index";
 
 export function move() {
   const entities = ecsLibrary.getZipper([Bounce, Position, Velocity]);
@@ -23,12 +23,12 @@ export function bounce() {
   const entities = ecsLibrary.getZipper([Bounce, Position, Velocity]);
 
   entities.forEach((entity) => {
-    if (entity.Position.x >= 1.6 || entity.Position.x <= -1.6) {
+    if (entity.Position.x >= 1800 || entity.Position.x <= 100) {
       entity.Velocity.x = -entity.Velocity.x;
 
       sounds.play("test");
     }
-    if (entity.Position.y >= 1 || entity.Position.y <= -1) {
+    if (entity.Position.y >= 1000 || entity.Position.y <= 100) {
       entity.Velocity.y = -entity.Velocity.y;
 
       sounds.play("test");
@@ -41,14 +41,14 @@ export function controlPlayer() {
 
   entities.forEach((entity) => {
     if (inputs.isKeyPressed(entity.Controller.up) && !checkCollisions(entity)) {
-      entity.Position.y += entity.Velocity.y;
-    } else {
       entity.Position.y -= entity.Velocity.y;
+    } else {
+      entity.Position.y += entity.Velocity.y;
     }
     if (inputs.isKeyPressed(entity.Controller.down) && !checkCollisions(entity)) {
-      entity.Position.y -= entity.Velocity.y;
-    } else {
       entity.Position.y += entity.Velocity.y;
+    } else {
+      entity.Position.y -= entity.Velocity.y;
     }
   });
 }
@@ -59,27 +59,15 @@ export function drawCircle() {
   entities.forEach((entity) => {
     const pos = entity.Position;
     entity.CircleComponent.component.setPosition(pos);
-    graphics.getWindow().draw(entity.CircleComponent.component);
   });
 }
 
 export function moveRectangle() {
   const entities = ecsLibrary.getZipper([RectangleComponent, Position, Hitbox]);
 
+  console.log(entities);
   entities.forEach((entity) => {
     const pos = entity.Position;
-    entity.RectangleComponent.component.setMin({ x: pos.x, y: pos.y });
-    entity.RectangleComponent.component.setMax({
-      x: pos.x + entity.Hitbox.width,
-      y: pos.y + entity.Hitbox.height,
-    });
-  });
-}
-
-export function drawRectangle() {
-  const entities = ecsLibrary.getZipper([RectangleComponent]);
-
-  entities.forEach((entity) => {
-    graphics.getWindow().draw(entity.RectangleComponent.component);
+    (entity.RectangleComponent as RectangleComponent).component.setPosition(pos);
   });
 }
