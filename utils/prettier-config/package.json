@@ -1,0 +1,40 @@
+{
+  "name": "@nanoforge/utils-prettier-config",
+  "version": "1.0.0",
+  "description": "NanoForge Engine - Utils Prettier Config",
+  "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "license": "MIT",
+  "contributors": [
+    "Bill",
+    "Exelo",
+    "Fexkoser",
+    "Tchips"
+  ],
+  "funding": {
+    "type": "individual",
+    "url": ""
+  },
+  "type": "module",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanoForge-dev/Engine.git",
+    "directory": "utils/prettier-config"
+  },
+  "scripts": {
+    "lint": "prettier --check .",
+    "fix": "prettier --write .",
+    "taze": "taze major -w"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "lint-staged": "^16.2.3",
+    "prettier": "^3.6.2",
+    "taze": "^19.7.0"
+  },
+  "engines": {
+    "node": "23.6.0",
+    "pnpm": "10.17.1"
+  },
+  "packageManager": "pnpm@10.17.1"
+}
