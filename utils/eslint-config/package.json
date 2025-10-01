@@ -1,0 +1,46 @@
+{
+  "name": "@nanoforge/utils-eslint-config",
+  "version": "1.0.0",
+  "description": "NanoForge Engine - Utils EsLint Config",
+  "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "license": "MIT",
+  "contributors": [
+    "Bill",
+    "Exelo",
+    "Fexkoser",
+    "Tchips"
+  ],
+  "funding": {
+    "type": "individual",
+    "url": ""
+  },
+  "type": "module",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanoForge-dev/Engine.git",
+    "directory": "utils/eslint-config"
+  },
+  "scripts": {
+    "lint": "prettier --check .",
+    "fix": "prettier --write .",
+    "taze": "taze major -w"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@nanoforge/utils-prettier-config": "workspace:^",
+    "eslint": "^9.36.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-format": "^1.0.2",
+    "eslint-plugin-jest": "^29.0.1",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.4.0",
+    "taze": "^19.7.0",
+    "typescript-eslint": "^8.45.0"
+  },
+  "engines": {
+    "node": "23.6.0",
+    "pnpm": "10.17.1"
+  },
+  "packageManager": "pnpm@10.17.1"
+}
