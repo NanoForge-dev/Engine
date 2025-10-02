@@ -28,8 +28,7 @@
     "clean:scripts": "find src -name '*.js' -delete",
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write .",
-    "taze": "taze major -w",
-    "lint-staged": "lint-staged"
+    "taze": "taze major -w"
   },
   "devDependencies": {
     "@nanoforge/utils-eslint-config": "workspace:^",
