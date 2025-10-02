@@ -38,6 +38,9 @@ jobs:
         with:
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
 
+      - name: "Run build"
+        run: pnpm build
+
       - name: "Run tests"
         run: pnpm test:unit
 
