@@ -1,5 +1,4 @@
-import { BaseMusicLibrary } from "@nanoforge/common";
-import { NfNotFound } from "@nanoforge/common/src/exception";
+import { BaseMusicLibrary, NfNotFound } from "@nanoforge/common";
 
 export class MusicLibrary extends BaseMusicLibrary {
   private muted: boolean;

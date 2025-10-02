@@ -2,13 +2,31 @@
   "files": [],
   "references": [
     {
+      "path": "./asset-manager/tsconfig.build.json"
+    },
+    {
       "path": "./common/tsconfig.build.json"
+    },
+    {
+      "path": "./config/tsconfig.build.json"
     },
     {
       "path": "./core/tsconfig.build.json"
     },
     {
       "path": "./ecs/tsconfig.build.json"
+    },
+    {
+      "path": "./graphics-2d/tsconfig.build.json"
+    },
+    {
+      "path": "./input/tsconfig.build.json"
+    },
+    {
+      "path": "./music/tsconfig.build.json"
+    },
+    {
+      "path": "./sound/tsconfig.build.json"
     }
   ]
 }
