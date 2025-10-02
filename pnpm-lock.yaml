@@ -219,15 +219,9 @@ importers:
       '@nanoforge/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
-      '@types/node':
-        specifier: ^22.18.7
-        version: 22.18.7
       taze:
         specifier: ^19.7.0
         version: 19.7.0
-      typescript:
-        specifier: ^5.9.2
-        version: 5.9.2
 
   packages/music:
     dependencies:
