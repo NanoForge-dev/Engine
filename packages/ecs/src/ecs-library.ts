@@ -2,6 +2,7 @@ import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
 import {
   ASSET_MANAGER_LIBRARY,
   BaseComponentSystemLibrary,
+  type ExecutionContext,
   GRAPHICS_LIBRARY,
   type InitContext,
 } from "@nanoforge/common";
@@ -36,8 +37,8 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     this.registry = new this.module.Registry();
   }
 
-  async run(): Promise<void> {
-    this.runSystems();
+  async run(ctx: ExecutionContext<this>): Promise<void> {
+    this.runSystems(ctx);
   }
 
   addComponent(entity: Entity, component: Component): void {
@@ -68,8 +69,8 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     this.registry.clearEntities();
   }
 
-  runSystems(): void {
-    this.registry.runSystems();
+  runSystems(ctx: ExecutionContext<this>): void {
+    this.registry.runSystems(ctx);
   }
 
   clearSystems(): void {
