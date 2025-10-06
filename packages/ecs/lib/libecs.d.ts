@@ -1,4 +1,17 @@
 // TypeScript bindings for emscripten-generated code.  Automatically generated at compile time.
+declare namespace RuntimeExports {
+    let HEAPF32: any;
+    let HEAPF64: any;
+    let HEAP_DATA_VIEW: any;
+    let HEAP8: any;
+    let HEAPU8: any;
+    let HEAP16: any;
+    let HEAPU16: any;
+    let HEAP32: any;
+    let HEAPU32: any;
+    let HEAP64: any;
+    let HEAPU64: any;
+}
 interface WasmModule {
 }
 
@@ -7,8 +20,6 @@ export interface ClassHandle {
   delete(): void;
   deleteLater(): this;
   isDeleted(): boolean;
-  // @ts-ignore - If targeting lower than ESNext, this symbol might not exist.
-  [Symbol.dispose](): void;
   clone(): this;
 }
 export interface container extends ClassHandle {
@@ -47,8 +58,7 @@ export interface Registry extends ClassHandle {
   killEntity(_0: Entity): void;
   clearEntities(): void;
   removeComponent(_0: Entity, _1: {name: string, [key: string]: any}): void;
-  addSystem(_0: (registry: Registry) => void): void;
-  runSystems(): void;
+  addSystem(_0: (registry: Registry, ctx: any) => void): void;
   clearSystems(): void;
   entityFromIndex(_0: number): Entity;
   removeSystem(_0: number): void;
@@ -56,6 +66,7 @@ export interface Registry extends ClassHandle {
   getEntityComponentConst(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
   getEntityComponent(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
   addComponent(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
+  runSystems(_0: any): void;
   getZipper(_0: any): any;
 }
 
@@ -74,5 +85,5 @@ interface EmbindModule {
   };
 }
 
-export type MainModule = WasmModule & EmbindModule;
+export type MainModule = WasmModule & typeof RuntimeExports & EmbindModule;
 export default function MainModuleFactory (options?: unknown): Promise<MainModule>;
