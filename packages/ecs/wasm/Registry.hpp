@@ -159,11 +159,11 @@ namespace nfo {
             _systems.clear();
         }
 
-        void run_systems()
+        void run_systems(const emscripten::val &ctx)
         {
-            std::vector<std::function<void(Registry &)>> systems_copy = _systems;
-            for (std::function<void(Registry &)> &system : systems_copy)
-                system(*this);
+            std::vector<std::function<void(Registry &, const emscripten::val &)>> systems_copy = _systems;
+            for (std::function<void(Registry &, const emscripten::val &)> &system : systems_copy)
+                system(*this, ctx);
         }
 
         void log(const Entity &entity) const
@@ -214,7 +214,7 @@ namespace nfo {
 
         std::unordered_map<std::string, std::function<void(Registry &, Entity const &)>> _remove_functions;
         std::unordered_map<std::string, std::function<bool(const Registry &, const Entity &)>> _loggers;
-        std::vector<std::function<void(Registry &)>> _systems;
+        std::vector<std::function<void(Registry &, const emscripten::val &)>> _systems;
 
         std::vector<Entity> _dead_entities;
         std::size_t _next_entity{0};
