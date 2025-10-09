@@ -41,6 +41,7 @@ pnpm build
 ```
 
 This will produce 2 files in the `lib/` directory.
+
 - `libecs.js`, which is the file containg the javascript binding permitting the javascript to interract with the wasm.
 - `libecs.wasm`, the compile code library
 
@@ -57,4 +58,3 @@ To run tests use:
 ```sh
 pnpm test
 ```
-
