@@ -41,3 +41,7 @@ To run tests use:
 ```sh
 pnpm test
 ```
+
+## Setting up a test project
+
+In order to setup a test project see (this)[https://github.com/NanoForge-dev/Engine/docs/Introduction.md]
