@@ -34,7 +34,6 @@ export const main = async (options: IRunOptions) => {
   const registry = ecsLibrary.registry;
 
   graphics.stage.add(layer);
-  console.log(graphics.stage.width());
 
   sounds.load("test", "https://universal-soundbank.com/sounds/18782.mp3");
 
