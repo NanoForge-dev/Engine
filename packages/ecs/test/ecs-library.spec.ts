@@ -41,12 +41,12 @@ describe("ECSLibrary", () => {
   libraryManager.setAssetManager(assetManager);
 
   beforeAll(async () => {
-    await assetManager.init(initContext);
+    await assetManager.__init(initContext);
   });
 
   beforeEach(async () => {
     ecs = new ECSLibrary();
-    await ecs.init(initContext);
+    await ecs.__init(initContext);
     registry = ecs.registry;
   });
 
@@ -66,6 +66,6 @@ describe("ECSLibrary", () => {
   });
 
   test("clear", async () => {
-    await ecs.clear(clearContext);
+    await ecs.__clear(clearContext);
   });
 });

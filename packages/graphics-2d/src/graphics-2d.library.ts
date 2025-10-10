@@ -5,7 +5,7 @@ import { Graphics } from ".";
 export class Graphics2DLibrary extends BaseGraphicsLibrary {
   private _stage: Graphics.Stage;
 
-  get name(): string {
+  get __name(): string {
     return "Graphics2DLibrary";
   }
 
@@ -13,7 +13,7 @@ export class Graphics2DLibrary extends BaseGraphicsLibrary {
     return this._stage;
   }
 
-  public async init(context: InitContext): Promise<void> {
+  public async __init(context: InitContext): Promise<void> {
     if (!context.canvas) {
       throw new Error("Can't initialize the canvas context");
     }
@@ -24,5 +24,5 @@ export class Graphics2DLibrary extends BaseGraphicsLibrary {
     });
   }
 
-  public async run(): Promise<void> {}
+  public async __run(): Promise<void> {}
 }

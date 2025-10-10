@@ -1,8 +1,9 @@
+import { type Context } from "@nanoforge/common";
+
 import type { Entity, Registry, SparseArray } from "../lib";
-import { type ECSContext } from "./ecs-context.type";
 
 export type Component = { name: string; [key: string]: any };
-export type System = (registry: ECSRegistry, ctx: ECSContext) => void;
+export type System = (registry: ECSRegistry, ctx: Context) => void;
 
 export class ECSRegistry {
   private _registry: Registry;
@@ -39,7 +40,7 @@ export class ECSRegistry {
     return this._registry.clearEntities();
   }
 
-  runSystems(ctx: ECSContext): void {
+  runSystems(ctx: Context): void {
     return this._registry.runSystems(ctx);
   }
 
