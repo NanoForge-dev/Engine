@@ -35,6 +35,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@nanoforge/common": "workspace:^",
+    "@nanoforge/core": "workspace:^",
+    "@nanoforge/asset-manager": "workspace:^",
+    "@nanoforge/config": "workspace:^",
+    "@nanoforge/ecs": "workspace:^",
+    "@nanoforge/graphics-2d": "workspace:^",
+    "@nanoforge/sound": "workspace:^",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/bun": "latest",
     "eslint": "^9.22.0",
@@ -47,15 +54,6 @@
   },
   "peerDependencies": {
     "typescript": "^5"
-  },
-  "optionalDependencies": {
-    "@nanoforge/common": "workspace:^",
-    "@nanoforge/core": "workspace:^",
-    "@nanoforge/asset-manager": "workspace:^",
-    "@nanoforge/config": "workspace:^",
-    "@nanoforge/ecs": "workspace:^",
-    "@nanoforge/graphics-2d": "workspace:^",
-    "@nanoforge/sound": "workspace:^"
   },
   "engines": {
     "node": "23.6.0",
@@ -71,6 +69,7 @@
   "workspaces": [
     ".",
     "../../packages/*",
-    "../../libs/*"
+    "../../libs/*",
+    "../../utils/*"
   ]
 }
