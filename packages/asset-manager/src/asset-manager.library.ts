@@ -7,11 +7,11 @@ export class AssetManagerLibrary extends BaseAssetManagerLibrary {
   private _wasm: Map<string, string>;
   private _wgsl: Map<string, string>;
 
-  get name(): string {
+  get __name(): string {
     return "AssetManagerLibrary";
   }
 
-  public async init(context: InitContext): Promise<void> {
+  public async __init(context: InitContext): Promise<void> {
     this._assets = context.files.assets;
     this._wasm = context.files.wasm;
     this._wgsl = context.files.wgsl;
