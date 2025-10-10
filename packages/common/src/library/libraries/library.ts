@@ -19,15 +19,15 @@ export abstract class Library implements ILibrary {
     );
   }
 
-  get relationship(): RelationshipHandler {
+  get __relationship(): RelationshipHandler {
     return this._relationship;
   }
 
-  abstract get name(): string;
+  abstract get __name(): string;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async init(_context: InitContext): Promise<void> {}
+  public async __init(_context: InitContext): Promise<void> {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async clear(_context: ClearContext): Promise<void> {}
+  public async __clear(_context: ClearContext): Promise<void> {}
 }
