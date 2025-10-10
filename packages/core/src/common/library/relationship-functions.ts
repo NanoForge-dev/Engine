@@ -21,10 +21,10 @@ class RelationshipStatic {
     for (const handle of libraries) {
       const key = handle.symbol;
 
-      for (const before of handle.library.relationship.runBefore) {
+      for (const before of handle.library.__relationship.runBefore) {
         this._pushToDependencies(key, before, dependencies);
       }
-      for (const after of handle.library.relationship.runAfter) {
+      for (const after of handle.library.__relationship.runAfter) {
         this._pushToDependencies(after, key, dependencies);
       }
     }
@@ -100,7 +100,7 @@ class RelationshipStatic {
     if (cache.includes(handle.symbol)) throw new Error("Circular dependencies !");
 
     cache.push(handle.symbol);
-    for (const dep of handle.library.relationship.dependencies) {
+    for (const dep of handle.library.__relationship.dependencies) {
       if (this._symbolIsInList(dep, response)) continue;
 
       const depHandle = libraries.find((lib) => lib?.symbol === dep) as LibraryHandle;

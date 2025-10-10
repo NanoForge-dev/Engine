@@ -96,7 +96,7 @@ export class EditableLibraryManager extends LibraryManager {
 
   private _getRunnerLibraries(): LibraryHandle<IRunnerLibrary>[] {
     return this._libraries.filter(
-      (handle) => handle && typeof handle.library["run"] === "function",
+      (handle) => handle && typeof handle.library["__run"] === "function",
     ) as LibraryHandle<IRunnerLibrary>[];
   }
 }
