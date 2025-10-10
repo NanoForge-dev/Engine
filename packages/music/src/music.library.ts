@@ -5,11 +5,11 @@ export class MusicLibrary extends BaseMusicLibrary {
   private musics: Map<string, HTMLAudioElement>;
   private current: HTMLAudioElement | null = null;
 
-  get name(): string {
+  get __name(): string {
     return "NfMusic";
   }
 
-  public async init(): Promise<void> {
+  public async __init(): Promise<void> {
     this.musics = new Map<string, HTMLAudioElement>();
     this.muted = true;
   }

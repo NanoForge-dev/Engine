@@ -4,11 +4,11 @@ export class SoundLibrary extends BaseSoundLibrary {
   private muted: boolean;
   private sounds: Map<string, HTMLAudioElement>;
 
-  get name(): string {
+  get __name(): string {
     return "NfSound";
   }
 
-  public async init(): Promise<void> {
+  public async __init(): Promise<void> {
     this.sounds = new Map<string, HTMLAudioElement>();
     this.muted = true;
   }

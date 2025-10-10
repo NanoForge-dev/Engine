@@ -2,13 +2,13 @@ import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
 import {
   ASSET_MANAGER_LIBRARY,
   BaseComponentSystemLibrary,
+  type Context,
   GRAPHICS_LIBRARY,
   type InitContext,
 } from "@nanoforge/common";
 
 import type { MainModule } from "../lib";
 import { Module } from "../lib";
-import { type ECSContext } from "./ecs-context.type";
 import { ECSRegistry } from "./ecs-registry";
 
 export class ECSLibrary extends BaseComponentSystemLibrary {
@@ -24,11 +24,11 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     });
   }
 
-  get name(): string {
+  get __name(): string {
     return "ECSLibrary";
   }
 
-  async init(context: InitContext): Promise<void> {
+  async __init(context: InitContext): Promise<void> {
     const wasmFile = await context.libraries
       .getAssetManager<AssetManagerLibrary>()
       .library.getWasm(this.path);
@@ -36,7 +36,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     this._registry = new ECSRegistry(new this.module.Registry());
   }
 
-  async run(ctx: ECSContext): Promise<void> {
+  async __run(ctx: Context): Promise<void> {
     this._registry.runSystems(ctx);
   }
 
