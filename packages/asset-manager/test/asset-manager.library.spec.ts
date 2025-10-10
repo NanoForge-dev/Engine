@@ -21,7 +21,7 @@ describe("Asset Manager Library", () => {
       wgsl: new Map([["/test.wgsl", "blob:http://localhost:3000/test.wgsl"]]),
     },
   });
-  library.init(context);
+  library.__init(context);
 
   it("Should get asset", async () => {
     expect((await library.getAsset("test.png")).path).toEqual(
