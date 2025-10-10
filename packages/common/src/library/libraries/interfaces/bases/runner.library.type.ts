@@ -1,6 +1,6 @@
-import { type ExecutionContext } from "../../../../context";
+import { type Context } from "../../../../context";
 import { type ILibrary } from "../../library.type";
 
 export interface IRunnerLibrary extends ILibrary {
-  run(context: ExecutionContext<IRunnerLibrary>): Promise<void>;
+  __run(context: Context): Promise<void>;
 }
