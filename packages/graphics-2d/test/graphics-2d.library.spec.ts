@@ -23,6 +23,6 @@ describe("Graphics 2D Library", () => {
   });
 
   it("Should throw if canvas is undefined", async () => {
-    await expect(library.init(context)).rejects.toThrow();
+    await expect(library.__init(context)).rejects.toThrow();
   });
 });
