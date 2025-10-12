@@ -1,6 +1,8 @@
 import {
   type ApplicationContext,
   ClearContext,
+  ClientLibraryManager,
+  Context,
   type IRunOptions,
   type IRunnerLibrary,
   InitContext,
@@ -33,15 +35,16 @@ export class Core {
 
   public async run(): Promise<void> {
     const context = this.getExecutionContext();
+    const clientContext = this.getClientContext();
     const libraries = this.config.libraryManager.getExecutionLibraries();
     let requestAnimationFrameHandle: number;
 
     const runner = async () => {
-      await this.runExecute(context, libraries);
+      await this.runExecute(clientContext, libraries);
     };
 
     const render = () => {
-      if (!context.isRunning) {
+      if (!context.application.isRunning) {
         clearInterval(intervalHandle);
         this.runClear(this.getClearContext());
         return;
@@ -50,6 +53,7 @@ export class Core {
       requestAnimationFrameHandle = requestAnimationFrame(runner);
     };
 
+    context.application.setIsRunning(true);
     const intervalHandle = setInterval(render, 1000 / this.options.tickRate);
   }
 
@@ -64,7 +68,7 @@ export class Core {
     return new InitContext(this.context, this.config.libraryManager, this._configRegistry, options);
   }
 
-  private getExecutionContext<T extends IRunnerLibrary>(): EditableExecutionContext<T> {
+  private getExecutionContext(): EditableExecutionContext {
     return new EditableExecutionContext(this.context, this.config.libraryManager);
   }
 
@@ -72,26 +76,26 @@ export class Core {
     return new ClearContext(this.context, this.config.libraryManager);
   }
 
+  private getClientContext(): Context {
+    return new Context(this.context, new ClientLibraryManager(this.config.libraryManager));
+  }
+
   private async runInit(context: InitContext): Promise<void> {
     for (const handle of this.config.libraryManager.getInitLibraries()) {
-      await handle.library.init(context);
+      await handle.library.__init(context);
       (handle.context as EditableLibraryContext).setStatus(LibraryStatusEnum.LOADED);
     }
   }
 
-  private async runExecute(
-    context: EditableExecutionContext<IRunnerLibrary>,
-    libraries: LibraryHandle<IRunnerLibrary>[],
-  ) {
+  private async runExecute(context: Context, libraries: LibraryHandle<IRunnerLibrary>[]) {
     for (const handle of libraries) {
-      context.setCurrentLibrary(handle.library);
-      await handle.library.run(context);
+      await handle.library.__run(context);
     }
   }
 
   private async runClear(context: ClearContext) {
     for (const handle of this.config.libraryManager.getClearLibraries()) {
-      await handle.library.clear(context);
+      await handle.library.__clear(context);
       (handle.context as EditableLibraryContext).setStatus(LibraryStatusEnum.CLEAR);
     }
   }

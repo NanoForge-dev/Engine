@@ -6,11 +6,11 @@ import { type InputEnum } from "./input.enum";
 export class InputLibrary extends BaseInputLibrary {
   private _inputHandler: InputHandler;
 
-  get name(): string {
+  get __name(): string {
     return "InputLibrary";
   }
 
-  public async init(): Promise<void> {
+  public async __init(): Promise<void> {
     this._inputHandler = new InputHandler();
   }
 
