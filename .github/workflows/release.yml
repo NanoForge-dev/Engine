@@ -1,18 +1,16 @@
-name: Tests
+name: release
 
 on:
-  pull_request:
-    branches:
-      - main
-      - dev
+  push:
+    tags:
+      - "v*.*.*"
+      - "v*.*.*-pre"
   workflow_dispatch:
 
-env:
-  EM_CACHE_FOLDER: "emsdk-cache"
-
 jobs:
-  checkout:
+  release:
     runs-on: ubuntu-latest
+    name: Building stack
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -23,7 +21,7 @@ jobs:
       - name: "Setup node"
         uses: actions/setup-node@v4
         with:
-          node-version: 24.11.0
+          node-version: 23.6.0
           cache: "pnpm"
 
       - name: "Install dependencies"
@@ -34,15 +32,9 @@ jobs:
         with:
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
           
-      - name: "Run build"
+      - name: "Build"
         run: pnpm build
 
-      - name: "Run tests"
-        run: pnpm test:unit
-
-      - name: "Run linter"
-        run: pnpm clean && pnpm lint
-      
       - name: Get previous tag
         id: previousTag
         run: |
@@ -57,3 +49,8 @@ jobs:
           token: ${{ secrets.ACTIONS_KEY }}
           tag: ${{ github.ref_name }}
           writeToFile: false
+          # fromTag: ${{ github.ref_name }}
+          # toTag: ${{ env.previousTag }}
+          
+      # - name: Release
+      #   shell: echo ${{ run.steps.changelog.outputs.changes }}
