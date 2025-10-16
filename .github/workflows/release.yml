@@ -1,0 +1,19 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+      - "v*.*.*-pre"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Building stack
+
+    steps:
+      - build:
+          
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
