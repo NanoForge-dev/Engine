@@ -12,14 +12,7 @@ jobs:
     name: Building stack
 
     steps:
-      - name: Check out
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Build ${{ matrix.projects }}
-        run: |
-          pnpm run build
+      - build:
           
       - name: Release
         uses: softprops/action-gh-release@v2

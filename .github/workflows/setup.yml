@@ -1,0 +1,26 @@
+name: setup
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  setup-dependencies:
+    runs-on: ubuntu-latest
+    steps:    
+      - name: "Setup pnpm"
+        uses: pnpm/action-setup@v4
+
+      - name: "Setup node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23.6.0
+          cache: "pnpm"
+
+      - name: "Install dependencies"
+        run: pnpm install
+
+      - name: "Install emscipten"
+        uses: "mymindstorm/setup-emsdk@v14"
+        with:
+          actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
