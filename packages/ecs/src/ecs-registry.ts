@@ -1,9 +1,6 @@
 import { type Context } from "@nanoforge/common";
 
-import type { Entity, Registry, SparseArray } from "../lib";
-
-export type Component = { name: string; [key: string]: any };
-export type System = (registry: ECSRegistry, ctx: Context) => void;
+import type { Component, Entity, Registry, SparseArray, System } from "../lib";
 
 export class ECSRegistry {
   private _registry: Registry;
@@ -69,10 +66,10 @@ export class ECSRegistry {
   }
 
   addSystem(system: System): void {
-    return this._registry.addSystem(system as unknown as (registry: Registry, ctx: any) => void);
+    return this._registry.addSystem(system);
   }
 
-  getZipper(types: [Component, ...Component[]]): [any, ...any[]] {
+  getZipper(types: [Component]) {
     return this._registry.getZipper(types);
   }
 }

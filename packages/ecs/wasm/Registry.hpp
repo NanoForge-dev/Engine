@@ -16,6 +16,7 @@
 #include <any>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <ranges>
 #include <stdexcept>
 #include <unordered_map>
@@ -179,7 +180,7 @@ namespace nfo {
             return _next_entity;
         }
 
-        emscripten::val get_zipper(const emscripten::val &comps)
+        emscripten::val get_zipper(const ZipperInput &comps)
         {
             if (!comps.isArray())
                 throw std::runtime_error("getZipper: need an array of comps as parameter");
