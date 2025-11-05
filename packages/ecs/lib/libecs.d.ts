@@ -1,17 +1,4 @@
 // TypeScript bindings for emscripten-generated code.  Automatically generated at compile time.
-declare namespace RuntimeExports {
-    let HEAPF32: any;
-    let HEAPF64: any;
-    let HEAP_DATA_VIEW: any;
-    let HEAP8: any;
-    let HEAPU8: any;
-    let HEAP16: any;
-    let HEAPU16: any;
-    let HEAP32: any;
-    let HEAPU32: any;
-    let HEAP64: any;
-    let HEAPU64: any;
-}
 interface WasmModule {
 }
 
@@ -20,6 +7,8 @@ export interface ClassHandle {
   delete(): void;
   deleteLater(): this;
   isDeleted(): boolean;
+  // @ts-ignore - If targeting lower than ESNext, this symbol might not exist.
+  [Symbol.dispose](): void;
   clone(): this;
 }
 export interface container extends ClassHandle {
@@ -50,24 +39,28 @@ export interface Entity extends ClassHandle {
   getId(): number;
 }
 
+type Component = {name: string, [key: string]: any};
+
+type System = (registry: Registry, ctx: any) => void;
+
 export interface Registry extends ClassHandle {
-  registerComponent(_0: {name: string, [key: string]: any}): SparseArray;
-  getComponentsConst(_0: {name: string, [key: string]: any}): SparseArray;
-  getComponents(_0: {name: string, [key: string]: any}): SparseArray;
+  registerComponent(_0: Component): SparseArray;
+  getComponentsConst(_0: Component): SparseArray;
+  getComponents(_0: Component): SparseArray;
   spawnEntity(): Entity;
   killEntity(_0: Entity): void;
   clearEntities(): void;
-  removeComponent(_0: Entity, _1: {name: string, [key: string]: any}): void;
-  addSystem(_0: (registry: Registry, ctx: any) => void): void;
+  removeComponent(_0: Entity, _1: Component): void;
+  addSystem(_0: System): void;
   clearSystems(): void;
   entityFromIndex(_0: number): Entity;
   removeSystem(_0: number): void;
   maxEntities(): number;
-  getEntityComponentConst(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
-  getEntityComponent(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
-  addComponent(_0: Entity, _1: {name: string, [key: string]: any}): any | undefined;
+  getEntityComponentConst(_0: Entity, _1: Component): any | undefined;
+  getEntityComponent(_0: Entity, _1: Component): any | undefined;
+  addComponent(_0: Entity, _1: Component): any | undefined;
   runSystems(_0: any): void;
-  getZipper(_0: any): any;
+  getZipper(_0: [Component]): any;
 }
 
 interface EmbindModule {
@@ -85,5 +78,5 @@ interface EmbindModule {
   };
 }
 
-export type MainModule = WasmModule & typeof RuntimeExports & EmbindModule;
+export type MainModule = WasmModule & EmbindModule;
 export default function MainModuleFactory (options?: unknown): Promise<MainModule>;
