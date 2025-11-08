@@ -60,7 +60,7 @@ export interface Registry extends ClassHandle {
   getEntityComponent(_0: Entity, _1: Component): any | undefined;
   addComponent(_0: Entity, _1: Component): any | undefined;
   runSystems(_0: any): void;
-  getZipper(_0: [Component]): any;
+  getZipper(_0: Component[]): any;
 }
 
 interface EmbindModule {

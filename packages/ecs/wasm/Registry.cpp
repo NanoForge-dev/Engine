@@ -24,7 +24,7 @@ namespace nfo {
     {
         emscripten::register_type<Component>("Component", "{name: string, [key: string]: any}");
         emscripten::register_type<System>("System", "(registry: Registry, ctx: any) => void");
-        emscripten::register_type<ZipperInput>("[Component]");
+        emscripten::register_type<ZipperInput>("Component[]");
 
         emscripten::class_<Registry>("Registry")
             .constructor()

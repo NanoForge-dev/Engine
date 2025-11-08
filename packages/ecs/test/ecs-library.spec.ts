@@ -2,8 +2,9 @@ import { AssetManagerLibrary } from "@nanoforge/asset-manager";
 import { ClearContext, type IConfigRegistry, InitContext } from "@nanoforge/common";
 import { EditableApplicationContext } from "@nanoforge/core/src/common/context/contexts/application.editable-context";
 import { EditableLibraryManager } from "@nanoforge/core/src/common/library/manager/library.manager";
-import { type ECSRegistry } from "@nanoforge/ecs";
 import { ECSLibrary } from "@nanoforge/ecs/src/ecs-library";
+
+import { type Registry } from "../lib";
 
 class Position {
   name: string = "Position";
@@ -18,7 +19,7 @@ class Position {
 
 describe("ECSLibrary", () => {
   let ecs: ECSLibrary;
-  let registry: ECSRegistry;
+  let registry: Registry;
   const assetManager = new AssetManagerLibrary();
   const libraryManager = new EditableLibraryManager();
   const appContext = new EditableApplicationContext(libraryManager);
