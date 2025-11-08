@@ -6,12 +6,12 @@ import {
   type InitContext,
 } from "@nanoforge/common";
 
-import { type MainModule, Module } from "../lib";
-import { ECSRegistry } from "./ecs-registry";
+import type { MainModule, Registry } from "../lib";
+import { Module } from "../lib";
 
 export class ECSLibrary extends BaseComponentSystemLibrary {
   private module: MainModule;
-  private _registry: ECSRegistry;
+  private _registry: Registry;
 
   private readonly path: string = "libecs.wasm";
 
@@ -29,14 +29,14 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
   async __init(context: InitContext): Promise<void> {
     const wasmFile = context.libraries.getAssetManager().library.getAsset(this.path);
     this.module = await Module({ locateFile: () => wasmFile.path });
-    this._registry = new ECSRegistry(new this.module.Registry());
+    this._registry = new this.module.Registry();
   }
 
   async __run(ctx: Context): Promise<void> {
     this._registry.runSystems(ctx);
   }
 
-  get registry(): ECSRegistry {
+  get registry(): Registry {
     return this._registry;
   }
 }
