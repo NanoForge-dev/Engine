@@ -1,8 +1,8 @@
-import { type ECSRegistry } from "@nanoforge/ecs";
+import { type Registry } from "@nanoforge/ecs";
 
 import { Hitbox, Position } from "./components";
 
-export function checkCollisions(registry: ECSRegistry, entity: any) {
+export function checkCollisions(registry: Registry, entity: any) {
   const entities = registry.getZipper([Hitbox, Position]);
 
   const { x, y } = entity.Position;

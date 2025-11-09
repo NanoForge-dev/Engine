@@ -1,5 +1,5 @@
 import { type Context } from "@nanoforge/common";
-import { type ECSRegistry } from "@nanoforge/ecs";
+import { type Registry } from "@nanoforge/ecs";
 import { type InputLibrary } from "@nanoforge/input";
 import { type SoundLibrary } from "@nanoforge/sound";
 
@@ -14,7 +14,7 @@ import {
   Velocity,
 } from "./components";
 
-export function move(registry: ECSRegistry) {
+export function move(registry: Registry) {
   const entities = registry.getZipper([Bounce, Position, Velocity]);
 
   entities.forEach((entity) => {
@@ -23,7 +23,7 @@ export function move(registry: ECSRegistry) {
   });
 }
 
-export function bounce(registry: ECSRegistry, ctx: Context) {
+export function bounce(registry: Registry, ctx: Context) {
   const entities = registry.getZipper([Bounce, Position, Velocity]);
 
   entities.forEach((entity) => {
@@ -39,7 +39,7 @@ export function bounce(registry: ECSRegistry, ctx: Context) {
   });
 }
 
-export function controlPlayer(registry: ECSRegistry, ctx: Context) {
+export function controlPlayer(registry: Registry, ctx: Context) {
   const entities = registry.getZipper([Controller, Position, Hitbox, Velocity]);
 
   entities.forEach((entity) => {
@@ -62,7 +62,7 @@ export function controlPlayer(registry: ECSRegistry, ctx: Context) {
   });
 }
 
-export function drawCircle(registry: ECSRegistry) {
+export function drawCircle(registry: Registry) {
   const entities = registry.getZipper([CircleComponent, Position]);
 
   entities.forEach((entity) => {
@@ -71,7 +71,7 @@ export function drawCircle(registry: ECSRegistry) {
   });
 }
 
-export function moveRectangle(registry: ECSRegistry) {
+export function moveRectangle(registry: Registry) {
   const entities = registry.getZipper([RectangleComponent, Position, Hitbox]);
 
   entities.forEach((entity) => {
