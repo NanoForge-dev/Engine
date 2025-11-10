@@ -1,4 +1,3 @@
-import { type AssetManagerLibrary } from "@nanoforge/asset-manager";
 import {
   ASSET_MANAGER_LIBRARY,
   BaseComponentSystemLibrary,
@@ -7,8 +6,7 @@ import {
   type InitContext,
 } from "@nanoforge/common";
 
-import type { MainModule } from "../lib";
-import { Module } from "../lib";
+import { type MainModule, Module } from "../lib";
 import { ECSRegistry } from "./ecs-registry";
 
 export class ECSLibrary extends BaseComponentSystemLibrary {
@@ -29,9 +27,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
   }
 
   async __init(context: InitContext): Promise<void> {
-    const wasmFile = await context.libraries
-      .getAssetManager<AssetManagerLibrary>()
-      .library.getWasm(this.path);
+    const wasmFile = context.libraries.getAssetManager().library.getAsset(this.path);
     this.module = await Module({ locateFile: () => wasmFile.path });
     this._registry = new ECSRegistry(new this.module.Registry());
   }
