@@ -30,11 +30,7 @@ describe("ECSLibrary", () => {
   const initContext = new InitContext(appContext, libraryManager, configRegistry, {
     // @ts-ignore
     canvas: null,
-    files: {
-      assets: new Map(),
-      wasm: new Map([["/libecs.wasm", "./lib/libecs.wasm"]]),
-      wgsl: new Map(),
-    },
+    files: new Map([["/libecs.wasm", "./lib/libecs.wasm"]]),
   });
 
   const clearContext = new ClearContext(appContext, libraryManager);
