@@ -1,3 +1,5 @@
+import { NfFetchException } from "../exception";
+
 export class NfFile {
   private readonly _path: string;
 
@@ -41,7 +43,7 @@ export class NfFile {
 
   private async _fetch(): Promise<Response> {
     const res = await fetch(this._path);
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    if (!res.ok) throw new NfFetchException(res.status, res.statusText);
     return res;
   }
 }
