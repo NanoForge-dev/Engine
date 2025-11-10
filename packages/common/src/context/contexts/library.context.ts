@@ -5,7 +5,7 @@ export enum LibraryStatusEnum {
 }
 
 export class LibraryContext {
-  protected _status: LibraryStatusEnum;
+  protected _status: LibraryStatusEnum = LibraryStatusEnum.UNLOADED;
 
   get status() {
     return this._status;

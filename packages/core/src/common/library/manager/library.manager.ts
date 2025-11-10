@@ -24,6 +24,10 @@ import {
 import { EditableLibraryContext } from "../../context/contexts/library.editable-context";
 import { Relationship } from "../relationship-functions";
 
+const hasMethod = (obj: any, method: string) => {
+  return typeof obj[method] === "function";
+};
+
 export class EditableLibraryManager extends LibraryManager {
   public set(sym: symbol, library: ILibrary) {
     this.setNewLibrary(sym, library, new EditableLibraryContext());
@@ -90,13 +94,13 @@ export class EditableLibraryManager extends LibraryManager {
 
   public getMutableLibraries(): LibraryHandle<IMutableLibrary>[] {
     return this._libraries.filter(
-      (handle) => handle && typeof handle.library["mute"] === "function",
+      (handle) => handle && hasMethod(handle.library, "mute"),
     ) as LibraryHandle<IMutableLibrary>[];
   }
 
   private _getRunnerLibraries(): LibraryHandle<IRunnerLibrary>[] {
     return this._libraries.filter(
-      (handle) => handle && typeof handle.library["__run"] === "function",
+      (handle) => handle && hasMethod(handle.library, "__run"),
     ) as LibraryHandle<IRunnerLibrary>[];
   }
 }

@@ -3,7 +3,6 @@
     "composite": true,
     "module": "commonjs",
     "declaration": true,
-    "noImplicitAny": false,
     "skipLibCheck": true,
     "noUnusedLocals": false,
     "importHelpers": true,
@@ -18,7 +17,6 @@
     "strict": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
-    "strictPropertyInitialization": false,
     "types": ["node"]
   }
 }
