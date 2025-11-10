@@ -4,7 +4,6 @@
     "outDir": ".",
     "rootDir": ".",
     "paths": {
-      "@lib": ["./lib"],
       "@nanoforge/common": ["../common"]
     }
   },

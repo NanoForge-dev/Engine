@@ -4,6 +4,5 @@ package-lock.json
 yarn.lock
 bun.lock
 
-*.js
 *.d.ts
 build

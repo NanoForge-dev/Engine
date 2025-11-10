@@ -1,8 +1,8 @@
 import { BaseSoundLibrary, NfNotFound } from "@nanoforge/common";
 
 export class SoundLibrary extends BaseSoundLibrary {
-  private muted: boolean;
-  private sounds: Map<string, HTMLAudioElement>;
+  private muted: boolean = true;
+  private sounds?: Map<string, HTMLAudioElement>;
 
   get __name(): string {
     return "NfSound";
@@ -14,10 +14,9 @@ export class SoundLibrary extends BaseSoundLibrary {
   }
 
   public mute(): void {
+    if (!this.sounds) this.throwNotInitializedError();
     this.muted = !this.muted;
-    for (const key in this.sounds) {
-      const element = this.sounds[key];
-
+    for (const [, element] of this.sounds) {
       if (element) {
         element.muted = this.muted;
       }
@@ -25,6 +24,7 @@ export class SoundLibrary extends BaseSoundLibrary {
   }
 
   public play(sound: string): void {
+    if (!this.sounds) this.throwNotInitializedError();
     const soundElement = this.sounds.get(sound);
 
     if (soundElement) {
@@ -40,6 +40,7 @@ export class SoundLibrary extends BaseSoundLibrary {
   }
 
   public load(sound: string, file: string) {
+    if (!this.sounds) this.throwNotInitializedError();
     const element = new Audio(file);
     if (element) {
       element.muted = this.muted;

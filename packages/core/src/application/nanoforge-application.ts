@@ -4,6 +4,7 @@ import {
   type ILibrary,
   type INetworkLibrary,
   type IRunOptions,
+  NfNotInitializedException,
 } from "@nanoforge/common";
 
 import { EditableApplicationContext } from "../common/context/contexts/application.editable-context";
@@ -13,7 +14,7 @@ import type { IApplicationOptions } from "./application-options.type";
 
 export abstract class NanoforgeApplication {
   protected applicationConfig: ApplicationConfig;
-  private _core: Core;
+  private _core?: Core;
   private readonly _options: IApplicationOptions;
 
   constructor(options?: Partial<IApplicationOptions>) {
@@ -51,6 +52,7 @@ export abstract class NanoforgeApplication {
   }
 
   public run() {
-    return this._core.run();
+    if (!this._core) throw new NfNotInitializedException("Core");
+    return this._core?.run();
   }
 }

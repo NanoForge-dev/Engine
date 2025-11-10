@@ -4,9 +4,7 @@ import { LibraryHandle } from "../handle/library.handle";
 
 export class BaseLibraryManager {
   protected _libraries: LibraryHandle[] = [];
-  private _librariesIndex: {
-    [sym: symbol]: number;
-  };
+  private _librariesIndex: Record<symbol, number> = {};
 
   /**
    * @todo Add error management
