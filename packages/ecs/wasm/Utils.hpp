@@ -22,6 +22,7 @@
 EMSCRIPTEN_DECLARE_VAL_TYPE(Component);
 EMSCRIPTEN_DECLARE_VAL_TYPE(ComponentArray);
 EMSCRIPTEN_DECLARE_VAL_TYPE(ZipperInput);
+EMSCRIPTEN_DECLARE_VAL_TYPE(ZipperOutput);
 
 std::optional<std::string> json_to_str(const emscripten::val &c);
 std::optional<emscripten::val> get_js_member(const emscripten::val &c, const std::string &member);

@@ -180,7 +180,7 @@ namespace nfo {
             return _next_entity;
         }
 
-        emscripten::val get_zipper(const ZipperInput &comps)
+        ZipperOutput get_zipper(const ZipperInput &comps)
         {
             if (!comps.isArray())
                 throw std::runtime_error("getZipper: need an array of comps as parameter");
@@ -207,7 +207,7 @@ namespace nfo {
                 if (need_to_add)
                     arr.set(idx, obj);
             }
-            return arr;
+            return ZipperOutput(arr);
         }
 
       private:
