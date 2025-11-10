@@ -1,4 +1,5 @@
 import { type ClearContext, type InitContext } from "../../context";
+import { NfNotInitializedException } from "../../exception";
 import { RelationshipHandler } from "../relationship/relationship-handler";
 import { DEFAULT_LIBRARY_OPTIONS } from "./consts/library-options-default.const";
 import { type ILibrary, type ILibraryOptions } from "./library.type";
@@ -30,4 +31,8 @@ export abstract class Library implements ILibrary {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async __clear(_context: ClearContext): Promise<void> {}
+
+  protected throwNotInitializedError(): never {
+    throw new NfNotInitializedException(this.__name, "Library");
+  }
 }

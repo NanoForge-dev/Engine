@@ -1,8 +1,8 @@
 import { BaseMusicLibrary, NfNotFound } from "@nanoforge/common";
 
 export class MusicLibrary extends BaseMusicLibrary {
-  private muted: boolean;
-  private musics: Map<string, HTMLAudioElement>;
+  private muted: boolean = true;
+  private musics?: Map<string, HTMLAudioElement>;
   private current: HTMLAudioElement | null = null;
 
   get __name(): string {
@@ -15,10 +15,9 @@ export class MusicLibrary extends BaseMusicLibrary {
   }
 
   public mute(): void {
+    if (!this.musics) this.throwNotInitializedError();
     this.muted = !this.muted;
-    for (const key in this.musics) {
-      const element = this.musics[key];
-
+    for (const [, element] of this.musics) {
       if (element) {
         element.muted = this.muted;
       }
@@ -26,6 +25,7 @@ export class MusicLibrary extends BaseMusicLibrary {
   }
 
   public play(music: string): void {
+    if (!this.musics) this.throwNotInitializedError();
     const musicElement = this.musics.get(music);
 
     if (musicElement) {
@@ -44,6 +44,7 @@ export class MusicLibrary extends BaseMusicLibrary {
   }
 
   public load(music: string, file: string) {
+    if (!this.musics) this.throwNotInitializedError();
     const element = new Audio(file);
     if (element) {
       element.muted = this.muted;

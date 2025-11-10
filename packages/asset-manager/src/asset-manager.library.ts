@@ -1,7 +1,7 @@
 import { BaseAssetManagerLibrary, type InitContext, NfFile, NfNotFound } from "@nanoforge/common";
 
 export class AssetManagerLibrary extends BaseAssetManagerLibrary {
-  private _assets: Map<string, string>;
+  private _assets?: Map<string, string>;
 
   get __name(): string {
     return "AssetManagerLibrary";
@@ -12,6 +12,7 @@ export class AssetManagerLibrary extends BaseAssetManagerLibrary {
   }
 
   public getAsset(path: string): NfFile {
+    if (!this._assets) this.throwNotInitializedError();
     const res = this._assets.get(this._parsePath(path));
     if (!res) throw new NfNotFound(path, "Asset");
     return new NfFile(res);

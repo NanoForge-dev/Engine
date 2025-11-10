@@ -3,13 +3,14 @@ import { BaseGraphicsLibrary, type InitContext } from "@nanoforge/common";
 import { Graphics } from ".";
 
 export class Graphics2DLibrary extends BaseGraphicsLibrary {
-  private _stage: Graphics.Stage;
+  private _stage?: Graphics.Stage;
 
   get __name(): string {
     return "Graphics2DLibrary";
   }
 
   get stage(): Graphics.Stage {
+    if (!this._stage) this.throwNotInitializedError();
     return this._stage;
   }
 

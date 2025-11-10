@@ -8,6 +8,7 @@ import {
   InitContext,
   type LibraryHandle,
   LibraryStatusEnum,
+  NfNotInitializedException,
 } from "@nanoforge/common";
 
 import { type ApplicationConfig } from "../application/application-config";
@@ -19,8 +20,8 @@ import { ConfigRegistry } from "../config/config-registry";
 export class Core {
   private readonly config: ApplicationConfig;
   private readonly context: ApplicationContext;
-  private options: IApplicationOptions;
-  private _configRegistry: ConfigRegistry;
+  private options?: IApplicationOptions;
+  private _configRegistry?: ConfigRegistry;
 
   constructor(config: ApplicationConfig, context: ApplicationContext) {
     this.config = config;
@@ -34,6 +35,8 @@ export class Core {
   }
 
   public async run(): Promise<void> {
+    if (!this.options) throw new NfNotInitializedException("Core");
+
     const context = this.getExecutionContext();
     const clientContext = this.getClientContext();
     const libraries = this.config.libraryManager.getExecutionLibraries();
@@ -58,6 +61,8 @@ export class Core {
   }
 
   private getInitContext(options: IRunOptions): InitContext {
+    if (!this._configRegistry) throw new NfNotInitializedException("Core");
+
     return new InitContext(this.context, this.config.libraryManager, this._configRegistry, options);
   }
 

@@ -6,12 +6,11 @@ import {
   type InitContext,
 } from "@nanoforge/common";
 
-import type { MainModule, Registry } from "../lib";
-import { Module } from "../lib";
+import { type MainModule, Module, type Registry } from "../lib";
 
 export class ECSLibrary extends BaseComponentSystemLibrary {
-  private module: MainModule;
-  private _registry: Registry;
+  private module?: MainModule;
+  private _registry?: Registry;
 
   private readonly path: string = "libecs.wasm";
 
@@ -33,10 +32,12 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
   }
 
   async __run(ctx: Context): Promise<void> {
+    if (!this._registry) this.throwNotInitializedError();
     this._registry.runSystems(ctx);
   }
 
   get registry(): Registry {
+    if (!this._registry) this.throwNotInitializedError();
     return this._registry;
   }
 }
