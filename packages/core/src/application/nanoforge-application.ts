@@ -1,5 +1,4 @@
 import {
-  ApplicationContext,
   type IAssetManagerLibrary,
   type IComponentSystemLibrary,
   type ILibrary,
@@ -7,6 +6,7 @@ import {
   type IRunOptions,
 } from "@nanoforge/common";
 
+import { EditableApplicationContext } from "../common/context/contexts/application.editable-context";
 import { Core } from "../core/core";
 import { ApplicationConfig } from "./application-config";
 import type { IApplicationOptions } from "./application-options.type";
@@ -43,7 +43,10 @@ export abstract class NanoforgeApplication {
   }
 
   public init(options: IRunOptions): Promise<void> {
-    this._core = new Core(this.applicationConfig, new ApplicationContext());
+    this._core = new Core(
+      this.applicationConfig,
+      new EditableApplicationContext(this.applicationConfig.libraryManager),
+    );
     return this._core.init(options, this._options);
   }
 
