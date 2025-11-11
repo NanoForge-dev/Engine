@@ -39,18 +39,19 @@
     "@nanoforge/common": "workspace:^"
   },
   "devDependencies": {
+    "@nanoforge/asset-manager": "workspace:^",
     "@nanoforge/utils-eslint-config": "workspace:^",
     "@nanoforge/utils-prettier-config": "workspace:^",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.18.7",
+    "@types/node": "^24.10.1",
     "jest": "^30.2.0",
-    "taze": "^19.7.0",
-    "ts-jest": "^29.4.4",
-    "typescript": "^5.9.2"
+    "taze": "^19.9.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
   },
   "engines": {
-    "node": "23.6.0",
-    "pnpm": "10.17.1"
+    "node": "24.11.0",
+    "pnpm": "10.22.0"
   },
-  "packageManager": "pnpm@10.17.1"
+  "packageManager": "pnpm@10.22.0"
 }
