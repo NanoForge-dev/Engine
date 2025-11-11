@@ -1,4 +1,4 @@
-export class ApplicationContext {
+export abstract class ApplicationContext {
   private _isRunning: boolean = false;
 
   get isRunning(): boolean {
@@ -8,4 +8,6 @@ export class ApplicationContext {
   setIsRunning(value: boolean): void {
     this._isRunning = value;
   }
+
+  abstract muteSoundLibraries(): void;
 }
