@@ -1,6 +1,11 @@
 {
   "extends": "../../../tsconfig.spec.json",
   "compilerOptions": {
-    "types": ["jest", "node", "@webgpu/types"]
+    "types": ["jest", "node", "@webgpu/types"],
+    "paths": {
+      "@nanoforge/common": ["./packages/common"],
+      "@nanoforge/core": ["./packages/core"],
+      "@nanoforge/core/*": ["./packages/core/*"]
+    }
   }
 }

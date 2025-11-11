@@ -1,16 +1,13 @@
-import {
-  ApplicationContext,
-  type IConfigRegistry,
-  InitContext,
-  LibraryManager,
-} from "@nanoforge/common";
+import { type IConfigRegistry, InitContext } from "@nanoforge/common";
+import { EditableApplicationContext } from "@nanoforge/core/src/common/context/contexts/application.editable-context";
+import { EditableLibraryManager } from "@nanoforge/core/src/common/library/manager/library.manager";
 
 import { AssetManagerLibrary } from "../src";
 
 describe("Asset Manager Library", () => {
   const library = new AssetManagerLibrary();
-  const appContext = new ApplicationContext();
-  const libraryManager = new LibraryManager();
+  const libraryManager = new EditableLibraryManager();
+  const appContext = new EditableApplicationContext(libraryManager);
   const configRegistry = {} as IConfigRegistry;
   const context = new InitContext(appContext, libraryManager, configRegistry, {
     // @ts-ignore

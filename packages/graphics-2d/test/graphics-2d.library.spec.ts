@@ -1,16 +1,13 @@
-import {
-  ApplicationContext,
-  type IConfigRegistry,
-  InitContext,
-  LibraryManager,
-} from "@nanoforge/common";
+import { type IConfigRegistry, InitContext } from "@nanoforge/common";
+import { EditableApplicationContext } from "@nanoforge/core/src/common/context/contexts/application.editable-context";
+import { EditableLibraryManager } from "@nanoforge/core/src/common/library/manager/library.manager";
 
 import { Graphics2DLibrary } from "../src/graphics-2d.library";
 
 describe("Graphics 2D Library", () => {
   const library = new Graphics2DLibrary();
-  const appContext = new ApplicationContext();
-  const libraryManager = new LibraryManager();
+  const libraryManager = new EditableLibraryManager();
+  const appContext = new EditableApplicationContext(libraryManager);
   const configRegistry = {} as IConfigRegistry;
   const context = new InitContext(appContext, libraryManager, configRegistry, {
     // @ts-ignore

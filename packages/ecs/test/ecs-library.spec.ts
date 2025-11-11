@@ -1,10 +1,6 @@
 import { AssetManagerLibrary } from "@nanoforge/asset-manager";
-import {
-  ApplicationContext,
-  ClearContext,
-  type IConfigRegistry,
-  InitContext,
-} from "@nanoforge/common";
+import { ClearContext, type IConfigRegistry, InitContext } from "@nanoforge/common";
+import { EditableApplicationContext } from "@nanoforge/core/src/common/context/contexts/application.editable-context";
 import { EditableLibraryManager } from "@nanoforge/core/src/common/library/manager/library.manager";
 import { type ECSRegistry } from "@nanoforge/ecs";
 import { ECSLibrary } from "@nanoforge/ecs/src/ecs-library";
@@ -24,8 +20,8 @@ describe("ECSLibrary", () => {
   let ecs: ECSLibrary;
   let registry: ECSRegistry;
   const assetManager = new AssetManagerLibrary();
-  const appContext = new ApplicationContext();
   const libraryManager = new EditableLibraryManager();
+  const appContext = new EditableApplicationContext(libraryManager);
   const configRegistry = {} as IConfigRegistry;
   const initContext = new InitContext(appContext, libraryManager, configRegistry, {
     // @ts-ignore

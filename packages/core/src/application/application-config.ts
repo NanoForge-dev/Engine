@@ -86,8 +86,4 @@ export class ApplicationConfig {
   public useMusicLibrary(library: IMusicLibrary) {
     this._libraryManager.setMusic(library);
   }
-
-  public getMutableLibraries() {
-    return this._libraryManager.getMutableLibraries();
-  }
 }
