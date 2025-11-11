@@ -27,14 +27,14 @@
     "taze": "taze major -w"
   },
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
-    "lint-staged": "^16.2.3",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
+    "lint-staged": "^16.2.6",
     "prettier": "^3.6.2",
-    "taze": "^19.7.0"
+    "taze": "^19.9.0"
   },
   "engines": {
-    "node": "23.6.0",
-    "pnpm": "10.17.1"
+    "node": "24.11.0",
+    "pnpm": "10.22.0"
   },
-  "packageManager": "pnpm@10.17.1"
+  "packageManager": "pnpm@10.22.0"
 }
