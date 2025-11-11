@@ -27,28 +27,28 @@
     "test:unit": "lerna run test:unit",
     "test:e2e": "lerna run test:e2e",
     "prepare": "husky",
-    "taze": "taze major -w && lerna run taze"
+    "taze": "taze major -wr"
   },
   "dependencies": {
     "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.0.0",
+    "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@nanoforge/utils-eslint-config": "workspace:^",
     "@nanoforge/utils-prettier-config": "workspace:^",
-    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
-    "@types/node": "^22.18.7",
-    "eslint": "^9.36.0",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
     "husky": "^9.1.7",
-    "lerna": "^8.2.4",
+    "lerna": "^9.0.1",
     "prettier": "^3.6.2",
-    "taze": "^19.7.0",
-    "typescript": "^5.9.2"
+    "taze": "^19.9.0",
+    "typescript": "^5.9.3"
   },
   "engines": {
-    "node": "23.6.0",
-    "pnpm": "10.17.1"
+    "node": "24.11.0",
+    "pnpm": "10.22.0"
   },
-  "packageManager": "pnpm@10.17.1"
+  "packageManager": "pnpm@10.22.0"
 }

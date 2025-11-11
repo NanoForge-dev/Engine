@@ -27,20 +27,20 @@
     "taze": "taze major -w"
   },
   "devDependencies": {
-    "@eslint/js": "^9.36.0",
+    "@eslint/js": "^9.39.1",
     "@nanoforge/utils-prettier-config": "workspace:^",
-    "eslint": "^9.36.0",
+    "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-format": "^1.0.2",
-    "eslint-plugin-jest": "^29.0.1",
+    "eslint-plugin-jest": "^29.1.0",
     "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.4.0",
-    "taze": "^19.7.0",
-    "typescript-eslint": "^8.45.0"
+    "globals": "^16.5.0",
+    "taze": "^19.9.0",
+    "typescript-eslint": "^8.47.0"
   },
   "engines": {
-    "node": "23.6.0",
-    "pnpm": "10.17.1"
+    "node": "24.11.0",
+    "pnpm": "10.22.0"
   },
-  "packageManager": "pnpm@10.17.1"
+  "packageManager": "pnpm@10.22.0"
 }
