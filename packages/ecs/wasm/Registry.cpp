@@ -23,7 +23,7 @@ namespace nfo {
     EMSCRIPTEN_BINDINGS(Registry)
     {
         emscripten::register_type<Component>("Component", "{name: string, [key: string]: any}");
-        emscripten::register_type<System>("System", "(registry: Registry, ctx: any) => void");
+        emscripten::register_type<System>("System", "(registry: Registry, ctx: Context) => void");
         emscripten::register_type<ZipperInput>("Component[]");
         emscripten::register_type<ZipperOutput>("any[]");
 

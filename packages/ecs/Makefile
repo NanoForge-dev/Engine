@@ -46,7 +46,10 @@ $(HTML_NAME): $(OBJ)
 $(TS_NAME): LDFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s ENVIRONMENT=web
 $(TS_NAME): $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) $(LDFLAGS) --emit-tsd $(TS_NAME) -o $(JS_NAME)
+	$(CC) $(OBJ) $(LDFLAGS) --emit-tsd libecs-tmp.d.ts -o $(JS_NAME)
+	cat build/pre.ts > $(OUT_DIR)/$(TS_NAME)
+	cat lib/libecs-tmp.d.ts >> $(OUT_DIR)/$(TS_NAME)
+	$(RM) lib/libecs-tmp.d.ts
 
 clean:
 	$(RM) $(OBJ)
@@ -57,7 +60,10 @@ fclean: clean
 tests: LDFLAGS += -s MODULARIZE=1
 tests: $(OBJ)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(OBJ) $(LDFLAGS) --emit-tsd $(TS_NAME) -o $(JS_NAME)
+	$(CC) $(OBJ) $(LDFLAGS) --emit-tsd libecs-tmp.d.ts -o $(JS_NAME)
+	cat build/pre.ts > $(OUT_DIR)/$(TS_NAME)
+	cat lib/libecs-tmp.d.ts >> $(OUT_DIR)/$(TS_NAME)
+	$(RM) lib/libecs-tmp.d.ts
 
 re: fclean all
 
