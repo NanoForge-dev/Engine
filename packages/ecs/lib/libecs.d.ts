@@ -1,6 +1,7 @@
+import { Context } from "@nanoforge/common";
+
 // TypeScript bindings for emscripten-generated code.  Automatically generated at compile time.
-interface WasmModule {
-}
+interface WasmModule {}
 
 export interface ClassHandle {
   isAliasOf(other: ClassHandle): boolean;
@@ -39,15 +40,16 @@ export interface Entity extends ClassHandle {
   getId(): number;
 }
 
-type Component = {name: string, [key: string]: any};
+type Component = { name: string; [key: string]: any };
 
-type System = (registry: Registry, ctx: any) => void;
+type System = (registry: Registry, ctx: Context) => void;
 
 export interface Registry extends ClassHandle {
   registerComponent(_0: Component): SparseArray;
   getComponentsConst(_0: Component): SparseArray;
   getComponents(_0: Component): SparseArray;
   spawnEntity(): Entity;
+  getZipper(_0: Component[]): any[];
   killEntity(_0: Entity): void;
   clearEntities(): void;
   removeComponent(_0: Entity, _1: Component): void;
@@ -60,23 +62,22 @@ export interface Registry extends ClassHandle {
   getEntityComponent(_0: Entity, _1: Component): any | undefined;
   addComponent(_0: Entity, _1: Component): any | undefined;
   runSystems(_0: any): void;
-  getZipper(_0: Component[]): any;
 }
 
 interface EmbindModule {
   container: {
-    new(): container;
+    new (): container;
   };
   SparseArray: {
-    new(): SparseArray;
+    new (): SparseArray;
   };
   Entity: {
-    new(_0: number): Entity;
+    new (_0: number): Entity;
   };
   Registry: {
-    new(): Registry;
+    new (): Registry;
   };
 }
 
 export type MainModule = WasmModule & EmbindModule;
-export default function MainModuleFactory (options?: unknown): Promise<MainModule>;
+export default function MainModuleFactory(options?: unknown): Promise<MainModule>;
