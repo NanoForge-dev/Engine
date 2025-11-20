@@ -1,5 +1,5 @@
 {
-  "name": "@nanoforge/sound",
+  "name": "@nanoforge-dev/sound",
   "version": "1.0.0",
   "description": "NanoForge Engine - sound",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
@@ -31,11 +31,11 @@
     "taze": "taze major -w"
   },
   "dependencies": {
-    "@nanoforge/common": "workspace:^"
+    "@nanoforge-dev/common": "workspace:^"
   },
   "devDependencies": {
-    "@nanoforge/utils-eslint-config": "workspace:^",
-    "@nanoforge/utils-prettier-config": "workspace:^",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "taze": "^19.9.0"
   },
   "engines": {

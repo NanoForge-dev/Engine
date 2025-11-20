@@ -1,6 +1,6 @@
-import { type IConfigRegistry, InitContext } from "@nanoforge/common";
-import { EditableApplicationContext } from "@nanoforge/core/src/common/context/contexts/application.editable-context";
-import { EditableLibraryManager } from "@nanoforge/core/src/common/library/manager/library.manager";
+import { type IConfigRegistry, InitContext } from "@nanoforge-dev/common";
+import { EditableApplicationContext } from "@nanoforge-dev/core/src/common/context/contexts/application.editable-context";
+import { EditableLibraryManager } from "@nanoforge-dev/core/src/common/library/manager/library.manager";
 
 import { Graphics2DLibrary } from "../src/graphics-2d.library";
 

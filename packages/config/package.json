@@ -1,5 +1,5 @@
 {
-  "name": "@nanoforge/config",
+  "name": "@nanoforge-dev/config",
   "version": "1.0.0",
   "description": "NanoForge Engine - Config",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
@@ -35,8 +35,8 @@
     "class-validator": "^0.14.2"
   },
   "devDependencies": {
-    "@nanoforge/utils-eslint-config": "workspace:^",
-    "@nanoforge/utils-prettier-config": "workspace:^",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "taze": "^19.9.0"
   },
   "engines": {

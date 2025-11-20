@@ -1,7 +1,7 @@
-import { type Context } from "@nanoforge/common";
-import { type Registry } from "@nanoforge/ecs";
-import { type InputLibrary } from "@nanoforge/input";
-import { type SoundLibrary } from "@nanoforge/sound";
+import { type Context } from "@nanoforge-dev/common";
+import { type Registry } from "@nanoforge-dev/ecs";
+import { type InputLibrary } from "@nanoforge-dev/input";
+import { type SoundLibrary } from "@nanoforge-dev/sound";
 
 import { checkCollisions } from "./collisions";
 import {

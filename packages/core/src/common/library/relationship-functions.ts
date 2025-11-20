@@ -1,4 +1,4 @@
-import { type ILibrary, type LibraryHandle } from "@nanoforge/common";
+import { type ILibrary, type LibraryHandle } from "@nanoforge-dev/common";
 
 class RelationshipStatic {
   getLibrariesByDependencies(libraries: LibraryHandle[], reverse: boolean = false) {

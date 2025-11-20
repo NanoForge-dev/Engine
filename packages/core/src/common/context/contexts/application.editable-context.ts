@@ -1,4 +1,4 @@
-import { ApplicationContext } from "@nanoforge/common";
+import { ApplicationContext } from "@nanoforge-dev/common";
 
 import { type EditableLibraryManager } from "../../library/manager/library.manager";
 

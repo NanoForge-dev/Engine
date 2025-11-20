@@ -2,13 +2,13 @@
   "extends": "../../../tsconfig.spec.json",
   "compilerOptions": {
     "paths": {
-      "@nanoforge/common": ["./packages/common"],
-      "@nanoforge/core": ["./packages/core"],
-      "@nanoforge/core/*": ["./packages/core/*"],
-      "@nanoforge/asset-manager": ["./packages/asset-manager"],
-      "@nanoforge/ecs": ["./packages/ecs"],
-      "@nanoforge/ecs/*": ["./packages/ecs/*"],
-      "@nanoforge/graphics-2d": ["./packages/graphics-2d"]
+      "@nanoforge-dev/common": ["./packages/common"],
+      "@nanoforge-dev/core": ["./packages/core"],
+      "@nanoforge-dev/core/*": ["./packages/core/*"],
+      "@nanoforge-dev/asset-manager": ["./packages/asset-manager"],
+      "@nanoforge-dev/ecs": ["./packages/ecs"],
+      "@nanoforge-dev/ecs/*": ["./packages/ecs/*"],
+      "@nanoforge-dev/graphics-2d": ["./packages/graphics-2d"]
     }
   }
 }

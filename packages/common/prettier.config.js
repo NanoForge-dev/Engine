@@ -1,3 +1,3 @@
-import config from "@nanoforge/utils-prettier-config";
+import config from "@nanoforge-dev/utils-prettier-config";
 
 export default config;

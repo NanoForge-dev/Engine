@@ -1,5 +1,5 @@
 {
-  "name": "@nanoforge/ecs",
+  "name": "@nanoforge-dev/ecs",
   "version": "1.0.0",
   "description": "NanoForge Engine - ECS",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
@@ -36,12 +36,12 @@
     "test:unit": "make fclean && make tests -j 16 && pnpm clean:script && pnpm build:script && jest --config ./jest.config.json"
   },
   "dependencies": {
-    "@nanoforge/common": "workspace:^"
+    "@nanoforge-dev/common": "workspace:^"
   },
   "devDependencies": {
-    "@nanoforge/asset-manager": "workspace:^",
-    "@nanoforge/utils-eslint-config": "workspace:^",
-    "@nanoforge/utils-prettier-config": "workspace:^",
+    "@nanoforge-dev/asset-manager": "workspace:^",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
     "jest": "^30.2.0",

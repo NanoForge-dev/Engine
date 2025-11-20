@@ -4,7 +4,7 @@
     "outDir": ".",
     "rootDir": ".",
     "paths": {
-      "@nanoforge/common": ["../common"]
+      "@nanoforge-dev/common": ["../common"]
     }
   },
   "exclude": ["node_modules", "dist", "test/**/*", "*.spec.ts", "build"],
