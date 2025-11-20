@@ -1,32 +1,50 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  // Mapped from https://www.typescriptlang.org/tsconfig
   "compilerOptions": {
-    "module": "commonjs",
-    "noImplicitAny": false,
-    "noUnusedLocals": false,
-    "removeComments": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": false,
-    "forceConsistentCasingInFileNames": true,
-    "noLib": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "useUnknownInCatchVariables": false,
-    "target": "ES2023",
-    "sourceMap": true,
-    "allowJs": false,
+    // Type Checking
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+
+    // Modules
+    "allowArbitraryExtensions": false,
+    "allowImportingTsExtensions": false,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true,
+
+    // Emit
+    "declaration": true,
+    "declarationMap": true,
+    "importHelpers": false,
+    "newLine": "lf",
+    "noEmitHelpers": true,
     "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "@nanoforge-dev/asset-manager": ["./packages/asset-manager"],
-      "@nanoforge-dev/common": ["./packages/common"],
-      "@nanoforge-dev/config": ["./packages/config"],
-      "@nanoforge-dev/core": ["./packages/core"],
-      "@nanoforge-dev/ecs": ["./packages/ecs"],
-      "@nanoforge-dev/graphics-2d": ["./packages/graphics-2d"],
-      "@nanoforge-dev/input": ["./packages/input"],
-      "@nanoforge-dev/sound": ["./packages/sound"]
-    }
+    "removeComments": false,
+    "sourceMap": true,
+
+    // Interop Constraints
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+
+    // Language and Environment
+    "experimentalDecorators": true,
+    "lib": ["ESNext", "esnext.disposable"],
+    "target": "ESNext",
+    "useDefineForClassFields": true
   },
-  "include": ["packages/**/*", "integration/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": ["node_modules"]
 }
