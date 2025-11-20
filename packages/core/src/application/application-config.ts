@@ -8,7 +8,7 @@ import {
   type INetworkLibrary,
   type ISoundLibrary,
   type LibraryHandle,
-} from "@nanoforge/common";
+} from "@nanoforge-dev/common";
 
 import { EditableLibraryManager } from "../common/library/manager/library.manager";
 

@@ -9,7 +9,7 @@ import {
   type LibraryHandle,
   LibraryStatusEnum,
   NfNotInitializedException,
-} from "@nanoforge/common";
+} from "@nanoforge-dev/common";
 
 import { type ApplicationConfig } from "../application/application-config";
 import type { IApplicationOptions } from "../application/application-options.type";

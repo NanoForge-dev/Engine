@@ -2,9 +2,9 @@
   "extends": "../../../tsconfig.spec.json",
   "compilerOptions": {
     "paths": {
-      "@nanoforge/common": ["./packages/common"],
-      "@nanoforge/core": ["./packages/core"],
-      "@nanoforge/core/*": ["./packages/core/*"]
+      "@nanoforge-dev/common": ["./packages/common"],
+      "@nanoforge-dev/core": ["./packages/core"],
+      "@nanoforge-dev/core/*": ["./packages/core/*"]
     }
   }
 }

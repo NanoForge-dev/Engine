@@ -1,4 +1,8 @@
-import { type IGraphicsLibrary, type IInputLibrary, type ISoundLibrary } from "@nanoforge/common";
+import {
+  type IGraphicsLibrary,
+  type IInputLibrary,
+  type ISoundLibrary,
+} from "@nanoforge-dev/common";
 
 import { NanoforgeApplication } from "./nanoforge-application";
 

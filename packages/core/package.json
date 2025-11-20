@@ -1,5 +1,5 @@
 {
-  "name": "@nanoforge/core",
+  "name": "@nanoforge-dev/core",
   "version": "1.0.0",
   "description": "NanoForge Engine - Core",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
@@ -31,15 +31,15 @@
     "taze": "taze major -w"
   },
   "dependencies": {
-    "@nanoforge/asset-manager": "workspace:^",
-    "@nanoforge/common": "workspace:^",
-    "@nanoforge/input": "workspace:^",
+    "@nanoforge-dev/asset-manager": "workspace:^",
+    "@nanoforge-dev/common": "workspace:^",
+    "@nanoforge-dev/input": "workspace:^",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2"
   },
   "devDependencies": {
-    "@nanoforge/utils-eslint-config": "workspace:^",
-    "@nanoforge/utils-prettier-config": "workspace:^",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "taze": "^19.9.0"
   },
   "engines": {

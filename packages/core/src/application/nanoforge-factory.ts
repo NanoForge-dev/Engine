@@ -1,5 +1,5 @@
-import { AssetManagerLibrary } from "@nanoforge/asset-manager";
-import { InputLibrary } from "@nanoforge/input";
+import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
+import { InputLibrary } from "@nanoforge-dev/input";
 
 import { type IApplicationOptions } from "./application-options.type";
 import { NanoforgeClient } from "./nanoforge-client";

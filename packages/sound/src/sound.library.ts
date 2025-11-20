@@ -1,4 +1,4 @@
-import { BaseSoundLibrary, NfNotFound } from "@nanoforge/common";
+import { BaseSoundLibrary, NfNotFound } from "@nanoforge-dev/common";
 
 export class SoundLibrary extends BaseSoundLibrary {
   private muted: boolean = true;

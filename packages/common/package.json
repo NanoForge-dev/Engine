@@ -1,5 +1,5 @@
 {
-  "name": "@nanoforge/common",
+  "name": "@nanoforge-dev/common",
   "version": "1.0.0",
   "description": "NanoForge Engine - Common",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
@@ -31,8 +31,8 @@
     "taze": "taze major -w"
   },
   "devDependencies": {
-    "@nanoforge/utils-eslint-config": "workspace:^",
-    "@nanoforge/utils-prettier-config": "workspace:^",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "taze": "^19.9.0"
   },
   "engines": {

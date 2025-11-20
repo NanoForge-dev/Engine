@@ -1,4 +1,9 @@
-import { BaseAssetManagerLibrary, type InitContext, NfFile, NfNotFound } from "@nanoforge/common";
+import {
+  BaseAssetManagerLibrary,
+  type InitContext,
+  NfFile,
+  NfNotFound,
+} from "@nanoforge-dev/common";
 
 export class AssetManagerLibrary extends BaseAssetManagerLibrary {
   private _assets?: Map<string, string>;

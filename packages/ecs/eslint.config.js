@@ -1,3 +1,3 @@
-import config from "@nanoforge/utils-eslint-config";
+import config from "@nanoforge-dev/utils-eslint-config";
 
 export default [...config, { ignores: ["build"] }];

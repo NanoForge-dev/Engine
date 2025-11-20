@@ -1,5 +1,5 @@
 {
-  "name": "@nanoforge/asset-manager",
+  "name": "@nanoforge-dev/asset-manager",
   "version": "1.0.0",
   "description": "NanoForge Engine - Asset Manager",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
@@ -32,11 +32,11 @@
     "test:unit": "jest --config ./jest.config.json"
   },
   "dependencies": {
-    "@nanoforge/common": "workspace:^"
+    "@nanoforge-dev/common": "workspace:^"
   },
   "devDependencies": {
-    "@nanoforge/utils-eslint-config": "workspace:^",
-    "@nanoforge/utils-prettier-config": "workspace:^",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
     "jest": "^30.2.0",

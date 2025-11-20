@@ -19,7 +19,7 @@ import {
   MUSIC_LIBRARY,
   NETWORK_LIBRARY,
   SOUND_LIBRARY,
-} from "@nanoforge/common";
+} from "@nanoforge-dev/common";
 
 import { EditableLibraryContext } from "../../context/contexts/library.editable-context";
 import { Relationship } from "../relationship-functions";

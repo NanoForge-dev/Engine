@@ -5,7 +5,7 @@ import {
   type INetworkLibrary,
   type IRunOptions,
   NfNotInitializedException,
-} from "@nanoforge/common";
+} from "@nanoforge-dev/common";
 
 import { EditableApplicationContext } from "../common/context/contexts/application.editable-context";
 import { Core } from "../core/core";
