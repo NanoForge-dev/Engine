@@ -21,14 +21,21 @@
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
     "directory": "packages/common"
   },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc -b .",
     "clean": "pnpm clean:types && pnpm clean:scripts && rm -f tsconfig.build.tsbuildinfo",
-    "clean:types": "find src -name '*.d.ts' -delete",
+    "clean:types": "find src -name '*.d.ts' -delete && rm -rf dist",
     "clean:scripts": "find src -name '*.js' -delete",
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write .",
-    "taze": "taze major -w"
+    "taze": "taze major -w",
+    "publish": "npm publish --access public"
   },
   "devDependencies": {
     "@nanoforge-dev/utils-eslint-config": "workspace:^",

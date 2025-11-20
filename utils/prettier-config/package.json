@@ -21,10 +21,17 @@
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
     "directory": "utils/prettier-config"
   },
+  "files": [
+    "index.js",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "lint": "prettier --check .",
     "fix": "prettier --write .",
-    "taze": "taze major -w"
+    "taze": "taze major -w",
+    "publish": "npm publish --access public"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",

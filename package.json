@@ -28,7 +28,8 @@
     "test:unit": "lerna run test:unit",
     "test:e2e": "lerna run test:e2e",
     "prepare": "husky",
-    "taze": "taze major -wr"
+    "taze": "taze major -wr",
+    "publish": "lerna run build && lerna run publish"
   },
   "dependencies": {
     "tslib": "^2.8.1"

@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.build.json",
   "compilerOptions": {
-    "outDir": ".",
+    "outDir": "dist",
     "rootDir": ".",
     "paths": {
       "@nanoforge-dev/common": ["../common"]

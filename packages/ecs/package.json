@@ -21,6 +21,15 @@
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
     "directory": "packages/ecs"
   },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "lib/libecs.wasm",
+    "lib/libecs.js",
+    "lib/libecs.d.ts"
+  ],
   "scripts": {
     "build": "pnpm build:wasm && pnpm build:script",
     "build:script": "tsc -b .",
@@ -28,12 +37,13 @@
     "clean": "pnpm clean:wasm && pnpm clean:script",
     "clean:script": "pnpm clean:types && pnpm clean:scripts && rm -f tsconfig.build.tsbuildinfo",
     "clean:wasm": "make fclean",
-    "clean:types": "find src -name '*.d.ts' -delete",
+    "clean:types": "find src -name '*.d.ts' -delete && rm -rf dist",
     "clean:scripts": "find src -name '*.js' -delete",
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write .",
     "taze": "taze major -w",
-    "test:unit": "make fclean && make tests -j 16 && pnpm clean:script && pnpm build:script && jest --config ./jest.config.json"
+    "test:unit": "make fclean && make tests -j 16 && pnpm clean:script && pnpm build:script && jest --config ./jest.config.json",
+    "publish": "npm publish --access public"
   },
   "dependencies": {
     "@nanoforge-dev/common": "workspace:^"
