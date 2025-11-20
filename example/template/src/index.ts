@@ -1,8 +1,8 @@
-import { AssetManagerLibrary } from "@nanoforge/asset-manager";
-import { type IRunOptions } from "@nanoforge/common";
-import { NanoforgeFactory } from "@nanoforge/core";
-import { ECSLibrary } from "@nanoforge/ecs";
-import { Graphics2DLibrary } from "@nanoforge/graphics-2d";
+import {AssetManagerLibrary} from "@nanoforge-dev/asset-manager";
+import {type IRunOptions} from "@nanoforge-dev/common";
+import {NanoforgeFactory} from "@nanoforge-dev/core";
+import {ECSLibrary} from "@nanoforge-dev/ecs";
+import {Graphics2DLibrary} from "@nanoforge-dev/graphics-2d";
 
 export const app = NanoforgeFactory.createClient();
 

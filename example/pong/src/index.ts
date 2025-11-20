@@ -1,9 +1,9 @@
-import { type IRunOptions } from "@nanoforge/common";
-import { NanoforgeFactory } from "@nanoforge/core";
-import { ECSLibrary } from "@nanoforge/ecs";
-import { Graphics, Graphics2DLibrary } from "@nanoforge/graphics-2d";
-import { InputEnum } from "@nanoforge/input";
-import { SoundLibrary } from "@nanoforge/sound";
+import { type IRunOptions } from "@nanoforge-dev/common";
+import { NanoforgeFactory } from "@nanoforge-dev/core";
+import { ECSLibrary } from "@nanoforge-dev/ecs";
+import { Graphics, Graphics2DLibrary } from "@nanoforge-dev/graphics-2d";
+import { InputEnum } from "@nanoforge-dev/input";
+import { SoundLibrary } from "@nanoforge-dev/sound";
 
 import {
   Bounce,

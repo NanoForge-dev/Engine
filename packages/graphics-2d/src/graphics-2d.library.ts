@@ -1,4 +1,4 @@
-import { BaseGraphicsLibrary, type InitContext } from "@nanoforge/common";
+import { BaseGraphicsLibrary, type InitContext } from "@nanoforge-dev/common";
 
 import { Graphics } from ".";
 

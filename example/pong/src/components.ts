@@ -1,5 +1,5 @@
-import type { Graphics } from "@nanoforge/graphics-2d";
-import type { InputEnum } from "@nanoforge/input";
+import type { Graphics } from "@nanoforge-dev/graphics-2d";
+import type { InputEnum } from "@nanoforge-dev/input";
 
 import { layer } from "./index";
 

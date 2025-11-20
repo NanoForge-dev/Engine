@@ -1,5 +1,5 @@
 {
-  "name": "@nanoforge/graphics-2d",
+  "name": "@nanoforge-dev/graphics-2d",
   "version": "1.0.0",
   "description": "NanoForge Engine - Graphics 2D",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
@@ -32,13 +32,13 @@
     "test:unit": "jest --config ./jest.config.json"
   },
   "dependencies": {
-    "@nanoforge/asset-manager": "workspace:^",
-    "@nanoforge/common": "workspace:^",
+    "@nanoforge-dev/asset-manager": "workspace:^",
+    "@nanoforge-dev/common": "workspace:^",
     "konva": "^10.0.9"
   },
   "devDependencies": {
-    "@nanoforge/utils-eslint-config": "workspace:^",
-    "@nanoforge/utils-prettier-config": "workspace:^",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
     "@webgpu/types": "^0.1.66",

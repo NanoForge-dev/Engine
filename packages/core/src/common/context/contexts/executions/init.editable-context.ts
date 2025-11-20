@@ -1,3 +1,3 @@
-import { InitContext } from "@nanoforge/common";
+import { InitContext } from "@nanoforge-dev/common";
 
 export class EditableInitContext extends InitContext {}

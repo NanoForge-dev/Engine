@@ -1,4 +1,4 @@
-import { BaseInputLibrary } from "@nanoforge/common";
+import { BaseInputLibrary } from "@nanoforge-dev/common";
 
 import { InputHandler } from "./input-handler";
 import { type InputEnum } from "./input.enum";

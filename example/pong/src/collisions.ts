@@ -1,4 +1,4 @@
-import { type Registry } from "@nanoforge/ecs";
+import { type Registry } from "@nanoforge-dev/ecs";
 
 import { Hitbox, Position } from "./components";
 

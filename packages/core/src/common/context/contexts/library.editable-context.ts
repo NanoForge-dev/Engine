@@ -1,4 +1,4 @@
-import { LibraryContext, type LibraryStatusEnum } from "@nanoforge/common";
+import { LibraryContext, type LibraryStatusEnum } from "@nanoforge-dev/common";
 
 export class EditableLibraryContext extends LibraryContext {
   setStatus(status: LibraryStatusEnum) {

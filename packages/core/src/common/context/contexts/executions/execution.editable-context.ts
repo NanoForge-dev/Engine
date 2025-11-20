@@ -1,3 +1,3 @@
-import { ExecutionContext } from "@nanoforge/common";
+import { ExecutionContext } from "@nanoforge-dev/common";
 
 export class EditableExecutionContext extends ExecutionContext {}

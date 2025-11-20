@@ -4,7 +4,7 @@ import {
   type Context,
   GRAPHICS_LIBRARY,
   type InitContext,
-} from "@nanoforge/common";
+} from "@nanoforge-dev/common";
 
 import { type MainModule, Module, type Registry } from "../lib";
 

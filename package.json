@@ -1,5 +1,5 @@
 {
-  "name": "@nanoforge/nanoforge",
+  "name": "@nanoforge-dev/nanoforge",
   "version": "1.0.0",
   "description": "NanoForge Engine",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
@@ -35,8 +35,8 @@
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
-    "@nanoforge/utils-eslint-config": "workspace:^",
-    "@nanoforge/utils-prettier-config": "workspace:^",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",

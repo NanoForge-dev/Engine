@@ -1,7 +1,7 @@
-import { Context } from "@nanoforge/common";
-
+import { Context } from "@nanoforge-dev/common"
 // TypeScript bindings for emscripten-generated code.  Automatically generated at compile time.
-interface WasmModule {}
+interface WasmModule {
+}
 
 export interface ClassHandle {
   isAliasOf(other: ClassHandle): boolean;
@@ -40,7 +40,7 @@ export interface Entity extends ClassHandle {
   getId(): number;
 }
 
-type Component = { name: string; [key: string]: any };
+type Component = {name: string, [key: string]: any};
 
 type System = (registry: Registry, ctx: Context) => void;
 
@@ -66,18 +66,18 @@ export interface Registry extends ClassHandle {
 
 interface EmbindModule {
   container: {
-    new (): container;
+    new(): container;
   };
   SparseArray: {
-    new (): SparseArray;
+    new(): SparseArray;
   };
   Entity: {
-    new (_0: number): Entity;
+    new(_0: number): Entity;
   };
   Registry: {
-    new (): Registry;
+    new(): Registry;
   };
 }
 
 export type MainModule = WasmModule & EmbindModule;
-export default function MainModuleFactory(options?: unknown): Promise<MainModule>;
+export default function MainModuleFactory (options?: unknown): Promise<MainModule>;
