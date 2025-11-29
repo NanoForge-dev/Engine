@@ -83,6 +83,9 @@ type ECElement =
  * Manifest for a component to be used in the NanoForge Editor
  */
 export type EditorComponentManifest = {
+  /**
+   * Parameters of the component
+   */
   params: ECElement[];
 };
 
@@ -90,5 +93,8 @@ export type EditorComponentManifest = {
  * Manifest for a system to be used in the NanoForge Editor
  */
 export type EditorSystemManifest = {
+  /**
+   * Component names needed by the system
+   */
   dependencies: string[];
 };
