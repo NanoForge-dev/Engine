@@ -99,6 +99,16 @@ type ECElement =
  */
 export type EditorComponentManifest = {
   /**
+   * Displayed name of the component
+   */
+  name: string;
+
+  /**
+   * Description of the component
+   */
+  description?: string;
+
+  /**
    * Parameters of the component
    */
   params: Record<string, ECElement>;
@@ -108,6 +118,16 @@ export type EditorComponentManifest = {
  * Manifest for a system to be used in the NanoForge Editor
  */
 export type EditorSystemManifest = {
+  /**
+   * Displayed name of the system
+   */
+  name: string;
+
+  /**
+   * Description of the system
+   */
+  description?: string;
+
   /**
    * Component names needed by the system
    */
