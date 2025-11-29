@@ -11,6 +11,21 @@ type ECElementDefaults<Type, Default> = {
   type: Type;
 
   /**
+   * Name of the element
+   */
+  name: string;
+
+  /**
+   * Description of the element
+   */
+  description?: string;
+
+  /**
+   * Example of the element
+   */
+  example?: Default;
+
+  /**
    * Is the element optional
    * @default false
    */
@@ -86,7 +101,7 @@ export type EditorComponentManifest = {
   /**
    * Parameters of the component
    */
-  params: ECElement[];
+  params: Record<string, ECElement>;
 };
 
 /**
