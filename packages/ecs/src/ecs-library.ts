@@ -25,7 +25,7 @@ export class ECSLibrary extends BaseComponentSystemLibrary {
     return "ECSLibrary";
   }
 
-  async __init(context: InitContext): Promise<void> {
+  override async __init(context: InitContext): Promise<void> {
     const wasmFile = context.libraries.getAssetManager().library.getAsset(this.path);
     this.module = await Module({ locateFile: () => wasmFile.path });
     this._registry = new this.module.Registry();

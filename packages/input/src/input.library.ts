@@ -10,11 +10,11 @@ export class InputLibrary extends BaseInputLibrary {
     return "InputLibrary";
   }
 
-  public async __init(): Promise<void> {
+  public override async __init(): Promise<void> {
     this._inputHandler = new InputHandler();
   }
 
-  public isKeyPressed(key: InputEnum): boolean {
+  public isKeyPressed(key: InputEnum): boolean | undefined {
     if (!this._inputHandler) this.throwNotInitializedError();
     return this._inputHandler.getKeyStatus(key);
   }

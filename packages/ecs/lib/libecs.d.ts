@@ -1,4 +1,8 @@
-import { Context } from "@nanoforge-dev/common"
+import { Context } from "@nanoforge-dev/common";
+
+export type Component = { name: string; [key: string]: any };
+
+export type System = (registry: Registry, ctx: Context) => void;
 // TypeScript bindings for emscripten-generated code.  Automatically generated at compile time.
 interface WasmModule {
 }
@@ -39,10 +43,6 @@ export interface SparseArray extends ClassHandle {
 export interface Entity extends ClassHandle {
   getId(): number;
 }
-
-type Component = {name: string, [key: string]: any};
-
-type System = (registry: Registry, ctx: Context) => void;
 
 export interface Registry extends ClassHandle {
   registerComponent(_0: Component): SparseArray;

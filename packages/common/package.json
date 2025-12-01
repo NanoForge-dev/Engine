@@ -18,10 +18,7 @@
     "Tchips <leo.outmizguine@epitech.eu>"
   ],
   "files": [
-    "dist",
-    "LICENSCE",
-    "package.json",
-    "README.md"
+    "dist"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

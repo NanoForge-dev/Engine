@@ -1,12 +1,5 @@
 import { type Options, defineConfig } from "tsup";
 
-
-
-
-
-
-
-
 export function createTsupConfig({
   entry = ["src/index.ts"],
   external = [],

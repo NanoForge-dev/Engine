@@ -1,19 +1,22 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "@nanoforge-dev/ecs",
   "version": "0.0.1",
   "description": "NanoForge Engine - ECS",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "bugs": "https://github.com/NanoForge-dev/Engine/issues",
   "license": "MIT",
-  "contributors": [
-    "Bill",
-    "Exelo",
-    "Fexkoser",
-    "Tchips"
+  "keywords": [
+    "nanoforge",
+    "game",
+    "engine"
   ],
-  "funding": {
-    "type": "individual",
-    "url": ""
-  },
+  "contributors": [
+    "Bill <timothe.jacquot@epitech.eu>",
+    "Exelo <exelo.corp@gmail.com>",
+    "Fexkoser <martin.fillon@epitech.eu>",
+    "Tchips <leo.outmizguine@epitech.eu>"
+  ],
   "type": "module",
   "main": "src/index.ts",
   "repository": {
@@ -23,32 +26,27 @@
   },
   "files": [
     "dist",
-    "package.json",
-    "README.md",
-    "LICENSE",
-    "lib/libecs.wasm",
-    "lib/libecs.js",
-    "lib/libecs.d.ts"
+    "lib"
   ],
   "scripts": {
     "build": "pnpm build:wasm && pnpm build:script",
-    "build:script": "tsc -b .",
-    "build:wasm": "make re",
+    "build:script": "tsc --noEmit && tsup",
+    "build:wasm": "make",
     "clean": "pnpm clean:wasm && pnpm clean:script",
     "clean:script": "pnpm clean:types && pnpm clean:scripts && rm -f tsconfig.build.tsbuildinfo",
     "clean:wasm": "make fclean",
     "clean:types": "find src -name '*.d.ts' -delete && rm -rf dist",
     "clean:scripts": "find src -name '*.js' -delete",
-    "lint": "eslint . && prettier --check .",
-    "fix": "eslint . --fix && prettier --write .",
-    "taze": "taze major -w",
+    "lint": "prettier --check . && eslint --format=pretty src",
+    "format": "prettier --write . && eslint --fix --format=pretty src",
     "test:unit": "make fclean && make tests -j 16 && pnpm clean:script && pnpm build:script && jest --config ./jest.config.json",
-    "publish": "npm publish --access public"
+    "release": "cliff-jumper"
   },
   "dependencies": {
     "@nanoforge-dev/common": "workspace:^"
   },
   "devDependencies": {
+    "@favware/cliff-jumper": "^6.0.0",
     "@nanoforge-dev/asset-manager": "workspace:^",
     "@nanoforge-dev/utils-eslint-config": "workspace:^",
     "@nanoforge-dev/utils-prettier-config": "workspace:^",
@@ -57,6 +55,8 @@
     "jest": "^30.2.0",
     "taze": "^19.9.0",
     "ts-jest": "^29.4.5",
+    "tsup": "^8.5.1",
+    "eslint-formatter-pretty": "^7.0.0",
     "typescript": "^5.9.3"
   },
   "engines": {

@@ -23,7 +23,7 @@ export class NfFile {
 
   public async bytes(): Promise<Uint8Array<ArrayBuffer>> {
     const res = await this._fetch();
-    return await res.bytes();
+    return await res.arrayBuffer().then((buf) => new Uint8Array(buf));
   }
 
   public async formData(): Promise<FormData> {

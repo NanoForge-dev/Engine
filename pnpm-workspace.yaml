@@ -2,6 +2,9 @@ packages:
   - packages/*
   - utils/*
 
+ignoredBuiltDependencies:
+  - esbuild
+
 onlyBuiltDependencies:
   - nx
   - unrs-resolver
