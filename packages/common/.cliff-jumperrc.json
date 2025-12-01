@@ -1,0 +1,6 @@
+{
+  "name": "common",
+  "org": "nanoforge-dev",
+  "packagePath": "packages/common",
+  "identifierBase": false
+}

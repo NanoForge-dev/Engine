@@ -54,46 +54,77 @@ importers:
 
   packages/asset-manager:
     dependencies:
-      '@nanoforge-dev/common':
-        specifier: workspace:^
-        version: link:../common
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.2
+        version: 0.14.2
     devDependencies:
+      '@favware/cliff-jumper':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:^
         version: link:../../utils/eslint-config
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
-      '@types/jest':
-        specifier: ^30.0.0
-        version: 30.0.0
-      '@types/node':
-        specifier: ^24.10.1
-        version: 24.10.1
-      jest:
-        specifier: ^30.2.0
-        version: 30.2.0(@types/node@24.10.1)
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      eslint-formatter-pretty:
+        specifier: ^7.0.0
+        version: 7.0.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       taze:
         specifier: ^19.9.0
         version: 19.9.0
-      ts-jest:
-        specifier: ^29.4.5
-        version: 29.4.5(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(esbuild@0.27.0)(jest-util@30.2.0)(jest@30.2.0(@types/node@24.10.1))(typescript@5.9.3)
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.1)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
 
   packages/common:
+    dependencies:
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.2
+        version: 0.14.2
     devDependencies:
+      '@favware/cliff-jumper':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:^
         version: link:../../utils/eslint-config
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      eslint-formatter-pretty:
+        specifier: ^7.0.0
+        version: 7.0.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       taze:
         specifier: ^19.9.0
         version: 19.9.0
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.1)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
   packages/config:
     dependencies:
@@ -134,15 +165,6 @@ importers:
 
   packages/core:
     dependencies:
-      '@nanoforge-dev/asset-manager':
-        specifier: workspace:^
-        version: link:../asset-manager
-      '@nanoforge-dev/common':
-        specifier: workspace:^
-        version: link:../common
-      '@nanoforge-dev/input':
-        specifier: workspace:^
-        version: link:../input
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -150,15 +172,33 @@ importers:
         specifier: ^0.14.2
         version: 0.14.2
     devDependencies:
+      '@favware/cliff-jumper':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:^
         version: link:../../utils/eslint-config
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      eslint-formatter-pretty:
+        specifier: ^7.0.0
+        version: 7.0.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       taze:
         specifier: ^19.9.0
         version: 19.9.0
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.1)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
   packages/ecs:
     dependencies:
@@ -196,91 +236,151 @@ importers:
 
   packages/graphics-2d:
     dependencies:
-      '@nanoforge-dev/asset-manager':
-        specifier: workspace:^
-        version: link:../asset-manager
-      '@nanoforge-dev/common':
-        specifier: workspace:^
-        version: link:../common
-      konva:
-        specifier: ^10.0.9
-        version: 10.0.9
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.2
+        version: 0.14.2
     devDependencies:
+      '@favware/cliff-jumper':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:^
         version: link:../../utils/eslint-config
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
-      '@types/jest':
-        specifier: ^30.0.0
-        version: 30.0.0
-      '@types/node':
-        specifier: ^24.10.1
-        version: 24.10.1
-      '@webgpu/types':
-        specifier: ^0.1.66
-        version: 0.1.66
-      jest:
-        specifier: ^30.2.0
-        version: 30.2.0(@types/node@24.10.1)
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      eslint-formatter-pretty:
+        specifier: ^7.0.0
+        version: 7.0.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       taze:
         specifier: ^19.9.0
         version: 19.9.0
-      ts-jest:
-        specifier: ^29.4.5
-        version: 29.4.5(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(esbuild@0.27.0)(jest-util@30.2.0)(jest@30.2.0(@types/node@24.10.1))(typescript@5.9.3)
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.1)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
 
   packages/input:
     dependencies:
-      '@nanoforge-dev/common':
-        specifier: workspace:^
-        version: link:../common
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.2
+        version: 0.14.2
     devDependencies:
+      '@favware/cliff-jumper':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:^
         version: link:../../utils/eslint-config
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      eslint-formatter-pretty:
+        specifier: ^7.0.0
+        version: 7.0.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       taze:
         specifier: ^19.9.0
         version: 19.9.0
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.1)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
   packages/music:
     dependencies:
-      '@nanoforge-dev/common':
-        specifier: workspace:^
-        version: link:../common
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.2
+        version: 0.14.2
     devDependencies:
+      '@favware/cliff-jumper':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:^
         version: link:../../utils/eslint-config
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      eslint-formatter-pretty:
+        specifier: ^7.0.0
+        version: 7.0.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       taze:
         specifier: ^19.9.0
         version: 19.9.0
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.1)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
   packages/sound:
     dependencies:
-      '@nanoforge-dev/common':
-        specifier: workspace:^
-        version: link:../common
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.2
+        version: 0.14.2
     devDependencies:
+      '@favware/cliff-jumper':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:^
         version: link:../../utils/eslint-config
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      eslint-formatter-pretty:
+        specifier: ^7.0.0
+        version: 7.0.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       taze:
         specifier: ^19.9.0
         version: 19.9.0
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.1)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
   utils/eslint-config:
     devDependencies:
@@ -1759,9 +1859,6 @@ packages:
     resolution: {integrity: sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==}
     cpu: [x64]
     os: [win32]
-
-  '@webgpu/types@0.1.66':
-    resolution: {integrity: sha512-YA2hLrwLpDsRueNDXIMqN9NTzD6bCDkuXbOSe0heS+f8YE8usA6Gbv1prj81pzVHrbaAma7zObnIC+I6/sXJgA==}
 
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
@@ -3387,9 +3484,6 @@ packages:
   kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
     engines: {node: '>=0.10.0'}
-
-  konva@10.0.9:
-    resolution: {integrity: sha512-AEqV0XqfE0ouHjcSo/IVAXZUK4jB/r18OlUoIzPFEx/59Vb95Yq1S4Ch5QuDDEXJT21SEpOMb89zSpEpsQWzWg==}
 
   lerna@9.0.1:
     resolution: {integrity: sha512-sPfufYbSLisgi3mghbfOPxNL0Jhs4p6yCexXEdwgXITV5oKq6mdj2w5NQ32i6wMfSlEZFzIIV17ozdYsHavNhg==}
@@ -6549,8 +6643,6 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@webgpu/types@0.1.66': {}
-
   '@yarnpkg/lockfile@1.1.0': {}
 
   '@yarnpkg/parsers@3.0.2':
@@ -8339,8 +8431,6 @@ snapshots:
       json-buffer: 3.0.1
 
   kind-of@6.0.3: {}
-
-  konva@10.0.9: {}
 
   lerna@9.0.1(@types/node@24.10.1):
     dependencies:

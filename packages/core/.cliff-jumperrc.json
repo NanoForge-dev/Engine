@@ -1,0 +1,6 @@
+{
+  "name": "core",
+  "org": "nanoforge-dev",
+  "packagePath": "packages/core",
+  "identifierBase": false
+}
