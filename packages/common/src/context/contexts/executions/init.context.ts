@@ -1,10 +1,10 @@
 import { type IConfigRegistry, type LibraryManager } from "../../../library";
-import { type IRunOptions } from "../../../options";
+import { type IRunClientOptions, type IRunOptions } from "../../../options";
 import { type ApplicationContext } from "../application.context";
 import { BaseContext } from "./base.context";
 
 export class InitContext extends BaseContext {
-  private readonly _canvas: IRunOptions["canvas"];
+  private readonly _canvas: IRunClientOptions["canvas"] | undefined;
   private readonly _files: IRunOptions["files"];
   private readonly _config: IConfigRegistry;
 
@@ -16,12 +16,12 @@ export class InitContext extends BaseContext {
   ) {
     super(context, libraryManager);
 
-    this._canvas = options.canvas;
+    this._canvas = (options as IRunClientOptions)["canvas"];
     this._files = options.files;
     this._config = configRegistry;
   }
 
-  get canvas(): IRunOptions["canvas"] {
+  get canvas(): IRunClientOptions["canvas"] | undefined {
     return this._canvas;
   }
 
