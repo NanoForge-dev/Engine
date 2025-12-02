@@ -17,6 +17,8 @@ export abstract class NanoforgeApplication {
   private _core?: Core;
   private readonly _options: IApplicationOptions;
 
+  protected abstract get type(): "client" | "server";
+
   constructor(options?: Partial<IApplicationOptions>) {
     this.applicationConfig = new ApplicationConfig();
 
@@ -47,6 +49,7 @@ export abstract class NanoforgeApplication {
     this._core = new Core(
       this.applicationConfig,
       new EditableApplicationContext(this.applicationConfig.libraryManager),
+      this.type === "server",
     );
     return this._core.init(options, this._options);
   }

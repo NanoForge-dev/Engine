@@ -22,10 +22,12 @@ export class Core {
   private readonly context: ApplicationContext;
   private options?: IApplicationOptions;
   private _configRegistry?: ConfigRegistry;
+  private _isServer;
 
-  constructor(config: ApplicationConfig, context: ApplicationContext) {
+  constructor(config: ApplicationConfig, context: ApplicationContext, isServer: boolean) {
     this.config = config;
     this.context = context;
+    this._isServer = isServer;
   }
 
   public async init(options: IRunOptions, appOptions: IApplicationOptions): Promise<void> {
@@ -52,12 +54,23 @@ export class Core {
         this.runClear(this.getClearContext());
         return;
       }
+    };
+
+    const renderClient = () => {
+      render();
       cancelAnimationFrame(requestAnimationFrameHandle);
       requestAnimationFrameHandle = requestAnimationFrame(runner);
     };
 
+    const renderServer = () => {
+      render();
+    };
+
     context.application.setIsRunning(true);
-    const intervalHandle = setInterval(render, 1000 / this.options.tickRate);
+    const intervalHandle = setInterval(
+      this._isServer ? renderServer : renderClient,
+      1000 / this.options.tickRate,
+    );
   }
 
   private getInitContext(options: IRunOptions): InitContext {

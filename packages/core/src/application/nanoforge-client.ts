@@ -7,6 +7,10 @@ import {
 import { NanoforgeApplication } from "./nanoforge-application";
 
 export class NanoforgeClient extends NanoforgeApplication {
+  protected get type(): "client" {
+    return "client";
+  }
+
   public useGraphics(library: IGraphicsLibrary) {
     this.applicationConfig.useGraphicsLibrary(library);
   }
