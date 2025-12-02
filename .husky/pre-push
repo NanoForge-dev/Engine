@@ -1,4 +1,3 @@
-pnpm clean
 pnpm lint
 pnpm build
-pnpm test
+pnpm test:unit

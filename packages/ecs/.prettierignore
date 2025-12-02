@@ -4,5 +4,8 @@ package-lock.json
 yarn.lock
 bun.lock
 
-*.d.ts
-build
+.turbo/
+node_modules/
+dist/
+coverage/
+CHANGELOG.md

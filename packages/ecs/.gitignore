@@ -260,8 +260,8 @@ dist
 
 ### Private
 
-# NX
-.nx/
+# Turbo
+.turbo/
 
 # Compiled files
 src/**/*.js
