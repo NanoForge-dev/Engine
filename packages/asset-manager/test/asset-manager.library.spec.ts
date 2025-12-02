@@ -1,7 +1,7 @@
 import { type IConfigRegistry, InitContext } from "@nanoforge-dev/common";
-import { EditableApplicationContext } from "@nanoforge-dev/core/src/common/context/contexts/application.editable-context";
-import { EditableLibraryManager } from "@nanoforge-dev/core/src/common/library/manager/library.manager";
 
+import { EditableApplicationContext } from "../../core/src/common/context/contexts/application.editable-context";
+import { EditableLibraryManager } from "../../core/src/common/library/manager/library.manager";
 import { AssetManagerLibrary } from "../src";
 
 describe("Asset Manager Library", () => {

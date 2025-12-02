@@ -1,5 +1,33 @@
 {
-  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "removeComments": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": false,
+    "forceConsistentCasingInFileNames": true,
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "useUnknownInCatchVariables": false,
+    "target": "ES2023",
+    "sourceMap": true,
+    "allowJs": false,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@nanoforge-dev/asset-manager": ["./packages/asset-manager"],
+      "@nanoforge-dev/common": ["./packages/common"],
+      "@nanoforge-dev/config": ["./packages/config"],
+      "@nanoforge-dev/core": ["./packages/core"],
+      "@nanoforge-dev/core/*": ["./packages/core/*"],
+      "@nanoforge-dev/ecs": ["./packages/ecs"],
+      "@nanoforge-dev/graphics-2d": ["./packages/graphics-2d"],
+      "@nanoforge-dev/input": ["./packages/input"],
+      "@nanoforge-dev/sound": ["./packages/sound"]
+    }
+  },
   "include": ["integration/**/*", "integration/**/*.spec.ts", "packages/**/*.spec.ts"],
   "exclude": ["node_modules", "dist"]
 }

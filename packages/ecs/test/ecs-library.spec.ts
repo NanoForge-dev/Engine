@@ -1,10 +1,10 @@
 import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
 import { ClearContext, type IConfigRegistry, InitContext } from "@nanoforge-dev/common";
-import { EditableApplicationContext } from "@nanoforge-dev/core/src/common/context/contexts/application.editable-context";
-import { EditableLibraryManager } from "@nanoforge-dev/core/src/common/library/manager/library.manager";
-import { ECSLibrary } from "@nanoforge-dev/ecs/src/ecs-library";
 
+import { EditableApplicationContext } from "../../core/src/common/context/contexts/application.editable-context";
+import { EditableLibraryManager } from "../../core/src/common/library/manager/library.manager";
 import { type Registry } from "../lib";
+import { ECSLibrary } from "../src/ecs-library";
 
 class Position {
   name: string = "Position";

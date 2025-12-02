@@ -9,3 +9,6 @@ node_modules/
 dist/
 coverage/
 CHANGELOG.md
+
+lib/libecs.d.ts
+lib/libecs.js
