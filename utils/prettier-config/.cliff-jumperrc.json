@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/favware/cliff-jumper/main/assets/cliff-jumper.schema.json",
   "name": "utils-prettier-config",
   "org": "nanoforge-dev",
   "packagePath": "utils/prettier-config",
