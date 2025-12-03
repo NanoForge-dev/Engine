@@ -223,9 +223,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# NX
-.nx/
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
+# Turbo
+.turbo/
 
 compile_commands.json

@@ -1,46 +1,87 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "@nanoforge-dev/input",
   "version": "0.0.1",
   "description": "NanoForge Engine - Input",
+  "keywords": [
+    "nanoforge",
+    "game",
+    "engine"
+  ],
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "bugs": "https://github.com/NanoForge-dev/Engine/issues",
   "license": "MIT",
   "contributors": [
-    "Bill",
-    "Exelo",
-    "Fexkoser",
-    "Tchips"
+    "Bill <timothe.jacquot@epitech.eu>",
+    "Exelo <exelo.corp@gmail.com>",
+    "Fexkoser <martin.fillon@epitech.eu>",
+    "Tchips <leo.outmizguine@epitech.eu>"
   ],
-  "funding": {
-    "type": "individual",
-    "url": ""
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "type": "module",
-  "main": "src/index.ts",
+  "directories": {
+    "lib": "src"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
     "directory": "packages/input"
   },
+  "funding": "",
   "scripts": {
-    "build": "tsc -b .",
-    "clean": "pnpm clean:types && pnpm clean:scripts && rm -f tsconfig.build.tsbuildinfo",
-    "clean:types": "find src -name '*.d.ts' -delete",
-    "clean:scripts": "find src -name '*.js' -delete",
-    "lint": "eslint . && prettier --check .",
-    "fix": "eslint . --fix && prettier --write .",
-    "taze": "taze major -w"
+    "build": "tsc --noEmit && tsup",
+    "lint": "prettier --check . && eslint --format=pretty src",
+    "format": "prettier --write . && eslint --fix --format=pretty src",
+    "prepack": "pnpm run build && pnpm run lint",
+    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/input/*'",
+    "release": "cliff-jumper"
   },
   "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "@nanoforge-dev/common": "workspace:^"
   },
   "devDependencies": {
+    "@favware/cliff-jumper": "^6.0.0",
     "@nanoforge-dev/utils-eslint-config": "workspace:^",
     "@nanoforge-dev/utils-prettier-config": "workspace:^",
-    "taze": "^19.9.0"
+    "eslint": "^9.39.1",
+    "eslint-formatter-pretty": "^7.0.0",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
   },
+  "packageManager": "pnpm@10.22.0",
   "engines": {
-    "node": "24.11.0",
-    "pnpm": "10.22.0"
+    "node": "24.11.0"
   },
-  "packageManager": "pnpm@10.22.0"
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "**/*.ts": [
+      "prettier --write"
+    ],
+    "src/**/*.ts": [
+      "eslint --fix"
+    ]
+  }
 }

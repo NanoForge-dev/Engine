@@ -3,5 +3,6 @@ packages:
   - utils/*
 
 onlyBuiltDependencies:
+  - esbuild
   - nx
   - unrs-resolver

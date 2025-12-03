@@ -1,0 +1,6 @@
+{
+  "name": "ecs",
+  "org": "nanoforge-dev",
+  "packagePath": "packages/ecs",
+  "identifierBase": false
+}

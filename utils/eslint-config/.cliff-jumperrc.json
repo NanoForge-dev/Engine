@@ -1,0 +1,6 @@
+{
+  "name": "utils-eslint-config",
+  "org": "nanoforge-dev",
+  "packagePath": "utils/eslint-config",
+  "identifierBase": false
+}

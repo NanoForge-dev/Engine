@@ -1,1 +1,1 @@
-export { IRunOptions } from "./types/options.type";
+export type { IRunOptions } from "./types/options.type";

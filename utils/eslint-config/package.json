@@ -1,46 +1,62 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "@nanoforge-dev/utils-eslint-config",
   "version": "1.0.0",
   "description": "NanoForge Engine - Utils EsLint Config",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "bugs": "https://github.com/NanoForge-dev/Engine/issues",
   "license": "MIT",
   "contributors": [
-    "Bill",
-    "Exelo",
-    "Fexkoser",
-    "Tchips"
+    "Bill <timothe.jacquot@epitech.eu>",
+    "Exelo <exelo.corp@gmail.com>",
+    "Fexkoser <martin.fillon@epitech.eu>",
+    "Tchips <leo.outmizguine@epitech.eu>"
   ],
-  "funding": {
-    "type": "individual",
-    "url": ""
+  "files": [
+    "index.js"
+  ],
+  "main": "index.js",
+  "module": "index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./index.js"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "type": "module",
-  "main": "index.js",
+  "directories": {
+    "lib": "src"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
-    "directory": "utils/eslint-config"
+    "directory": "utils/prettier-config"
   },
+  "funding": "",
   "scripts": {
     "lint": "prettier --check .",
-    "fix": "prettier --write .",
-    "taze": "taze major -w"
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@nanoforge-dev/utils-prettier-config": "workspace:^",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-format": "^1.0.2",
     "eslint-plugin-jest": "^29.1.0",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.5.0",
-    "taze": "^19.9.0",
+    "prettier": "^3.6.2",
     "typescript-eslint": "^8.47.0"
   },
+  "packageManager": "pnpm@10.22.0",
   "engines": {
-    "node": "24.11.0",
-    "pnpm": "10.22.0"
+    "node": "24.11.0"
   },
-  "packageManager": "pnpm@10.22.0"
+  "publishConfig": {
+    "access": "public"
+  }
 }

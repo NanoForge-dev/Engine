@@ -1,34 +1,30 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "@nanoforge-dev/nanoforge",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "NanoForge Engine",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "bugs": "https://github.com/NanoForge-dev/Engine/issues",
   "license": "MIT",
   "contributors": [
-    "Bill",
-    "Exelo",
-    "Fexkoser",
-    "Tchips"
+    "Bill <timothe.jacquot@epitech.eu>",
+    "Exelo <exelo.corp@gmail.com>",
+    "Fexkoser <martin.fillon@epitech.eu>",
+    "Tchips <leo.outmizguine@epitech.eu>"
   ],
-  "funding": {
-    "type": "individual",
-    "url": ""
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NanoForge-dev/Engine.git"
+    "url": "git+https://github.com/NanoForge-dev/Engine.git",
+    "directory": "packages/ecs"
   },
-  "private": true,
+  "funding": "",
   "scripts": {
-    "build": "lerna run build",
-    "clean": "lerna run clean",
-    "fix": "lerna run fix",
-    "lint": "lerna run lint",
-    "test": "lerna run test:unit,test:e2e",
-    "test:unit": "lerna run test:unit",
-    "test:e2e": "lerna run test:e2e",
-    "prepare": "husky",
-    "taze": "taze major -wr"
+    "build": "turbo run build --concurrency=5",
+    "format": "prettier --write . && turbo run format --concurrency=5",
+    "lint": "prettier --check . && turbo run lint --concurrency=5",
+    "test:unit": "turbo run test:unit --concurrency=5",
+    "test:e2e": "turbo run test:e2e --concurrency=5",
+    "prepare": "husky"
   },
   "dependencies": {
     "tslib": "^2.8.1"
@@ -42,14 +38,15 @@
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
     "husky": "^9.1.7",
-    "lerna": "^9.0.1",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.6.2",
-    "taze": "^19.9.0",
+    "tsup": "^8.5.1",
+    "turbo": "^2.6.1",
     "typescript": "^5.9.3"
   },
+  "packageManager": "pnpm@10.22.0",
   "engines": {
-    "node": "24.11.0",
-    "pnpm": "10.22.0"
+    "node": "24.11.0"
   },
-  "packageManager": "pnpm@10.22.0"
+  "private": true
 }

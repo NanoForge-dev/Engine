@@ -1,13 +1,6 @@
 {
-  "extends": "../tsconfig.build.json",
-  "compilerOptions": {
-    "types": ["jest", "node"]
-  },
-  "files": [],
-  "include": [],
-  "references": [
-    {
-      "path": "./tsconfig.build.json"
-    }
-  ]
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "extends": "../../tsconfig.json",
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

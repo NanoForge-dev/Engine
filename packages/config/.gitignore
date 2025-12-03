@@ -223,8 +223,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# NX
-.nx/
+# Turbo
+.turbo/
 
 # Compiled files
 src/**/*.js

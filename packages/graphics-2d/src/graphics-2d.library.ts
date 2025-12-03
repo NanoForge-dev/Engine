@@ -14,7 +14,7 @@ export class Graphics2DLibrary extends BaseGraphicsLibrary {
     return this._stage;
   }
 
-  public async __init(context: InitContext): Promise<void> {
+  public override async __init(context: InitContext): Promise<void> {
     if (!context.canvas) {
       throw new Error("Can't initialize the canvas context");
     }

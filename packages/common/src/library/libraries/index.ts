@@ -1,4 +1,4 @@
-export { ILibrary } from "./library.type";
+export type { ILibrary } from "./library.type";
 
 export * from "./abstracts";
 export * from "./consts";

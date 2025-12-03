@@ -1,0 +1,6 @@
+{
+  "name": "config",
+  "org": "nanoforge-dev",
+  "packagePath": "packages/config",
+  "identifierBase": false
+}

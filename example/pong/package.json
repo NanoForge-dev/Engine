@@ -29,8 +29,7 @@
     "build:raw": "bun build src/index.ts --outdir dist --asset-naming \"[name].[ext]\"",
     "clean": "rm -rf dist",
     "lint": "eslint . && prettier --check . '!.cloud/**'",
-    "fix": "eslint . --fix && prettier --write . '!.cloud/**'",
-    "taze": "taze major -w",
+    "format": "eslint . --fix && prettier --write . '!.cloud/**'",
     "lint-staged": "lint-staged"
   },
   "dependencies": {

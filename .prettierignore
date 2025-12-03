@@ -4,5 +4,15 @@ package-lock.json
 yarn.lock
 bun.lock
 
-/.nx/cache
-/.nx/workspace-data
+packages/
+example/
+utils/
+releases/
+
+.turbo/
+node_modules/
+dist/
+coverage/
+CHANGELOG.md
+
+emsdk-cache/
