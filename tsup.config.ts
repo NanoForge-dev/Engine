@@ -21,9 +21,13 @@ export function createTsupConfig({
   keepNames = true,
   dts = true,
   sourcemap = true,
+  esbuildOptions = (options) => {
+    options.assetNames = "assets/[name]";
+  },
   esbuildPlugins = [],
   treeshake = false,
   outDir = "dist",
+  loader = { ".wasm": "copy" },
 }: Options = {}) {
   return defineConfig({
     entry,
@@ -42,8 +46,10 @@ export function createTsupConfig({
     keepNames,
     dts,
     sourcemap,
+    esbuildOptions,
     esbuildPlugins,
     treeshake,
     outDir,
+    loader,
   });
 }
