@@ -54,10 +54,6 @@
     "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/common/*'",
     "release": "cliff-jumper"
   },
-  "dependencies": {
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.2"
-  },
   "devDependencies": {
     "@favware/cliff-jumper": "^6.0.0",
     "@nanoforge-dev/utils-eslint-config": "workspace:^",

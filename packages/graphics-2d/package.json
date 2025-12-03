@@ -50,15 +50,12 @@
     "build": "tsc --noEmit && tsup",
     "lint": "prettier --check . && eslint --format=pretty src",
     "format": "prettier --write . && eslint --fix --format=pretty src",
-    "test:unit": "jest --config ./jest.config.json",
+    "test:unit": "vitest run --config ../../vitest.config.ts",
     "prepack": "pnpm run build && pnpm run lint",
     "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/graphics-2d/*'",
     "release": "cliff-jumper"
   },
   "dependencies": {
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.2",
-    "@nanoforge-dev/asset-manager": "workspace:^",
     "@nanoforge-dev/common": "workspace:^",
     "konva": "^10.0.9"
   },
@@ -66,14 +63,12 @@
     "@favware/cliff-jumper": "^6.0.0",
     "@nanoforge-dev/utils-eslint-config": "workspace:^",
     "@nanoforge-dev/utils-prettier-config": "workspace:^",
-    "@types/jest": "^30.0.0",
     "eslint": "^9.39.1",
     "eslint-formatter-pretty": "^7.0.0",
-    "jest": "^30.2.0",
     "prettier": "^3.6.2",
-    "ts-jest": "^29.4.5",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
   },
   "packageManager": "pnpm@10.22.0",
   "engines": {

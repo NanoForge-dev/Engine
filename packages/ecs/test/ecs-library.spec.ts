@@ -1,5 +1,6 @@
 import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
 import { ClearContext, type IConfigRegistry, InitContext } from "@nanoforge-dev/common";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { EditableApplicationContext } from "../../core/src/common/context/contexts/application.editable-context";
 import { EditableLibraryManager } from "../../core/src/common/library/manager/library.manager";
@@ -43,13 +44,13 @@ describe("ECSLibrary", () => {
     registry = ecs.registry;
   });
 
-  test("init and spawn entity", async () => {
+  it("init and spawn entity", async () => {
     const entity = registry.spawnEntity();
     expect(entity).toBeDefined();
     expect(entity.getId()).toBe(0);
   });
 
-  test("add component to entity", async () => {
+  it("add component to entity", async () => {
     const entity = registry.spawnEntity();
     const pos = new Position(1, 2);
     registry.addComponent(entity, pos);
@@ -58,7 +59,7 @@ describe("ECSLibrary", () => {
     expect(components.size()).toBe(1);
   });
 
-  test("clear", async () => {
+  it("clear", async () => {
     await ecs.__clear(clearContext);
   });
 });

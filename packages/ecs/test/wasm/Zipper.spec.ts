@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import Module from "../../lib/libecs.js";
 
 class Velocity {
@@ -23,7 +25,7 @@ class Position {
 }
 
 describe("Zipper", () => {
-  test("single simple sparse array instantation", async () => {
+  it("single simple sparse array instantation", async () => {
     const m = await Module();
     const r = new m.Registry();
     expect(r).toBeDefined();
@@ -45,7 +47,7 @@ describe("Zipper", () => {
     ]);
   });
 
-  test("single complex sparse array instantation", async () => {
+  it("single complex sparse array instantation", async () => {
     const m = await Module();
     const r = new m.Registry();
     expect(r).toBeDefined();
@@ -65,7 +67,7 @@ describe("Zipper", () => {
     expect(zip[20]).toStrictEqual({ Velocity: new Velocity(4, 4) });
   });
 
-  test("multiple complex sparse array instantation", async () => {
+  it("multiple complex sparse array instantation", async () => {
     const m = await Module();
     const r = new m.Registry();
     expect(r).toBeDefined();
@@ -89,7 +91,7 @@ describe("Zipper", () => {
     }
   });
 
-  test("simple indexed zipper modification", async () => {
+  it("simple indexed zipper modification", async () => {
     const m = await Module();
     const r = new m.Registry();
     expect(r).toBeDefined();
