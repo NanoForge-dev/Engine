@@ -1,8 +1,10 @@
+import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager/src";
 import { type IRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { ECSLibrary } from "@nanoforge-dev/ecs";
-import { Graphics, Graphics2DLibrary } from "@nanoforge-dev/graphics-2d";
+import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
 import { InputEnum } from "@nanoforge-dev/input";
+import { InputLibrary } from "@nanoforge-dev/input/src";
 import { SoundLibrary } from "@nanoforge-dev/sound";
 
 import {
@@ -18,15 +20,19 @@ import { bounce, controlPlayer, drawCircle, move, moveRectangle } from "./system
 
 export const app = NanoforgeFactory.createClient();
 
-export const layer = new Graphics.Layer();
+export const layer = new Layer();
 
 export const main = async (options: IRunOptions) => {
+  const assetManager = new AssetManagerLibrary();
   const graphics = new Graphics2DLibrary();
   const ecsLibrary = new ECSLibrary();
+  const inputLibrary = new InputLibrary();
   const sounds = new SoundLibrary();
 
+  app.useAssetManager(assetManager);
   app.useGraphics(graphics);
   app.useComponentSystem(ecsLibrary);
+  app.useInput(inputLibrary);
   app.useSound(sounds);
 
   await app.init(options);
@@ -47,7 +53,7 @@ export const main = async (options: IRunOptions) => {
   registry.addComponent(
     ball,
     new CircleComponent(
-      new Graphics.Circle({
+      new Circle({
         radius: 70,
         fill: "red",
       }),
@@ -61,7 +67,7 @@ export const main = async (options: IRunOptions) => {
   registry.addComponent(player1, new Controller(InputEnum.KeyW, InputEnum.KeyS));
   registry.addComponent(
     player1,
-    new RectangleComponent(new Graphics.Rect({ fill: "blue", width: 50, height: 500 })),
+    new RectangleComponent(new Rect({ fill: "blue", width: 50, height: 500 })),
   );
 
   const player2 = registry.spawnEntity();
@@ -71,7 +77,7 @@ export const main = async (options: IRunOptions) => {
   registry.addComponent(player2, new Controller(InputEnum.ArrowUp, InputEnum.ArrowDown));
   registry.addComponent(
     player2,
-    new RectangleComponent(new Graphics.Rect({ fill: "blue", width: 50, height: 500 })),
+    new RectangleComponent(new Rect({ fill: "blue", width: 50, height: 500 })),
   );
 
   registry.addSystem(move);
