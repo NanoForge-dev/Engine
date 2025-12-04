@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/favware/cliff-jumper/main/assets/cliff-jumper.schema.json",
   "name": "input",
   "org": "nanoforge-dev",
   "packagePath": "packages/input",
