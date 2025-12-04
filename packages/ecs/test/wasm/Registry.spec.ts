@@ -1,3 +1,5 @@
+import { assert, describe, expect, it } from "vitest";
+
 import Module from "../../lib/libecs.js";
 
 class Velocity {
@@ -23,7 +25,7 @@ class Position {
 }
 
 describe("Registry", () => {
-  test("1 entity 2 components", async () => {
+  it("1 entity 2 components", async () => {
     const m = await Module();
     const r = new m.Registry();
     expect(r).toBeDefined();
@@ -44,7 +46,7 @@ describe("Registry", () => {
     expect(positions.get(e.getId())).toStrictEqual(new Position(4, 5));
   });
 
-  test("override components", async () => {
+  it("override components", async () => {
     const m = await Module();
     const r = new m.Registry();
 
@@ -60,7 +62,7 @@ describe("Registry", () => {
     expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(4, 5));
   });
 
-  test("basic remove", async () => {
+  it("basic remove", async () => {
     const m = await Module();
     const r = new m.Registry();
 
@@ -75,7 +77,7 @@ describe("Registry", () => {
     expect(r.getComponents(Velocity).get(e.getId())).toBeUndefined();
   });
 
-  test("basic kill", async () => {
+  it("basic kill", async () => {
     const m = await Module();
     const r = new m.Registry();
     expect(r).toBeDefined();
@@ -102,7 +104,7 @@ describe("Registry", () => {
     expect(r.getComponents(Position).get(e.getId())).toBeUndefined();
   });
 
-  test("system incrementing a variable", async () => {
+  it("system incrementing a variable", async () => {
     const m = await Module();
     const r = new m.Registry();
 
@@ -119,7 +121,7 @@ describe("Registry", () => {
     expect(counter).toBe(16);
   });
 
-  test("system incrementing component positions by velocity", async () => {
+  it("system incrementing component positions by velocity", async () => {
     const m = await Module();
     const r = new m.Registry();
     expect(r).toBeDefined();
@@ -166,7 +168,7 @@ describe("Registry", () => {
     expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
   });
 
-  test("Try unallowed component name", async () => {
+  it("Try unallowed component name", async () => {
     const m = await Module();
     const r = new m.Registry();
     expect(r).toBeDefined();
@@ -178,7 +180,7 @@ describe("Registry", () => {
 
     try {
       r.addComponent(e, entityComp);
-      fail();
+      assert.fail("Should have thrown an error");
     } catch (e) {
       //@ts-ignore
       expect(m.getExceptionMessage(e)[1].toString()).toBeDefined();

@@ -1,4 +1,5 @@
 import { type IConfigRegistry, InitContext } from "@nanoforge-dev/common";
+import { describe, expect, it } from "vitest";
 
 import { EditableApplicationContext } from "../../core/src/common/context/contexts/application.editable-context";
 import { EditableLibraryManager } from "../../core/src/common/library/manager/library.manager";
