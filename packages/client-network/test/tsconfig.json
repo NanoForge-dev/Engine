@@ -1,0 +1,11 @@
+{
+  "extends": "../../../tsconfig.spec.json",
+  "compilerOptions": {
+    "types": ["jest", "node"],
+    "paths": {
+      "@nanoforge-dev/common": ["./packages/common"],
+      "@nanoforge-dev/core": ["./packages/core"],
+      "@nanoforge-dev/core/*": ["./packages/core/*"]
+    }
+  }
+}

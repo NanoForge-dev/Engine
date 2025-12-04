@@ -153,15 +153,15 @@ namespace nfo {
         /**
          * Get an entity from its index.
          *
-         * @param component_type The index of the entity.
+         * @param entity_id The index of the entity.
          * @return The entity corresponding to the given index.
          * @throws std::runtime_error if the index is out of range.
          */
-        Entity entity_from_index(const std::size_t component_type)
+        Entity entity_from_index(const std::size_t entity_id)
         {
-            if (std::ranges::find(_dead_entities, component_type) != _dead_entities.end() || component_type >= _next_entity)
+            if (std::ranges::find(_dead_entities, id) != _dead_entities.end() || id >= _next_entity)
                 throw std::runtime_error("Entity index out of range.");
-            return Entity(component_type);
+            return Entity(id);
         }
 
         /**
@@ -227,7 +227,7 @@ namespace nfo {
         template <typename Function>
         void add_system(Function &&f)
         {
-            _systems.emplace_back(std::forward<Function>(f));
+            _systems.emplace_back(emscripten::val(std::forward<Function>(f)));
         }
 
         /**
@@ -257,9 +257,10 @@ namespace nfo {
          */
         void run_systems(const emscripten::val &ctx)
         {
-            std::vector<std::function<void(Registry &, const emscripten::val &)>> systems_copy = _systems;
-            for (std::function<void(Registry &, const emscripten::val &)> &system : systems_copy)
-                system(*this, ctx);
+            emscripten::val registry = ctx["libs"].call<emscripten::val>("getComponentSystem")["registry"];
+            std::vector<emscripten::val> systems_copy = _systems;
+            for (emscripten::val &system : systems_copy)
+                system(registry, ctx);
         }
 
         /**
@@ -306,6 +307,7 @@ namespace nfo {
             }
 
             emscripten::val arr = emscripten::val::array();
+            std:size_t zipper_idx = 0;
             for (std::size_t idx = 0; idx < max; idx++) {
                 emscripten::val obj = emscripten::val::object();
                 bool need_to_add = true;
@@ -317,7 +319,7 @@ namespace nfo {
                     obj.set(name, (*sparse_array)[idx].value());
                 }
                 if (need_to_add)
-                    arr.set(idx, obj);
+                    arr.set(zipper_idx++, obj);
             }
             return ZipperOutput(arr);
         }
@@ -327,7 +329,7 @@ namespace nfo {
 
         std::unordered_map<std::string, std::function<void(Registry &, Entity const &)>> _remove_functions;
         std::unordered_map<std::string, std::function<bool(const Registry &, const Entity &)>> _loggers;
-        std::vector<std::function<void(Registry &, const emscripten::val &)>> _systems;
+        std::vector<emscripten::val> _systems;
 
         std::vector<Entity> _dead_entities;
         std::size_t _next_entity{0};
