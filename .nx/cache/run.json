@@ -1,0 +1,131 @@
+{
+  "run": {
+    "command": "cli run build",
+    "startTime": "2025-12-02T06:54:22.454Z",
+    "endTime": "2025-12-02T06:54:29.006Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "@nanoforge-dev/asset-manager:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/asset-manager",
+      "hash": "675816086419651297",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:22.881Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/common:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/common",
+      "hash": "6976902434223210473",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:22.884Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/config:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/config",
+      "hash": "16044545065673730659",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:22.899Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/input:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/input",
+      "hash": "10865337297008853058",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:22.914Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/sound:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/sound",
+      "hash": "8753837709440855661",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:22.955Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/core:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/core",
+      "hash": "10959208275777394389",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:22.963Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/graphics-2d:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/graphics-2d",
+      "hash": "6047163605593041192",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:22.964Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/music:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/music",
+      "hash": "3506456329405231136",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:22.992Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/client-network:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/client-network",
+      "hash": "11412494794300235288",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:23.095Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/server-network:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/server-network",
+      "hash": "16417807821269420115",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:23.111Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "@nanoforge-dev/ecs:build",
+      "target": "build",
+      "projectName": "@nanoforge-dev/ecs",
+      "hash": "16642325799383373777",
+      "startTime": "2025-12-02T06:54:22.471Z",
+      "endTime": "2025-12-02T06:54:28.999Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

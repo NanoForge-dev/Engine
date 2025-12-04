@@ -1,0 +1,4 @@
+
+> @nanoforge-dev/graphics-2d@0.0.1 build /home/leoout/eip/engine/packages/graphics-2d
+> tsc -b .
+

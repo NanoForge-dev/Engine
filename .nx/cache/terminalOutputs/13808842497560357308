@@ -1,0 +1,8 @@
+
+> @nanoforge-dev/client-network@1.0.0 build /home/leoout/eip/engine/packages/client-network
+> pnpm build:main
+
+
+> @nanoforge-dev/client-network@1.0.0 build:main /home/leoout/eip/engine/packages/client-network
+> tsc -b .
+

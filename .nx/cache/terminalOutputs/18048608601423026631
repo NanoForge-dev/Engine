@@ -1,0 +1,10 @@
+
+> @nanoforge-dev/music@0.0.1 fix /home/leoout/eip/engine/packages/music
+> eslint . --fix && prettier --write .
+
+[90mpackage.json[39m 8ms (unchanged)
+[90mREADME.md[39m 15ms (unchanged)
+[90msrc/index.ts[39m 14ms (unchanged)
+[90msrc/music.library.ts[39m 33ms (unchanged)
+[90mtsconfig.build.json[39m 2ms (unchanged)
+[90mtsconfig.json[39m 1ms (unchanged)
