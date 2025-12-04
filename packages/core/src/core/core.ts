@@ -48,29 +48,19 @@ export class Core {
       await this.runExecute(clientContext, libraries);
     };
 
-    const render = () => {
+    const tickLengthMs = 1000 / this.options.tickRate;
+    const render = async () => {
       if (!context.application.isRunning) {
-        clearInterval(intervalHandle);
-        this.runClear(this.getClearContext());
+        await this.runClear(this.getClearContext());
         return;
       }
-    };
-
-    const renderClient = () => {
-      render();
-      cancelAnimationFrame(requestAnimationFrameHandle);
-      requestAnimationFrameHandle = requestAnimationFrame(runner);
-    };
-
-    const renderServer = () => {
-      render();
+      const tickStart = Date.now();
+      await runner();
+      setTimeout(render, tickLengthMs + tickStart - Date.now());
     };
 
     context.application.setIsRunning(true);
-    const intervalHandle = setInterval(
-      this._isServer ? renderServer : renderClient,
-      1000 / this.options.tickRate,
-    );
+    setTimeout(render);
   }
 
   private getInitContext(options: IRunOptions): InitContext {

@@ -1,0 +1,8 @@
+
+> @nanoforge-dev/utils-eslint-config@1.0.0 fix /home/leoout/eip/engine/utils/eslint-config
+> prettier --write .
+
+[90mindex.js[39m 87ms (unchanged)
+[90mpackage.json[39m 6ms (unchanged)
+[90mprettier.config.js[39m 7ms (unchanged)
+[90mREADME.md[39m 34ms (unchanged)

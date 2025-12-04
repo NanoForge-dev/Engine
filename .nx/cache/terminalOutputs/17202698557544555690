@@ -1,0 +1,4 @@
+
+> @nanoforge-dev/config@0.0.1 build /home/leoout/eip/engine/packages/config
+> tsc -b .
+

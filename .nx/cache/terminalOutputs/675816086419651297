@@ -1,0 +1,4 @@
+
+> @nanoforge-dev/asset-manager@0.0.1 build /home/leoout/eip/engine/packages/asset-manager
+> tsc -b .
+

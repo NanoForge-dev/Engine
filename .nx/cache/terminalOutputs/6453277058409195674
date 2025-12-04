@@ -1,0 +1,12 @@
+
+> @nanoforge-dev/input@0.0.1 fix /home/leoout/eip/engine/packages/input
+> eslint . --fix && prettier --write .
+
+[90mpackage.json[39m 7ms (unchanged)
+[90mREADME.md[39m 13ms (unchanged)
+[90msrc/index.ts[39m 15ms (unchanged)
+[90msrc/input-handler.ts[39m 25ms (unchanged)
+[90msrc/input.enum.ts[39m 17ms (unchanged)
+[90msrc/input.library.ts[39m 14ms (unchanged)
+[90mtsconfig.build.json[39m 2ms (unchanged)
+[90mtsconfig.json[39m 1ms (unchanged)
