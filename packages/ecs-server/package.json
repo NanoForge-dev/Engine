@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@nanoforge-dev/common": "workspace:^",
-    "@nanoforge-dev/ecs": "workspace:^"
+    "@nanoforge-dev/ecs-lib": "workspace:^"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "^6.0.0",

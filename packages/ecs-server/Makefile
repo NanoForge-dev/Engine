@@ -1,4 +1,4 @@
-BASE_DIR = node_modules/@nanoforge-dev/ecs
+BASE_DIR = node_modules/@nanoforge-dev/ecs-lib
 
 SRC = $(BASE_DIR)/wasm/SparseArray.cpp\
 	$(BASE_DIR)/wasm/Entity.cpp\

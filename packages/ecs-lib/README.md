@@ -1,4 +1,4 @@
-# ECS
+# ECS Lib
 
 > This lib doesn't work on its own.
 >

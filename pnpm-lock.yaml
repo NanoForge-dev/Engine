@@ -196,51 +196,14 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/ecs:
-    dependencies:
-      '@nanoforge-dev/common':
-        specifier: workspace:^
-        version: link:../common
-    devDependencies:
-      '@favware/cliff-jumper':
-        specifier: ^6.0.0
-        version: 6.0.0
-      '@nanoforge-dev/utils-eslint-config':
-        specifier: workspace:^
-        version: link:../../utils/eslint-config
-      '@nanoforge-dev/utils-prettier-config':
-        specifier: workspace:^
-        version: link:../../utils/prettier-config
-      '@types/node':
-        specifier: ^24.10.1
-        version: 24.10.1
-      eslint:
-        specifier: ^9.39.1
-        version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
-      prettier:
-        specifier: ^3.6.2
-        version: 3.7.4
-      tsup:
-        specifier: ^8.5.1
-        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(typescript@5.9.3)(yaml@2.8.2)
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      vitest:
-        specifier: ^4.0.15
-        version: 4.0.15(@types/node@24.10.1)(jiti@2.6.1)(yaml@2.8.2)
-
   packages/ecs-client:
     dependencies:
       '@nanoforge-dev/common':
         specifier: workspace:^
         version: link:../common
-      '@nanoforge-dev/ecs':
+      '@nanoforge-dev/ecs-lib':
         specifier: workspace:^
-        version: link:../ecs
+        version: link:../ecs-lib
     devDependencies:
       '@favware/cliff-jumper':
         specifier: ^6.0.0
@@ -279,14 +242,51 @@ importers:
         specifier: ^4.0.15
         version: 4.0.15(@types/node@24.10.1)(jiti@2.6.1)(yaml@2.8.2)
 
+  packages/ecs-lib:
+    dependencies:
+      '@nanoforge-dev/common':
+        specifier: workspace:^
+        version: link:../common
+    devDependencies:
+      '@favware/cliff-jumper':
+        specifier: ^6.0.0
+        version: 6.0.0
+      '@nanoforge-dev/utils-eslint-config':
+        specifier: workspace:^
+        version: link:../../utils/eslint-config
+      '@nanoforge-dev/utils-prettier-config':
+        specifier: workspace:^
+        version: link:../../utils/prettier-config
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.10.1
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      eslint-formatter-pretty:
+        specifier: ^7.0.0
+        version: 7.0.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.7.4
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.0.15(@types/node@24.10.1)(jiti@2.6.1)(yaml@2.8.2)
+
   packages/ecs-server:
     dependencies:
       '@nanoforge-dev/common':
         specifier: workspace:^
         version: link:../common
-      '@nanoforge-dev/ecs':
+      '@nanoforge-dev/ecs-lib':
         specifier: workspace:^
-        version: link:../ecs
+        version: link:../ecs-lib
     devDependencies:
       '@favware/cliff-jumper':
         specifier: ^6.0.0

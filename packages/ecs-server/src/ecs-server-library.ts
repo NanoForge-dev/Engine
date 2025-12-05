@@ -1,5 +1,5 @@
 import { type InitContext } from "@nanoforge-dev/common";
-import { AbstractECSLibrary } from "@nanoforge-dev/ecs";
+import { AbstractECSLibrary } from "@nanoforge-dev/ecs-lib";
 
 import { default as Module } from "../lib/libecs";
 

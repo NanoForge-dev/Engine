@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/favware/cliff-jumper/main/assets/cliff-jumper.schema.json",
-  "name": "ecs",
+  "name": "ecs-lib",
   "org": "nanoforge-dev",
-  "packagePath": "packages/ecs",
+  "packagePath": "packages/ecs-lib",
   "identifierBase": false
 }

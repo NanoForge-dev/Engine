@@ -69,7 +69,7 @@ commit_parsers = [
 ]
 filter_commits = true
 protect_breaking_commits = true
-tag_pattern = "@nanoforge-dev/ecs@[0-9]*"
+tag_pattern = "@nanoforge-dev/ecs-lib@[0-9]*"
 ignore_tags = ""
 topo_order = false
 sort_commits = "newest"
