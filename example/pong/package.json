@@ -37,7 +37,7 @@
     "@nanoforge-dev/common": "workspace:^",
     "@nanoforge-dev/config": "workspace:^",
     "@nanoforge-dev/core": "workspace:^",
-    "@nanoforge-dev/ecs": "workspace:^",
+    "@nanoforge-dev/ecs-client": "workspace:^",
     "@nanoforge-dev/graphics-2d": "workspace:^",
     "@nanoforge-dev/input": "workspace:^",
     "@nanoforge-dev/sound": "workspace:^"

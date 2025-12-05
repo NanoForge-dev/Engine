@@ -1,7 +1,7 @@
 import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager/src";
 import { type IRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { ECSLibrary } from "@nanoforge-dev/ecs";
+import { ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
 import { InputEnum } from "@nanoforge-dev/input";
 import { InputLibrary } from "@nanoforge-dev/input/src";
@@ -25,7 +25,7 @@ export const layer = new Layer();
 export const main = async (options: IRunOptions) => {
   const assetManager = new AssetManagerLibrary();
   const graphics = new Graphics2DLibrary();
-  const ecsLibrary = new ECSLibrary();
+  const ecsLibrary = new ECSClientLibrary();
   const inputLibrary = new InputLibrary();
   const sounds = new SoundLibrary();
 
