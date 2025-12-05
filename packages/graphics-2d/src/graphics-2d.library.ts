@@ -1,6 +1,6 @@
 import { BaseGraphicsLibrary, type InitContext } from "@nanoforge-dev/common";
 
-import { Graphics } from ".";
+import * as Graphics from "./exports/konva";
 
 export class Graphics2DLibrary extends BaseGraphicsLibrary {
   private _stage?: Graphics.Stage;
