@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@nanoforge-dev/ecs-server",
+  "version": "0.0.1",
+  "description": "NanoForge Engine - ECS Server",
+  "keywords": [
+    "nanoforge",
+    "game",
+    "engine"
+  ],
+  "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "bugs": "https://github.com/NanoForge-dev/Engine/issues",
+  "license": "MIT",
+  "contributors": [
+    "Bill <timothe.jacquot@epitech.eu>",
+    "Exelo <exelo.corp@gmail.com>",
+    "Fexkoser <martin.fillon@epitech.eu>",
+    "Tchips <leo.outmizguine@epitech.eu>"
+  ],
+  "files": [
+    "dist",
+    "lib",
+    "wasm"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "type": "module",
+  "directories": {
+    "lib": "src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanoForge-dev/Engine.git",
+    "directory": "packages/ecs-server"
+  },
+  "scripts": {
+    "build": "pnpm build:wasm && pnpm build:script",
+    "build:script": "tsc --noEmit && tsup",
+    "build:wasm": "make",
+    "clean": "make fclean",
+    "lint": "prettier --check . && eslint --format=pretty src",
+    "format": "prettier --write . && eslint --fix --format=pretty src",
+    "test:unit": "make fclean && make tests -j 16 && vitest run --config ../../vitest.config.ts",
+    "prepack": "pnpm run build && pnpm run lint",
+    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/ecs-server/*'",
+    "release": "cliff-jumper"
+  },
+  "dependencies": {
+    "@nanoforge-dev/common": "workspace:^",
+    "@nanoforge-dev/ecs": "workspace:^"
+  },
+  "devDependencies": {
+    "@favware/cliff-jumper": "^6.0.0",
+    "@nanoforge-dev/asset-manager": "workspace:^",
+    "@nanoforge-dev/core": "workspace:^",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "eslint-formatter-pretty": "^7.0.0",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  },
+  "packageManager": "pnpm@10.22.0",
+  "engines": {
+    "node": "24.11.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "**/*.ts": [
+      "prettier --write"
+    ],
+    "src/**/*.ts": [
+      "eslint --fix"
+    ]
+  }
+}
