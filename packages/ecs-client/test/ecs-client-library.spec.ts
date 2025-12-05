@@ -4,8 +4,8 @@ import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { EditableApplicationContext } from "../../core/src/common/context/contexts/application.editable-context";
 import { EditableLibraryManager } from "../../core/src/common/library/manager/library.manager";
-import { type Registry } from "../lib";
-import { ECSLibrary } from "../src/ecs-library";
+import { type Registry } from "../lib/libecs";
+import { ECSClientLibrary } from "../src/ecs-client-library";
 
 class Position {
   name: string = "Position";
@@ -18,8 +18,8 @@ class Position {
   }
 }
 
-describe("ECSLibrary", () => {
-  let ecs: ECSLibrary;
+describe("ECSClientLibrary", () => {
+  let ecs: ECSClientLibrary;
   let registry: Registry;
   const assetManager = new AssetManagerLibrary();
   const libraryManager = new EditableLibraryManager();
@@ -39,7 +39,7 @@ describe("ECSLibrary", () => {
   });
 
   beforeEach(async () => {
-    ecs = new ECSLibrary();
+    ecs = new ECSClientLibrary();
     await ecs.__init(initContext);
     registry = ecs.registry;
   });

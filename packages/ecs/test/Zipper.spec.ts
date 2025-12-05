@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import Module from "../../lib/libecs.js";
+import Module from "../lib/libecs";
 
 class Velocity {
   name: string = "Velocity";
