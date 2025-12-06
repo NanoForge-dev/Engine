@@ -5,7 +5,9 @@ It can be used by itself.
 
 The engine is made of multiple components:
 
-- [ecs](packages/ecs)
+- [ecs-client](packages/ecs-client)
+- [ecs-server](packages/ecs-server)
+- [ecs-lib](packages/ecs-lib)
 - [input](packages/input)
 - [core](packages/core)
 - [common](packages/common)
