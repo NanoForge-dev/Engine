@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Ask a Question
+    url: https://github.com/NanoForge-dev/Engine/discussions
+    about: Please ask questions in the discussion tab.
