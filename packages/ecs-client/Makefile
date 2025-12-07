@@ -22,10 +22,10 @@ OBJ = $(SRC:.cpp=.o)
 %.o: %.cpp
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-all: $(JS_NAME)
+all: $(TS_NAME) $(JS_NAME) $(WASM_NAME)
 
-$(JS_NAME): LDFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s ENVIRONMENT=web
-$(JS_NAME): $(OBJ)
+$(TS_NAME) $(JS_NAME) $(WASM_NAME): LDFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1 -s ENVIRONMENT=web
+$(TS_NAME) $(JS_NAME) $(WASM_NAME) &: $(OBJ)
 	@mkdir -p $(OUT_DIR)
 	$(CC) $(OBJ) $(LDFLAGS) -o $(JS_NAME)
 	cp $(BASE_DIR)/$(TS_NAME) $(TS_NAME)
@@ -40,6 +40,7 @@ tests: LDFLAGS += -s MODULARIZE=1 -s EXPORT_ES6=1
 tests: $(OBJ)
 	@mkdir -p $(OUT_DIR)
 	$(CC) $(OBJ) $(LDFLAGS) -o $(JS_NAME)
+	cp $(BASE_DIR)/$(TS_NAME) $(TS_NAME)
 
 re: fclean all
 
