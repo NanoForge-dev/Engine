@@ -73,12 +73,12 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -103,12 +103,12 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -137,12 +137,12 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -180,12 +180,12 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -220,15 +220,15 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -257,15 +257,15 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -303,15 +303,15 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -343,12 +343,12 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -377,12 +377,12 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -408,12 +408,12 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -439,12 +439,12 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^6.0.0
+        version: 6.0.0(prettier@3.7.4)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-formatter-pretty:
-        specifier: ^7.0.0
-        version: 7.0.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
@@ -456,10 +456,29 @@ importers:
         version: 5.9.3
 
   utils/eslint-config:
-    devDependencies:
+    dependencies:
       '@eslint/js':
         specifier: ^9.39.1
         version: 9.39.1
+      eslint-config-prettier:
+        specifier: ^10.1.8
+        version: 10.1.8(eslint@9.39.1(jiti@2.6.1))
+      eslint-formatter-pretty:
+        specifier: ^7.0.0
+        version: 7.0.0
+      eslint-plugin-format:
+        specifier: ^1.0.2
+        version: 1.1.0(eslint@9.39.1(jiti@2.6.1))
+      eslint-plugin-prettier:
+        specifier: ^5.5.4
+        version: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(prettier@3.7.4)
+      globals:
+        specifier: ^16.5.0
+        version: 16.5.0
+      typescript-eslint:
+        specifier: ^8.47.0
+        version: 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+    devDependencies:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:^
         version: link:../prettier-config
@@ -469,27 +488,9 @@ importers:
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.39.1(jiti@2.6.1))
-      eslint-plugin-format:
-        specifier: ^1.0.2
-        version: 1.1.0(eslint@9.39.1(jiti@2.6.1))
-      eslint-plugin-jest:
-        specifier: ^29.1.0
-        version: 29.2.1(@typescript-eslint/eslint-plugin@8.48.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
-      eslint-plugin-prettier:
-        specifier: ^5.5.4
-        version: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(prettier@3.7.4)
-      globals:
-        specifier: ^16.5.0
-        version: 16.5.0
       prettier:
         specifier: ^3.6.2
         version: 3.7.4
-      typescript-eslint:
-        specifier: ^8.47.0
-        version: 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
 
   utils/prettier-config:
     devDependencies:
@@ -1622,19 +1623,6 @@ packages:
     resolution: {integrity: sha512-zjGPZcftddkO9GydBwvTKBV4ICN6a++XK0zIPi3HZHlU8W9EaftTA3XAanJvGAXQUYEqAADtgQi08SX+afbPrg==}
     peerDependencies:
       eslint: ^8.40.0 || ^9.0.0
-
-  eslint-plugin-jest@29.2.1:
-    resolution: {integrity: sha512-0WLIezrIxitUGbjMIGwznVzSIp0uFJV0PZ2fiSvpyVcxe+QMXKUt7MRhUpzdbctnnLwiOTOFkACplgB0wAglFw==}
-    engines: {node: ^20.12.0 || ^22.0.0 || >=24.0.0}
-    peerDependencies:
-      '@typescript-eslint/eslint-plugin': ^8.0.0
-      eslint: ^8.57.0 || ^9.0.0
-      jest: '*'
-    peerDependenciesMeta:
-      '@typescript-eslint/eslint-plugin':
-        optional: true
-      jest:
-        optional: true
 
   eslint-plugin-prettier@5.5.4:
     resolution: {integrity: sha512-swNtI95SToIz05YINMA6Ox5R057IMAmWZ26GqPxusAp1TZzj+IdY9tXNWWD3vkF/wEqydCONcwjTFpxybBqZsg==}
@@ -3729,16 +3717,6 @@ snapshots:
       eslint-parser-plain: 0.1.1
       prettier: 3.7.4
       synckit: 0.11.11
-
-  eslint-plugin-jest@29.2.1(@typescript-eslint/eslint-plugin@8.48.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
-    dependencies:
-      '@typescript-eslint/utils': 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
-      eslint: 9.39.1(jiti@2.6.1)
-    optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 8.48.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
 
   eslint-plugin-prettier@5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(prettier@3.7.4):
     dependencies:

@@ -32,25 +32,27 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
-    "directory": "utils/prettier-config"
+    "directory": "utils/eslint-config"
   },
   "funding": "",
   "scripts": {
     "lint": "prettier --check .",
     "format": "prettier --write ."
   },
-  "devDependencies": {
+  "dependencies": {
     "@eslint/js": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-formatter-pretty": "^7.0.0",
+    "eslint-plugin-format": "^1.0.2",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.47.0"
+  },
+  "devDependencies": {
     "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "eslint": "^9.39.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-format": "^1.0.2",
-    "eslint-plugin-jest": "^29.1.0",
-    "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.5.0",
-    "prettier": "^3.6.2",
-    "typescript-eslint": "^8.47.0"
+    "prettier": "^3.6.2"
   },
   "packageManager": "pnpm@10.22.0",
   "engines": {
