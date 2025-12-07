@@ -1,11 +1,8 @@
-My Project Documentation
-==========
+ECS Documentation
+=================
 
 .. toctree::
   :maxdepth: 2
 
-C++ classes
------------
-
-.. doxygenclass:: nfo::Registry
-    :members:
+  wasm
+  typescript
