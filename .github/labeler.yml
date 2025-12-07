@@ -1,0 +1,77 @@
+packages:asset-manager:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/asset-manager/*
+          - packages/asset-manager/**/*
+
+packages:common:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/common/*
+          - packages/common/**/*
+
+packages:config:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/config/*
+          - packages/config/**/*
+
+packages:core:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/core/*
+          - packages/core/**/*
+
+packages:ecs-client:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/ecs-client/*
+          - packages/ecs-client/**/*
+
+packages:ecs-lib:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/ecs-lib/*
+          - packages/ecs-lib/**/*
+
+packages:ecs-server:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/ecs-server/*
+          - packages/ecs-server/**/*
+
+packages:graphics-2d:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/graphics-2d/*
+          - packages/graphics-2d/**/*
+
+packages:input:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/input/*
+          - packages/input/**/*
+
+packages:music:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/music/*
+          - packages/music/**/*
+
+packages:sound:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/sound/*
+          - packages/sound/**/*
+
+utils:eslint-config:
+  - changed-files:
+      - any-glob-to-any-file:
+          - utils/eslint-config/*
+          - utils/eslint-config/**/*
+
+utils:prettier-config:
+  - changed-files:
+      - any-glob-to-any-file:
+          - utils/prettier-config/*
+          - utils/prettier-config/**/*
