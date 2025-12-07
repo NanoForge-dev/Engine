@@ -5,7 +5,6 @@ This choice was made to leverage the performance benefits of C++ for managing en
 Emscripten allows us to compile C++ code into WebAssembly, which can then be
 used in web applications, providing a bridge between high-performance C++ code and JavaScript.
 
-
 ## Design Choices
 
 This design makes some trade-offs between performance and ease of use. A pure C++ ECS would have been easier to use but having to bind it as us make choices that impact usability.
