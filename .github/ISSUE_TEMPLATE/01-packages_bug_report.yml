@@ -1,0 +1,83 @@
+name: Bug report
+description: Report an issue with Nanoforge Engine.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for filing an issue! If you are here to ask a question, don't hesitate to open a discussion instead: https://github.com/NanoForge-dev/Engine/discussions.
+
+        This issue form is for Nanoforge Engine packages.
+  - type: dropdown
+    id: package
+    attributes:
+      label: Which package is this bug report for?
+      options:
+        - asset-manager
+        - common
+        - config
+        - core
+        - ecs-client
+        - ecs-lib
+        - ecs-server
+        - graphics-2d
+        - input
+        - music
+        - sound
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue description
+      description: Describe the issue in as much detail as possible.
+      placeholder: |
+        Steps to reproduce with below code sample:
+        1. Do thing
+        2. Do thing in your game
+        3. Observe behavior
+        4. See error logs below
+    validations:
+      required: true
+  - type: textarea
+    id: code_sample
+    attributes:
+      label: Code sample
+      description: |
+        Your code sample should be:
+        1. Minimal - Use as little code as possible that still produces the same problem (and is understandable)
+        2. Complete - Provide all parts someone else needs to reproduce your problem
+        3. Reproducible - Test the code you're about to provide to make sure it reproduces the problem
+
+        This will be automatically formatted into code, so no need for backticks.
+      render: typescript
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions
+      description: List necessary versions here. This includes your package version, runtime version, operating system etc.
+      placeholder: |
+        - @nanoforge-dev/common 1.0.0 (`npm ls @nanoforge-dev/common` or another package)
+        - Node.js 24.11.0 (`node --version`)
+        - TypeScript 5.9.3 (`npm ls typescript` if you use it)
+        - macOS Ventura 13.3.1
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Issue priority
+      description: Please be realistic. If you need to elaborate on your reasoning, please use the issue description field above.
+      options:
+        - Low (slightly annoying)
+        - Medium (should be fixed soon)
+        - High (immediate attention needed)
+    validations:
+      required: true
+  - type: input
+    id: dev_release
+    attributes:
+      label: I have tested this issue on a development release
+      placeholder: d23280c (commit hash)
+      description: |
+        The issue might already be fixed in a development main. This is not required, but helps us greatly.
