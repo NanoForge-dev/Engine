@@ -47,6 +47,7 @@
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
     "directory": "packages/ecs-lib"
   },
+  "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
     "build": "tsc --noEmit && tsup",
     "clean": "make fclean",

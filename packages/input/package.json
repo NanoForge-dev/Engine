@@ -45,7 +45,7 @@
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
     "directory": "packages/input"
   },
-  "funding": "",
+  "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
     "build": "tsc --noEmit && tsup",
     "lint": "prettier --check . && eslint --format=pretty src",

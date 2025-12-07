@@ -17,7 +17,7 @@
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
     "directory": "packages/ecs"
   },
-  "funding": "",
+  "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
     "build": "turbo run build --concurrency=5",
     "format": "prettier --write . && turbo run format --concurrency=5",
