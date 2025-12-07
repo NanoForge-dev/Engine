@@ -4,7 +4,7 @@
  * @param Type - Type of the element
  * @param Default - Type of the element's default value
  */
-type ECElementDefaults<Type, Default> = {
+type ECSElementDefaults<Type, Default> = {
   /**
    * Type of the element
    */
@@ -42,57 +42,57 @@ type ECElementDefaults<Type, Default> = {
  * * Editor Component String Element
  * Type for string element
  */
-type ECStringElement = {
+type ECSStringElement = {
   /**
    * Values allowed for the element
    */
   enum?: string[];
-} & ECElementDefaults<"string", string>;
+} & ECSElementDefaults<"string", string>;
 
 /**
  * * Editor Component Number Element
  * Type for number element
  */
-type ECNumberElement = ECElementDefaults<"number", number>;
+type ECSNumberElement = ECSElementDefaults<"number", number>;
 
 /**
  * * Editor Component Boolean Element
  * Type for boolean element
  */
-type ECBooleanElement = ECElementDefaults<"boolean", boolean>;
+type ECSBooleanElement = ECSElementDefaults<"boolean", boolean>;
 
 /**
  * * Editor Component Array Element
  * Type for array element
  */
-type ECArrayElement = {
+type ECSArrayElement = {
   /**
    * Items of the array
    */
-  items: ECElement;
-} & ECElementDefaults<"array", any[]>;
+  items: ECSElement;
+} & ECSElementDefaults<"array", any[]>;
 
 /**
  * * Editor Component Object Element
  * Type for object element
  */
-type ECObjectElement = {
+type ECSObjectElement = {
   /**
    * Properties of the object
    */
-  properties: Record<string, ECElement>;
-} & ECElementDefaults<"object", object>;
+  properties: Record<string, ECSElement>;
+} & ECSElementDefaults<"object", object>;
 
 /**
  * * Editor Component Element
  * Type for component element
  */
-type ECElement =
-  | ECStringElement
-  | ECNumberElement
-  | ECBooleanElement
-  | ECArrayElement
-  | ECObjectElement;
+type ECSElement =
+  | ECSStringElement
+  | ECSNumberElement
+  | ECSBooleanElement
+  | ECSArrayElement
+  | ECSObjectElement;
 
 /**
  * Manifest for a component to be used in the NanoForge Editor
@@ -111,7 +111,7 @@ export type EditorComponentManifest = {
   /**
    * Parameters of the component
    */
-  params: Record<string, ECElement>;
+  params: Record<string, ECSElement>;
 };
 
 /**
