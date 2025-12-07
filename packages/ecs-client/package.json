@@ -47,6 +47,7 @@
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
     "directory": "packages/ecs-client"
   },
+  "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
     "build": "pnpm build:wasm && pnpm build:script",
     "build:script": "tsc --noEmit && tsup",

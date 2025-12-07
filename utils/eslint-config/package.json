@@ -34,7 +34,7 @@
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
     "directory": "utils/prettier-config"
   },
-  "funding": "",
+  "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
     "lint": "prettier --check .",
     "format": "prettier --write ."
