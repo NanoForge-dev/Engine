@@ -1,0 +1,107 @@
+- name: "blocked"
+  description: "This is blocked"
+  color: "e92f1d"
+
+- name: "bug"
+  description: "Something isn't working"
+  color: "d73a4a"
+
+- name: "chore"
+  description: "Changes that don't affect the codebase (eg. CI, docs)"
+  color: "eba8cc"
+
+- name: "ci"
+  description: "Changes to our CI configuration files and scripts"
+  color: "721cdb"
+
+- name: "documentation"
+  description: "Improvements or additions to documentation"
+  color: "0075ca"
+
+- name: "duplicate"
+  description: "This issue or pull request already exists"
+  color: "cfd3d7"
+
+- name: "enhancement"
+  description: "New feature or request"
+  color: "a2eeef"
+
+- name: "good first issue"
+  description: "Good for newcomers"
+  color: "7057ff"
+
+- name: "help wanted"
+  description: "Extra attention is needed"
+  color: "008672"
+
+- name: "invalid"
+  description: "This doesn't seem right"
+  color: "e4e669"
+
+- name: "packages:asset-manager"
+  description: "Related to AssetManager library"
+  color: "aaa3dc"
+
+- name: "packages:common"
+  description: "Related to Common library"
+  color: "aaa3dc"
+
+- name: "packages:config"
+  description: "Related to Config library"
+  color: "aaa3dc"
+
+- name: "packages:core"
+  description: "Related to Core library"
+  color: "aaa3dc"
+
+- name: "packages:ecs-client"
+  description: "Related to ECSClient library"
+  color: "aaa3dc"
+
+- name: "packages:ecs-lib"
+  description: "Related to Abstract ECS library"
+  color: "aaa3dc"
+
+- name: "packages:ecs-server"
+  description: "Related to ECSServer library"
+  color: "aaa3dc"
+
+- name: "packages:graphics-2d"
+  description: "Related to Graphics2D library"
+  color: "aaa3dc"
+
+- name: "packages:input"
+  description: "Related to Input library"
+  color: "aaa3dc"
+
+- name: "packages:music"
+  description: "Related to Music library"
+  color: "aaa3dc"
+
+- name: "packages:sound"
+  description: "Related to Sound library"
+  color: "aaa3dc"
+
+- name: "question"
+  description: "Further information is requested"
+  color: "d876e3"
+
+- name: "refactor"
+  description: "Code change that neither fixes a bug nor adds a feature"
+  color: "a3f2e8"
+
+- name: "tests"
+  description: "Adding missing tests or correcting existing tests"
+  color: "7f8f92"
+
+- name: "utils:eslint-config"
+  description: "Related to ESLint config"
+  color: "606bdf"
+
+- name: "utils:prettier-config"
+  description: "Related to Prettier config"
+  color: "606bdf"
+
+- name: "wontfix"
+  description: "This will not be worked on"
+  color: "ffffff"

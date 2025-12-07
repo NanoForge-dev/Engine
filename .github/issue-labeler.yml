@@ -1,0 +1,51 @@
+packages:asset-manager:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nasset-manager\\n"
+
+packages:common:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ncommon\\n"
+
+packages:config:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nconfig\\n"
+
+packages:core:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ncore\\n"
+
+packages:ecs-client:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\necs-client\\n"
+
+packages:ecs-lib:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\necs-lib\\n"
+
+packages:ecs-server:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\necs-server\\n"
+
+packages:graphics-2d:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ngraphics-2d\\n"
+
+packages:input:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ninput\\n"
+
+packages:music:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nmusic\\n"
+
+packages:sound:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nsound\\n"
+
+utils:eslint-config:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nstructures\\n"
+
+utils:prettier-config:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ui\\n"
