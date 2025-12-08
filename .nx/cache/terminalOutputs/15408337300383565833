@@ -1,8 +1,0 @@
-
-> @nanoforge-dev/utils-prettier-config@1.0.0 fix /home/leoout/eip/engine/utils/prettier-config
-> prettier --write .
-
-[90mindex.js[39m 46ms (unchanged)
-[90mpackage.json[39m 6ms (unchanged)
-[90mprettier.config.js[39m 9ms (unchanged)
-[90mREADME.md[39m 29ms (unchanged)
