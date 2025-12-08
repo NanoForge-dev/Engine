@@ -40,6 +40,4 @@ export class NetworkServerLibrary extends BaseNetworkLibrary {
       this.udp.listen();
     }
   }
-
-  public async __run(): Promise<void> {}
 }

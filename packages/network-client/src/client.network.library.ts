@@ -32,6 +32,4 @@ export class NetworkClientLibrary extends BaseNetworkLibrary {
       await this.udp.connect();
     }
   }
-
-  public async __run(): Promise<void> {}
 }
