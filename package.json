@@ -12,6 +12,7 @@
     "Fexkoser <martin.fillon@epitech.eu>",
     "Tchips <leo.outmizguine@epitech.eu>"
   ],
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
