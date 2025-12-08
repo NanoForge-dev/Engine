@@ -1,9 +1,11 @@
+import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
 import { ClientNetworkLibrary } from "@nanoforge-dev/client-network";
 import { type IRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { ECSLibrary } from "@nanoforge-dev/ecs";
-import { Graphics, Graphics2DLibrary } from "@nanoforge-dev/graphics-2d";
+import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
 import { InputEnum } from "@nanoforge-dev/input";
+import { InputLibrary } from "@nanoforge-dev/input";
 
 import { CircleComponent, Controller, Position, RectangleComponent, Velocity } from "./components";
 import { controlPlayer, draw, move, packetHandler } from "./systems";
@@ -13,16 +15,20 @@ export const app = NanoforgeFactory.createClient({
   environment: { serverTcpPort: "4445", serverUdpPort: "4444", serverAddress: "127.0.0.1" },
 });
 
-export const layer = new Graphics.Layer();
+export const layer = new Layer();
 
 export const main = async (options: IRunOptions) => {
   const graphics = new Graphics2DLibrary();
   const ecsLibrary = new ECSLibrary();
   const network = new ClientNetworkLibrary();
+  const assetManager = new AssetManagerLibrary();
+  const input = new InputLibrary();
 
   app.useGraphics(graphics);
   app.useComponentSystem(ecsLibrary);
   app.useNetwork(network);
+  app.useAssetManager(assetManager);
+  app.useInput(input);
 
   await app.init(options);
 
@@ -31,12 +37,12 @@ export const main = async (options: IRunOptions) => {
   graphics.stage.add(layer);
 
   const ball = registry.spawnEntity();
-  registry.addComponent(ball, new Velocity(10, 0));
-  registry.addComponent(ball, new Position(1920 / 2, 1080 / 2));
+  registry.addComponent(ball, new Velocity(0, 0));
+  registry.addComponent(ball, new Position(0, 0));
   registry.addComponent(
     ball,
     new CircleComponent(
-      new Graphics.Circle({
+      new Circle({
         radius: 30,
         fill: "red",
       }),
@@ -47,19 +53,19 @@ export const main = async (options: IRunOptions) => {
   registry.addComponent(me, new Controller(InputEnum.ArrowUp, InputEnum.ArrowDown));
 
   const paddle1 = registry.spawnEntity();
-  registry.addComponent(paddle1, new Position(20, 100));
+  registry.addComponent(paddle1, new Position(0, 0));
   registry.addComponent(paddle1, new Velocity(0, 0));
   registry.addComponent(
     paddle1,
-    new RectangleComponent(new Graphics.Rect({ fill: "blue", width: 30, height: 300 })),
+    new RectangleComponent(new Rect({ fill: "blue", width: 30, height: 300 })),
   );
 
   const paddle2 = registry.spawnEntity();
-  registry.addComponent(paddle2, new Position(1850, 100));
+  registry.addComponent(paddle2, new Position(0, 0));
   registry.addComponent(paddle2, new Velocity(0, 0));
   registry.addComponent(
     paddle2,
-    new RectangleComponent(new Graphics.Rect({ fill: "blue", width: 30, height: 300 })),
+    new RectangleComponent(new Rect({ fill: "blue", width: 30, height: 300 })),
   );
 
   registry.addSystem(packetHandler);
@@ -68,7 +74,7 @@ export const main = async (options: IRunOptions) => {
   registry.addSystem(draw);
 
   new RectangleComponent(
-    new Graphics.Rect({
+    new Rect({
       strokeEnabled: true,
       stroke: "black",
       strokeWidth: 2,

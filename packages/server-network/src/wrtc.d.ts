@@ -1,1 +1,1 @@
-declare module "wrtc";
+declare module 'wrtc';

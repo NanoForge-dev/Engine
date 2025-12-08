@@ -26,7 +26,7 @@
   "scripts": {
     "setup": "bun i",
     "build": "bun run clean && bun run build:raw",
-    "build:raw": "bun build src/index.ts --outdir dist --asset-naming \"[name].[ext]\"",
+    "build:raw": "bun build src/index.ts --outdir dist --asset-naming \"[name].[ext]\" --target node",
     "clean": "rm -rf dist",
     "lint": "eslint . && prettier --check . '!.cloud/**'",
     "fix": "eslint . --fix && prettier --write . '!.cloud/**'",

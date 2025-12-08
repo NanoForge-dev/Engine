@@ -6,9 +6,7 @@
       "data": {
         "root": "packages/client-network",
         "name": "@nanoforge-dev/client-network",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
             "NPM Scripts": [
@@ -152,9 +150,7 @@
       "data": {
         "root": "packages/server-network",
         "name": "@nanoforge-dev/server-network",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
             "NPM Scripts": [
@@ -298,9 +294,7 @@
       "data": {
         "root": "packages/asset-manager",
         "name": "@nanoforge-dev/asset-manager",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
             "NPM Scripts": [
@@ -431,16 +425,10 @@
       "data": {
         "root": "utils/prettier-config",
         "name": "@nanoforge-dev/utils-prettier-config",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
-            "NPM Scripts": [
-              "lint",
-              "fix",
-              "taze"
-            ]
+            "NPM Scripts": ["lint", "fix", "taze"]
           },
           "description": "NanoForge Engine - Utils Prettier Config",
           "js": {
@@ -499,9 +487,7 @@
       "data": {
         "root": "packages/graphics-2d",
         "name": "@nanoforge-dev/graphics-2d",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
             "NPM Scripts": [
@@ -632,16 +618,10 @@
       "data": {
         "root": "utils/eslint-config",
         "name": "@nanoforge-dev/utils-eslint-config",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
-            "NPM Scripts": [
-              "lint",
-              "fix",
-              "taze"
-            ]
+            "NPM Scripts": ["lint", "fix", "taze"]
           },
           "description": "NanoForge Engine - Utils EsLint Config",
           "js": {
@@ -700,20 +680,10 @@
       "data": {
         "root": "packages/common",
         "name": "@nanoforge-dev/common",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
-            "NPM Scripts": [
-              "build",
-              "clean",
-              "clean:types",
-              "clean:scripts",
-              "lint",
-              "fix",
-              "taze"
-            ]
+            "NPM Scripts": ["build", "clean", "clean:types", "clean:scripts", "lint", "fix", "taze"]
           },
           "description": "NanoForge Engine - Common",
           "js": {
@@ -820,20 +790,10 @@
       "data": {
         "root": "packages/config",
         "name": "@nanoforge-dev/config",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
-            "NPM Scripts": [
-              "build",
-              "clean",
-              "clean:types",
-              "clean:scripts",
-              "lint",
-              "fix",
-              "taze"
-            ]
+            "NPM Scripts": ["build", "clean", "clean:types", "clean:scripts", "lint", "fix", "taze"]
           },
           "description": "NanoForge Engine - Config",
           "js": {
@@ -940,20 +900,10 @@
       "data": {
         "root": "packages/input",
         "name": "@nanoforge-dev/input",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
-            "NPM Scripts": [
-              "build",
-              "clean",
-              "clean:types",
-              "clean:scripts",
-              "lint",
-              "fix",
-              "taze"
-            ]
+            "NPM Scripts": ["build", "clean", "clean:types", "clean:scripts", "lint", "fix", "taze"]
           },
           "description": "NanoForge Engine - Input",
           "js": {
@@ -1060,20 +1010,10 @@
       "data": {
         "root": "packages/music",
         "name": "@nanoforge-dev/music",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
-            "NPM Scripts": [
-              "build",
-              "clean",
-              "clean:types",
-              "clean:scripts",
-              "lint",
-              "fix",
-              "taze"
-            ]
+            "NPM Scripts": ["build", "clean", "clean:types", "clean:scripts", "lint", "fix", "taze"]
           },
           "description": "NanoForge Engine - music",
           "js": {
@@ -1180,20 +1120,10 @@
       "data": {
         "root": "packages/sound",
         "name": "@nanoforge-dev/sound",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
-            "NPM Scripts": [
-              "build",
-              "clean",
-              "clean:types",
-              "clean:scripts",
-              "lint",
-              "fix",
-              "taze"
-            ]
+            "NPM Scripts": ["build", "clean", "clean:types", "clean:scripts", "lint", "fix", "taze"]
           },
           "description": "NanoForge Engine - sound",
           "js": {
@@ -1300,20 +1230,10 @@
       "data": {
         "root": "packages/core",
         "name": "@nanoforge-dev/core",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
-            "NPM Scripts": [
-              "build",
-              "clean",
-              "clean:types",
-              "clean:scripts",
-              "lint",
-              "fix",
-              "taze"
-            ]
+            "NPM Scripts": ["build", "clean", "clean:types", "clean:scripts", "lint", "fix", "taze"]
           },
           "description": "NanoForge Engine - Core",
           "js": {
@@ -1420,9 +1340,7 @@
       "data": {
         "root": "packages/ecs",
         "name": "@nanoforge-dev/ecs",
-        "tags": [
-          "npm:public"
-        ],
+        "tags": ["npm:public"],
         "metadata": {
           "targetGroups": {
             "NPM Scripts": [

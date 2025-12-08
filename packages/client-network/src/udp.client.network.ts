@@ -50,7 +50,7 @@ export class UDPClient {
     const webSocket = new WebSocket(serverUrl);
 
     webSocket.onerror = (e: Event) => {
-      throw new Error("UDP connection error : WebSocket Error" + e.toString());
+      throw new Error("UDP connection error : WebSocket Error", { cause: e });
     };
     return webSocket;
   }
