@@ -34,7 +34,7 @@ export class UDPServer {
           await this.receiveClientOffer(pc, data.offer, pendingCandidates, webSocket);
         }
 
-        if (data.type === "ice" && data.candidate) {
+        if (data.type === "ice" && data.candidate && data.candidate.candidate) {
           if (pc.remoteDescription) {
             await pc.addIceCandidate(data.candidate);
           } else {
