@@ -4,6 +4,8 @@ on:
     types: [opened]
 jobs:
   issue-triage:
+    permissions:
+      issues: write
     runs-on: ubuntu-latest
     steps:
       - uses: github/issue-labeler@v3.4
