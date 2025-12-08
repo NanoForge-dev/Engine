@@ -1,5 +1,4 @@
 import {
-  type ApplicationContext,
   ClearContext,
   ClientLibraryManager,
   Context,
@@ -13,21 +12,20 @@ import {
 
 import { type ApplicationConfig } from "../application/application-config";
 import type { IApplicationOptions } from "../application/application-options.type";
+import { type EditableApplicationContext } from "../common/context/contexts/application.editable-context";
 import { EditableExecutionContext } from "../common/context/contexts/executions/execution.editable-context";
 import { type EditableLibraryContext } from "../common/context/contexts/library.editable-context";
 import { ConfigRegistry } from "../config/config-registry";
 
 export class Core {
   private readonly config: ApplicationConfig;
-  private readonly context: ApplicationContext;
+  private readonly context: EditableApplicationContext;
   private options?: IApplicationOptions;
   private _configRegistry?: ConfigRegistry;
-  private _isServer;
 
-  constructor(config: ApplicationConfig, context: ApplicationContext, isServer: boolean) {
+  constructor(config: ApplicationConfig, context: EditableApplicationContext) {
     this.config = config;
     this.context = context;
-    this._isServer = isServer;
   }
 
   public async init(options: IRunOptions, appOptions: IApplicationOptions): Promise<void> {
@@ -42,20 +40,23 @@ export class Core {
     const context = this.getExecutionContext();
     const clientContext = this.getClientContext();
     const libraries = this.config.libraryManager.getExecutionLibraries();
-    let requestAnimationFrameHandle: number;
 
-    const runner = async () => {
+    const runner = async (delta: number) => {
+      this.context.setDelta(delta);
       await this.runExecute(clientContext, libraries);
     };
 
     const tickLengthMs = 1000 / this.options.tickRate;
+    let previousTick = Date.now();
+
     const render = async () => {
       if (!context.application.isRunning) {
         await this.runClear(this.getClearContext());
         return;
       }
       const tickStart = Date.now();
-      await runner();
+      await runner(tickStart - previousTick);
+      previousTick = tickStart;
       setTimeout(render, tickLengthMs + tickStart - Date.now());
     };
 
