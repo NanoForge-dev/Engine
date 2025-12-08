@@ -1,7 +1,7 @@
 import type { Circle, Rect } from "@nanoforge-dev/graphics-2d";
 import type { InputEnum } from "@nanoforge-dev/input";
 
-import { layer } from "./index";
+import { layer } from "./main";
 
 export class NetworkId {
   name = "NetworkId";

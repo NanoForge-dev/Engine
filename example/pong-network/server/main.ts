@@ -1,8 +1,8 @@
 import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
 import { type IRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { ECSLibrary } from "@nanoforge-dev/ecs";
-import { ServerNetworkLibrary } from "@nanoforge-dev/server-network";
+import { ECSServerLibrary } from "@nanoforge-dev/ecs-server";
+import { ServerNetworkLibrary } from "@nanoforge-dev/network-server";
 
 import { Position, Velocity } from "./components";
 import { bounce, move, packetHandler } from "./systems";
@@ -13,7 +13,7 @@ export const app = NanoforgeFactory.createServer({
 });
 
 export const main = async (options: IRunOptions) => {
-  const ecsLibrary = new ECSLibrary();
+  const ecsLibrary = new ECSServerLibrary();
   const network = new ServerNetworkLibrary();
   const assetManager = new AssetManagerLibrary();
 
@@ -43,9 +43,3 @@ export const main = async (options: IRunOptions) => {
 
   app.run();
 };
-
-main({
-  files: new Map([
-    ["/libecs.wasm", "/home/leoout/eip/engine/example/server-network-pong/dist/libecs.wasm"],
-  ]),
-});

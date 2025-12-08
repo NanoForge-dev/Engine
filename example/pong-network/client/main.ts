@@ -1,8 +1,8 @@
 import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
-import { ClientNetworkLibrary } from "@nanoforge-dev/client-network";
+import { ClientNetworkLibrary } from "@nanoforge-dev/network-client";
 import { type IRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { ECSLibrary } from "@nanoforge-dev/ecs";
+import { ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
 import { InputEnum } from "@nanoforge-dev/input";
 import { InputLibrary } from "@nanoforge-dev/input";
@@ -19,7 +19,7 @@ export const layer = new Layer();
 
 export const main = async (options: IRunOptions) => {
   const graphics = new Graphics2DLibrary();
-  const ecsLibrary = new ECSLibrary();
+  const ecsLibrary = new ECSClientLibrary();
   const network = new ClientNetworkLibrary();
   const assetManager = new AssetManagerLibrary();
   const input = new InputLibrary();
@@ -72,16 +72,6 @@ export const main = async (options: IRunOptions) => {
   registry.addSystem(move);
   registry.addSystem(controlPlayer);
   registry.addSystem(draw);
-
-  new RectangleComponent(
-    new Rect({
-      strokeEnabled: true,
-      stroke: "black",
-      strokeWidth: 2,
-      width: 1920,
-      height: 1080,
-    }),
-  );
 
   async function waitForConnection(): Promise<void> {
     if (network.udp?.isConnected()) return;

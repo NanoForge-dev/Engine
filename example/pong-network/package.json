@@ -1,0 +1,52 @@
+{
+  "name": "pong-network",
+  "version": "0.0.0",
+  "description": "",
+  "author": "",
+  "scripts": {
+    "build": "nf build",
+    "start": "nf start",
+    "lint": "prettier --check . && eslint --format=pretty \"{client,server}/**/*.ts\"",
+    "format": "prettier --write . && eslint --fix --format=pretty \"{client,server}/**/*.ts\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@nanoforge-dev/asset-manager": "workspace:^",
+    "@nanoforge-dev/cli": "file:../../../cli",
+    "@nanoforge-dev/common": "workspace:^",
+    "@nanoforge-dev/config": "workspace:^",
+    "@nanoforge-dev/core": "workspace:^",
+    "@nanoforge-dev/ecs-client": "workspace:^",
+    "@nanoforge-dev/ecs-server": "workspace:^",
+    "@nanoforge-dev/graphics-2d": "workspace:^",
+    "@nanoforge-dev/input": "workspace:^",
+    "@nanoforge-dev/network-client": "workspace:^",
+    "@nanoforge-dev/network-server": "workspace:^",
+    "@nanoforge-dev/music": "workspace:^",
+    "@nanoforge-dev/sound": "workspace:^",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.5.0",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
+  },
+  "private": true,
+  "workspaces": [
+    ".",
+    "../../packages/*",
+    "../../utils/*"
+  ],
+  "lint-staged": {
+    "**/*.ts": [
+      "prettier --write"
+    ],
+    "{client,server}/**/*.ts": [
+      "eslint --fix"
+    ]
+  }
+}

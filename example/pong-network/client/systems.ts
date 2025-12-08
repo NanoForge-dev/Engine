@@ -1,6 +1,6 @@
-import { type ClientNetworkLibrary } from "@nanoforge-dev/client-network";
+import { type ClientNetworkLibrary } from "@nanoforge-dev/network-client";
 import { type Context } from "@nanoforge-dev/common";
-import { type Registry } from "@nanoforge-dev/ecs";
+import { type Registry } from "@nanoforge-dev/ecs-client";
 import { type InputLibrary } from "@nanoforge-dev/input";
 
 import {
