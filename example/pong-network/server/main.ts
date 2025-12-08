@@ -2,7 +2,7 @@ import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
 import { type IRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { ECSServerLibrary } from "@nanoforge-dev/ecs-server";
-import { ServerNetworkLibrary } from "@nanoforge-dev/network-server";
+import { NetworkServerLibrary } from "@nanoforge-dev/network-server";
 
 import { Position, Velocity } from "./components";
 import { bounce, move, packetHandler } from "./systems";
@@ -14,7 +14,7 @@ export const app = NanoforgeFactory.createServer({
 
 export const main = async (options: IRunOptions) => {
   const ecsLibrary = new ECSServerLibrary();
-  const network = new ServerNetworkLibrary();
+  const network = new NetworkServerLibrary();
   const assetManager = new AssetManagerLibrary();
 
   app.useComponentSystem(ecsLibrary);

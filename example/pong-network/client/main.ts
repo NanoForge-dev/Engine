@@ -1,5 +1,5 @@
 import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
-import { ClientNetworkLibrary } from "@nanoforge-dev/network-client";
+import { NetworkClientLibrary } from "@nanoforge-dev/network-client";
 import { type IRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { ECSClientLibrary } from "@nanoforge-dev/ecs-client";
@@ -20,7 +20,7 @@ export const layer = new Layer();
 export const main = async (options: IRunOptions) => {
   const graphics = new Graphics2DLibrary();
   const ecsLibrary = new ECSClientLibrary();
-  const network = new ClientNetworkLibrary();
+  const network = new NetworkClientLibrary();
   const assetManager = new AssetManagerLibrary();
   const input = new InputLibrary();
 
