@@ -22,8 +22,7 @@
     "directory": "packages/client-network"
   },
   "scripts": {
-    "build": "pnpm build:main",
-    "build:main": "tsc -b .",
+    "build": "tsc --noEmit && tsup",
     "clean": "pnpm clean:types && pnpm clean:scripts && rm -f tsconfig.build.tsbuildinfo",
     "clean:types": "find src -name '*.d.ts' -delete",
     "clean:scripts": "find src -name '*.js' -delete",

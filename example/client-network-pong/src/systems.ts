@@ -12,18 +12,13 @@ import {
   Velocity,
 } from "./components";
 
-let lastMoovedTick = Date.now();
-
-export function move(registry: Registry) {
+export function move(registry: Registry, ctx: Context) {
   const entities = registry.getZipper([Position, Velocity]);
 
-  const now = Date.now();
-  const delta = now - lastMoovedTick;
   entities.forEach(({ Position, Velocity }) => {
-    Position.x += Velocity.x * delta;
-    Position.y += Velocity.y * delta;
+    Position.x += Velocity.x * ctx.app.delta;
+    Position.y += Velocity.y * ctx.app.delta;
   });
-  lastMoovedTick = now;
 }
 
 export const controlPlayer = (registry: Registry, ctx: Context) => {

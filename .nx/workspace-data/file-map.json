@@ -2,30 +2,14 @@
   "version": "6.0",
   "nxVersion": "22.1.0",
   "pathMappings": {
-    "@nanoforge-dev/asset-manager": [
-      "./packages/asset-manager"
-    ],
-    "@nanoforge-dev/common": [
-      "./packages/common"
-    ],
-    "@nanoforge-dev/config": [
-      "./packages/config"
-    ],
-    "@nanoforge-dev/core": [
-      "./packages/core"
-    ],
-    "@nanoforge-dev/ecs": [
-      "./packages/ecs"
-    ],
-    "@nanoforge-dev/graphics-2d": [
-      "./packages/graphics-2d"
-    ],
-    "@nanoforge-dev/input": [
-      "./packages/input"
-    ],
-    "@nanoforge-dev/sound": [
-      "./packages/sound"
-    ]
+    "@nanoforge-dev/asset-manager": ["./packages/asset-manager"],
+    "@nanoforge-dev/common": ["./packages/common"],
+    "@nanoforge-dev/config": ["./packages/config"],
+    "@nanoforge-dev/core": ["./packages/core"],
+    "@nanoforge-dev/ecs": ["./packages/ecs"],
+    "@nanoforge-dev/graphics-2d": ["./packages/graphics-2d"],
+    "@nanoforge-dev/input": ["./packages/input"],
+    "@nanoforge-dev/sound": ["./packages/sound"]
   },
   "nxJsonPlugins": [],
   "fileMap": {

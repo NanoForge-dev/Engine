@@ -10,6 +10,10 @@ export class EditableApplicationContext extends ApplicationContext {
     this._libraryManager = libraryManager;
   }
 
+  setDelta(delta: number) {
+    this._delta = delta;
+  }
+
   muteSoundLibraries(): void {
     this._libraryManager.getMutableLibraries().forEach((lib) => lib.library.mute());
   }

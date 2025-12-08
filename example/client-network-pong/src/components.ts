@@ -1,4 +1,4 @@
-import type { Graphics } from "@nanoforge-dev/graphics-2d";
+import type { Circle, Rect } from "@nanoforge-dev/graphics-2d";
 import type { InputEnum } from "@nanoforge-dev/input";
 
 import { layer } from "./index";
@@ -32,9 +32,9 @@ export class Position {
 
 export class CircleComponent {
   name = "CircleComponent";
-  component: Graphics.Circle;
+  component: Circle;
 
-  constructor(component: Graphics.Circle) {
+  constructor(component: Circle) {
     this.component = component;
     layer.add(this.component);
   }
@@ -42,9 +42,9 @@ export class CircleComponent {
 
 export class RectangleComponent {
   name = "RectangleComponent";
-  component: Graphics.Rect;
+  component: Rect;
 
-  constructor(component: Graphics.Rect) {
+  constructor(component: Rect) {
     this.component = component;
     layer.add(this.component);
   }
