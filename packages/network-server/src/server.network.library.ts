@@ -1,25 +1,25 @@
-import { BaseNetworkLibrary, type InitContext } from "@nanoforge-dev/common";
+import { BaseNetworkLibrary, type InitContext, NfConfigException } from "@nanoforge-dev/common";
 
 import { ServerConfigNetwork } from "./config.server.network";
 import { TCPServer } from "./tcp.server.network";
 import { UDPServer } from "./udp.server.network";
 
-export class ServerNetworkLibrary extends BaseNetworkLibrary {
-  public udp: UDPServer | null = null;
-  public tcp: TCPServer | null = null;
+export class NetworkServerLibrary extends BaseNetworkLibrary {
+  public udp!: UDPServer;
+  public tcp!: TCPServer;
 
   get __name(): string {
-    return "ServerNetworkLibrary";
+    return "NetworkServerLibrary";
   }
 
   public override async __init(context: InitContext): Promise<void> {
     const config: ServerConfigNetwork = await context.config.registerConfig(ServerConfigNetwork);
 
     if (config.listeningInterface === undefined) {
-      throw new Error("No listenning address provided");
+      throw new NfConfigException("No listenning address provided", this.__name);
     }
     if (config.listeningUdpPort === undefined && config.listeningTcpPort === undefined) {
-      throw new Error("No listenning port specified");
+      throw new NfConfigException("No listenning port specified", this.__name);
     }
 
     if (config.listeningTcpPort !== undefined) {

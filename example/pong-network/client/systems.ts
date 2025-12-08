@@ -1,4 +1,4 @@
-import { type ClientNetworkLibrary } from "@nanoforge-dev/network-client";
+import { type NetworkClientLibrary } from "@nanoforge-dev/network-client";
 import { type Context } from "@nanoforge-dev/common";
 import { type Registry } from "@nanoforge-dev/ecs-client";
 import { type InputLibrary } from "@nanoforge-dev/input";
@@ -24,7 +24,7 @@ export function move(registry: Registry, ctx: Context) {
 export const controlPlayer = (registry: Registry, ctx: Context) => {
   const entities = registry.getZipper([Controller]);
   const input = ctx.libs.getInput<InputLibrary>();
-  const network = ctx.libs.getNetwork<ClientNetworkLibrary>();
+  const network = ctx.libs.getNetwork<NetworkClientLibrary>();
 
   entities.forEach(({ Controller }) => {
     const upPressed = input.isKeyPressed(Controller.up);
@@ -62,7 +62,7 @@ export function draw(registry: Registry) {
 }
 
 export function packetHandler(registry: Registry, ctx: Context) {
-  const network = ctx.libs.getNetwork<ClientNetworkLibrary>();
+  const network = ctx.libs.getNetwork<NetworkClientLibrary>();
   const jsonPackets = network.tcp?.getReceivedPackets().map((packet) => {
     return JSON.parse(new TextDecoder().decode(packet));
   });

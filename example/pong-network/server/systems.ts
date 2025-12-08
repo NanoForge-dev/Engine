@@ -1,6 +1,6 @@
 import { type Context } from "@nanoforge-dev/common";
 import { type Registry } from "@nanoforge-dev/ecs-server";
-import { type ServerNetworkLibrary } from "@nanoforge-dev/network-server";
+import { type NetworkServerLibrary } from "@nanoforge-dev/network-server";
 
 import { Position, Velocity } from "./components";
 
@@ -19,7 +19,7 @@ export function move(registry: Registry, ctx: Context) {
   });
 }
 
-function sendMoveAll(id: number, vel: Velocity, pos: Position, network: ServerNetworkLibrary) {
+function sendMoveAll(id: number, vel: Velocity, pos: Position, network: NetworkServerLibrary) {
   if (!network || !network.tcp) return;
   network.tcp.sendToEverybody(
     new TextEncoder().encode(
@@ -33,7 +33,7 @@ function sendMoveAll(id: number, vel: Velocity, pos: Position, network: ServerNe
   );
 }
 
-function connectNewClient(newCli: number, network: ServerNetworkLibrary, zip: any) {
+function connectNewClient(newCli: number, network: NetworkServerLibrary, zip: any) {
   if (!network || !network.tcp) return;
   network.tcp.sendToClient(
     newCli,
@@ -52,7 +52,7 @@ function connectNewClient(newCli: number, network: ServerNetworkLibrary, zip: an
   sendMoveAll(2, zip[2].Velocity, zip[2].Position, network);
 }
 
-function handleClientInput(clientId: number, key: string, network: ServerNetworkLibrary, zip: any) {
+function handleClientInput(clientId: number, key: string, network: NetworkServerLibrary, zip: any) {
   let id = 0;
 
   if (clientId === cli1) {
@@ -78,7 +78,7 @@ function handleClientInput(clientId: number, key: string, network: ServerNetwork
 
 export function packetHandler(registry: Registry, ctx: Context) {
   const zip = registry.getZipper([Position, Velocity]);
-  const network: ServerNetworkLibrary = ctx.libs.getNetwork<ServerNetworkLibrary>();
+  const network = ctx.libs.getNetwork<NetworkServerLibrary>();
   if (!network || !network.tcp) return;
   if (network.tcp.getConnectedClients().indexOf(cli1) == -1) cli1 = -1;
   if (network.tcp.getConnectedClients().indexOf(cli2) == -1) cli2 = -1;
@@ -107,7 +107,7 @@ export function packetHandler(registry: Registry, ctx: Context) {
 }
 
 export const bounce = (registry: Registry, ctx: Context) => {
-  const network = ctx.libs.getNetwork<ServerNetworkLibrary>();
+  const network = ctx.libs.getNetwork<NetworkServerLibrary>();
   if (roundStart < 3000 && roundStart != -1) {
     roundStart += ctx.app.delta;
     return;
