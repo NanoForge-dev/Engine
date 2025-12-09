@@ -56,8 +56,7 @@
   },
   "dependencies": {
     "@nanoforge-dev/common": "workspace:^",
-    "@nanoforge-dev/config": "workspace:^",
-    "@nanoforge-dev/ecs-client": "workspace:^"
+    "@nanoforge-dev/config": "workspace:^"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "^6.0.0",
