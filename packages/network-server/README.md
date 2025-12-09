@@ -1,25 +1,98 @@
-# Engine Network Manager
+<div align="center">
+	<br />
+	<p>
+		<a href="https://github.com/NanoForge-dev"><img src="https://github.com/NanoForge-dev/blob/main/.github/logo.png" width="546" alt="NanoForge" /></a>
+	</p>
+	<br />
+	<p>
+		<a href="https://www.npmjs.com/package/@nanoforge-dev/network-server"><img src="https://img.shields.io/npm/v/@nanoforge-dev/network-server.svg?maxAge=3600" alt="npm version" /></a>
+		<a href="https://www.npmjs.com/package/@nanoforge-dev/network-server"><img src="https://img.shields.io/npm/dt/@nanoforge-dev/network-server.svg?maxAge=3600" alt="npm downloads" /></a>
+		<a href="https://github.com/NanoForge-dev/Engine/actions"><img src="https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml/badge.svg" alt="Tests status" /></a>
+		<a href="https://github.com/NanoForge-dev/Engine/commits/main/packages/network-server"><img src="https://img.shields.io/github/last-commit/NanoForge-dev/Engine.svg?logo=github&logoColor=ffffff&path=packages%2Fnetwork-server" alt="Last commit." /></a>
+	</p>
+</div>
 
-## Installing dependencies
+## About
 
-To install dependencies run:
+`@nanoforge-dev/network-server` is a network lib with tcp and udp support for server-side usage.
+
+## Installation
+
+**Node.js 24.11.0 or newer is required.**
 
 ```sh
-pnpm i
+npm install @nanoforge-dev/network-server
+yarn add @nanoforge-dev/network-server
+pnpm add @nanoforge-dev/network-server
+bun add @nanoforge-dev/network-server
 ```
 
-## Building
+## Example usage
 
-To build the project run:
+Initilize the library in your main file.
 
-```sh
-pnpm build
+```ts
+import { type IRunOptions } from "@nanoforge-dev/common";
+import { NanoforgeFactory } from "@nanoforge-dev/core";
+import { ECSServerLibrary } from "@nanoforge-dev/ecs-server";
+
+export function main(options: IRunServerOptions) {
+  const app = NanoforgeFactory.createServer();
+
+  const network = new NetworkServerLibrary();
+
+  app.useNetwork(network);
+
+  app.init(options);
+
+  app.run();
+}
 ```
 
-## Tests
+Use to receive packets
 
-To run tests use:
+```ts
+export function myReceiveSystem(registry: Registry, ctx: Context) {
+  const network = ctx.libs.getNetwork<NetworkServerLibrary>();
 
-```sh
-pnpm test
+  network.tcp.getReceivedPackets().forEach((packets, client) => {
+    packets.forEach((packet) => {
+      const data = JSON.parse(new TextDecoder().decode(packet));
+      // Do something with the data
+    });
+  });
+}
 ```
+
+Use to send packets to everyones
+
+```ts
+export function mySendSystem(registry: Registry, ctx: Context) {
+  const network = ctx.libs.getNetwork<NetworkServerLibrary>();
+
+  // Do something to get a data
+  const packet = new TextEncoder().encode(JSON.stringify(data));
+  network.tcp.sendToEverybody(packet);
+}
+```
+
+## Links
+
+- [GitHub][source]
+- [npm][npm]
+
+## Contributing
+
+Before creating an issue, please ensure that it hasn't already been reported/suggested, and double-check the
+[documentation][documentation].  
+See [the contribution guide][contributing] if you'd like to submit a PR.
+
+## Help
+
+If you don't understand something in the documentation, you are experiencing problems, or you just need a gentle nudge in the right direction, please don't hesitate to ask questions in [discussions][discussions].
+
+[documentation]: https://github.com/NanoForge-dev/Engine
+[discussions]: https://github.com/NanoForge-dev/Engine/discussions
+[source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/network-server
+[npm]: https://www.npmjs.com/package/@nanoforge-dev/network-server
+[contributing]: https://github.com/NanoForge-dev/Engine/blob/main/.github/CONTRIBUTING.md

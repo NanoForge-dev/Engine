@@ -31,14 +31,14 @@ export const controlPlayer = (registry: Registry, ctx: Context) => {
     const downPressed = input.isKeyPressed(Controller.down);
     if (upPressed == downPressed) {
       if (Controller.lastPressedUp || Controller.lastPressedDown) {
-        network.tcp?.sendData(
+        network.tcp.sendData(
           new TextEncoder().encode(JSON.stringify({ type: "input", key: "stop" })),
         );
         Controller.lastPressedDown = false;
         Controller.lastPressedUp = false;
       }
     } else if (upPressed && !Controller.lastPressedUp) {
-      network.tcp?.sendData(new TextEncoder().encode(JSON.stringify({ type: "input", key: "up" })));
+      network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ type: "input", key: "up" })));
       Controller.lastPressedUp = true;
     } else if (downPressed && !Controller.lastPressedDown) {
       network.tcp?.sendData(
@@ -63,7 +63,7 @@ export function draw(registry: Registry) {
 
 export function packetHandler(registry: Registry, ctx: Context) {
   const network = ctx.libs.getNetwork<NetworkClientLibrary>();
-  const jsonPackets = network.tcp?.getReceivedPackets().map((packet) => {
+  const jsonPackets = network.tcp.getReceivedPackets().map((packet) => {
     return JSON.parse(new TextDecoder().decode(packet));
   });
 

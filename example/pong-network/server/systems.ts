@@ -20,7 +20,6 @@ export function move(registry: Registry, ctx: Context) {
 }
 
 function sendMoveAll(id: number, vel: Velocity, pos: Position, network: NetworkServerLibrary) {
-  if (!network || !network.tcp) return;
   network.tcp.sendToEverybody(
     new TextEncoder().encode(
       JSON.stringify({
@@ -34,7 +33,6 @@ function sendMoveAll(id: number, vel: Velocity, pos: Position, network: NetworkS
 }
 
 function connectNewClient(newCli: number, network: NetworkServerLibrary, zip: any) {
-  if (!network || !network.tcp) return;
   network.tcp.sendToClient(
     newCli,
     new TextEncoder().encode(JSON.stringify({ type: "assignId", assigned: "ball", id: 0 })),
@@ -79,7 +77,7 @@ function handleClientInput(clientId: number, key: string, network: NetworkServer
 export function packetHandler(registry: Registry, ctx: Context) {
   const zip = registry.getZipper([Position, Velocity]);
   const network = ctx.libs.getNetwork<NetworkServerLibrary>();
-  if (!network || !network.tcp) return;
+
   if (network.tcp.getConnectedClients().indexOf(cli1) == -1) cli1 = -1;
   if (network.tcp.getConnectedClients().indexOf(cli2) == -1) cli2 = -1;
   const clientPackets = network.tcp.getReceivedPackets();

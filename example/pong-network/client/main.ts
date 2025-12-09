@@ -78,7 +78,7 @@ export const main = async (options: IRunOptions) => {
 
     return new Promise((resolve) => {
       const check = () => {
-        if (network.udp?.isConnected()) {
+        if (network.udp.isConnected()) {
           resolve();
         } else {
           setTimeout(check, 50);
@@ -89,6 +89,6 @@ export const main = async (options: IRunOptions) => {
   }
 
   await waitForConnection();
-  network.tcp?.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
+  network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
   app.run();
 };
