@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@nanoforge-dev/utils-prettier-config",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "NanoForge Engine - Utils Prettier Config",
   "homepage": "https://github.com/NanoForge-dev/Engine#readme",
   "bugs": "https://github.com/NanoForge-dev/Engine/issues",
@@ -37,9 +37,13 @@
   "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
     "lint": "prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepack": "pnpm run lint",
+    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'utils/prettier-config/*'",
+    "release": "cliff-jumper"
   },
   "devDependencies": {
+    "@favware/cliff-jumper": "^6.0.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "prettier": "^3.6.2"
   },
