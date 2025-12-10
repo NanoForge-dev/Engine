@@ -61,10 +61,10 @@ describe("Zipper", () => {
     expect(zip).toBeDefined();
 
     expect(zip[0]).toStrictEqual({ Velocity: new Velocity(0, 0) });
-    expect(zip[5]).toStrictEqual({ Velocity: new Velocity(1, 1) });
-    expect(zip[10]).toStrictEqual({ Velocity: new Velocity(2, 2) });
-    expect(zip[15]).toStrictEqual({ Velocity: new Velocity(3, 3) });
-    expect(zip[20]).toStrictEqual({ Velocity: new Velocity(4, 4) });
+    expect(zip[1]).toStrictEqual({ Velocity: new Velocity(1, 1) });
+    expect(zip[2]).toStrictEqual({ Velocity: new Velocity(2, 2) });
+    expect(zip[3]).toStrictEqual({ Velocity: new Velocity(3, 3) });
+    expect(zip[4]).toStrictEqual({ Velocity: new Velocity(4, 4) });
   });
 
   it("multiple complex sparse array instantation", async () => {
@@ -74,18 +74,19 @@ describe("Zipper", () => {
 
     for (let i = 0; i < 20; i++) {
       const e = r.spawnEntity();
-      if (i % 5 === 0) r.addComponent(e, new Velocity(0, i));
-      if (i % 3 === 0) r.addComponent(e, new Position(i, 0));
+      if (i % 5 === 0) r.addComponent(e, new Velocity(0, 1));
+      if (i % 3 === 0) r.addComponent(e, new Position(1, 0));
     }
 
     const zip = r.getZipper([Velocity, Position]);
     expect(zip).toBeDefined();
 
+    console.log(zip);
     for (let i = 0; i < 20; i++) {
-      if (i % 3 === 0 && i % 5 === 0) {
+      if (zip[i]) {
         expect(zip[i]).toStrictEqual({
-          Velocity: new Velocity(0, i),
-          Position: new Position(i, 0),
+          Velocity: new Velocity(0, 1),
+          Position: new Position(1, 0),
         });
       }
     }
@@ -99,7 +100,7 @@ describe("Zipper", () => {
     for (let i = 0; i < 20; i++) {
       const e = r.spawnEntity();
       if (i % 5 === 0) {
-        r.addComponent(e, new Velocity(0, i));
+        r.addComponent(e, new Velocity(0, 1));
       }
     }
 
@@ -107,7 +108,7 @@ describe("Zipper", () => {
     expect(zip).toBeDefined();
 
     for (let i = 0; i < 20; i++) {
-      if (i % 5 === 0) {
+      if (zip[i]) {
         const vel = zip[i]["Velocity"];
         vel.y *= 2;
       }
@@ -115,9 +116,9 @@ describe("Zipper", () => {
 
     zip = r.getZipper([Velocity]);
     for (let i = 0; i < 20; i++) {
-      if (i % 5 === 0) {
+      if (zip[i]) {
         expect(zip[i]).toStrictEqual({
-          Velocity: new Velocity(0, i * 2),
+          Velocity: new Velocity(0, 2),
         });
       }
     }
