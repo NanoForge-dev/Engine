@@ -1,12 +1,9 @@
 # from cgitb import html
 
-extensions = ["breathe", "sphinx_js"]
+extensions = ["breathe"]
 
 html_theme = "sphinx_rtd_theme"
 
-js_language = "typescript"
-
-js_source_path = "../src/"
-
 # Breathe configuration
-breathe_default_project = "my_project"
+breathe_projects = {"ecs-lib": "doc_out/xml"}
+breathe_default_project = "ecs-lib"

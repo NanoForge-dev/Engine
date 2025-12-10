@@ -16,6 +16,12 @@
 #include <cstddef>
 
 namespace nfo {
+    /**
+    ** @brief Represents an entity in the ECS (Entity-Component-System) architecture.
+    **
+    ** This class encapsulates the concept of an entity, which is identified by a unique ID.
+    ** Entities are used to group components together in the ECS paradigm.
+    */
     class Entity {
       public:
         /**
