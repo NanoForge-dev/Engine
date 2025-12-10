@@ -1,8 +1,8 @@
 Typescript
 ==========
 
-.. js:autoclass:: AbstractECSLibrary
-    :members:
+.. .. js:autoclass:: AbstractECSLibrary
+..     :members:
 
-.. js::autoclass:: ECElementDefaults
-    :members:
+.. .. js::typealias:: ECSElementDefaults
+..     :members:

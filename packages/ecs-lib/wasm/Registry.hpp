@@ -26,6 +26,12 @@
 #include "Utils.hpp"
 
 namespace nfo {
+    /**
+    ** @brief The main registry class for managing entities and components.
+    **
+    ** This class provides methods to register components, manage entities,
+    ** add and remove components from entities, and run systems.
+    */
     class Registry {
       public:
         /**
