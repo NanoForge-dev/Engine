@@ -460,6 +460,9 @@ importers:
       '@eslint/js':
         specifier: ^9.39.1
         version: 9.39.1
+      '@favware/cliff-jumper':
+        specifier: ^6.0.0
+        version: 6.0.0
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.1(jiti@2.6.1))
