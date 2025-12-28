@@ -1,0 +1,11 @@
+{
+  "pong": {
+    "build": {
+      "entryFile": "src/index.ts",
+      "outDir": ".nanoforge/"
+    },
+    "runtime": {
+      "dir": ".nanoforge/"
+    }
+  }
+}

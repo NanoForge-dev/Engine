@@ -26,7 +26,7 @@
 #include "Utils.hpp"
 
 namespace nfo {
-    class Registry {
+    class Registry : public std::enable_shared_from_this<Registry> {
       public:
         SparseArray<emscripten::val> &register_component(const Component &c)
         {
@@ -162,9 +162,9 @@ namespace nfo {
 
         void run_systems(const emscripten::val &ctx)
         {
-            std::vector<std::function<void(Registry &, const emscripten::val &)>> systems_copy = _systems;
-            for (std::function<void(Registry &, const emscripten::val &)> &system : systems_copy)
-                system(*this, ctx);
+            std::vector<std::function<void(std::shared_ptr<Registry>, const emscripten::val &)>> systems_copy = _systems;
+            for (std::function<void(std::shared_ptr<Registry>, const emscripten::val &)> &system : systems_copy)
+                system(shared_from_this(), ctx);
         }
 
         void log(const Entity &entity) const
@@ -215,7 +215,7 @@ namespace nfo {
 
         std::unordered_map<std::string, std::function<void(Registry &, Entity const &)>> _remove_functions;
         std::unordered_map<std::string, std::function<bool(const Registry &, const Entity &)>> _loggers;
-        std::vector<std::function<void(Registry &, const emscripten::val &)>> _systems;
+        std::vector<std::function<void(std::shared_ptr<Registry>, const emscripten::val &)>> _systems;
 
         std::vector<Entity> _dead_entities;
         std::size_t _next_entity{0};
