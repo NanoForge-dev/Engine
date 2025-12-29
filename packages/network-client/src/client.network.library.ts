@@ -15,9 +15,6 @@ export class NetworkClientLibrary extends BaseNetworkLibrary {
   public override async __init(context: InitContext): Promise<void> {
     const config: ClientConfigNetwork = await context.config.registerConfig(ClientConfigNetwork);
 
-    if (config.serverAddress === undefined) {
-      throw new NfConfigException("No server address provided", this.__name);
-    }
     if (config.serverTcpPort === undefined && config.serverUdpPort === undefined) {
       throw new NfConfigException("No server port specified to connect", this.__name);
     }
