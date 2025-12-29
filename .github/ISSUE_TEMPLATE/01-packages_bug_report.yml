@@ -23,6 +23,8 @@ body:
         - graphics-2d
         - input
         - music
+        - network-client
+        - network-server
         - sound
     validations:
       required: true
