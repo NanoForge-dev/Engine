@@ -1,25 +1,49 @@
-# Engine Common
+<div align="center">
+	<br />
+	<p>
+		<a href="https://github.com/NanoForge-dev"><img src="https://github.com/NanoForge-dev/blob/main/.github/logo.png" width="546" alt="NanoForge" /></a>
+	</p>
+	<br />
+	<p>
+		<a href="https://www.npmjs.com/package/@nanoforge-dev/common"><img src="https://img.shields.io/npm/v/@nanoforge-dev/common.svg?maxAge=3600" alt="npm version" /></a>
+		<a href="https://www.npmjs.com/package/@nanoforge-dev/common"><img src="https://img.shields.io/npm/dt/@nanoforge-dev/common.svg?maxAge=3600" alt="npm downloads" /></a>
+		<a href="https://github.com/NanoForge-dev/Engine/actions"><img src="https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml/badge.svg" alt="Tests status" /></a>
+		<a href="https://github.com/NanoForge-dev/Engine/commits/main/packages/common"><img src="https://img.shields.io/github/last-commit/NanoForge-dev/Engine.svg?logo=github&logoColor=ffffff&path=packages%2Fcommon" alt="Last commit." /></a>
+	</p>
+</div>
 
-## Installing dependencies
+## About
 
-To install dependencies run:
+`@nanoforge-dev/common` is library with common interfaces and utilities used by Nanoforge Engine.
+
+## Installation
+
+**Node.js 24.11.0 or newer is required.**
 
 ```sh
-pnpm i
+npm install @nanoforge-dev/common
+yarn add @nanoforge-dev/common
+pnpm add @nanoforge-dev/common
+bun add @nanoforge-dev/common
 ```
 
-## Building
+## Links
 
-To build the project run:
+- [GitHub][source]
+- [npm][npm]
 
-```sh
-pnpm build
-```
+## Contributing
 
-## Tests
+Before creating an issue, please ensure that it hasn't already been reported/suggested, and double-check the
+[documentation][documentation].  
+See [the contribution guide][contributing] if you'd like to submit a PR.
 
-To run tests use:
+## Help
 
-```sh
-pnpm test
-```
+If you don't understand something in the documentation, you are experiencing problems, or you just need a gentle nudge in the right direction, please don't hesitate to ask questions in [discussions][discussions].
+
+[documentation]: https://github.com/NanoForge-dev/Engine
+[discussions]: https://github.com/NanoForge-dev/Engine/discussions
+[source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/common
+[npm]: https://www.npmjs.com/package/@nanoforge-dev/common
+[contributing]: https://github.com/NanoForge-dev/Engine/blob/main/.github/CONTRIBUTING.md
