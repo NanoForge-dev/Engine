@@ -1,64 +1,55 @@
-# ECS Lib
+<div align="center">
+	<br />
+	<p>
+		<a href="https://github.com/NanoForge-dev"><img src="https://github.com/NanoForge-dev/blob/main/.github/logo.png" width="546" alt="NanoForge" /></a>
+	</p>
+	<br />
+	<p>
+		<a href="https://www.npmjs.com/package/@nanoforge-dev/ecs-lib"><img src="https://img.shields.io/npm/v/@nanoforge-dev/ecs-lib.svg?maxAge=3600" alt="npm version" /></a>
+		<a href="https://www.npmjs.com/package/@nanoforge-dev/ecs-lib"><img src="https://img.shields.io/npm/dt/@nanoforge-dev/ecs-lib.svg?maxAge=3600" alt="npm downloads" /></a>
+		<a href="https://github.com/NanoForge-dev/Engine/actions"><img src="https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml/badge.svg" alt="Tests status" /></a>
+		<a href="https://github.com/NanoForge-dev/Engine/commits/main/packages/ecs-lib"><img src="https://img.shields.io/github/last-commit/NanoForge-dev/Engine.svg?logo=github&logoColor=ffffff&path=packages%2Fecs-lib" alt="Last commit." /></a>
+	</p>
+</div>
 
-> This lib doesn't work on its own.
->
-> Please import `@nanoforge-dev/ecs-client` or `@nanoforge-dev/ecs-server` either
+## About
 
-## What is an ECS
+`@nanoforge-dev/ecs-lib` is a powerful data structure for managing game entities.
 
-"Entity–component–system (ECS) is a software architectural pattern mostly used in video game development for the representation of game world objects. An ECS comprises entities composed from components of data, with systems which operate on the components."
-[Wikipedia](https://en.wikipedia.org/wiki/Entity_component_system)
+## Installation
 
-## How to build
-
-In order to build this ECS we need to first install a wasm compiler. For this project we gonna use `emsdk`.
-You will also need `make` and `pnpm`
-
-### Installing dependencies
-
-To install dependencies run:
-
-```sh
-pnpm i
-```
-
-#### How to install the emsdk compiler:
-
-To install emsdk the WASM compiler we are using run :
+**Node.js 24.11.0 or newer is required.**
 
 ```sh
-git clone https://github.com/emscripten-core/emsdk.git
-cd emsdk/
-./emsdk install latest
-./emsdk activate latest
-source "$PWD/emsdk_env.sh"
-echo -ne "export EMSDK_QUIET=1\nsource \"$PWD/emsdk_env.sh\"\n" >> ~/.bashrc
-cd ..
+npm install @nanoforge-dev/ecs-lib
+yarn add @nanoforge-dev/ecs-lib
+pnpm add @nanoforge-dev/ecs-lib
+bun add @nanoforge-dev/ecs-lib
 ```
 
-### Building
+## Warning
 
-Now that you have the dependencies you can build by running:
+This library is not usable on its own. You must use either the [ECS Client][ecs-client] or [ECS Server][ecs-server].
 
-```sh
-pnpm build
-```
+## Links
 
-This will produce 2 files in the `lib/` directory.
+- [GitHub][source]
+- [npm][npm]
 
-- `libecs.js`, which is the file containg the javascript binding permitting the javascript to interract with the wasm.
-- `libecs.wasm`, the compile code library
+## Contributing
 
-If you only wanna build the c++ part just use:
+Before creating an issue, please ensure that it hasn't already been reported/suggested, and double-check the
+[documentation][documentation].  
+See [the contribution guide][contributing] if you'd like to submit a PR.
 
-```sh
-make
-```
+## Help
 
-## Tests
+If you don't understand something in the documentation, you are experiencing problems, or you just need a gentle nudge in the right direction, please don't hesitate to ask questions in [discussions][discussions].
 
-To run tests use:
-
-```sh
-pnpm test
-```
+[documentation]: https://github.com/NanoForge-dev/Engine
+[discussions]: https://github.com/NanoForge-dev/Engine/discussions
+[source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/ecs-lib
+[npm]: https://www.npmjs.com/package/@nanoforge-dev/ecs-lib
+[contributing]: https://github.com/NanoForge-dev/Engine/blob/main/.github/CONTRIBUTING.md
+[ecs-client]: https://github.com/NanoForge-dev/Engine/tree/main/packages/ecs-client
+[ecs-server]: https://github.com/NanoForge-dev/Engine/tree/main/packages/ecs-server
