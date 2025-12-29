@@ -32,20 +32,20 @@ bun add @nanoforge-dev/network-server
 Initilize the library in your main file.
 
 ```ts
-import { type IRunOptions } from "@nanoforge-dev/common";
+import { type IRunServerOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { ECSServerLibrary } from "@nanoforge-dev/ecs-server";
+import { NetworkServerLibrary } from "@nanoforge-dev/network-server";
 
-export function main(options: IRunServerOptions) {
+export async function main(options: IRunServerOptions) {
   const app = NanoforgeFactory.createServer();
 
   const network = new NetworkServerLibrary();
 
   app.useNetwork(network);
 
-  app.init(options);
+  await app.init(options);
 
-  app.run();
+  await app.run();
 }
 ```
 
