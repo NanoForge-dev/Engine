@@ -110,10 +110,4 @@ export {
   ValidateIf,
   ValidateNested,
   ValidatePromise,
-  ValidatorConstraint,
-  type ValidatorConstraintInterface,
-  type ValidationOptions,
-  isFQDN,
-  isIP,
-  registerDecorator,
 } from "class-validator";

@@ -20,7 +20,7 @@ export class ClientConfigNetwork {
 
   @Expose()
   @IsIpOrFQDN()
-  serverAddress?: string;
+  serverAddress!: string;
 
   @Expose()
   @Default("PACKET_END")
