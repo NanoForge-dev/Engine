@@ -1,7 +1,7 @@
 <div align="center">
 	<br />
 	<p>
-		<a href="https://github.com/NanoForge-dev"><img src="https://github.com/NanoForge-dev/blob/main/.github/logo.png" width="546" alt="NanoForge" /></a>
+		<a href="https://github.com/NanoForge-dev"><img src="https://github.com/NanoForge-dev/Engine/blob/main/.github/logo.png" width="546" alt="NanoForge" /></a>
 	</p>
 	<br />
 	<p>
