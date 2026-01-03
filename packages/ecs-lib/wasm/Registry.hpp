@@ -26,22 +26,36 @@
 #include "Utils.hpp"
 
 namespace nfo {
+    /**
+    ** @brief The main registry class for managing entities and components.
+    **
+    ** This class provides methods to register components, manage entities,
+    ** add and remove components from entities, and run systems.
+    */
     class Registry {
       public:
-        SparseArray<emscripten::val> &register_component(const Component &c)
+        /**
+         * Register a component type in the registry.
+         *
+         * @param conponent An instance of the component to register.
+         * @return A reference to the SparseArray that will hold all components of this type.
+         * @throws std::runtime_error if the component type is "entity", "id",
+         *         or UNKNOWN_COMPONENT_TYPE.
+         */
+        SparseArray<emscripten::val> &register_component(const Component &component)
         {
-            std::string component_type(get_js_class_name(c));
+            std::string component_type(get_js_class_name(component));
             if (component_type == "entity" || component_type == "id")
                 throw std::runtime_error("Component type '" + component_type + "' not supported : you can't use : id, entity, " + UNKNOWN_COMPONENT_TYPE);
             if (!_components_arrays.contains(component_type))
                 _components_arrays.emplace(component_type, SparseArray<emscripten::val>());
             if (!_remove_functions.contains(component_type)) {
-                _remove_functions.emplace(component_type, [c](Registry &reg, Entity const &ent) {
-                    SparseArray<emscripten::val> &array = reg.get_components(c);
+                _remove_functions.emplace(component_type, [component](Registry &reg, Entity const &ent) {
+                    SparseArray<emscripten::val> &array = reg.get_components(component);
                     array.erase(ent);
                 });
             }
-            // TODO: rework logger
+            // TODO: rework logger https://github.com/NanoForge-dev/Engine/issues/104
             // if (!_loggers.contains(component_type)) {
             //     _loggers.emplace(component_type, [](Registry const &reg, Entity const &ent) {
             //         const auto &array = reg.get_components<emscripten::val>();
@@ -54,42 +68,77 @@ namespace nfo {
             return std::any_cast<SparseArray<emscripten::val> &>(_components_arrays[component_type]);
         }
 
-        SparseArray<emscripten::val> &get_components(const Component &c)
+        /**
+         * Get the SparseArray of a given component type.
+         *
+         * @param component An instance of the component type to get.
+         * @return A reference to the SparseArray holding all components of this type.
+         * @throws std::runtime_error if the component type is not registered.
+         */
+        SparseArray<emscripten::val> &get_components(const Component &component)
         {
-            const std::string component_type(get_js_class_name(c));
+            const std::string component_type(get_js_class_name(component));
             if (!_components_arrays.contains(component_type))
-                register_component(c);
+                register_component(component);
             std::any &components = _components_arrays[component_type];
             return std::any_cast<SparseArray<emscripten::val> &>(components);
         }
 
-        [[nodiscard]] SparseArray<emscripten::val> const &get_components(const Component &c) const
+        /**
+         * Get the SparseArray of a given component type (const version).
+         *
+         * @param component An instance of the component type to get.
+         * @return A const reference to the SparseArray holding all components of this type.
+         * @throws std::runtime_error if the component type is not registered.
+         */
+        [[nodiscard]] SparseArray<emscripten::val> const &get_components(const Component &component) const
         {
-            const std::string component_type(get_js_class_name(c));
+            const std::string component_type(get_js_class_name(component));
             if (!_components_arrays.contains(component_type))
                 throw std::runtime_error(component_type + " array not registered");
             const std::any &components = _components_arrays.find(component_type)->second;
             return std::any_cast<const SparseArray<emscripten::val> &>(components);
         }
 
-        std::optional<emscripten::val> &get_entity_component(const Entity e, const Component &c)
+        /**
+         * Get the component of a given entity.
+         *
+         * @param entity The entity to get the component from.
+         * @param component An instance of the component type to get.
+         * @return A reference to an optional containing the component if it exists, or std::nullopt otherwise.
+         * @throws std::runtime_error if the component type is not registered.
+         */
+        std::optional<emscripten::val> &get_entity_component(const Entity entity, const Component &component)
         {
-            const std::string component_type(get_js_class_name(c));
+            const std::string component_type(get_js_class_name(component));
             if (!_components_arrays.contains(component_type))
-                register_component(c);
+                register_component(component);
             std::any &components = _components_arrays[component_type];
-            return std::any_cast<SparseArray<emscripten::val> &>(components)[e];
+            return std::any_cast<SparseArray<emscripten::val> &>(components)[entity];
         }
 
-        [[nodiscard]] std::optional<emscripten::val> const &get_entity_component(const Entity e, const Component &c) const
+        /**
+         * Get the component of a given entity (const version).
+         *
+         * @param entity The entity to get the component from.
+         * @param component An instance of the component type to get.
+         * @return A const reference to an optional containing the component if it exists, or std::nullopt otherwise.
+         * @throws std::runtime_error if the component type is not registered.
+         */
+        [[nodiscard]] std::optional<emscripten::val> const &get_entity_component(const Entity entity, const Component &component) const
         {
-            const std::string component_type(get_js_class_name(c));
+            const std::string component_type(get_js_class_name(component));
             if (!_components_arrays.contains(component_type))
                 throw std::runtime_error(component_type + " array not registered");
             const std::any &components = _components_arrays.find(component_type)->second;
-            return std::any_cast<const SparseArray<emscripten::val> &>(components)[e];
+            return std::any_cast<const SparseArray<emscripten::val> &>(components)[entity];
         }
 
+        /**
+         * Spawn a new entity.
+         *
+         * @return The newly spawned entity.
+         */
         [[nodiscard]] Entity spawn_entity()
         {
             if (!_dead_entities.empty()) {
@@ -101,6 +150,13 @@ namespace nfo {
             return Entity(_next_entity - 1);
         }
 
+        /**
+         * Get an entity from its index.
+         *
+         * @param component_type The index of the entity.
+         * @return The entity corresponding to the given index.
+         * @throws std::runtime_error if the index is out of range.
+         */
         Entity entity_from_index(const std::size_t component_type)
         {
             if (std::ranges::find(_dead_entities, component_type) != _dead_entities.end() || component_type >= _next_entity)
@@ -108,13 +164,21 @@ namespace nfo {
             return Entity(component_type);
         }
 
-        void kill_entity(Entity const &e)
+        /**
+         * Kill an entity, marking it for removal.
+         *
+         * @param entity The entity to kill.
+         */
+        void kill_entity(Entity const &entity)
         {
-            _dead_entities.push_back(e);
+            _dead_entities.push_back(entity);
             for (const std::function<void(Registry &, const Entity &)> &remove_function : std::views::values(_remove_functions))
-                remove_function(*this, e);
+                remove_function(*this, entity);
         }
 
+        /**
+         * Clear all entities and reset the registry.
+         */
         void clear_entities()
         {
             _next_entity = 0;
@@ -124,30 +188,53 @@ namespace nfo {
             _components_arrays.clear();
         }
 
-        SparseArray<emscripten::val>::reference_type add_component(Entity const &to, Component &&c)
+        /**
+         * Add a component to an entity.
+         *
+         * @param entity The entity to add the component to.
+         * @param component The component to add.
+         * @return A reference to the added component.
+         */
+        SparseArray<emscripten::val>::reference_type add_component(Entity const &entity, Component &&component)
         {
-            const std::string component_type(get_js_class_name(c));
+            const std::string component_type(get_js_class_name(component));
             if (!_components_arrays.contains(component_type)) {
-                register_component(c);
+                register_component(component);
             }
-            return get_components(c).insert_at(to, c);
+            return get_components(component).insert_at(entity, component);
         }
 
-        void remove_component(Entity const &from, Component &&c)
+        /**
+         * Remove a component from an entity.
+         *
+         * @param entity The entity to remove the component from.
+         * @param component The component to remove.
+         */
+        void remove_component(Entity const &entity, Component &&component)
         {
-            const std::string component_type(get_js_class_name(c));
+            const std::string component_type(get_js_class_name(component));
             if (!_components_arrays.contains(component_type))
-                register_component(c);
+                register_component(component);
             if (_remove_functions.contains(component_type))
-                _remove_functions[component_type](*this, from);
+                _remove_functions[component_type](*this, entity);
         }
 
+        /**
+         * Add a system to the registry.
+         *
+         * @param f The system function to add.
+         */
         template <typename Function>
         void add_system(Function &&f)
         {
             _systems.emplace_back(std::forward<Function>(f));
         }
 
+        /**
+         * Remove a system from the registry by its index.
+         *
+         * @param system_idx The index of the system to remove.
+         */
         void remove_system(const std::size_t system_idx)
         {
             if (system_idx >= _systems.size())
@@ -155,11 +242,19 @@ namespace nfo {
             _systems.erase(_systems.begin() + static_cast<long>(system_idx));
         }
 
+        /**
+         * Clear all systems from the registry.
+         */
         void clear_systems()
         {
             _systems.clear();
         }
 
+        /**
+         * Run all systems with the given context.
+         *
+         * @param ctx The context to pass to each system.
+         */
         void run_systems(const emscripten::val &ctx)
         {
             std::vector<std::function<void(Registry &, const emscripten::val &)>> systems_copy = _systems;
@@ -167,6 +262,11 @@ namespace nfo {
                 system(*this, ctx);
         }
 
+        /**
+         * Log information about an entity. (Costly operation as logging in JS is not memory safe)
+         *
+         * @param entity The entity to log information about.
+         */
         void log(const Entity &entity) const
         {
             for (const auto &logger : std::views::values(_loggers)) {
@@ -175,11 +275,23 @@ namespace nfo {
             }
         }
 
+        /**
+         * Get the maximum number of entities that have been spawned.
+         *
+         * @return The maximum number of entities.
+         */
         [[nodiscard]] std::size_t max_entities() const
         {
             return _next_entity;
         }
 
+        /**
+         * Get the zipper output for the given components.
+         *
+         * @param comps An array of component types to zip.
+         * @return A ZipperOutput containing the zipped components.
+         * @throws std::runtime_error if the input is not an array.
+         */
         ZipperOutput get_zipper(const ZipperInput &comps)
         {
             if (!comps.isArray())
