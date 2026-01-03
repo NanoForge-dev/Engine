@@ -274,4 +274,4 @@ lib/index.js
 lib/libecs.js
 compile_commands.json
 emsdk/
-doc_out/
+docs/xml
