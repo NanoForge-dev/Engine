@@ -115,7 +115,6 @@ export const bounce = (registry: Registry, ctx: Context) => {
     roundStart = -1;
     zip[0].Velocity.x = 1;
     sendMoveAll(0, zip[0].Velocity, zip[0].Position, network);
-    sendMoveAll(0, zip[0].Velocity, zip[0].Position, network);
     return;
   }
   let bounced = false;
@@ -128,13 +127,19 @@ export const bounce = (registry: Registry, ctx: Context) => {
       zip[1].Position.y - 15 <= zip[0].Position.y &&
       zip[0].Position.y - 15 <= zip[1].Position.y + 300) ||
     (zip[0].Position.x >= 1835 &&
-      zip[1].Position.y - 15 <= zip[0].Position.y &&
-      zip[0].Position.y - 15 <= zip[1].Position.y + 300)
+      zip[2].Position.y - 15 <= zip[0].Position.y &&
+      zip[0].Position.y - 15 <= zip[2].Position.y + 300)
   ) {
+    let paddleTouched = 1;
+    if (zip[0].Position.x >= 1835) {
+      paddleTouched = 2;
+    }
     const prevSpeed = Math.sqrt(zip[0].Velocity.x ** 2 + zip[0].Velocity.y ** 2);
     const newSpeed = prevSpeed * 1.1;
     const posOnPaddle =
-      (zip[0].Position.y - (zip[0].Position.x < 960 ? zip[1].Position.y : zip[1].Position.y) + 15) /
+      (zip[0].Position.y -
+        (zip[0].Position.x < 960 ? zip[paddleTouched].Position.y : zip[paddleTouched].Position.y) +
+        15) /
       330;
     const baseAngle = posOnPaddle * ((6 * Math.PI) / 8) + Math.PI / 8 - Math.PI / 2;
     const outAngle = zip[0].Position.x < 960 ? baseAngle : -baseAngle + Math.PI;
@@ -142,13 +147,14 @@ export const bounce = (registry: Registry, ctx: Context) => {
     zip[0].Velocity.y = Math.sin(outAngle) * newSpeed;
     bounced = true;
   } else if (zip[0].Position.x <= 15 || zip[0].Position.x >= 1905) {
-    zip[0].Position = { x: 960, y: 540 };
-    zip[0].Velocity = { x: 0, y: 0 };
+    zip[0].Position.x = 960;
+    zip[0].Position.y = 540;
+    zip[0].Velocity.x = 0;
+    zip[0].Velocity.y = 0;
     roundStart = 0;
     bounced = true;
   }
   if (bounced) {
-    sendMoveAll(0, zip[0].Velocity, zip[0].Position, network);
     sendMoveAll(0, zip[0].Velocity, zip[0].Position, network);
   }
 };
