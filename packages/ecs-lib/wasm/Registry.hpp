@@ -32,7 +32,7 @@ namespace nfo {
     ** This class provides methods to register components, manage entities,
     ** add and remove components from entities, and run systems.
     */
-    class Registry {
+    class Registry : public std::enable_shared_from_this<Registry> {
       public:
         /**
          * Register a component type in the registry.
@@ -257,10 +257,9 @@ namespace nfo {
          */
         void run_systems(const emscripten::val &ctx)
         {
-            emscripten::val registry = ctx["libs"].call<emscripten::val>("getComponentSystem")["registry"];
             std::vector<emscripten::val> systems_copy = _systems;
             for (emscripten::val &system : systems_copy)
-                system(registry, ctx);
+                system(shared_from_this(), ctx);
         }
 
         /**
