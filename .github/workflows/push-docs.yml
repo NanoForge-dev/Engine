@@ -4,12 +4,10 @@ on:
   push:
     branches:
       - main
-    # paths:
-    #   - "*.rst"
-    #   - "Doxyfile"
-    #   - "ecs-lib/"
-    #   - "ecs-server/"
-    #   - "ecs-client/"
+    paths:
+      - "docs/**"
+      - "packages/ecs-lib/docs/**"
+      - "packages/ecs-lib/wasm/**"
   workflow_dispatch:
 
 jobs:
