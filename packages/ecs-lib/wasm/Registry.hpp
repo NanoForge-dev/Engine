@@ -159,9 +159,9 @@ namespace nfo {
          */
         Entity entity_from_index(const std::size_t entity_id)
         {
-            if (std::ranges::find(_dead_entities, id) != _dead_entities.end() || id >= _next_entity)
+            if (std::ranges::find(_dead_entities, entity_id) != _dead_entities.end() || entity_id >= _next_entity)
                 throw std::runtime_error("Entity index out of range.");
-            return Entity(id);
+            return Entity(entity_id);
         }
 
         /**
