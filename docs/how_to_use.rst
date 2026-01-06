@@ -9,8 +9,7 @@ As a devlopper on the engine
 ----------------------------
 
 As a devlopper you want to be able to use your changes in your project.
-Therefore it is recommended to use the provided template in the
-`example <https://github.com/NanoForge-dev/Engine/tree/main/example/template>`__
+Therefore it is recommended to use the provided `cli <https://github.com/NanoForge-dev/CLI>`__
 
 As a user
 ---------
