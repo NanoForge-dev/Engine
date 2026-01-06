@@ -16,15 +16,37 @@
 #include <cstddef>
 
 namespace nfo {
+    /**
+    ** @brief Represents an entity in the ECS (Entity-Component-System) architecture.
+    **
+    ** This class encapsulates the concept of an entity, which is identified by a unique ID.
+    ** Entities are used to group components together in the ECS paradigm.
+    */
     class Entity {
       public:
+        /**
+         * Create an entity from an ID.
+         *
+         * @param id The ID of the entity.
+         * @return An Entity instance.
+         */
         explicit Entity(const std::size_t id) : _id(id) {}
 
+        /**
+         * Convert the entity to its ID.
+         *
+         * @return The ID of the entity.
+         */
         operator std::size_t() const
         {
             return _id;
         }
 
+        /**
+         * Get the ID of the entity.
+         *
+         * @return The ID of the entity.
+         */
         [[nodiscard]] std::size_t get_id() const
         {
             return _id;

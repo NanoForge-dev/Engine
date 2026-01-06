@@ -1,3 +1,5 @@
+[![Nanoforge Documentation](https://github.com/NanoForge-dev/docs/actions/workflows/deploy.yml/badge.svg)](https://github.com/NanoForge-dev/docs/actions/workflows/deploy.yml)
+
 # Engine
 
 This repository contains the full engine for NanoForge.
@@ -19,6 +21,10 @@ The engine is made of multiple components:
 This is the full nanoforge engine including all the default libraries.
 
 In order to manage this project we use (pnpm)[https://pnpm.io/]
+
+## Documentation
+
+The full documentation can be found at: [https://nanoforge-dev.github.io/docs/engine](https://nanoforge-dev.github.io/docs/engine)
 
 ## Installing dependencies
 
