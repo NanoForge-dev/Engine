@@ -78,6 +78,14 @@
   description: "Related to Music library"
   color: "aaa3dc"
 
+- name: "packages:network-client"
+  description: "Related to NetworkClient library"
+  color: "aaa3dc"
+
+- name: "packages:network-server"
+  description: "Related to NetworkServer library"
+  color: "aaa3dc"
+
 - name: "packages:sound"
   description: "Related to Sound library"
   color: "aaa3dc"

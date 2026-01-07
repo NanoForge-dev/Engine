@@ -24,6 +24,14 @@ class Position {
   }
 }
 
+const getRunSystemsParams = (registry: any) => {
+  return {
+    libs: {
+      getComponentSystem: () => ({ registry: registry }),
+    },
+  };
+};
+
 describe("Registry", () => {
   it("1 entity 2 components", async () => {
     const m = await Module();
@@ -116,7 +124,7 @@ describe("Registry", () => {
 
     for (let i = 0; i <= 15; i++) {
       expect(counter).toBe(i);
-      r.runSystems(null);
+      r.runSystems(getRunSystemsParams(r));
     }
     expect(counter).toBe(16);
   });
@@ -156,12 +164,12 @@ describe("Registry", () => {
     expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(-2, -2));
     expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(2, 2));
     expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
-    r.runSystems(null);
+    r.runSystems(getRunSystemsParams(r));
 
     expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(-1, -1));
     expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(1, 1));
     expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
-    r.runSystems(null);
+    r.runSystems(getRunSystemsParams(r));
 
     expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(0, 0));
     expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(0, 0));

@@ -38,6 +38,14 @@ packages:music:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\nmusic\\n"
 
+packages:network-client:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nnetwork-client\\n"
+
+packages:network-server:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nnetwork-server\\n"
+
 packages:sound:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\nsound\\n"

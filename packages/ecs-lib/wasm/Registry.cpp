@@ -27,8 +27,8 @@ namespace nfo {
         emscripten::register_type<ZipperInput>("Component[]");
         emscripten::register_type<ZipperOutput>("any[]");
 
-        emscripten::class_<Registry>("Registry")
-            .constructor()
+        emscripten::class_<nfo::Registry>("Registry")
+            .smart_ptr_constructor("Registry", &std::make_shared<Registry>)
             .function("registerComponent", &Registry::register_component)
             .function(
                 "getComponentsConst",

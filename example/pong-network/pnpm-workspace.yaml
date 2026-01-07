@@ -1,0 +1,8 @@
+packages:
+  - ../../packages/*
+  - ../../utils/*
+
+onlyBuiltDependencies:
+  - bun
+  - esbuild
+  - wrtc

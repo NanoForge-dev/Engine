@@ -58,6 +58,18 @@ packages:music:
           - packages/music/*
           - packages/music/**/*
 
+packages:network-client:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/network-client/*
+          - packages/network-client/**/*
+
+packages:network-server:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/network-server/*
+          - packages/network-server/**/*
+
 packages:sound:
   - changed-files:
       - any-glob-to-any-file:

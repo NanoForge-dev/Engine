@@ -21,6 +21,8 @@ body:
         - graphics-2d
         - input
         - music
+        - network-client
+        - network-server
         - sound
         - eslint-config
         - prettier-config
