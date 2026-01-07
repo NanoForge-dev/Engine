@@ -5,7 +5,10 @@ import { TCPClient } from "./tcp.client.network";
 import { UDPClient } from "./udp.client.network";
 
 export class NetworkClientLibrary extends BaseNetworkLibrary {
+  // Fast but less reliable send/receive of packets to a UDP server
   public udp!: UDPClient;
+
+  // Reliable ordered send/receive of packets to a TCP server
   public tcp!: TCPClient;
 
   get __name(): string {

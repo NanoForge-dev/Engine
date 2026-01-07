@@ -5,7 +5,10 @@ import { TCPServer } from "./tcp.server.network";
 import { UDPServer } from "./udp.server.network";
 
 export class NetworkServerLibrary extends BaseNetworkLibrary {
+  // Fast but less reliable unordered send/receive to multiple UDP clients
   public udp!: UDPServer;
+
+  // Reliable ordered send/receive of packets to multiple TCP clients
   public tcp!: TCPServer;
 
   get __name(): string {

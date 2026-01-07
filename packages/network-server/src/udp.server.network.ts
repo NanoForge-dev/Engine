@@ -3,6 +3,9 @@ import { type RawData, type WebSocket, WebSocketServer } from "ws";
 
 import { buildMagicPacket, parsePacketsFromChunks } from "./utils";
 
+/** UDPServer
+ * Fast but less reliable unordered send/receive to multiple UDP clients
+ */
 export class UDPServer {
   private _clients = new Map<
     number,
@@ -19,6 +22,11 @@ export class UDPServer {
     this._magicData = new TextEncoder().encode(magicValue);
   }
 
+  /**
+   * Start the signaling WebSocket and accept incoming client offers (SDP/ICE).
+   *
+   * @returns void
+   */
   public listen() {
     const webSocketServer = this.startWebSocketServer();
 
@@ -49,10 +57,22 @@ export class UDPServer {
     });
   }
 
+  /**
+   * Return a snapshot array of client IDs with active data channels.
+   *
+   * @returns number[]
+   */
   public getConnectedClients(): number[] {
     return [...this._clients.keys()];
   }
 
+  /**
+   * Broadcast a packet to all connected clients over the unreliable data channels.
+   * The server will frame the provided data with the configured magic terminator.
+   *
+   * @param data - Raw packet bytes (Uint8Array) to send to every client
+   * @returns void
+   */
   public sendToEverybody(data: Uint8Array) {
     const magicPacket = buildMagicPacket(data, this._magicData);
     this._clients.forEach((client) => {
@@ -60,15 +80,31 @@ export class UDPServer {
     });
   }
 
+  /**
+   * Send a packet to a single client via the unreliable data channel.
+   * The packet will be framed with the server's configured magic terminator
+   * bytes before being sent.
+   *
+   * @param clientId - Numeric client identifier returned by `listen()` events
+   * @param data - Raw packet bytes (Uint8Array) to send
+   * @returns void
+   */
   public sendToClient(clientId: number, data: Uint8Array) {
     const client = this._clients.get(clientId);
     if (!client) {
-      console.error(`Unkown client: ${clientId}`);
+      console.error(`Unknown client: ${clientId}`);
       return;
     }
     client.channel.send(buildMagicPacket(data, this._magicData));
   }
 
+  /**
+   * Reassemble buffered chunks and return a map of clientId => complete packets.
+   * Partial packets are retained internally for the next call so callers may
+   * repeatedly poll this method to consume newly arrived data.
+   *
+   * @returns Map<number, Uint8Array[]>
+   */
   public getReceivedPackets(): Map<number, Uint8Array[]> {
     const packets = new Map<number, Uint8Array[]>();
 

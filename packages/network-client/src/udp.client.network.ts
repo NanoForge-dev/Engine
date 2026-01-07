@@ -1,5 +1,8 @@
 import { buildMagicPacket, parsePacketsFromChunks } from "./utils";
 
+/** UDPClient
+ * Fast but less reliable send/receive of packets to a UDP server
+ */
 export class UDPClient {
   private _channel: RTCDataChannel | null = null;
   private _data: Uint8Array = new Uint8Array();
@@ -14,6 +17,11 @@ export class UDPClient {
     this._magicData = new TextEncoder().encode(magicValue);
   }
 
+  /**
+   * Open a WebSocket for signaling, create an RTCPeerConnection and initiate an SDP offer.
+   *
+   * @returns Promise<void>
+   */
   public async connect(): Promise<void> {
     const webSocket: WebSocket = this.connectToServerWebSocket();
     const rtcPeerConnection: RTCPeerConnection = this.getRtcChannelFromIceServer();
@@ -21,10 +29,21 @@ export class UDPClient {
     await this.sendIceOffer(rtcPeerConnection, webSocket);
   }
 
+  /**
+   * Return `true` when the RTCDataChannel is open.
+   *
+   * @returns boolean
+   */
   public isConnected(): boolean {
     return this._channel !== null && this._channel.readyState === "open";
   }
 
+  /**
+   * Send a payload on the data channel.
+   *
+   * @param data Uint8Array — raw payload bytes.
+   * @returns void
+   */
   public sendData(data: Uint8Array): void {
     if (!this._channel) {
       console.error("UDP not connected");
@@ -33,6 +52,11 @@ export class UDPClient {
     this._channel.send(buildMagicPacket(data, this._magicData));
   }
 
+  /**
+   * Return an array of complete packets reassembled from received data-channel chunks.
+   *
+   * @returns Uint8Array[] — array of packet buffers.
+   */
   public getReceivedPackets(): Uint8Array[] {
     const { packets, data, chunkedData } = parsePacketsFromChunks(
       this._data,

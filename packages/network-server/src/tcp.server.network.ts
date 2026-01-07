@@ -2,6 +2,9 @@ import { type RawData, type WebSocket, WebSocketServer } from "ws";
 
 import { buildMagicPacket, parsePacketsFromChunks, rawDataToUint8Array } from "./utils";
 
+/** TCPServer
+ * Reliable ordered send/receive of packets to multiple TCP clients
+ */
 export class TCPServer {
   private _clients = new Map<
     number,
@@ -18,6 +21,11 @@ export class TCPServer {
     this._magicData = new TextEncoder().encode(magicValue);
   }
 
+  /**
+   * Start the WebSocket server and begin accepting clients.
+   *
+   * @returns void
+   */
   public listen() {
     const webSocketServer = this.startWebSocketServer();
 
@@ -46,10 +54,21 @@ export class TCPServer {
     });
   }
 
+  /**
+   * Return a snapshot array of numeric client IDs currently connected.
+   *
+   * @returns number[]
+   */
   public getConnectedClients(): number[] {
     return [...this._clients.keys()];
   }
 
+  /**
+   * Send a payload to every connected client.
+   *
+   * @param data Uint8Array — raw payload bytes.
+   * @returns void
+   */
   public sendToEverybody(data: Uint8Array) {
     const magicPacket = buildMagicPacket(data, this._magicData);
     this._clients.forEach((client) => {
@@ -57,15 +76,27 @@ export class TCPServer {
     });
   }
 
+  /**
+   * Send a payload to the client identified by `clientId`.
+   *
+   * @param clientId number — numeric client identifier.
+   * @param data Uint8Array — payload bytes.
+   * @returns void
+   */
   public sendToClient(clientId: number, data: Uint8Array) {
     const client = this._clients.get(clientId);
     if (!client) {
-      console.error(`Unkown client: ${clientId}`);
+      console.error(`Unknown client: ${clientId}`);
       return;
     }
     client.channel.send(buildMagicPacket(data, this._magicData));
   }
 
+  /**
+   * Parse and return complete packets received from each client. Each packet is a `Uint8Array` buffer.
+   *
+   * @returns Map<number, Uint8Array[]> — mapping client ID to array of packets.
+   */
   public getReceivedPackets(): Map<number, Uint8Array[]> {
     const packets = new Map<number, Uint8Array[]>();
 

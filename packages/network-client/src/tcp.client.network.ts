@@ -1,5 +1,8 @@
 import { buildMagicPacket, parsePacketsFromChunks } from "./utils";
 
+/** TCPClient
+ * Reliable ordered send/receive of packets to a TCP server
+ */
 export class TCPClient {
   private _channel: WebSocket | null = null;
   private _data: Uint8Array = new Uint8Array();
@@ -14,14 +17,30 @@ export class TCPClient {
     this._magicData = new TextEncoder().encode(magicValue);
   }
 
+  /**
+   * Initiate a WebSocket connection to the server (e.g. `ws://<ip>:<port>`).
+   *
+   * @returns Promise<void>
+   */
   public async connect(): Promise<void> {
     this.connectToServerWebSocket();
   }
 
+  /**
+   * Return `true` when the underlying WebSocket is open.
+   *
+   * @returns boolean
+   */
   public isConnected(): boolean {
     return this._channel !== null && this._channel.readyState === WebSocket.OPEN;
   }
 
+  /**
+   * Send a payload to the server.
+   *
+   * @param data Uint8Array — raw payload bytes.
+   * @returns void
+   */
   public sendData(data: Uint8Array): void {
     if (!this._channel) {
       console.error("TCP not connected");
@@ -30,6 +49,11 @@ export class TCPClient {
     this._channel.send(buildMagicPacket(data, this._magicData));
   }
 
+  /**
+   * Return an array of complete packets that were reassembled from received chunks.
+   *
+   * @returns Uint8Array[] — array of packet buffers.
+   */
   public getReceivedPackets(): Uint8Array[] {
     const { packets, data, chunkedData } = parsePacketsFromChunks(
       this._data,
