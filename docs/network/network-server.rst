@@ -15,33 +15,35 @@ in a game are:
 - Optionally establish `RTCPeerConnection`s (via WebSocket signaling) to receive
   unreliable, unordered data channels for low-latency state updates.
 
-Minimal usage pattern (as in `example/pong-network`)
+Example
 --------------------------------------------------
 
-- Server reads incoming TCP packets and handles simple single-message commands
-  (JSON frames in the example):
+It works exactly the same with UDP
 
 .. code-block:: javascript
+  // Send everybody a json encoded packet
+  network.tcp.sendToEverybody(
+    new TextEncoder().encode(JSON.stringify(
+      { type: "are you here" }
+    ))
+  );
 
-  // In a server system: read incoming messages
-  const clientPackets = network.tcp.getReceivedPackets();
-  clientPackets.forEach((packets, clientId) => {
-    packets.forEach((packet) => {
-      const msg = JSON.parse(new TextDecoder().decode(packet));
-      if (msg.type === 'play') {
-        // register client and reply using network.tcp.sendToClient(...)
-      }
-    });
+  // Check connected clients
+  const connectedClients = getConnectedClients();
+
+  // Receive all packets
+  const allPackets = network.tcp.getReceivedPackets();
+
+  // Get first client packets
+  const firstClientPackets = map.get(connectedClients[0]);
+
+  // Decode packets if encoded in json
+  const decodedPackets = firstClientPackets.map((packet) => {
+    return JSON.parse(new TextDecoder().decode(packet));
   });
-
-- To broadcast authoritative state, the server can use `network.tcp.sendToEverybody`
-  or `network.tcp.sendToClient(clientId, data)`, and use the UDP-like data channels
-  (WebRTC) for fast, best-effort updates.
 
 Notes
 -----
 
-- See `docs/network/network-server-api.rst` for the exact list of server
-  functions available to your systems.
-- For packet framing and terminator semantics see:
-  `docs/network/packet-framing.rst`.
+- See `docs/network/network-server-api.rst` for the exact list available functions.
+- For packet framing and terminator semantics see `docs/network/packet-framing.rst`.

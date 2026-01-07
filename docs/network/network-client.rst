@@ -16,26 +16,43 @@ Client responsibilities in a game are typically:
 - Optionally negotiate a WebRTC data channel for receiving server snapshots
   or sending low-latency updates.
 
-Minimal usage pattern (as in `example/pong-network`)
+Example
 --------------------------------------------------
+
+It works exactly the same with UDP
 
 .. code-block:: javascript
 
-  // Ensure TCP is connected
-  await network.tcp.connect();
+  // Wait for connection to be established
+  async function waitForConnection(): Promise<void> {
+    if (network.tcp?.isConnected()) return;
 
-  // Wait for UDP (RTC data channel) if used by the server
+    return new Promise((resolve) => {
+      const check = () => {
+        if (network.tcp.isConnected()) {
+          resolve();
+        } else {
+          setTimeout(check, 50);
+        }
+      };
+      check();
+    });
+  }
   await waitForConnection();
 
-  // Send a simple reliable control message (play)
-  network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ type: 'play' })));
+  // Send a json encoded packet
+  network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ hello: 'world' })));
 
-  // Send input messages (example)
-  network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ type: 'input', key: 'up' })));
+  // Receive raw server packets
+  const latestsPackets = getReceivedPackets();
+
+  // Decode packets if encoded in json
+  const decodedPackets = latestsPackets.map((packet) => {
+    return JSON.parse(new TextDecoder().decode(packet));
+  });
 
 Notes
 -----
 
-- See `docs/network/network-client-api.rst` for the client functions exposed to
-  your game code.
+- See `docs/network/network-client-api.rst` for the exact list available functions.
 - For packet framing/terminator semantics see `docs/network/packet-framing.rst`.

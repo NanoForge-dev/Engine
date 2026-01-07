@@ -80,7 +80,7 @@ export function packetHandler(registry: Registry, ctx: Context) {
 
   if (network.tcp.getConnectedClients().indexOf(cli1) == -1) cli1 = -1;
   if (network.tcp.getConnectedClients().indexOf(cli2) == -1) cli2 = -1;
-  const clientPackets = network.tcp.getReceivedPackets();
+  const clientPackets: Map<number, Uint8Array[]> = network.tcp.getReceivedPackets();
   clientPackets.forEach((packets, client) => {
     packets.forEach((packet) => {
       const data = JSON.parse(new TextDecoder().decode(packet));
@@ -93,8 +93,6 @@ export function packetHandler(registry: Registry, ctx: Context) {
         } else if (cli2 == -1) {
           cli2 = client;
           newCli = client;
-        } else {
-          return;
         }
         connectNewClient(newCli, network, zip);
       } else if (data.type == "input") {
