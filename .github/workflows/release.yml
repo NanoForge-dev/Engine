@@ -1,23 +1,76 @@
-name: release
+name: Release
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
-      - "v*.*.*-pre"
   workflow_dispatch:
+    inputs:
+      package:
+        description: "The published name of a single package to release"
+        type: choice
+        required: false
+        options:
+          - "all"
+          - "@nanoforge-dev/actions"
+          - "@nanoforge-dev/asset-manager"
+          - "@nanoforge-dev/common"
+          - "@nanoforge-dev/config"
+          - "@nanoforge-dev/core"
+          - "@nanoforge-dev/docgen"
+          - "@nanoforge-dev/ecs-client"
+          - "@nanoforge-dev/ecs-lib"
+          - "@nanoforge-dev/ecs-server"
+          - "@nanoforge-dev/graphics-2d"
+          - "@nanoforge-dev/input"
+          - "@nanoforge-dev/music"
+          - "@nanoforge-dev/network-client"
+          - "@nanoforge-dev/network-server"
+          - "@nanoforge-dev/sound"
+          - "@nanoforge-dev/utils-eslint-config"
+          - "@nanoforge-dev/utils-prettier-config"
+      exclude:
+        description: "Comma separated list of packages to exclude from release (if not depended upon)"
+        required: false
+        type: string
+      dry_run:
+        description: Perform a dry run?
+        type: boolean
+        default: false
+
+env:
+  EM_CACHE_FOLDER: "emsdk-cache"
 
 jobs:
-  release:
+  npm-publish:
+    name: npm publish
     runs-on: ubuntu-latest
-    name: Building stack
+    if: github.repository_owner == 'NanoForge-dev'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Install Node.js v24
+        uses: actions/setup-node@v6
         with:
-          files: |
-            CHANGELOG.md
+          node-version: 24
+          package-manager-cache: false
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install dependencies
+        uses: ./utils/actions/src/pnpm-install
+
+      - name: "Install emscipten"
+        uses: "mymindstorm/setup-emsdk@v14"
+        with:
+          actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+
+      - name: Build dependencies
+        run: pnpm run build
+
+      - name: Release packages
+        uses: ./utils/actions/src/release-packages
+        with:
+          package: ${{ inputs.package }}
+          exclude: ${{ inputs.exclude }}
+          dry: ${{ inputs.dry_run }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
