@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@nanoforge-dev/ecs-lib",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "NanoForge Engine - ECS Lib (source code use by ECS Client and Server)",
   "keywords": [
     "nanoforge",
