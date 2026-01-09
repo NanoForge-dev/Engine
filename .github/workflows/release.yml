@@ -38,6 +38,9 @@ on:
 env:
   EM_CACHE_FOLDER: "emsdk-cache"
 
+permissions:
+  contents: write
+
 jobs:
   npm-publish:
     name: npm publish

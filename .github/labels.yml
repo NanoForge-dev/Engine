@@ -102,6 +102,10 @@
   description: "Adding missing tests or correcting existing tests"
   color: "7f8f92"
 
+- name: "utils:actions"
+  description: "Related to Github actions"
+  color: "606bdf"
+
 - name: "utils:eslint-config"
   description: "Related to ESLint config"
   color: "606bdf"

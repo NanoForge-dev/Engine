@@ -24,8 +24,10 @@ body:
         - network-client
         - network-server
         - sound
+        - actions
         - eslint-config
         - prettier-config
+        - other
     validations:
       required: true
   - type: textarea

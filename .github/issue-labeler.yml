@@ -50,10 +50,14 @@ packages:sound:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\nsound\\n"
 
+utils:actions:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nactions\\n"
+
 utils:eslint-config:
   - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\nstructures\\n"
+    report|feature request) for\\?\\n\\neslint-config\\n"
 
 utils:prettier-config:
   - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\ui\\n"
+    report|feature request) for\\?\\n\\nprettier-config\\n"

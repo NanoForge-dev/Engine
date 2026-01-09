@@ -26,6 +26,7 @@ body:
         - network-client
         - network-server
         - sound
+        - other
     validations:
       required: true
   - type: textarea
