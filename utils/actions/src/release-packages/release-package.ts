@@ -14,9 +14,8 @@ if (process.env.GITHUB_TOKEN) {
 async function checkRegistry(release: ReleaseEntry) {
   // const res = await fetch(`https://registry.npmjs.org/${release.name}/${release.version}`);
   // return res.ok;
-  return ["@nanoforge-dev/utils-eslint-config", "@nanoforge-dev/utils-prettier-config"].includes(
-    release.name,
-  );
+  console.log(release);
+  return false;
 }
 
 async function gitTagAndRelease(release: ReleaseEntry, dry: boolean) {
