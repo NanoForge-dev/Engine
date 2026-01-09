@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@nanoforge-dev/actions",
+  "version": "1.0.0",
+  "description": "NanoForge Engine - Actions",
+  "keywords": [
+    "nanoforge",
+    "game",
+    "engine"
+  ],
+  "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "bugs": "https://github.com/NanoForge-dev/Engine/issues",
+  "license": "MIT",
+  "contributors": [
+    "Bill <timothe.jacquot@epitech.eu>",
+    "Exelo <exelo.corp@gmail.com>",
+    "Fexkoser <martin.fillon@epitech.eu>",
+    "Tchips <leo.outmizguine@epitech.eu>"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "type": "module",
+  "directories": {
+    "lib": "src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanoForge-dev/Engine.git",
+    "directory": "packages/actions"
+  },
+  "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
+  "scripts": {
+    "build": "tsc --noEmit && tsup",
+    "lint": "prettier --check . && eslint --format=pretty src",
+    "format": "prettier --write . && eslint --fix --format=pretty src",
+    "prepack": "pnpm run build && pnpm run lint",
+    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/actions/*'",
+    "release": "cliff-jumper"
+  },
+  "dependencies": {
+    "@actions/core": "^2.0.1",
+    "@actions/github": "^6.0.1",
+    "commander": "^14.0.2"
+  },
+  "devDependencies": {
+    "@favware/cliff-jumper": "^6.0.0",
+    "@nanoforge-dev/utils-eslint-config": "workspace:^",
+    "@nanoforge-dev/utils-prettier-config": "workspace:^",
+    "@npm/types": "^2.1.0",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
+    "@types/bun": "^1.3.5",
+    "eslint": "^9.39.1",
+    "prettier": "^3.6.2",
+    "terser": "^5.44.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.22.0",
+  "engines": {
+    "node": "24.11.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "**/*.ts": [
+      "prettier --write"
+    ],
+    "src/**/*.ts": [
+      "eslint --fix"
+    ]
+  }
+}
