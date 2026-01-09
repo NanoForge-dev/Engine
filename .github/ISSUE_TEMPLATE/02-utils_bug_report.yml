@@ -13,8 +13,10 @@ body:
     attributes:
       label: Which utils is this bug report for?
       options:
+        - actions
         - eslint-config
         - prettier-config
+        - other
     validations:
       required: true
   - type: textarea
