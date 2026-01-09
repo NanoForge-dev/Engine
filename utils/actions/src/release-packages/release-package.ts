@@ -12,26 +12,25 @@ if (process.env.GITHUB_TOKEN) {
 }
 
 async function checkRegistry(release: ReleaseEntry) {
-  // const res = await fetch(`https://registry.npmjs.org/${release.name}/${release.version}`);
-  // return res.ok;
-  console.log(release);
-  return false;
+  const res = await fetch(`https://registry.npmjs.org/${release.name}/${release.version}`);
+  return res.ok;
 }
 
 async function gitTagAndRelease(release: ReleaseEntry, dry: boolean) {
   const tagName = `${release.name}@${release.version}`;
 
-  console.log(dry);
+  if (dry) {
+    info(`[DRY] Release would be "${tagName}", skipping release creation.`);
+    return;
+  }
 
-  // if (dry) {
-  //   info(`[DRY] Release would be "${tagName}", skipping release creation.`);
-  //   return;
-  // }
+  const commitHash = (await $`git rev-parse HEAD`.text()).trim();
 
   try {
     await octokit?.rest.repos.createRelease({
       ...context.repo,
       tag_name: tagName,
+      target_commitish: commitHash,
       name: tagName,
       body: release.changelog ?? "",
       generate_release_notes: release.changelog === undefined,
