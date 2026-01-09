@@ -111,6 +111,7 @@ async function getReleaseEntries(dry: boolean, devTag?: string) {
             }
 
             foundChangelog = true;
+            continue;
           }
 
           if (foundChangelog) {
@@ -118,7 +119,7 @@ async function getReleaseEntries(dry: boolean, devTag?: string) {
           }
         }
 
-        release.changelog = changelogLines.join("\n");
+        release.changelog = `${changelogLines.join("\n").replace(/^\s+|\s+$/g, "")}\n`;
       } catch (error) {
         // Probably just no changelog file but log just in case
         warning(`Error parsing changelog for ${pkg.name}, will use auto generated: ${error}`);
