@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-# [@nanoforge-dev/ecs-server@0.0.1](https://github.com/NanoForge-dev/Engine/tree/@nanoforge-dev/ecs-server@0.0.1) - (2026-01-09)
+# [@nanoforge-dev/ecs-server@1.0.0](https://github.com/NanoForge-dev/Engine/tree/@nanoforge-dev/ecs-server@0.0.1) - (2026-01-09)
 
 ## Bug Fixes
 
