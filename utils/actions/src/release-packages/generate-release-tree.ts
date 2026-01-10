@@ -38,7 +38,7 @@ async function fetchDevVersion(pkg: string, tag: string) {
 async function getReleaseEntries(dry: boolean, devTag?: string) {
   const releaseEntries: ReleaseEntry[] = [];
   const packageList: pnpmTree[] =
-    await $`pnpm list --recursive --only-projects --filter {packages/\*} --filter {utils/\*} --prod --json`.json();
+    await $`pnpm list --recursive --only-projects --prod --json`.json();
 
   const commitHash = (await $`git rev-parse --short HEAD`.text()).trim();
   const timestamp = Math.round(Date.now() / 1_000);
