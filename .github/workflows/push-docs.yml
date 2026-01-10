@@ -40,7 +40,7 @@ jobs:
         run: |
           cp -r engine/packages/ecs-lib/docs engine/docs/registry/api
           mkdir -p docs/engine
-          cp -r engine/docs docs/engine
+          cp -r engine/docs/* docs/engine
           cd docs
           git add .
           git commit -m "chore(engine): updating docs"
