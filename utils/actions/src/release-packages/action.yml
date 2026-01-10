@@ -17,7 +17,7 @@ runs:
   using: composite
   steps:
     - uses: oven-sh/setup-bun@v2
-    - run: bun $GITHUB_ACTION_PATH/index.ts
+    - run: bun $GITHUB_ACTION_PATH/index.js
       shell: bash
       env:
         INPUT_DEV: ${{ inputs.dev }}

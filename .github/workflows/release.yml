@@ -69,7 +69,7 @@ jobs:
         run: pnpm run build
 
       - name: Release packages
-        uses: ./utils/actions/src/release-packages
+        uses: ./utils/actions/dist/release-packages
         with:
           package: ${{ inputs.package }}
           exclude: ${{ inputs.exclude }}
