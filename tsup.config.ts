@@ -27,7 +27,8 @@ export function createTsupConfig({
   esbuildPlugins = [],
   treeshake = false,
   outDir = "dist",
-  loader = { ".wasm": "copy" },
+  publicDir = false,
+  loader = { ".wasm": "copy", ".yml": "copy" },
 }: Options = {}) {
   return defineConfig({
     entry,
@@ -50,6 +51,7 @@ export function createTsupConfig({
     esbuildPlugins,
     treeshake,
     outDir,
+    publicDir,
     loader,
   });
 }
