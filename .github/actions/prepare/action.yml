@@ -1,0 +1,41 @@
+name: prepare
+description: Prepare action
+inputs:
+  node-install:
+    description: Install node
+    default: "true"
+  pnpm-install:
+    description: Install pnpm depedencies
+    default: "true"
+  emsdk-install:
+    description: Install emscriptens
+    default: "true"
+  build:
+    description: Build packages
+    default: "true"
+runs:
+  using: composite
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+
+    - if: inputs.node-install == 'true'
+      name: Install Node.js v24
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+        package-manager-cache: false
+        registry-url: https://registry.npmjs.org
+
+    - if: inputs.pnpm-install == 'true'
+      name: Install dependencies
+      uses: ./.github/actions/pnpm-install
+
+    - if: inputs.emsdk-install == 'true'
+      name: Install emsdk
+      uses: ./.github/actions/emsdk-install
+
+    - if: inputs.build == 'true'
+      name: Build packages
+      shell: bash
+      run: pnpm run build

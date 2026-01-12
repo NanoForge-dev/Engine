@@ -1,0 +1,37 @@
+name: "emsdk install"
+description: "Install emsdk with cache enabled"
+inputs:
+  version:
+    description: "Emscripten version"
+    default: "4.0.23"
+  cache-folder:
+    description: "Cache folder"
+    default: "emsdk-cache"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up swap space
+      if: runner.os == 'Linux'
+      uses: pierotofy/set-swap-space@v1.0
+      with:
+        swap-size-gb: 10
+
+    - name: Cache rotation keys
+      id: cache-rotation
+      shell: bash
+      run: |
+        echo "YEAR_MONTH=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
+
+    - name: Setup emsdk cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ input.cache-folder }}
+        key: ${{ runner.os }}-emsdk-cache-${{ steps.cache-rotation.outputs.YEAR_MONTH }}-${{ input.version }}
+        restore-keys: |
+          ${{ runner.os }}-emsdk-cache-${{ steps.cache-rotation.outputs.YEAR_MONTH }}-
+
+    - name: "Install emsdk"
+      uses: "mymindstorm/setup-emsdk@v14"
+      with:
+        version: ${{ input.version }}
+        actions-cache-folder: ${{ inputs.cache-folder }}

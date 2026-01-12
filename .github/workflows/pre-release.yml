@@ -1,4 +1,4 @@
-name: Release
+name: Pre-Release
 
 on:
   workflow_dispatch:
@@ -6,9 +6,8 @@ on:
       package:
         description: "The published name of a single package to release"
         type: choice
-        required: false
+        required: true
         options:
-          - "all"
           - "@nanoforge-dev/actions"
           - "@nanoforge-dev/asset-manager"
           - "@nanoforge-dev/common"
@@ -26,10 +25,10 @@ on:
           - "@nanoforge-dev/sound"
           - "@nanoforge-dev/utils-eslint-config"
           - "@nanoforge-dev/utils-prettier-config"
-      exclude:
-        description: "Comma separated list of packages to exclude from release (if not depended upon)"
-        required: false
+      version:
+        description: "New version of the package (leave empty for auto generated version)"
         type: string
+        required: false
       dry_run:
         description: Perform a dry run?
         type: boolean
@@ -39,8 +38,8 @@ permissions:
   contents: write
 
 jobs:
-  npm-publish:
-    name: npm publish
+  create-release-pr:
+    name: Create release pr
     runs-on: ubuntu-latest
     if: github.repository_owner == 'NanoForge-dev'
     steps:
@@ -48,11 +47,10 @@ jobs:
         uses: ./.github/actions/prepare
 
       - name: Release packages
-        uses: ./utils/actions/dist/release-packages
+        uses: ./utils/actions/dist/create-release-pr
         with:
           package: ${{ inputs.package }}
-          exclude: ${{ inputs.exclude }}
+          version: ${{ inputs.version }}
           dry: ${{ inputs.dry_run }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
