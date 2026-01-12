@@ -13,6 +13,9 @@ jobs:
   checkout:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Prepare
         uses: ./.github/actions/prepare
 

@@ -16,9 +16,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v6
-
     - if: inputs.node-install == 'true'
       name: Install Node.js v24
       uses: actions/setup-node@v6

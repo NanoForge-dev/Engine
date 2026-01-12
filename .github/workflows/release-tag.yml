@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository_owner == 'NanoForge-dev' && github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/')
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Prepare
         uses: ./.github/actions/prepare
 

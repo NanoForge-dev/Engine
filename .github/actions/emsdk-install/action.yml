@@ -25,13 +25,13 @@ runs:
     - name: Setup emsdk cache
       uses: actions/cache@v4
       with:
-        path: ${{ input.cache-folder }}
-        key: ${{ runner.os }}-emsdk-cache-${{ steps.cache-rotation.outputs.YEAR_MONTH }}-${{ input.version }}
+        path: ${{ inputs.cache-folder }}
+        key: ${{ runner.os }}-emsdk-cache-${{ steps.cache-rotation.outputs.YEAR_MONTH }}-${{ inputs.version }}
         restore-keys: |
           ${{ runner.os }}-emsdk-cache-${{ steps.cache-rotation.outputs.YEAR_MONTH }}-
 
     - name: "Install emsdk"
       uses: "mymindstorm/setup-emsdk@v14"
       with:
-        version: ${{ input.version }}
+        version: ${{ inputs.version }}
         actions-cache-folder: ${{ inputs.cache-folder }}

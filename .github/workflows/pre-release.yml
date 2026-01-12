@@ -43,6 +43,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository_owner == 'NanoForge-dev'
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Prepare
         uses: ./.github/actions/prepare
 
