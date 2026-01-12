@@ -35,3 +35,4 @@ runs:
       with:
         version: ${{ inputs.version }}
         actions-cache-folder: ${{ inputs.cache-folder }}
+        cache-key: ${{ runner.os }}-emsdk-cache-${{ steps.cache-rotation.outputs.YEAR_MONTH }}-${{ inputs.version }}
