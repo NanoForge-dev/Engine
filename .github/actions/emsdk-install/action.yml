@@ -30,8 +30,8 @@ runs:
         restore-keys: |
           ${{ runner.os }}-emsdk-cache-${{ steps.cache-rotation.outputs.YEAR_MONTH }}-
 
-    - name: "Install emsdk"
-      uses: "mymindstorm/setup-emsdk@v14"
+    - name: Install emsdk
+      uses: pyodide/setup-emsdk@v15
       with:
         version: ${{ inputs.version }}
         actions-cache-folder: ${{ inputs.cache-folder }}
