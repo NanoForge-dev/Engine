@@ -32,17 +32,15 @@ jobs:
           git config --global user.email "username@users.noreply.github.com"
 
       - name: setup registry code documentation
-        run: |
-          apt install doxygen -y
-          cd engine/packages/ecs-lib/docs
-          doxygen Doxyfile
-          cd -
-          cp engine/packages/ecs-lib/docs engine/docs/registry/api
+        uses: mattnotmitt/doxygen-action@v1
+        with:
+          doxyfile-path: engine/packages/ecs-lib/docs/Doxyfile
 
       - name: synchronize docs
         run: |
+          cp -r engine/packages/ecs-lib/docs engine/docs/registry/api
           mkdir -p docs/engine
-          cp engine/docs/. -r docs/engine
+          cp -r engine/docs/* docs/engine
           cd docs
           git add .
           git commit -m "chore(engine): updating docs"
