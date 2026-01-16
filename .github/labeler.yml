@@ -93,3 +93,11 @@ utils:prettier-config:
       - any-glob-to-any-file:
           - utils/prettier-config/*
           - utils/prettier-config/**/*
+
+documentation:
+  - changed-files:
+      - any-glob-t-any-file:
+          - docs/*
+          - docs/**/*
+          - packages/ecs-lib/docs/*
+          - packages/ecs-lib/docs/**/*
