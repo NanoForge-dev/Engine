@@ -11,4 +11,8 @@ const createConfig = (name: string, entries: string[] = []) => {
   });
 };
 
-export default [createConfig("pnpm-install"), createConfig("release-packages", ["index.ts"])];
+export default [
+  createConfig("create-release-pr", ["index.ts"]),
+  createConfig("create-release-tag", ["index.ts"]),
+  createConfig("release-packages", ["index.ts"]),
+];

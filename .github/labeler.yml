@@ -96,7 +96,7 @@ utils:prettier-config:
 
 documentation:
   - changed-files:
-      - any-glob-t-any-file:
+      - any-glob-to-any-file:
           - docs/*
           - docs/**/*
           - packages/ecs-lib/docs/*

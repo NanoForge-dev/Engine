@@ -24,13 +24,10 @@ async function gitTagAndRelease(release: ReleaseEntry, dry: boolean) {
     return;
   }
 
-  const commitHash = (await $`git rev-parse HEAD`.text()).trim();
-
   try {
     await octokit?.rest.repos.createRelease({
       ...context.repo,
       tag_name: tagName,
-      target_commitish: commitHash,
       name: tagName,
       body: release.changelog ?? "",
       generate_release_notes: release.changelog === undefined,

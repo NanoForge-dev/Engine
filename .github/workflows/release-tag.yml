@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  create-release-tag:
+    name: Create release tag
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'NanoForge-dev' && github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Prepare
+        uses: ./.github/actions/prepare
+
+      - name: Create release tag
+        uses: ./utils/actions/dist/create-release-tag
+        with:
+          commit: ${{ github.sha }}
+          branch: ${{ github.head_ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

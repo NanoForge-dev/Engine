@@ -4,38 +4,20 @@ on:
   pull_request:
     branches:
       - main
-      - dev
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
-env:
-  EM_CACHE_FOLDER: "emsdk-cache"
-
 jobs:
-  checkout:
+  tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - name: "Setup pnpm"
-        uses: pnpm/action-setup@v4
-
-      - name: "Setup node"
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24.11.0
-          cache: "pnpm"
-
-      - name: "Install dependencies"
-        run: pnpm install
-
-      - name: "Install emscipten"
-        uses: "mymindstorm/setup-emsdk@v14"
-        with:
-          actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
-
-      - name: "Run build"
-        run: pnpm build
+      - name: Prepare
+        uses: ./.github/actions/prepare
 
       - name: "Run tests"
         run: pnpm test:unit
