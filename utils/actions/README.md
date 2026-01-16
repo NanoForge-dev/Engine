@@ -1,15 +1,17 @@
 <div align="center">
-	<br />
-	<p>
-		<a href="https://github.com/NanoForge-dev"><img src="https://github.com/NanoForge-dev/Engine/blob/main/.github/logo.png" width="546" alt="NanoForge" /></a>
-	</p>
-	<br />
-	<p>
-		<a href="https://www.npmjs.com/package/@nanoforge-dev/actions"><img src="https://img.shields.io/npm/v/@nanoforge-dev/actions.svg?maxAge=3600" alt="npm version" /></a>
-		<a href="https://www.npmjs.com/package/@nanoforge-dev/actions"><img src="https://img.shields.io/npm/dt/@nanoforge-dev/actions.svg?maxAge=3600" alt="npm downloads" /></a>
-		<a href="https://github.com/NanoForge-dev/Engine/actions"><img src="https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml/badge.svg" alt="Tests status" /></a>
-		<a href="https://github.com/NanoForge-dev/Engine/commits/main/packages/actions"><img src="https://img.shields.io/github/last-commit/NanoForge-dev/Engine.svg?logo=github&logoColor=ffffff&path=packages%actions" alt="Last commit." /></a>
-	</p>
+    <br />
+    <p>
+        <a href="https://github.com/NanoForge-dev"><img src="https://github.com/NanoForge-dev/Engine/blob/main/.github/logo.png" width="546" alt="NanoForge" /></a>
+    </p>
+    <br />
+    <p>
+        <a href="https://www.npmjs.com/package/@nanoforge-dev/actions"><img src="https://img.shields.io/npm/v/@nanoforge-dev/actions.svg?maxAge=3600" alt="npm version" /></a>
+        <a href="https://www.npmjs.com/package/@nanoforge-dev/actions"><img src="https://img.shields.io/npm/dt/@nanoforge-dev/actions.svg?maxAge=3600" alt="npm downloads" /></a>
+		<a href="https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml"><img src="https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml/badge.svg" alt="Tests status" /></a>
+        <a href="https://github.com/NanoForge-dev/Engine/actions/workflows/push-docs.yml"><img src="https://github.com/NanoForge-dev/Engine/actions/workflows/push-docs.yml/badge.svg" alt="Documentation status" /></a>
+        <a href="https://github.com/NanoForge-dev/Engine/commits/main/utils/actions"><img src="https://img.shields.io/github/last-commit/NanoForge-dev/Engine.svg?logo=github&logoColor=ffffff&path=utils%2Factions" alt="Last commit" /></a>
+    	<a href="https://github.com/NanoForge-dev/Engine/graphs/contributors"><img src="https://img.shields.io/github/contributors/NanoForge-dev/Engine.svg?maxAge=3600&logo=github&logoColor=fff&color=00c7be" alt="Contributors" /></a>
+    </p>
 </div>
 
 ## About

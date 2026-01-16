@@ -1,4 +1,4 @@
-name: synchronize-docs
+name: Synchronize Docs
 
 on:
   push:
