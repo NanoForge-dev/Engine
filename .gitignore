@@ -227,3 +227,4 @@ dist
 .turbo/
 
 compile_commands.json
+docs_markdown
