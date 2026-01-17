@@ -38,9 +38,9 @@ jobs:
 
       - name: synchronize docs
         run: |
-          cp -r engine/packages/ecs-lib/docs engine/docs/registry/api
-          mkdir -p docs/engine
+          mkdir -p docs/engine/registry/api
           cp -r engine/docs/* docs/engine
+          cp -r engine/packages/ecs-lib/docs/* engine/docs/registry/api
           cd docs
           git add .
           git commit -m "chore(engine): updating docs"
