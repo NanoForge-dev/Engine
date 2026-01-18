@@ -1,7 +1,5 @@
 name: "Label sync"
 on:
-  schedule:
-    - cron: "0 0 * * *"
   workflow_dispatch:
   push:
     branches:
@@ -18,7 +16,7 @@ jobs:
     if: github.repository_owner == 'NanoForge-dev'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Label sync
         uses: crazy-max/ghaction-github-labeler@v5

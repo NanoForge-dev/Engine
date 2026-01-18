@@ -1,0 +1,16 @@
+name: "Create release tag"
+description: "Create a tag the package release"
+inputs:
+  commit:
+    description: "Commit sha to put the tag on"
+  branch:
+    description: "Head branch name"
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+    - run: bun $GITHUB_ACTION_PATH/index.js
+      shell: bash
+      env:
+        INPUT_COMMIT: ${{ inputs.commit }}
+        INPUT_BRANCH: ${{ inputs.branch }}
