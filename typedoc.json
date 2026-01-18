@@ -12,6 +12,7 @@
   "hideBreadcrumbs": true,
   "useCodeBlocks": true,
   "cleanOutputDir": true,
+  "excludePrivate": true,
   "outputs": [
     {
       "name": "markdown",

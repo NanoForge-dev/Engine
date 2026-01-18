@@ -26,22 +26,39 @@ jobs:
           repository: nanoforge-dev/docs
           token: ${{ secrets.ACTIONS_KEY }}
 
+      - name: Install Node.js v24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+          registry-url: https://registry.npmjs.org/
+
+      - uses: pnpm/action-setup@v4.1.0
+        name: Install pnpm
+        with:
+          run_install: false
+          version: 10.22.0 # Couldnt find a way to execute this action in the right directory
+
       - name: setup git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "username@users.noreply.github.com"
 
-      - name: setup registry code documentation
-        uses: mattnotmitt/doxygen-action@v1
-        with:
-          doxyfile-path: engine/packages/ecs-lib/docs/Doxyfile
+      - name: install doxygen
+        uses: ssciwr/doxygen-install@v1
+
+      - name: install deps
+        run: cd engine && pnpm i
 
       - name: synchronize docs
         run: |
-          mkdir -p docs/engine/registry/api
+          cd engine
+          ./scripts/build_docs.sh
+          cd ..
+          rm docs/engine -rf
+          mkdir -p docs/engine
           cp -r engine/docs/* docs/engine
-          cp -r engine/packages/ecs-lib/docs/* engine/docs/registry/api
           cd docs
-          git add .
-          git commit -m "chore(engine): updating docs"
-          git push origin main
+          git add . || echo "No changes to add"
+          git commit -m "chore(engine): updating docs" || echo "No changes to commit"
+          git push origin main || echo "No changes to push"

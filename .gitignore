@@ -228,3 +228,8 @@ dist
 
 compile_commands.json
 docs_markdown
+xml
+docs_build
+docs/conf.py
+docs/*/api/index.md
+docs/ecs-lib/api/typescript.md

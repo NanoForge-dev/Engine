@@ -2,7 +2,7 @@ Registry
 ========
 
 .. toctree::
-    :maxdepth: 2
+
 
     writing_web_assembly.rst
 
