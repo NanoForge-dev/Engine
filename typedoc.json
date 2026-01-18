@@ -1,0 +1,22 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "plugin": ["typedoc-plugin-markdown"],
+  "entryPoints": ["packages/*"],
+  "entryPointStrategy": "packages",
+  "skipErrorChecking": true,
+  "router": "module",
+  "includeVersion": false,
+  "readme": "none",
+  "entryFileName": "index",
+  "hidePageHeader": true,
+  "hideBreadcrumbs": true,
+  "useCodeBlocks": true,
+  "cleanOutputDir": true,
+  "excludePrivate": true,
+  "outputs": [
+    {
+      "name": "markdown",
+      "path": "./docs_markdown"
+    }
+  ]
+}

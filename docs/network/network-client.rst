@@ -17,7 +17,7 @@ Client responsibilities in a game are typically:
   or sending low-latency updates.
 
 Example
---------------------------------------------------
+-------
 
 It works exactly the same with UDP
 
