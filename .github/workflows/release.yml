@@ -9,7 +9,6 @@ on:
         required: false
         options:
           - "all"
-          - "@nanoforge-dev/actions"
           - "@nanoforge-dev/asset-manager"
           - "@nanoforge-dev/common"
           - "@nanoforge-dev/config"
@@ -51,7 +50,7 @@ jobs:
         uses: ./.github/actions/prepare
 
       - name: Release packages
-        uses: ./utils/actions/dist/release-packages
+        uses: ./node_modules/@nanoforge-dev/actions/dist/release-packages
         with:
           package: ${{ inputs.package }}
           exclude: ${{ inputs.exclude }}
