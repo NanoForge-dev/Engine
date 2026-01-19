@@ -76,12 +76,6 @@ packages:sound:
           - packages/sound/*
           - packages/sound/**/*
 
-utils:actions:
-  - changed-files:
-      - any-glob-to-any-file:
-          - utils/actions/*
-          - utils/actions/**/*
-
 utils:eslint-config:
   - changed-files:
       - any-glob-to-any-file:

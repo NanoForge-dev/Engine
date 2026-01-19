@@ -1,4 +1,4 @@
-name: Release
+name: Release Tag
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ jobs:
         uses: ./.github/actions/prepare
 
       - name: Create release tag
-        uses: ./utils/actions/dist/create-release-tag
+        uses: ./node_modules/@nanoforge-dev/actions/dist/create-release-tag
         with:
           commit: ${{ github.sha }}
           branch: ${{ github.head_ref }}
