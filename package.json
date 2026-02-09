@@ -15,8 +15,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NanoForge-dev/Engine.git",
-    "directory": "packages/ecs"
+    "url": "git+https://github.com/NanoForge-dev/Engine.git"
   },
   "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
@@ -33,6 +32,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@nanoforge-dev/actions": "^1.1.0",
     "@nanoforge-dev/utils-eslint-config": "workspace:^",
     "@nanoforge-dev/utils-prettier-config": "workspace:^",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
