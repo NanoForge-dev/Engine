@@ -42,8 +42,8 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "tsup": "^8.5.1",
-    "turbo": "^2.8.7",
-    "typedoc": "^0.28.16",
+    "turbo": "^2.8.8",
+    "typedoc": "^0.28.17",
     "typedoc-plugin-markdown": "^4.10.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
