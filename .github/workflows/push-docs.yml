@@ -26,10 +26,10 @@ jobs:
           repository: nanoforge-dev/docs
           token: ${{ secrets.ACTIONS_KEY }}
 
-      - name: Install Node.js v24
+      - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 25
           package-manager-cache: false
           registry-url: https://registry.npmjs.org/
 
@@ -37,7 +37,6 @@ jobs:
         name: Install pnpm
         with:
           run_install: false
-          version: 10.22.0 # Couldnt find a way to execute this action in the right directory
 
       - name: setup git
         run: |

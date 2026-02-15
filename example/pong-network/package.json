@@ -11,19 +11,19 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
-    "@nanoforge-dev/asset-manager": "workspace:^",
-    "@nanoforge-dev/cli": "file:../../../cli",
-    "@nanoforge-dev/common": "workspace:^",
-    "@nanoforge-dev/config": "workspace:^",
-    "@nanoforge-dev/core": "workspace:^",
-    "@nanoforge-dev/ecs-client": "workspace:^",
-    "@nanoforge-dev/ecs-server": "workspace:^",
-    "@nanoforge-dev/graphics-2d": "workspace:^",
-    "@nanoforge-dev/input": "workspace:^",
-    "@nanoforge-dev/network-client": "workspace:^",
-    "@nanoforge-dev/network-server": "workspace:^",
-    "@nanoforge-dev/music": "workspace:^",
-    "@nanoforge-dev/sound": "workspace:^",
+    "@nanoforge-dev/asset-manager": "workspace:*",
+    "@nanoforge-dev/cli": "latest",
+    "@nanoforge-dev/common": "workspace:*",
+    "@nanoforge-dev/config": "workspace:*",
+    "@nanoforge-dev/core": "workspace:*",
+    "@nanoforge-dev/ecs-client": "workspace:*",
+    "@nanoforge-dev/ecs-server": "workspace:*",
+    "@nanoforge-dev/graphics-2d": "workspace:*",
+    "@nanoforge-dev/input": "workspace:*",
+    "@nanoforge-dev/network-client": "workspace:*",
+    "@nanoforge-dev/network-server": "workspace:*",
+    "@nanoforge-dev/music": "workspace:*",
+    "@nanoforge-dev/sound": "workspace:*",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
     "eslint": "^9.39.0",
@@ -42,8 +42,8 @@
     "../../utils/*"
   ],
   "lint-staged": {
-    "**/*.ts": [
-      "prettier --write"
+    "**": [
+      "prettier --ignore-unknown --write"
     ],
     "{client,server}/**/*.ts": [
       "eslint --fix"

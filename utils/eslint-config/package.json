@@ -43,26 +43,31 @@
     "release": "cliff-jumper"
   },
   "dependencies": {
-    "@eslint/js": "^9.39.2",
-    "@favware/cliff-jumper": "^6.0.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-formatter-pretty": "^7.0.0",
-    "eslint-plugin-format": "^1.4.0",
-    "eslint-plugin-prettier": "^5.5.5",
-    "globals": "^16.5.0",
-    "typescript-eslint": "^8.55.0"
+    "@eslint/js": "catalog:lint",
+    "@favware/cliff-jumper": "catalog:ci",
+    "eslint-config-prettier": "catalog:lint",
+    "eslint-formatter-pretty": "catalog:lint",
+    "eslint-plugin-format": "catalog:lint",
+    "eslint-plugin-prettier": "catalog:lint",
+    "globals": "catalog:lint",
+    "typescript-eslint": "catalog:lint"
   },
   "devDependencies": {
-    "@nanoforge-dev/utils-prettier-config": "workspace:^",
-    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
-    "eslint": "^9.39.2",
-    "prettier": "^3.8.1"
+    "@nanoforge-dev/utils-prettier-config": "workspace:*",
+    "@trivago/prettier-plugin-sort-imports": "catalog:lint",
+    "eslint": "catalog:lint",
+    "prettier": "catalog:lint"
   },
   "packageManager": "pnpm@10.29.3",
   "engines": {
-    "node": "25.6.0"
+    "node": "25"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "lint-staged": {
+    "**": [
+      "prettier --ignore-unknown --write"
+    ]
   }
 }

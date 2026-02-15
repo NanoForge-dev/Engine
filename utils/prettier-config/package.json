@@ -43,15 +43,20 @@
     "release": "cliff-jumper"
   },
   "devDependencies": {
-    "@favware/cliff-jumper": "^6.0.0",
-    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
-    "prettier": "^3.8.1"
+    "@favware/cliff-jumper": "catalog:ci",
+    "@trivago/prettier-plugin-sort-imports": "catalog:lint",
+    "prettier": "catalog:lint"
   },
   "packageManager": "pnpm@10.29.3",
   "engines": {
-    "node": "25.6.0"
+    "node": "25"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "lint-staged": {
+    "**": [
+      "prettier --ignore-unknown --write"
+    ]
   }
 }

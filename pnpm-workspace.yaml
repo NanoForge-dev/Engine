@@ -2,8 +2,48 @@ packages:
   - packages/*
   - utils/*
 
+catalogs:
+  build:
+    tsup: ^8.5.1
+  ci:
+    "@commitlint/cli": ^20.4.1
+    "@commitlint/config-conventional": ^20.4.1
+    "@favware/cliff-jumper": ^6.0.0
+    husky: ^9.1.7
+    lint-staged: ^16.2.7
+  config:
+    class-transformer: ^0.5.1
+    class-validator: ^0.14.3
+  core:
+    "@types/node": ^25.2.3
+    turbo: ^2.8.9
+    typescript: ^5.9.3
+  docs:
+    typedoc: ^0.28.17
+    typedoc-plugin-markdown: ^4.10.0
+  graphics:
+    konva: ^10.2.0
+  lint:
+    "@eslint/js": ^9.39.2
+    "@trivago/prettier-plugin-sort-imports": ^6.0.2
+    eslint: ^10.0.0
+    eslint-config-prettier: ^10.1.8
+    eslint-formatter-pretty: ^7.0.0
+    eslint-plugin-format: ^1.4.0
+    eslint-plugin-prettier: ^5.5.5
+    globals: ^16.5.0
+    prettier: ^3.8.1
+    typescript-eslint: ^8.55.0
+  network:
+    "@mapbox/node-pre-gyp": ^2.0.3
+    "@types/ws": ^8.18.1
+    wrtc: ^0.4.7
+    ws: ^8.19.0
+  test:
+    "@vitest/coverage-v8": ^4.0.18
+    vitest: ^4.0.18
+
 onlyBuiltDependencies:
   - esbuild
-  - nx
   - unrs-resolver
   - wrtc
