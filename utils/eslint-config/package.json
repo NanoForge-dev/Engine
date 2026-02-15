@@ -43,24 +43,24 @@
     "release": "cliff-jumper"
   },
   "dependencies": {
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^9.39.2",
     "@favware/cliff-jumper": "^6.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-formatter-pretty": "^7.0.0",
-    "eslint-plugin-format": "^1.0.2",
-    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-format": "^1.4.0",
+    "eslint-plugin-prettier": "^5.5.5",
     "globals": "^16.5.0",
-    "typescript-eslint": "^8.47.0"
+    "typescript-eslint": "^8.55.0"
   },
   "devDependencies": {
     "@nanoforge-dev/utils-prettier-config": "workspace:^",
-    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
-    "eslint": "^9.39.1",
-    "prettier": "^3.6.2"
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+    "eslint": "^9.39.2",
+    "prettier": "^3.8.1"
   },
-  "packageManager": "pnpm@10.22.0",
+  "packageManager": "pnpm@10.29.3",
   "engines": {
-    "node": "24.11.0"
+    "node": "25.6.0"
   },
   "publishConfig": {
     "access": "public"
