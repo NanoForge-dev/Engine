@@ -14,6 +14,10 @@
   description: "Changes to our CI configuration files and scripts"
   color: "721cdb"
 
+- name: "dependencies"
+  description: "Update of dependencies"
+  color: "6f38c2"
+
 - name: "documentation"
   description: "Improvements or additions to documentation"
   color: "0075ca"

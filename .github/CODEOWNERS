@@ -1,0 +1,10 @@
+*                           @Exeloo
+
+/packages/ecs-client        @MartinFillon @Tchips46
+/packages/ecs-lib           @MartinFillon @Tchips46
+/packages/ecs-server        @MartinFillon @Tchips46
+/packages/network-client    @Tchips46
+/packages/network-server    @Tchips46
+
+/scripts                    @MartinFillon
+/typedoc.*                  @MartinFillon
