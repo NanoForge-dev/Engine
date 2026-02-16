@@ -32,6 +32,7 @@
   "devDependencies": {
     "@commitlint/cli": "catalog:ci",
     "@commitlint/config-conventional": "catalog:ci",
+    "@nanoforge-dev/actions": "catalog:ci",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",
