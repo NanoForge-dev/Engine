@@ -233,3 +233,6 @@ docs_build
 docs/conf.py
 docs/*/api/index.md
 docs/ecs-lib/api/typescript.md
+
+
+emsdk-cache/
