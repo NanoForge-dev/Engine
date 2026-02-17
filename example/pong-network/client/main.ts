@@ -87,11 +87,11 @@ export const main = async (options: IRunOptions) => {
   registry.addSystem(draw);
 
   async function waitForConnection(): Promise<void> {
-    if (network.udp?.isConnected()) return;
+    if (network.tcp?.isConnected()) return;
 
     return new Promise((resolve) => {
       const check = () => {
-        if (network.udp.isConnected()) {
+        if (network.tcp.isConnected()) {
           resolve();
         } else {
           setTimeout(check, 50);
