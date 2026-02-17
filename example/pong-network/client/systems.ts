@@ -82,11 +82,11 @@ export function packetHandler(registry: Registry, ctx: Context) {
       it.Velocity.y = packet.velocity.y;
     } else if (type === "assignId") {
       if (packet.assigned === "ball") {
-        registry.addComponent(registry.entityFromIndex(0), new NetworkId(packet.id));
-      } else if (packet.assigned === "paddle1") {
         registry.addComponent(registry.entityFromIndex(2), new NetworkId(packet.id));
+      } else if (packet.assigned === "paddle1") {
+        registry.addComponent(registry.entityFromIndex(4), new NetworkId(packet.id));
       } else if (packet.assigned === "paddle2") {
-        registry.addComponent(registry.entityFromIndex(3), new NetworkId(packet.id));
+        registry.addComponent(registry.entityFromIndex(5), new NetworkId(packet.id));
       }
     }
   });

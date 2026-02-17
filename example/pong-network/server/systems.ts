@@ -64,9 +64,17 @@ function handleClientInput(clientId: number, key: string, network: NetworkServer
 
   if (key === "up") {
     paddle.Velocity.y = -paddleSpeed;
+    if (paddle.Position.y < 0) {
+      paddle.Position.y = 0;
+      paddle.Velocity.y = 0;
+    }
   }
   if (key === "down") {
     paddle.Velocity.y = paddleSpeed;
+    if (paddle.Position.y > 780) {
+      paddle.Position.y = 780;
+      paddle.Velocity.y = 0;
+    }
   }
   if (key === "stop") {
     paddle.Velocity.y = 0;
@@ -102,13 +110,28 @@ export function packetHandler(registry: Registry, ctx: Context) {
   });
 }
 
+function checkOutOfTerrain(id: number, paddle: any, network: NetworkServerLibrary) {
+  if (paddle.Position.y < 0) {
+    paddle.Position.y = 0;
+    paddle.Velocity.y = 0;
+    sendMoveAll(id, paddle.Velocity, paddle.Position, network);
+  }
+  if (paddle.Position.y > 780) {
+    paddle.Position.y = 780;
+    paddle.Velocity.y = 0;
+    sendMoveAll(id, paddle.Velocity, paddle.Position, network);
+  }
+}
+
 export const bounce = (registry: Registry, ctx: Context) => {
   const network = ctx.libs.getNetwork<NetworkServerLibrary>();
+  const zip = registry.getZipper([Position, Velocity]);
+  checkOutOfTerrain(1, zip[1], network);
+  checkOutOfTerrain(2, zip[2], network);
   if (roundStart < 3000 && roundStart != -1) {
     roundStart += ctx.app.delta;
     return;
   }
-  const zip = registry.getZipper([Position, Velocity]);
   if (roundStart >= 3000) {
     roundStart = -1;
     zip[0].Velocity.x = 1;

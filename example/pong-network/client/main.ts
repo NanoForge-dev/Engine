@@ -36,6 +36,19 @@ export const main = async (options: IRunOptions) => {
 
   graphics.stage.add(layer);
 
+  const terrain = registry.spawnEntity();
+  registry.addComponent(terrain, new Position(0, 0));
+  registry.addComponent(
+    terrain,
+    new RectangleComponent(new Rect({ fill: "rgb(58,99,39)", width: 1920, height: 1080 })),
+  );
+  const terrainLine = registry.spawnEntity();
+  registry.addComponent(terrainLine, new Position(955, 0));
+  registry.addComponent(
+    terrainLine,
+    new RectangleComponent(new Rect({ fill: "rgb(148,204,117)", width: 10, height: 1080 })),
+  );
+
   const ball = registry.spawnEntity();
   registry.addComponent(ball, new Velocity(0, 0));
   registry.addComponent(ball, new Position(0, 0));
