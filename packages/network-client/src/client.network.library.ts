@@ -23,12 +23,22 @@ export class NetworkClientLibrary extends BaseNetworkLibrary {
     }
 
     if (config.serverTcpPort !== undefined) {
-      this.tcp = new TCPClient(+config.serverTcpPort, config.serverAddress, config.magicValue);
+      this.tcp = new TCPClient(
+        +config.serverTcpPort,
+        config.serverAddress,
+        config.magicValue,
+        config.wssl,
+      );
       await this.tcp.connect();
     }
 
     if (config.serverUdpPort !== undefined) {
-      this.udp = new UDPClient(+config.serverUdpPort, config.serverAddress, config.magicValue);
+      this.udp = new UDPClient(
+        +config.serverUdpPort,
+        config.serverAddress,
+        config.magicValue,
+        config.wssl,
+      );
       await this.udp.connect();
     }
   }

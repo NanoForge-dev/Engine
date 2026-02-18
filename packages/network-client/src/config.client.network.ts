@@ -26,4 +26,8 @@ export class ClientConfigNetwork {
   @Default("PACKET_END")
   @IsByteLength(2, 64)
   magicValue!: string;
+
+  @Expose()
+  @Default(false)
+  wssl!: boolean;
 }

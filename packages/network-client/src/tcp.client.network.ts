@@ -13,6 +13,7 @@ export class TCPClient {
     private _port: number,
     private _ip: string,
     magicValue: string,
+    private _wssl: boolean = false,
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
   }
@@ -66,7 +67,7 @@ export class TCPClient {
   }
 
   private connectToServerWebSocket() {
-    const serverUrl = `ws://${this._ip}:${this._port}`;
+    const serverUrl = `ws${this._wssl ? "s" : ""}://${this._ip}:${this._port}`;
     console.log("Try to connect for TCP to " + serverUrl);
     this._channel = new WebSocket(serverUrl);
     this._channel.binaryType = "arraybuffer";
