@@ -1,6 +1,7 @@
 import {
   Default,
   Expose,
+  IsBoolean,
   IsByteLength,
   IsIpOrFQDN,
   IsOptional,
@@ -28,6 +29,7 @@ export class ClientConfigNetwork {
   magicValue!: string;
 
   @Expose()
+  @IsBoolean()
   @Default(false)
-  wssl!: boolean;
+  wss!: boolean;
 }

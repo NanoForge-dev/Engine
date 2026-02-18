@@ -27,7 +27,7 @@ export class NetworkClientLibrary extends BaseNetworkLibrary {
         +config.serverTcpPort,
         config.serverAddress,
         config.magicValue,
-        config.wssl,
+        config.wss,
       );
       await this.tcp.connect();
     }
@@ -37,7 +37,7 @@ export class NetworkClientLibrary extends BaseNetworkLibrary {
         +config.serverUdpPort,
         config.serverAddress,
         config.magicValue,
-        config.wssl,
+        config.wss,
       );
       await this.udp.connect();
     }

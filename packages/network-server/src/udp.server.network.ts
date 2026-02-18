@@ -1,3 +1,4 @@
+import fs from "fs";
 import { createServer } from "https";
 import { RTCPeerConnection } from "wrtc";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
@@ -20,14 +21,14 @@ export class UDPServer {
     private _port: number,
     private _host: string,
     magicValue: string,
-    private _cert: string | undefined = undefined,
-    private _key: string | undefined = undefined,
+    private _cert?: string,
+    private _key?: string,
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
     if (this._cert && this._key) {
       this._httpsServer = createServer({
-        cert: this._cert,
-        key: this._key,
+        cert: fs.readFileSync(this._cert),
+        key: fs.readFileSync(this._key),
       });
     } else {
       console.warn(
@@ -44,6 +45,14 @@ export class UDPServer {
    */
   public listen() {
     const webSocketServer = this.startWebSocketServer();
+
+    if (this._httpsServer) {
+      this._httpsServer.listen(this._port, this._host, () => {
+        console.log(
+          "Secure WebSocketServer for UDP listening on wss://" + this._host + ":" + this._port,
+        );
+      });
+    }
 
     webSocketServer.on("connection", (webSocket, request) => {
       const pendingCandidates: any[] = [];
@@ -208,8 +217,6 @@ export class UDPServer {
     if (this._httpsServer) {
       const webSocketServer = new WebSocketServer({
         server: this._httpsServer,
-        port: this._port,
-        host: this._host,
       });
 
       console.log(

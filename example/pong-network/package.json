@@ -12,7 +12,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.0",
     "@nanoforge-dev/asset-manager": "workspace:*",
-    "@nanoforge-dev/cli": "latest",
+    "@nanoforge-dev/cli": "1.1.1",
     "@nanoforge-dev/common": "workspace:*",
     "@nanoforge-dev/config": "workspace:*",
     "@nanoforge-dev/core": "workspace:*",

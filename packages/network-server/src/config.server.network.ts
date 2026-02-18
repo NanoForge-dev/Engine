@@ -5,6 +5,7 @@ import {
   IsIpOrFQDN,
   IsOptional,
   IsPort,
+  IsString,
 } from "@nanoforge-dev/config";
 
 export class ServerConfigNetwork {
@@ -29,10 +30,12 @@ export class ServerConfigNetwork {
   magicValue!: string;
 
   @Expose()
+  @IsString()
   @IsOptional()
   cert?: string;
 
   @Expose()
+  @IsString()
   @IsOptional()
   key?: string;
 }
