@@ -4,6 +4,8 @@ package-lock.json
 yarn.lock
 bun.lock
 
+pnpm-workspace.yaml
+
 packages/
 example/
 utils/
