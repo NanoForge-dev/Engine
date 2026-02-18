@@ -27,4 +27,12 @@ export class ServerConfigNetwork {
   @Default("PACKET_END")
   @IsByteLength(2, 64)
   magicValue!: string;
+
+  @Expose()
+  @IsOptional()
+  cert?: string;
+
+  @Expose()
+  @IsOptional()
+  key?: string;
 }

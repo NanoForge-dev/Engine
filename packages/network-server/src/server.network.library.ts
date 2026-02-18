@@ -30,6 +30,8 @@ export class NetworkServerLibrary extends BaseNetworkLibrary {
         +config.listeningTcpPort,
         config.listeningInterface,
         config.magicValue,
+        config.cert,
+        config.key,
       );
       this.tcp.listen();
     }
@@ -39,6 +41,8 @@ export class NetworkServerLibrary extends BaseNetworkLibrary {
         +config.listeningUdpPort,
         config.listeningInterface,
         config.magicValue,
+        config.cert,
+        config.key,
       );
       this.udp.listen();
     }

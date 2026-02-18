@@ -1,3 +1,4 @@
+import { createServer } from "https";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
 
 import { buildMagicPacket, parsePacketsFromChunks, rawDataToUint8Array } from "./utils";
@@ -12,13 +13,27 @@ export class TCPServer {
   >();
   private _nextClientId: number = 0;
   private readonly _magicData = new Uint8Array();
+  private _httpsServer: ReturnType<typeof createServer> | undefined;
 
   constructor(
     private _port: number,
     private _host: string,
     magicValue: string,
+    private _cert: string | undefined = undefined,
+    private _key: string | undefined = undefined,
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
+    if (this._cert && this._key) {
+      this._httpsServer = createServer({
+        cert: this._cert,
+        key: this._key,
+      });
+    } else {
+      console.warn(
+        "No TLS cert/key provided for TCP server, WebSocket connections will be unencrypted",
+      );
+      this._httpsServer = undefined;
+    }
   }
 
   /**
@@ -114,12 +129,25 @@ export class TCPServer {
   }
 
   private startWebSocketServer(): WebSocketServer {
-    const webSocketServer = new WebSocketServer({
-      port: this._port,
-      host: this._host,
-    });
+    if (this._httpsServer) {
+      const webSocketServer = new WebSocketServer({
+        server: this._httpsServer,
+        port: this._port,
+        host: this._host,
+      });
 
-    console.log("WebSocketServer for TCP listening on ws://" + this._host + ":" + this._port);
-    return webSocketServer;
+      console.log(
+        "Secure WebSocketServer for TCP listening on wss://" + this._host + ":" + this._port,
+      );
+      return webSocketServer;
+    } else {
+      const webSocketServer = new WebSocketServer({
+        port: this._port,
+        host: this._host,
+      });
+
+      console.log("WebSocketServer for TCP listening on ws://" + this._host + ":" + this._port);
+      return webSocketServer;
+    }
   }
 }
