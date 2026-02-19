@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout engine
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: engine
 
       - name: Checkout docs
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: docs
           repository: nanoforge-dev/docs
