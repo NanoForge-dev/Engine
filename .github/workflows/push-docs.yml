@@ -44,7 +44,7 @@ jobs:
           git config --global user.email "username@users.noreply.github.com"
 
       - name: install doxygen
-        uses: ssciwr/doxygen-install@v1
+        uses: ssciwr/doxygen-install@v2
 
       - name: install deps
         run: cd engine && pnpm i
