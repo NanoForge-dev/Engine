@@ -25,7 +25,7 @@ catalogs:
   graphics:
     konva: ^10.2.0
   lint:
-    "@eslint/js": ^9.39.2
+    "@eslint/js": ^10.0.1
     "@trivago/prettier-plugin-sort-imports": ^6.0.2
     eslint: ^10.0.0
     eslint-config-prettier: ^10.1.8
