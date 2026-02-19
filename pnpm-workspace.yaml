@@ -32,7 +32,7 @@ catalogs:
     eslint-formatter-pretty: ^7.0.0
     eslint-plugin-format: ^1.4.0
     eslint-plugin-prettier: ^5.5.5
-    globals: ^16.5.0
+    globals: ^17.3.0
     prettier: ^3.8.1
     typescript-eslint: ^8.55.0
   network:
