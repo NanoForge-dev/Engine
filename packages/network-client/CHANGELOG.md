@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/network-client@1.1.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/network-client@1.0.1...@nanoforge-dev/network-client@1.1.0) - (2026-02-20)
+
+## Features
+
+- **network:** Setup ssl and wssl (#228) ([c52b623](https://github.com/NanoForge-dev/Engine/commit/c52b623118890ddbc6b49335af485d3d4c44bce3)) by @MartinFillon
+
 # [@nanoforge-dev/network-client@1.0.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/network-client@1.0.0...@nanoforge-dev/network-client@1.0.1) - (2026-02-16)
 
 ## Documentation
