@@ -1,3 +1,5 @@
+import fs from "fs";
+import { createServer } from "https";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
 
 import { buildMagicPacket, parsePacketsFromChunks, rawDataToUint8Array } from "./utils";
@@ -12,13 +14,27 @@ export class TCPServer {
   >();
   private _nextClientId: number = 0;
   private readonly _magicData = new Uint8Array();
+  private _httpsServer: ReturnType<typeof createServer> | undefined;
 
   constructor(
     private _port: number,
     private _host: string,
     magicValue: string,
+    private _cert?: string,
+    private _key?: string,
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
+    if (this._cert && this._key) {
+      this._httpsServer = createServer({
+        cert: fs.readFileSync(this._cert),
+        key: fs.readFileSync(this._key),
+      });
+    } else {
+      console.warn(
+        "No TLS cert/key provided for TCP server, WebSocket connections will be unencrypted",
+      );
+      this._httpsServer = undefined;
+    }
   }
 
   /**
@@ -28,6 +44,14 @@ export class TCPServer {
    */
   public listen() {
     const webSocketServer = this.startWebSocketServer();
+
+    if (this._httpsServer) {
+      this._httpsServer.listen(this._port, this._host, () => {
+        console.log(
+          "Secure WebSocketServer for TCP listening on wss://" + this._host + ":" + this._port,
+        );
+      });
+    }
 
     webSocketServer.on("connection", (webSocket, request) => {
       webSocket.binaryType = "arraybuffer";
@@ -114,12 +138,23 @@ export class TCPServer {
   }
 
   private startWebSocketServer(): WebSocketServer {
-    const webSocketServer = new WebSocketServer({
-      port: this._port,
-      host: this._host,
-    });
+    if (this._httpsServer) {
+      const webSocketServer = new WebSocketServer({
+        server: this._httpsServer,
+      });
 
-    console.log("WebSocketServer for TCP listening on ws://" + this._host + ":" + this._port);
-    return webSocketServer;
+      console.log(
+        "Secure WebSocketServer for TCP listening on wss://" + this._host + ":" + this._port,
+      );
+      return webSocketServer;
+    } else {
+      const webSocketServer = new WebSocketServer({
+        port: this._port,
+        host: this._host,
+      });
+
+      console.log("WebSocketServer for TCP listening on ws://" + this._host + ":" + this._port);
+      return webSocketServer;
+    }
   }
 }

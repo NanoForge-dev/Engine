@@ -13,6 +13,7 @@ export class UDPClient {
     private _port: number,
     private _ip: string,
     magicValue: string,
+    private _wss: boolean,
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
   }
@@ -69,7 +70,7 @@ export class UDPClient {
   }
 
   private connectToServerWebSocket(): WebSocket {
-    const serverUrl = `ws://${this._ip}:${this._port}`;
+    const serverUrl = `ws${this._wss ? "s" : ""}://${this._ip}:${this._port}`;
     console.log("Try to connect for UDP to " + serverUrl);
     const webSocket = new WebSocket(serverUrl);
 

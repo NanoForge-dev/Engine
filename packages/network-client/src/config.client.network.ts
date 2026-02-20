@@ -1,6 +1,7 @@
 import {
   Default,
   Expose,
+  IsBoolean,
   IsByteLength,
   IsIpOrFQDN,
   IsOptional,
@@ -26,4 +27,9 @@ export class ClientConfigNetwork {
   @Default("PACKET_END")
   @IsByteLength(2, 64)
   magicValue!: string;
+
+  @Expose()
+  @IsBoolean()
+  @Default(false)
+  wss!: boolean;
 }

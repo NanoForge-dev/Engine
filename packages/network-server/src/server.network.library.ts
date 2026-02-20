@@ -25,11 +25,20 @@ export class NetworkServerLibrary extends BaseNetworkLibrary {
       throw new NfConfigException("No listenning port specified", this.__name);
     }
 
+    if (
+      (config.cert !== undefined && config.key === undefined) ||
+      (config.cert === undefined && config.key !== undefined)
+    ) {
+      throw new NfConfigException("Both cert and key must be provided together", this.__name);
+    }
+
     if (config.listeningTcpPort !== undefined) {
       this.tcp = new TCPServer(
         +config.listeningTcpPort,
         config.listeningInterface,
         config.magicValue,
+        config.cert,
+        config.key,
       );
       this.tcp.listen();
     }
@@ -39,6 +48,8 @@ export class NetworkServerLibrary extends BaseNetworkLibrary {
         +config.listeningUdpPort,
         config.listeningInterface,
         config.magicValue,
+        config.cert,
+        config.key,
       );
       this.udp.listen();
     }
