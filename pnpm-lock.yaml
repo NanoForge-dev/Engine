@@ -37,8 +37,8 @@ catalogs:
       version: 0.14.3
   core:
     '@types/node':
-      specifier: ^25.2.3
-      version: 25.2.3
+      specifier: ^25.3.0
+      version: 25.3.0
     turbo:
       specifier: ^2.8.10
       version: 2.8.10
@@ -118,7 +118,7 @@ importers:
     devDependencies:
       '@commitlint/cli':
         specifier: catalog:ci
-        version: 20.4.1(@types/node@25.2.3)(typescript@5.9.3)
+        version: 20.4.1(@types/node@25.3.0)(typescript@5.9.3)
       '@commitlint/config-conventional':
         specifier: catalog:ci
         version: 20.4.1
@@ -136,10 +136,10 @@ importers:
         version: 6.0.2(prettier@3.8.1)
       '@types/node':
         specifier: catalog:core
-        version: 25.2.3
+        version: 25.3.0
       '@vitest/coverage-v8':
         specifier: catalog:test
-        version: 4.0.18(vitest@4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2))
+        version: 4.0.18(vitest@4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2))
       eslint:
         specifier: catalog:lint
         version: 10.0.0(jiti@2.6.1)
@@ -169,7 +169,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2)
 
   packages/asset-manager:
     dependencies:
@@ -203,7 +203,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2)
 
   packages/common:
     devDependencies:
@@ -338,7 +338,7 @@ importers:
         version: 6.0.2(prettier@3.8.1)
       '@types/node':
         specifier: catalog:core
-        version: 25.2.3
+        version: 25.3.0
       eslint:
         specifier: catalog:lint
         version: 10.0.0(jiti@2.6.1)
@@ -353,7 +353,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2)
 
   packages/ecs-lib:
     dependencies:
@@ -375,7 +375,7 @@ importers:
         version: 6.0.2(prettier@3.8.1)
       '@types/node':
         specifier: catalog:core
-        version: 25.2.3
+        version: 25.3.0
       eslint:
         specifier: catalog:lint
         version: 10.0.0(jiti@2.6.1)
@@ -390,7 +390,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2)
 
   packages/ecs-server:
     dependencies:
@@ -421,7 +421,7 @@ importers:
         version: 6.0.2(prettier@3.8.1)
       '@types/node':
         specifier: catalog:core
-        version: 25.2.3
+        version: 25.3.0
       eslint:
         specifier: catalog:lint
         version: 10.0.0(jiti@2.6.1)
@@ -436,7 +436,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2)
 
   packages/graphics-2d:
     dependencies:
@@ -473,7 +473,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2)
 
   packages/input:
     dependencies:
@@ -1406,6 +1406,9 @@ packages:
 
   '@types/node@25.2.3':
     resolution: {integrity: sha512-m0jEgYlYz+mDJZ2+F4v8D1AyQb+QzsNqRuI7xg1VQX/KlKS0qT9r1Mo16yo5F/MtifXFgaofIFsdFMox2SxIbQ==}
+
+  '@types/node@25.3.0':
+    resolution: {integrity: sha512-4K3bqJpXpqfg2XKGK9bpDTc6xO/xoUP/RBWS7AtRMug6zZFaRekiLzjVtAoZMquxoAbzBvy5nxQ7veS5eYzf8A==}
 
   '@types/semver@7.7.1':
     resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
@@ -2740,6 +2743,9 @@ packages:
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
+  undici-types@7.18.2:
+    resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
+
   undici@5.29.0:
     resolution: {integrity: sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==}
     engines: {node: '>=14.0'}
@@ -2997,11 +3003,11 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@commitlint/cli@20.4.1(@types/node@25.2.3)(typescript@5.9.3)':
+  '@commitlint/cli@20.4.1(@types/node@25.3.0)(typescript@5.9.3)':
     dependencies:
       '@commitlint/format': 20.4.0
       '@commitlint/lint': 20.4.1
-      '@commitlint/load': 20.4.0(@types/node@25.2.3)(typescript@5.9.3)
+      '@commitlint/load': 20.4.0(@types/node@25.3.0)(typescript@5.9.3)
       '@commitlint/read': 20.4.0
       '@commitlint/types': 20.4.0
       tinyexec: 1.0.2
@@ -3048,14 +3054,14 @@ snapshots:
       '@commitlint/rules': 20.4.1
       '@commitlint/types': 20.4.0
 
-  '@commitlint/load@20.4.0(@types/node@25.2.3)(typescript@5.9.3)':
+  '@commitlint/load@20.4.0(@types/node@25.3.0)(typescript@5.9.3)':
     dependencies:
       '@commitlint/config-validator': 20.4.0
       '@commitlint/execute-rule': 20.0.0
       '@commitlint/resolve-extends': 20.4.0
       '@commitlint/types': 20.4.0
       cosmiconfig: 9.0.0(typescript@5.9.3)
-      cosmiconfig-typescript-loader: 6.2.0(@types/node@25.2.3)(cosmiconfig@9.0.0(typescript@5.9.3))(typescript@5.9.3)
+      cosmiconfig-typescript-loader: 6.2.0(@types/node@25.3.0)(cosmiconfig@9.0.0(typescript@5.9.3))(typescript@5.9.3)
       is-plain-obj: 4.1.0
       lodash.mergewith: 4.6.2
       picocolors: 1.1.1
@@ -3566,6 +3572,10 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
+  '@types/node@25.3.0':
+    dependencies:
+      undici-types: 7.18.2
+
   '@types/semver@7.7.1': {}
 
   '@types/unist@3.0.3': {}
@@ -3667,7 +3677,7 @@ snapshots:
       '@typescript-eslint/types': 8.56.0
       eslint-visitor-keys: 5.0.0
 
-  '@vitest/coverage-v8@4.0.18(vitest@4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2))':
+  '@vitest/coverage-v8@4.0.18(vitest@4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/utils': 4.0.18
@@ -3679,7 +3689,7 @@ snapshots:
       obug: 2.1.1
       std-env: 3.10.0
       tinyrainbow: 3.0.3
-      vitest: 4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2)
+      vitest: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2)
 
   '@vitest/expect@4.0.18':
     dependencies:
@@ -3690,13 +3700,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.18(vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2))':
+  '@vitest/mocker@4.0.18(vite@7.3.1(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2))':
     dependencies:
       '@vitest/spy': 4.0.18
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.1(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2)
 
   '@vitest/pretty-format@4.0.18':
     dependencies:
@@ -3885,9 +3895,9 @@ snapshots:
       conventional-commits-parser: 6.2.1
       meow: 13.2.0
 
-  cosmiconfig-typescript-loader@6.2.0(@types/node@25.2.3)(cosmiconfig@9.0.0(typescript@5.9.3))(typescript@5.9.3):
+  cosmiconfig-typescript-loader@6.2.0(@types/node@25.3.0)(cosmiconfig@9.0.0(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
-      '@types/node': 25.2.3
+      '@types/node': 25.3.0
       cosmiconfig: 9.0.0(typescript@5.9.3)
       jiti: 2.6.1
       typescript: 5.9.3
@@ -4856,6 +4866,8 @@ snapshots:
 
   undici-types@7.16.0: {}
 
+  undici-types@7.18.2: {}
+
   undici@5.29.0:
     dependencies:
       '@fastify/busboy': 2.1.1
@@ -4874,7 +4886,7 @@ snapshots:
 
   validator@13.15.26: {}
 
-  vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2):
+  vite@7.3.1(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2):
     dependencies:
       esbuild: 0.27.3
       fdir: 6.5.0(picomatch@4.0.3)
@@ -4883,15 +4895,15 @@ snapshots:
       rollup: 4.57.1
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 25.2.3
+      '@types/node': 25.3.0
       fsevents: 2.3.3
       jiti: 2.6.1
       yaml: 2.8.2
 
-  vitest@4.0.18(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2):
+  vitest@4.0.18(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2):
     dependencies:
       '@vitest/expect': 4.0.18
-      '@vitest/mocker': 4.0.18(vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2))
+      '@vitest/mocker': 4.0.18(vite@7.3.1(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2))
       '@vitest/pretty-format': 4.0.18
       '@vitest/runner': 4.0.18
       '@vitest/snapshot': 4.0.18
@@ -4908,10 +4920,10 @@ snapshots:
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: 7.3.1(@types/node@25.2.3)(jiti@2.6.1)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@25.3.0)(jiti@2.6.1)(yaml@2.8.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 25.2.3
+      '@types/node': 25.3.0
     transitivePeerDependencies:
       - jiti
       - less
