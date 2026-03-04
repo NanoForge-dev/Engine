@@ -14,7 +14,7 @@ catalogs:
     lint-staged: ^16.2.7
   config:
     class-transformer: ^0.5.1
-    class-validator: ^0.14.3
+    class-validator: ^0.15.1
   core:
     "@types/node": ^25.3.0
     turbo: ^2.8.10
