@@ -8,7 +8,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "wasm/**", "test/**", "package.json", "tsconfig.json", "tsup.config.ts"],
-      "outputs": ["dist/**"],
+      "outputs": ["dist/**", ".nanoforge/client/**", ".nanoforge/server/**"],
       "outputLogs": "errors-only"
     },
     "format": {
@@ -25,12 +25,6 @@
     },
     "test:unit": {
       "dependsOn": ["^test:unit"],
-      "inputs": ["src/**", "wasm/**", "test/**", "package.json", "tsconfig.json", "tsup.config.ts"],
-      "outputs": [],
-      "outputLogs": "errors-only"
-    },
-    "test:e2e": {
-      "dependsOn": ["^test:e2e"],
       "inputs": ["src/**", "wasm/**", "test/**", "package.json", "tsconfig.json", "tsup.config.ts"],
       "outputs": [],
       "outputLogs": "errors-only"

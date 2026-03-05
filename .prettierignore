@@ -10,6 +10,7 @@ packages/
 example/
 utils/
 releases/
+.nanoforge/
 
 .turbo/
 node_modules/

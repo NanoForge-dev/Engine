@@ -1,22 +1,41 @@
 import { type IConfigRegistry, InitContext } from "@nanoforge-dev/common";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { EditableApplicationContext } from "../../core/src/common/context/contexts/application.editable-context";
 import { EditableLibraryManager } from "../../core/src/common/library/manager/library.manager";
-import { Graphics2DLibrary } from "../src/graphics-2d.library";
+import { Graphics2DLibrary } from "../src";
 
-describe("Graphics 2D Library", () => {
-  const library = new Graphics2DLibrary();
+const makeContext = (canvas: HTMLCanvasElement | null) => {
   const libraryManager = new EditableLibraryManager();
   const appContext = new EditableApplicationContext(libraryManager);
   const configRegistry = {} as IConfigRegistry;
-  const context = new InitContext(appContext, libraryManager, configRegistry, {
+  return new InitContext(appContext, libraryManager, configRegistry, {
     // @ts-ignore
-    canvas: null,
+    canvas,
     files: new Map(),
   });
+};
 
-  it("Should throw if canvas is undefined", async () => {
-    await expect(library.__init(context)).rejects.toThrow();
+describe("Graphics2DLibrary", () => {
+  describe("metadata", () => {
+    it("should expose the correct library name", () => {
+      expect(new Graphics2DLibrary().__name).toBe("Graphics2DLibrary");
+    });
+  });
+
+  describe("before initialization", () => {
+    let library: Graphics2DLibrary;
+
+    beforeEach(() => {
+      library = new Graphics2DLibrary();
+    });
+
+    it("should throw when stage is accessed before __init", () => {
+      expect(() => library.stage).toThrow();
+    });
+
+    it("should throw when __init is called with a null canvas", async () => {
+      await expect(library.__init(makeContext(null))).rejects.toThrow();
+    });
   });
 });

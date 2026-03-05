@@ -22,8 +22,9 @@
     "build": "turbo run build --concurrency=5",
     "format": "prettier --write . && turbo run format --concurrency=5",
     "lint": "prettier --check . && turbo run lint --concurrency=5",
+    "test": "pnpm run test:unit && pnpm run test:e2e",
     "test:unit": "turbo run test:unit --concurrency=5",
-    "test:e2e": "turbo run test:e2e --concurrency=5",
+    "test:e2e": "vitest run --config vitest.config.e2e.ts",
     "prepare": "husky"
   },
   "dependencies": {
