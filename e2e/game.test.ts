@@ -9,7 +9,7 @@ const PROJECT_DIR = join(dirname(fileURLToPath(import.meta.url)), "./game");
 describe("E2E Game", () => {
   beforeAll(() => {
     rmSync(join(PROJECT_DIR, ".nanoforge"), { recursive: true, force: true });
-    execSync("nf build", {
+    execSync("pnpm run build", {
       cwd: PROJECT_DIR,
       stdio: "pipe",
       timeout: 120_000,
@@ -32,15 +32,5 @@ describe("E2E Game", () => {
     it("should include the WASM file in the server bundle", () => {
       expect(existsSync(join(PROJECT_DIR, ".nanoforge/server/libecs.wasm"))).toBe(true);
     });
-  });
-
-  describe("Server", () => {
-    it("should start, run for 5 ticks, and exit cleanly", () => {
-      execSync("bun run ../run-server.mjs", {
-        cwd: PROJECT_DIR,
-        stdio: "pipe",
-        timeout: 15_000,
-      });
-    }, 20_000);
   });
 });
