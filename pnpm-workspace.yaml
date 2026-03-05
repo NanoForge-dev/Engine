@@ -46,6 +46,7 @@ catalogs:
     vitest: ^4.0.18
 
 onlyBuiltDependencies:
+  - bun
   - esbuild
   - unrs-resolver
   - wrtc
