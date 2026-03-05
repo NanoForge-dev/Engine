@@ -1,197 +1,162 @@
-import { assert, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import Module from "../lib/libecs";
 
 class Velocity {
   name: string = "Velocity";
-  x: number;
-  y: number;
-
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
+  constructor(
+    public x: number,
+    public y: number,
+  ) {}
 }
 
 class Position {
   name: string = "Position";
-  x: number;
-  y: number;
-
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
+  constructor(
+    public x: number,
+    public y: number,
+  ) {}
 }
 
-const getRunSystemsParams = (registry: any) => {
-  return {
-    libs: {
-      getComponentSystem: () => ({ registry: registry }),
-    },
-  };
-};
+const getRunSystemsParams = (registry: any) => ({
+  libs: { getComponentSystem: () => ({ registry }) },
+});
 
 describe("Registry", () => {
-  it("1 entity 2 components", async () => {
-    const m = await Module();
-    const r = new m.Registry();
-    expect(r).toBeDefined();
-
-    const vel = new Velocity(1, 2);
-    const pos = new Position(4, 5);
-
-    const e = r.spawnEntity();
-    expect(e.getId()).toBe(0);
-
-    r.addComponent(e, vel);
-    r.addComponent(e, pos);
-
-    const velocities = r.getComponents(Velocity);
-    const positions = r.getComponents(Position);
-
-    expect(velocities.get(e.getId())).toStrictEqual(new Velocity(1, 2));
-    expect(positions.get(e.getId())).toStrictEqual(new Position(4, 5));
-  });
-
-  it("override components", async () => {
-    const m = await Module();
-    const r = new m.Registry();
-
-    const vel = new Velocity(1, 2);
-    const vel2 = new Velocity(4, 5);
-
-    const e = r.spawnEntity();
-
-    r.addComponent(e, vel);
-    expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(1, 2));
-
-    r.addComponent(e, vel2);
-    expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(4, 5));
-  });
-
-  it("basic remove", async () => {
-    const m = await Module();
-    const r = new m.Registry();
-
-    const vel = new Velocity(1, 2);
-    const e = r.spawnEntity();
-
-    r.addComponent(e, vel);
-    expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(1, 2));
-
-    r.removeComponent(e, Velocity);
-    expect(r.getComponents(Velocity).size()).toEqual(1);
-    expect(r.getComponents(Velocity).get(e.getId())).toBeUndefined();
-  });
-
-  it("basic kill", async () => {
-    const m = await Module();
-    const r = new m.Registry();
-    expect(r).toBeDefined();
-
-    const vel = new Velocity(1, 2);
-    const pos = new Position(4, 5);
-
-    r.spawnEntity();
-    const e = r.spawnEntity();
-    expect(e.getId()).toBe(1);
-
-    r.addComponent(e, vel);
-    r.addComponent(e, pos);
-
-    const velocities = r.getComponents(Velocity);
-    const positions = r.getComponents(Position);
-
-    expect(positions.size()).toEqual(2);
-    expect(velocities.get(e.getId())).toStrictEqual(new Velocity(1, 2));
-    expect(positions.get(e.getId())).toStrictEqual(new Position(4, 5));
-
-    r.killEntity(e);
-    expect(r.getComponents(Velocity).get(e.getId())).toBeUndefined();
-    expect(r.getComponents(Position).get(e.getId())).toBeUndefined();
-  });
-
-  it("system incrementing a variable", async () => {
-    const m = await Module();
-    const r = new m.Registry();
-
-    let counter = 0;
-
-    r.addSystem(() => {
-      counter += 1;
+  describe("entity management", () => {
+    it("should spawn an entity with id 0", async () => {
+      const m = await Module();
+      const r = new m.Registry();
+      const e = r.spawnEntity();
+      expect(e.getId()).toBe(0);
     });
 
-    for (let i = 0; i <= 15; i++) {
-      expect(counter).toBe(i);
-      r.runSystems(getRunSystemsParams(r));
-    }
-    expect(counter).toBe(16);
+    it("should assign incrementing ids to spawned entities", async () => {
+      const m = await Module();
+      const r = new m.Registry();
+      const e0 = r.spawnEntity();
+      const e1 = r.spawnEntity();
+      expect(e0.getId()).toBe(0);
+      expect(e1.getId()).toBe(1);
+    });
+
+    it("should kill an entity and remove all its components", async () => {
+      const m = await Module();
+      const r = new m.Registry();
+
+      r.spawnEntity();
+      const e = r.spawnEntity();
+      expect(e.getId()).toBe(1);
+
+      r.addComponent(e, new Velocity(1, 2));
+      r.addComponent(e, new Position(4, 5));
+
+      r.killEntity(e);
+      expect(r.getComponents(Velocity).get(e.getId())).toBeUndefined();
+      expect(r.getComponents(Position).get(e.getId())).toBeUndefined();
+    });
   });
 
-  it("system incrementing component positions by velocity", async () => {
-    const m = await Module();
-    const r = new m.Registry();
-    expect(r).toBeDefined();
+  describe("component management", () => {
+    it("should add multiple components to a single entity", async () => {
+      const m = await Module();
+      const r = new m.Registry();
 
-    const e = r.spawnEntity();
-    const e2 = r.spawnEntity();
-    expect(e2.getId()).toBe(1);
-    const e3 = r.spawnEntity();
+      const e = r.spawnEntity();
+      r.addComponent(e, new Velocity(1, 2));
+      r.addComponent(e, new Position(4, 5));
 
-    r.addComponent(e, new Velocity(1, 1));
-    r.addComponent(e, new Position(-2, -2));
+      expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(1, 2));
+      expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(4, 5));
+    });
 
-    r.addComponent(e2, new Velocity(-1, -1));
-    r.addComponent(e2, new Position(2, 2));
+    it("should override an existing component on an entity", async () => {
+      const m = await Module();
+      const r = new m.Registry();
 
-    r.addComponent(e3, new Position(0, 0));
+      const e = r.spawnEntity();
+      r.addComponent(e, new Velocity(1, 2));
+      expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(1, 2));
 
-    r.addSystem(() => {
-      const velocities = r.getComponents(Velocity);
-      const positions = r.getComponents(Position);
-      for (let i = 0; i < velocities.size() && i < positions.size(); i++) {
-        if (velocities.get(i) === undefined || positions.get(i) === undefined) {
-          continue;
-        }
-        positions.get(i).x += velocities.get(i).x;
-        positions.get(i).y += velocities.get(i).y;
+      r.addComponent(e, new Velocity(4, 5));
+      expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(4, 5));
+    });
+
+    it("should remove a component from an entity", async () => {
+      const m = await Module();
+      const r = new m.Registry();
+
+      const e = r.spawnEntity();
+      r.addComponent(e, new Velocity(1, 2));
+      expect(r.getComponents(Velocity).get(e.getId())).toStrictEqual(new Velocity(1, 2));
+
+      r.removeComponent(e, Velocity);
+      expect(r.getComponents(Velocity).size()).toEqual(1);
+      expect(r.getComponents(Velocity).get(e.getId())).toBeUndefined();
+    });
+
+    it("should reject the reserved 'entity' component name", async () => {
+      const m = await Module();
+      const r = new m.Registry();
+
+      const e = r.spawnEntity();
+      expect(() => r.addComponent(e, { name: "entity" })).toThrow();
+    });
+  });
+
+  describe("system management", () => {
+    it("should run a system that increments a counter", async () => {
+      const m = await Module();
+      const r = new m.Registry();
+
+      let counter = 0;
+      r.addSystem(() => {
+        counter += 1;
+      });
+
+      for (let i = 0; i <= 15; i++) {
+        expect(counter).toBe(i);
+        r.runSystems(getRunSystemsParams(r));
       }
+      expect(counter).toBe(16);
     });
 
-    expect(r.getComponents(Position).size()).toEqual(3);
+    it("should run a system that updates positions by velocity", async () => {
+      const m = await Module();
+      const r = new m.Registry();
 
-    expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(-2, -2));
-    expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(2, 2));
-    expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
-    r.runSystems(getRunSystemsParams(r));
+      const e = r.spawnEntity();
+      const e2 = r.spawnEntity();
+      expect(e2.getId()).toBe(1);
+      const e3 = r.spawnEntity();
 
-    expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(-1, -1));
-    expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(1, 1));
-    expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
-    r.runSystems(getRunSystemsParams(r));
+      r.addComponent(e, new Velocity(1, 1));
+      r.addComponent(e, new Position(-2, -2));
+      r.addComponent(e2, new Velocity(-1, -1));
+      r.addComponent(e2, new Position(2, 2));
+      r.addComponent(e3, new Position(0, 0));
 
-    expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(0, 0));
-    expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(0, 0));
-    expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
-  });
+      r.addSystem(() => {
+        const velocities = r.getComponents(Velocity);
+        const positions = r.getComponents(Position);
+        for (let i = 0; i < velocities.size() && i < positions.size(); i++) {
+          if (velocities.get(i) === undefined || positions.get(i) === undefined) continue;
+          positions.get(i).x += velocities.get(i).x;
+          positions.get(i).y += velocities.get(i).y;
+        }
+      });
 
-  it("Try unallowed component name", async () => {
-    const m = await Module();
-    const r = new m.Registry();
-    expect(r).toBeDefined();
+      expect(r.getComponents(Position).size()).toEqual(3);
 
-    const entityComp = { name: "entity" };
+      r.runSystems(getRunSystemsParams(r));
+      expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(-1, -1));
+      expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(1, 1));
+      expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
 
-    const e = r.spawnEntity();
-    expect(e.getId()).toBe(0);
-
-    try {
-      r.addComponent(e, entityComp);
-      assert.fail("Should have thrown an error");
-    } catch (e) {
-      //@ts-ignore
-      expect(m.getExceptionMessage(e)[1].toString()).toBeDefined();
-    }
+      r.runSystems(getRunSystemsParams(r));
+      expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(0, 0));
+      expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(0, 0));
+      expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
+    });
   });
 });
