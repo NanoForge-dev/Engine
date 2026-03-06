@@ -212,9 +212,6 @@ importers:
       typescript:
         specifier: catalog:core
         version: 5.9.3
-      vitest:
-        specifier: catalog:test
-        version: 4.0.18(@types/node@25.3.5)(jiti@2.6.1)(yaml@2.8.2)
 
   example/pong-network:
     devDependencies:
