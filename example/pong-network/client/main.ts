@@ -1,11 +1,11 @@
 import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
-import { NetworkClientLibrary } from "@nanoforge-dev/network-client";
 import { type IRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
 import { InputEnum } from "@nanoforge-dev/input";
 import { InputLibrary } from "@nanoforge-dev/input";
+import { NetworkClientLibrary } from "@nanoforge-dev/network-client";
 
 import { CircleComponent, Controller, Position, RectangleComponent, Velocity } from "./components";
 import { controlPlayer, draw, move, packetHandler } from "./systems";

@@ -1,6 +1,3 @@
-export default {
-  useTabs: false,
-  singleQuote: false,
-  trailingComma: "all",
-  printWidth: 100,
-};
+import config from "@nanoforge-dev/utils-prettier-config";
+
+export default config;
