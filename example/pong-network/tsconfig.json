@@ -34,7 +34,7 @@
     "experimentalDecorators": true,
     "lib": ["ESNext", "esnext.disposable"],
     "target": "ESNext",
-    "useDefineForClassFields": true,
+    "useDefineForClassFields": true
   },
   "include": ["client/**/*.ts", "server/**/*.ts"],
   "exclude": ["node_modules", ".nanoforge"]
