@@ -51,7 +51,7 @@ function connectNewClient(newCli: number, network: NetworkServerLibrary, zip: an
 }
 
 function handleClientInput(clientId: number, key: string, network: NetworkServerLibrary, zip: any) {
-  let id = 0;
+  let id;
 
   if (clientId === cli1) {
     id = 1;

@@ -21,8 +21,7 @@
     "@nanoforge-dev/network-client": "workspace:*",
     "@nanoforge-dev/network-server": "workspace:*",
     "@nanoforge-dev/sound": "workspace:*",
-    "typescript": "catalog:core",
-    "vitest": "catalog:test"
+    "typescript": "catalog:core"
   },
   "private": true,
   "engines": {
