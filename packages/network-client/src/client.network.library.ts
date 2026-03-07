@@ -18,26 +18,26 @@ export class NetworkClientLibrary extends BaseNetworkLibrary {
   public override async __init(context: InitContext): Promise<void> {
     const config: ClientConfigNetwork = await context.config.registerConfig(ClientConfigNetwork);
 
-    if (config.serverTcpPort === undefined && config.serverUdpPort === undefined) {
+    if (config.SERVER_TCP_PORT === undefined && config.SERVER_UDP_PORT === undefined) {
       throw new NfConfigException("No server port specified to connect", this.__name);
     }
 
-    if (config.serverTcpPort !== undefined) {
+    if (config.SERVER_TCP_PORT !== undefined) {
       this.tcp = new TCPClient(
-        +config.serverTcpPort,
-        config.serverAddress,
-        config.magicValue,
-        config.wss,
+        +config.SERVER_TCP_PORT,
+        config.SERVER_ADDRESS,
+        config.MAGIC_VALUE,
+        config.WSS,
       );
       await this.tcp.connect();
     }
 
-    if (config.serverUdpPort !== undefined) {
+    if (config.SERVER_UDP_PORT !== undefined) {
       this.udp = new UDPClient(
-        +config.serverUdpPort,
-        config.serverAddress,
-        config.magicValue,
-        config.wss,
+        +config.SERVER_UDP_PORT,
+        config.SERVER_ADDRESS,
+        config.MAGIC_VALUE,
+        config.WSS,
       );
       await this.udp.connect();
     }

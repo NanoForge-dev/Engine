@@ -14,11 +14,6 @@ import { exampleSystem } from "./systems/example.system";
 export async function main(options: IRunOptions) {
   const app = NanoforgeFactory.createClient({
     tickRate: 60,
-    environment: {
-      serverAddress: "127.0.0.1",
-      serverTcpPort: "4445",
-      serverUdpPort: "4444",
-    },
   });
 
   const assetManager = new AssetManagerLibrary();
@@ -37,7 +32,15 @@ export async function main(options: IRunOptions) {
   app.useNetwork(network);
   app.use(Symbol("music"), music);
 
-  await app.init(options);
+  await app.init({
+    ...options,
+    env: {
+      ...options.env,
+      SERVER_ADDRESS: "127.0.0.1",
+      SERVER_TCP_PORT: "4445",
+      SERVER_UDP_PORT: "4444",
+    },
+  });
 
   const registry = ecs.registry;
 

@@ -31,7 +31,25 @@ bun add @nanoforge-dev/config
 
 ## Warning
 
-This library is of exclusive usage for other libraries. To put variables in the environment to allow libraries to use it through this config library, you must put it in factory options :
+This library is of exclusive usage for other libraries. To put variables in the environment to allow libraries to use it through this config library, you must put it in `.env` file at the root of your project (or in your environment) :
+
+```dotenv
+NANOFORGE_CLIENT_SERVER_TCP_PORT=4445
+NANOFORGE_CLIENT_SERVER_UDP_PORT=4444
+NANOFORGE_CLIENT_SERVER_ADDRESS=127.0.0.1
+```
+
+You must prefix your variables according to this table :
+
+| Prefix              | Availability             |
+| :------------------ | :----------------------- |
+| `NANOFORGE_CLIENT_` | Available in client only |
+| `NANOFORGE_SERVER_` | Available in server only |
+| `NANOFORGE_`        | Available in both apps   |
+
+⚠️ Prefixs are removed in libs
+
+You can also put it in init options (every value must be string or undefined) :
 
 ```ts
 import { type IRunOptions } from "@nanoforge-dev/common";
@@ -39,19 +57,21 @@ import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { NetworkLibrary } from "@nanoforge-dev/network";
 
 export async function main(options: IRunOptions) {
-  const app = NanoforgeFactory.createClient({
-    environment: {
-      serverTcpPort: "4445",
-      serverUdpPort: "4444",
-      serverAddress: "127.0.0.1",
-    },
-  });
+  const app = NanoforgeFactory.createClient();
 
   const network = new NetworkLibrary();
 
   app.useNetwork(network);
 
-  await app.init(options);
+  await app.init({
+    ...options,
+    env: {
+      ...options.env,
+      SERVER_TCP_PORT: "4445",
+      SERVER_UDP_PORT: "4444",
+      SERVER_ADDRESS: "127.0.0.1",
+    },
+  });
 
   await app.run();
 }
@@ -92,23 +112,23 @@ export class ClientConfigNetwork {
   @Expose()
   @IsOptional()
   @IsPort()
-  serverTcpPort?: string;
+  SERVER_TCP_PORT?: string;
 
   @Expose()
   @IsOptional()
   @IsPort()
-  serverUdpPort?: string;
+  SERVER_UDP_PORT?: string;
 
   // This var must be ip address or fqdn (it cannot be undefined)
   @Expose()
   @IsIpOrFQDN()
-  serverAddress?: string;
+  SERVER_ADDRESS?: string;
 
   // This var must be a byte length between 2 and 64. It can be undefined as it as a default value.
   @Expose()
   @Default("PACKET_END")
   @IsByteLength(2, 64)
-  magicValue!: string;
+  MAGIC_VALUE!: string;
 }
 ```
 

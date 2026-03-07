@@ -22,7 +22,6 @@ export abstract class NanoforgeApplication {
 
     this._options = {
       tickRate: 60,
-      environment: {},
       ...(options ?? {}),
     };
   }

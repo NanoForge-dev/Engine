@@ -12,7 +12,6 @@ import { controlPlayer, draw, move, packetHandler } from "./systems";
 
 export const app = NanoforgeFactory.createClient({
   tickRate: 60,
-  environment: { serverTcpPort: "4445", serverUdpPort: "4444", serverAddress: "127.0.0.1" },
 });
 
 export const layer = new Layer();
@@ -30,7 +29,15 @@ export const main = async (options: IRunOptions) => {
   app.useAssetManager(assetManager);
   app.useInput(input);
 
-  await app.init(options);
+  await app.init({
+    ...options,
+    env: {
+      ...options.env,
+      SERVER_TCP_PORT: "4445",
+      SERVER_UDP_PORT: "4444",
+      SERVER_ADDRESS: "127.0.0.1",
+    },
+  });
 
   const registry = ecsLibrary.registry;
 
