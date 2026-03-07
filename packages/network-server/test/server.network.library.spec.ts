@@ -37,23 +37,23 @@ describe("NetworkServerLibrary", () => {
   });
 
   describe("config validation", () => {
-    it("should throw NfConfigException when listeningInterface is not provided", async () => {
-      const ctx = makeContext({ listeningTcpPort: "9000", magicValue: "END" });
+    it("should throw NfConfigException when LISTENING_INTERFACE is not provided", async () => {
+      const ctx = makeContext({ LISTENING_TCP_PORT: "9000", MAGIC_VALUE: "END" });
       await expect(new NetworkServerLibrary().__init(ctx)).rejects.toThrow(NfConfigException);
     });
 
     it("should throw NfConfigException when neither TCP nor UDP port is provided", async () => {
-      const ctx = makeContext({ listeningInterface: "0.0.0.0", magicValue: "END" });
+      const ctx = makeContext({ LISTENING_INTERFACE: "0.0.0.0", MAGIC_VALUE: "END" });
       await expect(new NetworkServerLibrary().__init(ctx)).rejects.toThrow(NfConfigException);
     });
   });
 
   describe("initialization", () => {
-    it("should initialize a TCP server when only listeningTcpPort is provided", async () => {
+    it("should initialize a TCP server when only LISTENING_TCP_PORT is provided", async () => {
       const ctx = makeContext({
-        listeningTcpPort: "9000",
-        listeningInterface: "0.0.0.0",
-        magicValue: "END",
+        LISTENING_TCP_PORT: "9000",
+        LISTENING_INTERFACE: "0.0.0.0",
+        MAGIC_VALUE: "END",
       });
       const lib = new NetworkServerLibrary();
       await lib.__init(ctx);
@@ -61,11 +61,11 @@ describe("NetworkServerLibrary", () => {
       expect(lib.udp).toBeUndefined();
     });
 
-    it("should initialize a UDP server when only listeningUdpPort is provided", async () => {
+    it("should initialize a UDP server when only LISTENING_UDP_PORT is provided", async () => {
       const ctx = makeContext({
-        listeningUdpPort: "9001",
-        listeningInterface: "0.0.0.0",
-        magicValue: "END",
+        LISTENING_UDP_PORT: "9001",
+        LISTENING_INTERFACE: "0.0.0.0",
+        MAGIC_VALUE: "END",
       });
       const lib = new NetworkServerLibrary();
       await lib.__init(ctx);
@@ -75,10 +75,10 @@ describe("NetworkServerLibrary", () => {
 
     it("should initialize both TCP and UDP servers when both ports are provided", async () => {
       const ctx = makeContext({
-        listeningTcpPort: "9000",
-        listeningUdpPort: "9001",
-        listeningInterface: "0.0.0.0",
-        magicValue: "END",
+        LISTENING_TCP_PORT: "9000",
+        LISTENING_UDP_PORT: "9001",
+        LISTENING_INTERFACE: "0.0.0.0",
+        MAGIC_VALUE: "END",
       });
       const lib = new NetworkServerLibrary();
       await lib.__init(ctx);

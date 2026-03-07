@@ -9,7 +9,6 @@ import { bounce, move, packetHandler } from "./systems";
 
 export const app = NanoforgeFactory.createServer({
   tickRate: 60,
-  environment: { listeningTcpPort: "4445", listeningUdpPort: "4444" },
 });
 
 export const main = async (options: IRunOptions) => {
@@ -21,7 +20,10 @@ export const main = async (options: IRunOptions) => {
   app.useNetwork(network);
   app.useAssetManager(assetManager);
 
-  await app.init(options);
+  await app.init({
+    ...options,
+    env: { ...options.env, LISTENING_TCP_PORT: "4445", LISTENING_UDP_PORT: "4444" },
+  });
 
   const registry = ecsLibrary.registry;
 

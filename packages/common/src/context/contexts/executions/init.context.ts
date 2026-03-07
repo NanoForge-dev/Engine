@@ -6,6 +6,7 @@ import { BaseContext } from "./base.context";
 export class InitContext extends BaseContext {
   private readonly _canvas: IRunClientOptions["canvas"] | undefined;
   private readonly _files: IRunOptions["files"];
+  private readonly _env: Record<string, string | undefined>;
   private readonly _config: IConfigRegistry;
 
   constructor(
@@ -18,6 +19,7 @@ export class InitContext extends BaseContext {
 
     this._canvas = (options as IRunClientOptions)["canvas"];
     this._files = options.files;
+    this._env = options.env;
     this._config = configRegistry;
   }
 
@@ -27,6 +29,10 @@ export class InitContext extends BaseContext {
 
   get files(): IRunOptions["files"] {
     return this._files;
+  }
+
+  get env(): Record<string, string | undefined> {
+    return this._env;
   }
 
   get config(): IConfigRegistry {

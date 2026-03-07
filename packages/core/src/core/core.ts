@@ -30,7 +30,7 @@ export class Core {
 
   public async init(options: IRunOptions, appOptions: IApplicationOptions): Promise<void> {
     this.options = appOptions;
-    this._configRegistry = new ConfigRegistry(appOptions.environment);
+    this._configRegistry = new ConfigRegistry(options.env);
     await this.runInit(this.getInitContext(options));
   }
 
