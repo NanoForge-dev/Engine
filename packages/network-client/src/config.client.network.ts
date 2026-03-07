@@ -6,30 +6,32 @@ import {
   IsIpOrFQDN,
   IsOptional,
   IsPort,
+  TransformToBoolean,
 } from "@nanoforge-dev/config";
 
 export class ClientConfigNetwork {
   @Expose()
   @IsOptional()
   @IsPort()
-  serverTcpPort?: string;
+  SERVER_TCP_PORT?: string;
 
   @Expose()
   @IsOptional()
   @IsPort()
-  serverUdpPort?: string;
+  SERVER_UDP_PORT?: string;
 
   @Expose()
   @IsIpOrFQDN()
-  serverAddress!: string;
+  SERVER_ADDRESS!: string;
 
   @Expose()
   @Default("PACKET_END")
   @IsByteLength(2, 64)
-  magicValue!: string;
+  MAGIC_VALUE!: string;
 
   @Expose()
+  @TransformToBoolean()
   @IsBoolean()
   @Default(false)
-  wss!: boolean;
+  WSS!: boolean;
 }

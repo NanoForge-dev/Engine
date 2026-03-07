@@ -60,17 +60,17 @@ describe("NetworkClientLibrary", () => {
 
   describe("config validation", () => {
     it("should throw NfConfigException when neither TCP nor UDP port is provided", async () => {
-      const ctx = makeContext({ serverAddress: "127.0.0.1", magicValue: "END" });
+      const ctx = makeContext({ SERVER_ADDRESS: "127.0.0.1", MAGIC_VALUE: "END" });
       await expect(new NetworkClientLibrary().__init(ctx)).rejects.toThrow(NfConfigException);
     });
   });
 
   describe("initialization", () => {
-    it("should initialize a TCP client when only serverTcpPort is provided", async () => {
+    it("should initialize a TCP client when only SERVER_TCP_PORT is provided", async () => {
       const ctx = makeContext({
-        serverTcpPort: "8080",
-        serverAddress: "127.0.0.1",
-        magicValue: "END",
+        SERVER_TCP_PORT: "8080",
+        SERVER_ADDRESS: "127.0.0.1",
+        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
@@ -78,11 +78,11 @@ describe("NetworkClientLibrary", () => {
       expect(lib.udp).toBeUndefined();
     });
 
-    it("should initialize a UDP client when only serverUdpPort is provided", async () => {
+    it("should initialize a UDP client when only SERVER_UDP_PORT is provided", async () => {
       const ctx = makeContext({
-        serverUdpPort: "8081",
-        serverAddress: "127.0.0.1",
-        magicValue: "END",
+        SERVER_UDP_PORT: "8081",
+        SERVER_ADDRESS: "127.0.0.1",
+        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
@@ -92,10 +92,10 @@ describe("NetworkClientLibrary", () => {
 
     it("should initialize both TCP and UDP clients when both ports are provided", async () => {
       const ctx = makeContext({
-        serverTcpPort: "8080",
-        serverUdpPort: "8081",
-        serverAddress: "127.0.0.1",
-        magicValue: "END",
+        SERVER_TCP_PORT: "8080",
+        SERVER_UDP_PORT: "8081",
+        SERVER_ADDRESS: "127.0.0.1",
+        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);

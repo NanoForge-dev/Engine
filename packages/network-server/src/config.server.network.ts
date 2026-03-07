@@ -12,30 +12,30 @@ export class ServerConfigNetwork {
   @Expose()
   @IsOptional()
   @IsPort()
-  listeningUdpPort?: string;
+  LISTENING_TCP_PORT?: string;
 
   @Expose()
   @IsOptional()
   @IsPort()
-  listeningTcpPort?: string;
+  LISTENING_UDP_PORT?: string;
 
   @Expose()
   @Default("0.0.0.0")
   @IsIpOrFQDN()
-  listeningInterface!: string;
+  LISTENING_INTERFACE!: string;
 
   @Expose()
   @Default("PACKET_END")
   @IsByteLength(2, 64)
-  magicValue!: string;
+  MAGIC_VALUE!: string;
 
   @Expose()
   @IsString()
   @IsOptional()
-  cert?: string;
+  WSS_CERT?: string;
 
   @Expose()
   @IsString()
   @IsOptional()
-  key?: string;
+  WSS_KEY?: string;
 }

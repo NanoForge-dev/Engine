@@ -18,38 +18,38 @@ export class NetworkServerLibrary extends BaseNetworkLibrary {
   public override async __init(context: InitContext): Promise<void> {
     const config: ServerConfigNetwork = await context.config.registerConfig(ServerConfigNetwork);
 
-    if (config.listeningInterface === undefined) {
+    if (config.LISTENING_INTERFACE === undefined) {
       throw new NfConfigException("No listenning address provided", this.__name);
     }
-    if (config.listeningUdpPort === undefined && config.listeningTcpPort === undefined) {
+    if (config.LISTENING_TCP_PORT === undefined && config.LISTENING_UDP_PORT === undefined) {
       throw new NfConfigException("No listenning port specified", this.__name);
     }
 
     if (
-      (config.cert !== undefined && config.key === undefined) ||
-      (config.cert === undefined && config.key !== undefined)
+      (config.WSS_CERT !== undefined && config.WSS_KEY === undefined) ||
+      (config.WSS_CERT === undefined && config.WSS_KEY !== undefined)
     ) {
       throw new NfConfigException("Both cert and key must be provided together", this.__name);
     }
 
-    if (config.listeningTcpPort !== undefined) {
+    if (config.LISTENING_TCP_PORT !== undefined) {
       this.tcp = new TCPServer(
-        +config.listeningTcpPort,
-        config.listeningInterface,
-        config.magicValue,
-        config.cert,
-        config.key,
+        +config.LISTENING_TCP_PORT,
+        config.LISTENING_INTERFACE,
+        config.MAGIC_VALUE,
+        config.WSS_CERT,
+        config.WSS_KEY,
       );
       this.tcp.listen();
     }
 
-    if (config.listeningUdpPort !== undefined) {
+    if (config.LISTENING_UDP_PORT !== undefined) {
       this.udp = new UDPServer(
-        +config.listeningUdpPort,
-        config.listeningInterface,
-        config.magicValue,
-        config.cert,
-        config.key,
+        +config.LISTENING_UDP_PORT,
+        config.LISTENING_INTERFACE,
+        config.MAGIC_VALUE,
+        config.WSS_CERT,
+        config.WSS_KEY,
       );
       this.udp.listen();
     }
