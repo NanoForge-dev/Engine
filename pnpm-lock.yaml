@@ -73,8 +73,8 @@ catalogs:
       specifier: ^7.0.0
       version: 7.0.0
     eslint-plugin-format:
-      specifier: ^1.4.0
-      version: 1.5.0
+      specifier: ^2.0.1
+      version: 2.0.1
     eslint-plugin-prettier:
       specifier: ^5.5.5
       version: 5.5.5
@@ -790,7 +790,7 @@ importers:
         version: 7.0.0
       eslint-plugin-format:
         specifier: catalog:lint
-        version: 1.5.0(eslint@10.0.2(jiti@2.6.1))
+        version: 2.0.1(eslint@10.0.2(jiti@2.6.1))
       eslint-plugin-prettier:
         specifier: catalog:lint
         version: 5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.0.2(jiti@2.6.1)))(eslint@10.0.2(jiti@2.6.1))(prettier@3.8.1)
@@ -2475,8 +2475,8 @@ packages:
   eslint-parser-plain@0.1.1:
     resolution: {integrity: sha512-KRgd6wuxH4U8kczqPp+Oyk4irThIhHWxgFgLDtpgjUGVIS3wGrJntvZW/p6hHq1T4FOwnOtCNkvAI4Kr+mQ/Hw==}
 
-  eslint-plugin-format@1.5.0:
-    resolution: {integrity: sha512-jaeOKrxs79Nn6rMkLycPkLHvBVKcgsFG+RqNXb6W9iS9y2Q0NYGhFTLcDUdp5mf01X99wEkjtX2O8cumM7lNMQ==}
+  eslint-plugin-format@2.0.1:
+    resolution: {integrity: sha512-0BA65p5DAiuKtx5MmMJfPk9WaTjoHHbyVW7ZXRhaZoA1fdiMHhay9QRiDL2wr0hJWZxdF7CRThOK/70VUKVg2g==}
     peerDependencies:
       eslint: ^8.40.0 || ^9.0.0 || ^10.0.0
 
@@ -5166,7 +5166,7 @@ snapshots:
 
   eslint-parser-plain@0.1.1: {}
 
-  eslint-plugin-format@1.5.0(eslint@10.0.2(jiti@2.6.1)):
+  eslint-plugin-format@2.0.1(eslint@10.0.2(jiti@2.6.1)):
     dependencies:
       '@dprint/formatter': 0.5.1
       '@dprint/markdown': 0.21.1
