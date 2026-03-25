@@ -31,8 +31,8 @@ export class ApplicationConfig {
     this._libraryManager.set(sym, library);
   }
 
-  public getComponentSystemLibrary() {
-    return this._libraryManager.getComponentSystem();
+  public getComponentSystemLibrary<T extends IComponentSystemLibrary>() {
+    return this._libraryManager.getComponentSystem<T>();
   }
 
   public useComponentSystemLibrary(library: IComponentSystemLibrary) {

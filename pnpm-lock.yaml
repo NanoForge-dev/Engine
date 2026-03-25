@@ -420,6 +420,58 @@ importers:
         specifier: catalog:test
         version: 4.0.18(@types/node@25.5.0)(jiti@2.6.1)(yaml@2.8.2)
 
+  packages/core-editor:
+    dependencies:
+      '@nanoforge-dev/asset-manager':
+        specifier: workspace:*
+        version: link:../asset-manager
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../common
+      '@nanoforge-dev/ecs-client':
+        specifier: workspace:*
+        version: link:../ecs-client
+      '@nanoforge-dev/ecs-server':
+        specifier: workspace:*
+        version: link:../ecs-server
+      '@nanoforge-dev/input':
+        specifier: workspace:*
+        version: link:../input
+      class-transformer:
+        specifier: catalog:config
+        version: 0.5.1
+      class-validator:
+        specifier: catalog:config
+        version: 0.14.4
+    devDependencies:
+      '@favware/cliff-jumper':
+        specifier: catalog:ci
+        version: 6.0.0
+      '@nanoforge-dev/utils-eslint-config':
+        specifier: workspace:*
+        version: link:../../utils/eslint-config
+      '@nanoforge-dev/utils-prettier-config':
+        specifier: workspace:*
+        version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.8.1)
+      eslint:
+        specifier: catalog:lint
+        version: 10.0.2(jiti@2.6.1)
+      prettier:
+        specifier: catalog:lint
+        version: 3.8.1
+      tsup:
+        specifier: catalog:build
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.8)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: catalog:core
+        version: 5.9.3
+      vitest:
+        specifier: catalog:test
+        version: 4.0.18(@types/node@25.3.5)(jiti@2.6.1)(yaml@2.8.2)
+
   packages/ecs-client:
     dependencies:
       '@nanoforge-dev/common':

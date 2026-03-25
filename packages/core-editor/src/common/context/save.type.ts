@@ -17,6 +17,7 @@ export interface SaveLibrary {
 export interface SaveComponent {
   name: string;
   path: string;
+  paramsNames: string[];
 }
 
 export interface SaveSystem {
@@ -26,10 +27,7 @@ export interface SaveSystem {
 
 export interface SaveEntity {
   id: string;
-  components: {
-    name: string;
-    params: string[];
-  }[];
+  components: Record<string, Record<string, any>>;
 }
 
 export interface Save {

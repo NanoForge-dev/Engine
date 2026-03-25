@@ -1,13 +1,13 @@
 import {
   type IAssetManagerLibrary,
   type IComponentSystemLibrary,
-  type IEditorRunOptions,
   type ILibrary,
   type INetworkLibrary,
   NfNotInitializedException,
 } from "@nanoforge-dev/common";
 
 import { EditableApplicationContext } from "../common/context/contexts/application.editable-context";
+import { type IEditorRunOptions } from "../common/context/options.type";
 import { Core } from "../core/core";
 import { ApplicationConfig } from "./application-config";
 import type { IApplicationOptions } from "./application-options.type";

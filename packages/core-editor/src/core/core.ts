@@ -2,25 +2,29 @@ import {
   ClearContext,
   ClientLibraryManager,
   Context,
-  type IEditorRunOptions,
   type IRunnerLibrary,
   InitContext,
   type LibraryHandle,
   LibraryStatusEnum,
   NfNotInitializedException,
 } from "@nanoforge-dev/common";
+import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
+import { type ECSServerLibrary } from "@nanoforge-dev/ecs-server";
 
 import { type ApplicationConfig } from "../application/application-config";
 import type { IApplicationOptions } from "../application/application-options.type";
 import { type EditableApplicationContext } from "../common/context/contexts/application.editable-context";
 import { EditableExecutionContext } from "../common/context/contexts/executions/execution.editable-context";
 import { type EditableLibraryContext } from "../common/context/contexts/library.editable-context";
+import { type IEditorRunOptions } from "../common/context/options.type";
 import { ConfigRegistry } from "../config/config-registry";
+import { CoreEditor } from "../editor/core-editor";
 
 export class Core {
   private readonly config: ApplicationConfig;
   private readonly context: EditableApplicationContext;
   private options?: IApplicationOptions;
+  public editor?: CoreEditor;
   private _configRegistry?: ConfigRegistry;
 
   constructor(config: ApplicationConfig, context: EditableApplicationContext) {
@@ -30,6 +34,10 @@ export class Core {
 
   public async init(options: IEditorRunOptions, appOptions: IApplicationOptions): Promise<void> {
     this.options = appOptions;
+    this.editor = new CoreEditor(
+      options.editor,
+      this.config.getComponentSystemLibrary<ECSClientLibrary | ECSServerLibrary>().library,
+    );
     this._configRegistry = new ConfigRegistry(options.env);
     await this.runInit(this.getInitContext(options));
   }

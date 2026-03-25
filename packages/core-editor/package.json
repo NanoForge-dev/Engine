@@ -58,6 +58,8 @@
   "dependencies": {
     "@nanoforge-dev/asset-manager": "workspace:*",
     "@nanoforge-dev/common": "workspace:*",
+    "@nanoforge-dev/ecs-client": "workspace:*",
+    "@nanoforge-dev/ecs-server": "workspace:*",
     "@nanoforge-dev/input": "workspace:*",
     "class-transformer": "catalog:config",
     "class-validator": "catalog:config"
