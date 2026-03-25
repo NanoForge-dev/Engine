@@ -2,17 +2,11 @@ import { NfNotFound } from "@nanoforge-dev/common";
 import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 import { type ECSServerLibrary } from "@nanoforge-dev/ecs-server";
 
-import type { IEditorRunOptions } from "../common/context/options.type";
 import type { SaveComponent, SaveEntity } from "../common/context/save.type";
 
 export class CoreEditor {
-  private editor: IEditorRunOptions["editor"];
   private ecsLibrary: ECSClientLibrary | ECSServerLibrary;
-  constructor(
-    editor: IEditorRunOptions["editor"],
-    ecsLibrary: ECSClientLibrary | ECSServerLibrary,
-  ) {
-    this.editor = editor;
+  constructor(ecsLibrary: ECSClientLibrary | ECSServerLibrary) {
     this.ecsLibrary = ecsLibrary;
   }
 

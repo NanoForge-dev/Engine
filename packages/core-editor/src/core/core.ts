@@ -35,7 +35,6 @@ export class Core {
   public async init(options: IEditorRunOptions, appOptions: IApplicationOptions): Promise<void> {
     this.options = appOptions;
     this.editor = new CoreEditor(
-      options.editor,
       this.config.getComponentSystemLibrary<ECSClientLibrary | ECSServerLibrary>().library,
     );
     this._configRegistry = new ConfigRegistry(options.env);
