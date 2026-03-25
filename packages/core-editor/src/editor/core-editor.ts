@@ -15,11 +15,11 @@ export class CoreEditor {
     entityToReload.forEach(({ id, components }) => {
       Object.entries(components).forEach(([componentName, params]) => {
         const ogComponent = saveComponents.find(({ name: paramName }) => {
-          if (!ogComponent) {
-            throw new NfNotFound("Component: " + componentName + " not found in saved components");
-          }
           return paramName == componentName;
         });
+        if (!ogComponent) {
+          throw new NfNotFound("Component: " + componentName + " not found in saved components");
+        }
         const ecsComponent = reg.getComponents({ name: componentName }).get(Number(id));
         Object.entries(params).forEach(([paramName, paramValue]) => {
           ecsComponent[paramName] = paramValue;
