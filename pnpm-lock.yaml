@@ -431,9 +431,6 @@ importers:
       '@nanoforge-dev/ecs-client':
         specifier: workspace:*
         version: link:../ecs-client
-      '@nanoforge-dev/ecs-server':
-        specifier: workspace:*
-        version: link:../ecs-server
       '@nanoforge-dev/input':
         specifier: workspace:*
         version: link:../input

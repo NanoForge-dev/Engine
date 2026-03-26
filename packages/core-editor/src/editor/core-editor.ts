@@ -1,16 +1,15 @@
 import { NfNotFound } from "@nanoforge-dev/common";
-import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
-import { type ECSServerLibrary } from "@nanoforge-dev/ecs-server";
+import { type ECSClientLibrary, type Entity } from "@nanoforge-dev/ecs-client";
 
 import type { SaveComponent, SaveEntity } from "../common/context/save.type";
 
 export class CoreEditor {
-  private ecsLibrary: ECSClientLibrary | ECSServerLibrary;
-  constructor(ecsLibrary: ECSClientLibrary | ECSServerLibrary) {
+  private ecsLibrary: ECSClientLibrary;
+  constructor(ecsLibrary: ECSClientLibrary) {
     this.ecsLibrary = ecsLibrary;
   }
 
-  public askEntityHotReload(saveComponents: SaveComponent[], entityToReload: SaveEntity[]): void {
+  public askEntitiesHotReload(saveComponents: SaveComponent[], entityToReload: SaveEntity[]): void {
     const reg = this.ecsLibrary.registry;
     entityToReload.forEach(({ id, components }) => {
       Object.entries(components).forEach(([componentName, params]) => {
@@ -20,12 +19,24 @@ export class CoreEditor {
         if (!ogComponent) {
           throw new NfNotFound("Component: " + componentName + " not found in saved components");
         }
-        const ecsComponent = reg.getComponents({ name: componentName }).get(Number(id));
+        const ecsEntity: Entity = this.getEntityFromEntityId(id);
+        const ecsComponent = reg.getEntityComponent(ecsEntity, {
+          name: componentName,
+        });
         Object.entries(params).forEach(([paramName, paramValue]) => {
           ecsComponent[paramName] = paramValue;
         });
-        reg.getComponents({ name: componentName }).set(Number(id), ecsComponent);
+        reg.addComponent(ecsEntity, ecsComponent);
       });
     });
+  }
+
+  private getEntityFromEntityId(entityId: string): Entity {
+    const reg = this.ecsLibrary.registry;
+    return reg.entityFromIndex(
+      reg
+        .getComponentsConst({ name: "__RESERVED_ENTITY_ID" })
+        .getIndex({ name: "__RESERVED_ENTITY_ID", entityId: entityId }),
+    );
   }
 }
