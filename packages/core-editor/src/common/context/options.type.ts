@@ -1,3 +1,4 @@
+import { type EventEmitter } from "./event-emitter.type";
 import { type Save } from "./save.type";
 
 export type IEditorRunOptions = IEditorRunClientOptions | IEditorRunServerOptions;
@@ -8,6 +9,7 @@ export interface IEditorRunClientOptions {
   env: Record<string, string | undefined>;
   editor: {
     save: Save;
+    events: EventEmitter;
   };
 }
 export interface IEditorRunServerOptions {
@@ -16,5 +18,6 @@ export interface IEditorRunServerOptions {
   env: Record<string, string | undefined>;
   editor: {
     save: Save;
+    events: EventEmitter;
   };
 }

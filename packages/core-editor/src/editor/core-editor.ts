@@ -1,19 +1,37 @@
 import { NfNotFound } from "@nanoforge-dev/common";
 import { type ECSClientLibrary, type Entity } from "@nanoforge-dev/ecs-client";
 
-import type { SaveComponent, SaveEntity } from "../common/context/save.type";
+import { EventTypeEnum } from "../common/context/event-emitter.type";
+import { type IEditorRunOptions } from "../common/context/options.type";
 
 export class CoreEditor {
+  private editor: IEditorRunOptions["editor"];
   private ecsLibrary: ECSClientLibrary;
-  constructor(ecsLibrary: ECSClientLibrary) {
+  constructor(editor: IEditorRunOptions["editor"], ecsLibrary: ECSClientLibrary) {
+    this.editor = editor;
     this.ecsLibrary = ecsLibrary;
   }
 
-  public askEntitiesHotReload(saveComponents: SaveComponent[], entityToReload: SaveEntity[]): void {
+  public runEvents() {
+    const events: (EventTypeEnum | string)[] = this.editor.events.eventQueue;
+    while (events.length > 0) {
+      const event = events.shift();
+      switch (event) {
+        case EventTypeEnum.HOT_RELOAD:
+          this.askEntitiesHotReload();
+          break;
+        default:
+          console.warn(`Unknown event type ${event}`);
+      }
+    }
+  }
+
+  public askEntitiesHotReload(): void {
     const reg = this.ecsLibrary.registry;
-    entityToReload.forEach(({ id, components }) => {
+    const save = this.editor.save;
+    save.entities.forEach(({ id, components }) => {
       Object.entries(components).forEach(([componentName, params]) => {
-        const ogComponent = saveComponents.find(({ name: paramName }) => {
+        const ogComponent = save.components.find(({ name: paramName }) => {
           return paramName == componentName;
         });
         if (!ogComponent) {

@@ -33,9 +33,12 @@ export class Core {
 
   public async init(options: IEditorRunOptions, appOptions: IApplicationOptions): Promise<void> {
     this.options = appOptions;
-    this.editor = new CoreEditor(this.config.getComponentSystemLibrary<ECSClientLibrary>().library);
     this._configRegistry = new ConfigRegistry(options.env);
     await this.runInit(this.getInitContext(options));
+    this.editor = new CoreEditor(
+      options.editor,
+      this.config.getComponentSystemLibrary<ECSClientLibrary>().library,
+    );
   }
 
   public async run(): Promise<void> {
@@ -47,6 +50,7 @@ export class Core {
 
     const runner = async (delta: number) => {
       this.context.setDelta(delta);
+      this.editor?.runEvents();
       await this.runExecute(clientContext, libraries);
     };
 

@@ -1,57 +1,75 @@
 import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { type SaveComponent, type SaveEntity } from "../src/common/context/save.type";
+import { type EventEmitter, EventTypeEnum } from "../src/common/context/event-emitter.type";
+import type { IEditorRunOptions } from "../src/common/context/options.type";
+import { type Save, type SaveComponent, type SaveEntity } from "../src/common/context/save.type";
 import { CoreEditor } from "../src/editor/core-editor";
 
-const getIndex = vi.fn((component) => {
-  return Number(component.entityId.slice(-1));
-});
-
-const FakeRegistry = vi.fn(
-  class {
-    addComponent = vi.fn();
-    getComponentsConst = vi.fn(() => ({ getIndex }));
-    getEntityComponent = vi.fn((entity: number, component) => {
-      return (
-        {
-          2: {
-            Position: {
-              name: "Position",
-              x: 3,
-              y: 4,
-            },
-            Bullets: {
-              name: "Bullets",
-              number: 4,
-              bulletTypes: ["9mm"],
-            },
-            __RESERVED_ENTITY_ID: {
-              entityId: "ent2",
-            },
-          },
-          3: {
-            Position: {
-              name: "Position",
-              x: 7,
-              y: 8,
-            },
-            __RESERVED_ENTITY_ID: {
-              entityId: "ent3",
-            },
-          },
-        } as Record<string, Record<string, any>>
-      )[entity]?.[component.name];
-    });
-    entityFromIndex = vi.fn((index) => {
-      return index;
-    });
-  },
-);
-
 describe("EditorFeatures", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+  describe("eventEmitter", () => {
+    it("should execute eventQueue once", async () => {
+      const events: EventEmitter = {
+        eventQueue: [EventTypeEnum.HOT_RELOAD, EventTypeEnum.HOT_RELOAD],
+      };
+      const spyHotReload = vi
+        .spyOn(CoreEditor.prototype, "askEntitiesHotReload")
+        .mockImplementation(() => {});
+      new CoreEditor({ events } as IEditorRunOptions["editor"], {} as ECSClientLibrary).runEvents();
+      expect(spyHotReload).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe("askEntitiesHotReload", () => {
     it("should reload entities with new save variables", async () => {
+      const getIndex = vi.fn((component) => {
+        return Number(component.entityId.slice(-1));
+      });
+
+      const FakeRegistry = vi.fn(
+        class {
+          addComponent = vi.fn();
+          getComponentsConst = vi.fn(() => ({ getIndex }));
+          getEntityComponent = vi.fn((entity: number, component) => {
+            return (
+              {
+                2: {
+                  Position: {
+                    name: "Position",
+                    x: 3,
+                    y: 4,
+                  },
+                  Bullets: {
+                    name: "Bullets",
+                    number: 4,
+                    bulletTypes: ["9mm"],
+                  },
+                  __RESERVED_ENTITY_ID: {
+                    entityId: "ent2",
+                  },
+                },
+                3: {
+                  Position: {
+                    name: "Position",
+                    x: 7,
+                    y: 8,
+                  },
+                  __RESERVED_ENTITY_ID: {
+                    entityId: "ent3",
+                  },
+                },
+              } as Record<string, Record<string, any>>
+            )[entity]?.[component.name];
+          });
+          entityFromIndex = vi.fn((index) => {
+            return index;
+          });
+        },
+      );
+
       const components: SaveComponent[] = [
         {
           name: "Position",
@@ -89,10 +107,15 @@ describe("EditorFeatures", () => {
         },
       ];
       const fakeReg = new FakeRegistry();
-      new CoreEditor({ registry: fakeReg } as any as ECSClientLibrary).askEntitiesHotReload(
-        components,
-        entities,
-      );
+      new CoreEditor(
+        {
+          save: {
+            components,
+            entities,
+          } as any as Save,
+        } as any as IEditorRunOptions["editor"],
+        { registry: fakeReg } as any as ECSClientLibrary,
+      ).askEntitiesHotReload();
       expect(fakeReg.getComponentsConst).toHaveBeenCalledWith({ name: "__RESERVED_ENTITY_ID" });
       expect(getIndex).toHaveBeenNthCalledWith(1, {
         entityId: "ent2",
