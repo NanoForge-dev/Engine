@@ -23,6 +23,7 @@ export class UDPServer {
     magicValue: string,
     private _cert?: string,
     private _key?: string,
+    private iceServers: { urls: string; username: string; credential: string }[] = [],
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
     if (this._cert && this._key) {
@@ -164,7 +165,7 @@ export class UDPServer {
   }
 
   private setupRtcSendIceCandidates(webSocket: WebSocket) {
-    const pc = new RTCPeerConnection();
+    const pc = new RTCPeerConnection({ iceServers: this.iceServers });
     pc.onconnectionstatechange = () => {
       if (pc.connectionState === "failed") {
         console.error("ICE failed");

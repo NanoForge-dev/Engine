@@ -50,6 +50,7 @@ export class NetworkServerLibrary extends BaseNetworkLibrary {
         config.MAGIC_VALUE,
         config.WSS_CERT,
         config.WSS_KEY,
+        config.ICE_SERVERS,
       );
       this.udp.listen();
     }

@@ -1,6 +1,7 @@
 import {
   Default,
   Expose,
+  IsArray,
   IsByteLength,
   IsIpOrFQDN,
   IsOptional,
@@ -38,4 +39,9 @@ export class ServerConfigNetwork {
   @IsString()
   @IsOptional()
   WSS_KEY?: string;
+
+  @Expose()
+  @Default([])
+  @IsArray()
+  ICE_SERVERS!: { urls: string; username: string; credential: string }[];
 }
