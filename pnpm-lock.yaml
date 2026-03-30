@@ -54,8 +54,8 @@ catalogs:
       version: 4.10.0
   graphics:
     konva:
-      specifier: ^10.2.0
-      version: 10.2.0
+      specifier: ^10.2.3
+      version: 10.2.3
   lint:
     '@eslint/js':
       specifier: ^10.0.1
@@ -556,7 +556,7 @@ importers:
         version: link:../common
       konva:
         specifier: catalog:graphics
-        version: 10.2.0
+        version: 10.2.3
     devDependencies:
       '@favware/cliff-jumper':
         specifier: catalog:ci
@@ -2861,8 +2861,8 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
-  konva@10.2.0:
-    resolution: {integrity: sha512-JBoz0Xjbf49UPxCZegZ4WseqOzJ+C4AUDOtJ9eBve5RS5Fcq/u8TdBD5fDl/uPFInpC3a9uycm0sRyZpF4hheg==}
+  konva@10.2.3:
+    resolution: {integrity: sha512-NDGeIxm2nsQcp6oqZKS9T764JEi53RpQvpUxV2EK7Awm49fwdd1+EB1Nq1nyspRc0hOAKyKssoTFvPaKwiSUog==}
 
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -5545,7 +5545,7 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  konva@10.2.0: {}
+  konva@10.2.3: {}
 
   levn@0.4.1:
     dependencies:
