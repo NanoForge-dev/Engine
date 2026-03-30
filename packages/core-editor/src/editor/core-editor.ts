@@ -10,20 +10,11 @@ export class CoreEditor {
   constructor(editor: IEditorRunOptions["editor"], ecsLibrary: ECSClientLibrary) {
     this.editor = editor;
     this.ecsLibrary = ecsLibrary;
+    this.editor.coreEvents?.addListener(EventTypeEnum.HOT_RELOAD, this.askEntitiesHotReload);
   }
 
   public runEvents() {
-    const events: (EventTypeEnum | string)[] = this.editor.events.eventQueue;
-    while (events.length > 0) {
-      const event = events.shift();
-      switch (event) {
-        case EventTypeEnum.HOT_RELOAD:
-          this.askEntitiesHotReload();
-          break;
-        default:
-          console.warn(`Unknown event type ${event}`);
-      }
-    }
+    this.editor.coreEvents?.runEvents();
   }
 
   public askEntitiesHotReload(): void {

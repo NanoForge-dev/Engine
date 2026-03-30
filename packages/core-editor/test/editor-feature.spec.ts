@@ -1,24 +1,29 @@
 import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { type EventEmitter, EventTypeEnum } from "../src/common/context/event-emitter.type";
+import { EventTypeEnum } from "../src/common/context/event-emitter.type";
 import type { IEditorRunOptions } from "../src/common/context/options.type";
 import { type Save, type SaveComponent, type SaveEntity } from "../src/common/context/save.type";
 import { CoreEditor } from "../src/editor/core-editor";
+import { EventEmitter } from "../src/editor/event-emitter.manager";
 
 describe("EditorFeatures", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
+
   describe("eventEmitter", () => {
     it("should execute eventQueue once", async () => {
-      const events: EventEmitter = {
-        eventQueue: [EventTypeEnum.HOT_RELOAD, EventTypeEnum.HOT_RELOAD],
-      };
+      const events = new EventEmitter();
+      events.emitEvent(EventTypeEnum.HOT_RELOAD);
+      events.emitEvent(EventTypeEnum.HOT_RELOAD);
       const spyHotReload = vi
         .spyOn(CoreEditor.prototype, "askEntitiesHotReload")
         .mockImplementation(() => {});
-      new CoreEditor({ events } as IEditorRunOptions["editor"], {} as ECSClientLibrary).runEvents();
+      new CoreEditor(
+        { coreEvents: events } as IEditorRunOptions["editor"],
+        {} as ECSClientLibrary,
+      ).runEvents();
       expect(spyHotReload).toHaveBeenCalledTimes(2);
     });
   });

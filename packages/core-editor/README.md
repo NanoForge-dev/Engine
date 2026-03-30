@@ -16,17 +16,17 @@
 
 ## About
 
-`@nanoforge-dev/core` is a core package that contains game main loop. It is used to initialize the game and run it.
+`@nanoforge-dev/core-editor` is a core package that contains game main loop. It is used to initialize the game and run it.
 
 ## Installation
 
 **Node.js 24.11.0 or newer is required.**
 
 ```sh
-npm install @nanoforge-dev/core
-yarn add @nanoforge-dev/core
-pnpm add @nanoforge-dev/core
-bun add @nanoforge-dev/core
+npm install @nanoforge-dev/core-editor
+yarn add @nanoforge-dev/core-editor
+pnpm add @nanoforge-dev/core-editor
+bun add @nanoforge-dev/core-editor
 ```
 
 ## Example usage
@@ -34,10 +34,9 @@ bun add @nanoforge-dev/core
 Initialize the game in your main file.
 
 ```ts
-import { type IRunOptions } from "@nanoforge-dev/common";
-import { NanoforgeFactory } from "@nanoforge-dev/core";
+import { IEditorRunOptions, NanoforgeFactory } from "@nanoforge-dev/core-editor";
 
-export async function main(options: IRunClientOptions) {
+export async function main(options: IEditorRunOptions) {
   const app = NanoforgeFactory.createClient();
 
   await app.init(options);
@@ -63,6 +62,6 @@ If you don't understand something in the documentation, you are experiencing pro
 
 [documentation]: https://github.com/NanoForge-dev/Engine
 [discussions]: https://github.com/NanoForge-dev/Engine/discussions
-[source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/core
-[npm]: https://www.npmjs.com/package/@nanoforge-dev/core
+[source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/core-editor
+[npm]: https://www.npmjs.com/package/@nanoforge-dev/core-editor
 [contributing]: https://github.com/NanoForge-dev/Engine/blob/main/.github/CONTRIBUTING.md

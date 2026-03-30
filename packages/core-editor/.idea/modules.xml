@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/[NanoForge] Engine Core.iml" filepath="$PROJECT_DIR$/.idea/[NanoForge] Engine Core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/[NanoForge] Engine Core Editor.iml" filepath="$PROJECT_DIR$/.idea/[NanoForge] Engine Core Editor.iml" />
     </modules>
   </component>
 </project>
