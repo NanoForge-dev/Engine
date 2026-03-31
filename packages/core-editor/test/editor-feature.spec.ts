@@ -5,7 +5,7 @@ import { EventTypeEnum } from "../src/common/context/event-emitter.type";
 import type { IEditorRunOptions } from "../src/common/context/options.type";
 import { type Save, type SaveComponent, type SaveEntity } from "../src/common/context/save.type";
 import { CoreEditor } from "../src/editor/core-editor";
-import { EventEmitter } from "../src/editor/event-emitter.manager";
+import { EventEmitter } from "./helpers/event-emitter";
 
 describe("EditorFeatures", () => {
   afterEach(() => {

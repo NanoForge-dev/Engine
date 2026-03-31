@@ -2,7 +2,7 @@ import {
   type EventTypeEnum,
   type IEventEmitter,
   type ListenerType,
-} from "../common/context/event-emitter.type";
+} from "../../src/common/context/event-emitter.type";
 
 export class EventEmitter implements IEventEmitter {
   public listeners: Record<EventTypeEnum | string, ListenerType[]> = {};
