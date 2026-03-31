@@ -10,13 +10,13 @@ import {
 } from "@nanoforge-dev/common";
 import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 
-import { type ApplicationConfig } from "../application/application-config";
-import type { IApplicationOptions } from "../application/application-options.type";
-import { type EditableApplicationContext } from "../common/context/contexts/application.editable-context";
-import { EditableExecutionContext } from "../common/context/contexts/executions/execution.editable-context";
-import { type EditableLibraryContext } from "../common/context/contexts/library.editable-context";
+import { type ApplicationConfig } from "../../../core/src/application/application-config";
+import type { IApplicationOptions } from "../../../core/src/application/application-options.type";
+import { type EditableApplicationContext } from "../../../core/src/common/context/contexts/application.editable-context";
+import { EditableExecutionContext } from "../../../core/src/common/context/contexts/executions/execution.editable-context";
+import { type EditableLibraryContext } from "../../../core/src/common/context/contexts/library.editable-context";
+import { ConfigRegistry } from "../../../core/src/config/config-registry";
 import { type IEditorRunOptions } from "../common/context/options.type";
-import { ConfigRegistry } from "../config/config-registry";
 import { CoreEditor } from "../editor/core-editor";
 
 export class Core {

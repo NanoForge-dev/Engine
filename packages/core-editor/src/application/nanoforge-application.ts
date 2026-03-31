@@ -6,11 +6,11 @@ import {
   NfNotInitializedException,
 } from "@nanoforge-dev/common";
 
-import { EditableApplicationContext } from "../common/context/contexts/application.editable-context";
+import { ApplicationConfig } from "../../../core/src/application/application-config";
+import type { IApplicationOptions } from "../../../core/src/application/application-options.type";
+import { EditableApplicationContext } from "../../../core/src/common/context/contexts/application.editable-context";
 import { type IEditorRunOptions } from "../common/context/options.type";
 import { Core } from "../core/core";
-import { ApplicationConfig } from "./application-config";
-import type { IApplicationOptions } from "./application-options.type";
 
 export abstract class NanoforgeApplication {
   protected applicationConfig: ApplicationConfig;

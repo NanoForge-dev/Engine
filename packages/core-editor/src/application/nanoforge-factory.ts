@@ -1,4 +1,4 @@
-import { type IApplicationOptions } from "./application-options.type";
+import { type IApplicationOptions } from "../../../core/src/application/application-options.type";
 import { NanoforgeClient } from "./nanoforge-client";
 import { NanoforgeServer } from "./nanoforge-server";
 
