@@ -47,8 +47,8 @@ catalogs:
       version: 5.9.3
   docs:
     typedoc:
-      specifier: ^0.28.17
-      version: 0.28.17
+      specifier: ^0.28.18
+      version: 0.28.18
     typedoc-plugin-markdown:
       specifier: ^4.10.0
       version: 4.10.0
@@ -160,10 +160,10 @@ importers:
         version: 2.8.16
       typedoc:
         specifier: catalog:docs
-        version: 0.28.17(typescript@5.9.3)
+        version: 0.28.18(typescript@5.9.3)
       typedoc-plugin-markdown:
         specifier: catalog:docs
-        version: 4.10.0(typedoc@0.28.17(typescript@5.9.3))
+        version: 4.10.0(typedoc@0.28.18(typescript@5.9.3))
       typescript:
         specifier: catalog:core
         version: 5.9.3
@@ -3454,12 +3454,12 @@ packages:
     peerDependencies:
       typedoc: 0.28.x
 
-  typedoc@0.28.17:
-    resolution: {integrity: sha512-ZkJ2G7mZrbxrKxinTQMjFqsCoYY6a5Luwv2GKbTnBCEgV2ihYm5CflA9JnJAwH0pZWavqfYxmDkFHPt4yx2oDQ==}
+  typedoc@0.28.18:
+    resolution: {integrity: sha512-NTWTUOFRQ9+SGKKTuWKUioUkjxNwtS3JDRPVKZAXGHZy2wCA8bdv2iJiyeePn0xkmK+TCCqZFT0X7+2+FLjngA==}
     engines: {node: '>= 18', pnpm: '>= 10'}
     hasBin: true
     peerDependencies:
-      typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x
+      typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x || 6.0.x
 
   typescript-eslint@8.57.1:
     resolution: {integrity: sha512-fLvZWf+cAGw3tqMCYzGIU6yR8K+Y9NT2z23RwOjlNFF2HwSB3KhdEFI5lSBv8tNmFkkBShSjsCjzx1vahZfISA==}
@@ -6142,16 +6142,16 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
 
-  typedoc-plugin-markdown@4.10.0(typedoc@0.28.17(typescript@5.9.3)):
+  typedoc-plugin-markdown@4.10.0(typedoc@0.28.18(typescript@5.9.3)):
     dependencies:
-      typedoc: 0.28.17(typescript@5.9.3)
+      typedoc: 0.28.18(typescript@5.9.3)
 
-  typedoc@0.28.17(typescript@5.9.3):
+  typedoc@0.28.18(typescript@5.9.3):
     dependencies:
       '@gerrit0/mini-shiki': 3.23.0
       lunr: 2.3.9
       markdown-it: 14.1.1
-      minimatch: 9.0.9
+      minimatch: 10.2.4
       typescript: 5.9.3
       yaml: 2.8.2
 
