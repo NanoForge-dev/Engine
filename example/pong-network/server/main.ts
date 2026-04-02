@@ -20,10 +20,7 @@ export const main = async (options: IRunOptions) => {
   app.useNetwork(network);
   app.useAssetManager(assetManager);
 
-  await app.init({
-    ...options,
-    env: { ...options.env, LISTENING_TCP_PORT: "4445", LISTENING_UDP_PORT: "4444" },
-  });
+  await app.init(options);
 
   const registry = ecsLibrary.registry;
 

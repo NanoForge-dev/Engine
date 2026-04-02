@@ -29,15 +29,7 @@ export const main = async (options: IRunOptions) => {
   app.useAssetManager(assetManager);
   app.useInput(input);
 
-  await app.init({
-    ...options,
-    env: {
-      ...options.env,
-      SERVER_TCP_PORT: "4445",
-      SERVER_UDP_PORT: "4444",
-      SERVER_ADDRESS: "127.0.0.1",
-    },
-  });
+  await app.init(options);
 
   const registry = ecsLibrary.registry;
 

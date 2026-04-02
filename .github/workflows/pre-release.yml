@@ -12,7 +12,7 @@ on:
           - "@nanoforge-dev/common"
           - "@nanoforge-dev/config"
           - "@nanoforge-dev/core"
-          - "@nanoforge-dev/docgen"
+          - "@nanoforge-dev/core-editor"
           - "@nanoforge-dev/ecs-client"
           - "@nanoforge-dev/ecs-lib"
           - "@nanoforge-dev/ecs-server"

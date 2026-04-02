@@ -9,27 +9,27 @@ catalogs:
     tsup: ^8.5.1
   ci:
     '@commitlint/cli': ^20.5.0
-    '@commitlint/config-conventional': ^20.4.3
+    '@commitlint/config-conventional': ^20.5.0
     '@favware/cliff-jumper': ^6.0.0
-    '@nanoforge-dev/actions': ^1.1.0
+    '@nanoforge-dev/actions': ^1.2.3
     husky: ^9.1.7
-    lint-staged: ^16.3.3
+    lint-staged: ^16.4.0
   config:
     class-transformer: ^0.5.1
     class-validator: ^0.14.3
   core:
     '@types/node': ^25.5.0
-    turbo: ^2.8.16
-    typescript: ^5.9.3
+    turbo: ^2.9.3
+    typescript: ^6.0.2
   docs:
-    typedoc: ^0.28.17
-    typedoc-plugin-markdown: ^4.10.0
+    typedoc: ^0.28.18
+    typedoc-plugin-markdown: ^4.11.0
   graphics:
     konva: ^10.2.3
   lint:
     '@eslint/js': ^10.0.1
     '@trivago/prettier-plugin-sort-imports': ^6.0.2
-    eslint: ^10.0.3
+    eslint: ^10.1.0
     eslint-config-prettier: ^10.1.8
     eslint-formatter-pretty: ^7.0.0
     eslint-plugin-format: ^2.0.1
@@ -43,8 +43,8 @@ catalogs:
     wrtc: ^0.4.7
     ws: ^8.19.0
   test:
-    '@vitest/coverage-v8': ^4.0.18
-    vitest: ^4.0.18
+    '@vitest/coverage-v8': ^4.1.2
+    vitest: ^4.1.2
 
 onlyBuiltDependencies:
   - bun

@@ -38,7 +38,7 @@ body:
       description: List necessary versions here. This includes your package version, runtime version, operating system etc.
       placeholder: |
         - @nanoforge-dev/utils-eslint-config 1.0.0 (`npm ls @nanoforge-dev/utils-eslint-config` or another package)
-        - Node.js 24.11.0 (`node --version`)
+        - Node.js 25 (`node --version`)
         - TypeScript 5.9.3 (`npm ls typescript` if you use it)
         - macOS Ventura 13.3.1
     validations:

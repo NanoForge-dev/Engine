@@ -20,7 +20,7 @@
 
 ## Installation
 
-**Node.js 24.11.0 or newer is required.**
+**Node.js 25 or newer is required.**
 
 ```sh
 npm install @nanoforge-dev/asset-manager
