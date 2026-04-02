@@ -6,6 +6,8 @@ export type {
   EditorSystemManifest,
   System,
   Registry,
+  Entity,
+  SparseArray,
 } from "@nanoforge-dev/ecs-lib";
 
 export { ECSServerLibrary } from "./ecs-server-library";
