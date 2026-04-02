@@ -58,6 +58,10 @@
   description: "Related to Core library"
   color: "aaa3dc"
 
+- name: "packages:core-editor"
+  description: "Related to Core Editor library"
+  color: "aaa3dc"
+
 - name: "packages:ecs-client"
   description: "Related to ECSClient library"
   color: "aaa3dc"

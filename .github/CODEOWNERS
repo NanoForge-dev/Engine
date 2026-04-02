@@ -1,5 +1,7 @@
 *                           @Exeloo
 
+/packages/core              @Tchips46
+/packages/core-editor       @Tchips46
 /packages/ecs-client        @MartinFillon @Tchips46
 /packages/ecs-lib           @MartinFillon @Tchips46
 /packages/ecs-server        @MartinFillon @Tchips46

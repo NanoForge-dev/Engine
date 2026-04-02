@@ -15,6 +15,7 @@ body:
         - common
         - config
         - core
+        - core-editor
         - ecs-client
         - ecs-lib
         - ecs-server

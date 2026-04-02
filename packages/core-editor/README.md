@@ -22,7 +22,7 @@ If you want a core to run your game use the `@nanoforge-dev/core`.
 
 ## Installation
 
-**Node.js 24.11.0 or newer is required.**
+**Node.js 25 or newer is required.**
 
 ```sh
 npm install @nanoforge-dev/core-editor

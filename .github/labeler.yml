@@ -22,6 +22,12 @@ packages:core:
           - packages/core/*
           - packages/core/**/*
 
+packages:core-editor:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/core-editor/*
+          - packages/core-editor/**/*
+
 packages:ecs-client:
   - changed-files:
       - any-glob-to-any-file:

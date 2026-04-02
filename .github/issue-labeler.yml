@@ -14,6 +14,10 @@ packages:core:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\ncore\\n"
 
+packages:core-editor:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ncore-editor\\n"
+
 packages:ecs-client:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\necs-client\\n"
