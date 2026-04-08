@@ -29,7 +29,7 @@ catalogs:
   lint:
     '@eslint/js': ^10.0.1
     '@trivago/prettier-plugin-sort-imports': ^6.0.2
-    eslint: ^10.1.0
+    eslint: ^10.2.0
     eslint-config-prettier: ^10.1.8
     eslint-formatter-pretty: ^7.0.0
     eslint-plugin-format: ^2.0.1
