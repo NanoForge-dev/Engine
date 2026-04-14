@@ -17,7 +17,7 @@ export class InputHandler {
     }
   }
 
-  getKeyStatus(key: InputEnum): boolean | undefined {
-    return this.inputs[key];
+  getKeyStatus(key: InputEnum): boolean {
+    return this.inputs[key] || false;
   }
 }
