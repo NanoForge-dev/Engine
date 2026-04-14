@@ -4,7 +4,7 @@
   "description": "",
   "author": "",
   "scripts": {
-    "build": "nf build",
+    "build": "mkdir -p .nanoforge && nf build",
     "start": "nf start",
     "lint": "prettier --check . && eslint --format=pretty \"{client,server}/**/*.ts\"",
     "format": "prettier --write . && eslint --fix --format=pretty \"{client,server}/**/*.ts\""

@@ -5,7 +5,7 @@
   "description": "NanoForge Engine - End-to-End test game",
   "type": "module",
   "scripts": {
-    "build": "nf build",
+    "build": "mkdir -p .nanoforge && nf build",
     "start": "nf start"
   },
   "devDependencies": {
