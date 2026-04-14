@@ -18,10 +18,6 @@ class Position {
   ) {}
 }
 
-const getRunSystemsParams = (registry: any) => ({
-  libs: { getComponentSystem: () => ({ registry }) },
-});
-
 describe("Registry", () => {
   describe("entity management", () => {
     it("should spawn an entity with id 0", async () => {
@@ -116,7 +112,7 @@ describe("Registry", () => {
 
       for (let i = 0; i <= 15; i++) {
         expect(counter).toBe(i);
-        r.runSystems(getRunSystemsParams(r));
+        r.runSystems({});
       }
       expect(counter).toBe(16);
     });
@@ -148,12 +144,12 @@ describe("Registry", () => {
 
       expect(r.getComponents(Position).size()).toEqual(3);
 
-      r.runSystems(getRunSystemsParams(r));
+      r.runSystems({});
       expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(-1, -1));
       expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(1, 1));
       expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));
 
-      r.runSystems(getRunSystemsParams(r));
+      r.runSystems({});
       expect(r.getComponents(Position).get(e.getId())).toStrictEqual(new Position(0, 0));
       expect(r.getComponents(Position).get(e2.getId())).toStrictEqual(new Position(0, 0));
       expect(r.getComponents(Position).get(e3.getId())).toStrictEqual(new Position(0, 0));

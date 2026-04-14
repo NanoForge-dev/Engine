@@ -46,7 +46,7 @@ type ECSStringElement = {
   /**
    * Values allowed for the element
    */
-  enum?: string[];
+  enum?: string[] | Record<string, any>;
 } & ECSElementDefaults<"string", string>;
 
 /**
