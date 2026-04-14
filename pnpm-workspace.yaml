@@ -18,24 +18,24 @@ catalogs:
     class-transformer: ^0.5.1
     class-validator: ^0.14.3
   core:
-    '@types/node': ^25.5.0
-    turbo: ^2.9.3
-    typescript: ^6.0.2
+    '@types/node': ^25.6.0
+    turbo: ^2.9.6
+    typescript: ^5.9.3
   docs:
-    typedoc: ^0.28.18
+    typedoc: ^0.28.19
     typedoc-plugin-markdown: ^4.11.0
   graphics:
     konva: ^10.2.3
   lint:
     '@eslint/js': ^10.0.1
     '@trivago/prettier-plugin-sort-imports': ^6.0.2
-    eslint: ^10.1.0
+    eslint: ^10.2.0
     eslint-config-prettier: ^10.1.8
     eslint-formatter-pretty: ^7.0.0
     eslint-plugin-format: ^2.0.1
     eslint-plugin-prettier: ^5.5.5
     globals: ^17.3.0
-    prettier: ^3.8.1
+    prettier: ^3.8.2
     typescript-eslint: ^8.57.1
   network:
     '@mapbox/node-pre-gyp': ^2.0.3
@@ -43,8 +43,8 @@ catalogs:
     wrtc: ^0.4.7
     ws: ^8.19.0
   test:
-    '@vitest/coverage-v8': ^4.1.2
-    vitest: ^4.1.2
+    '@vitest/coverage-v8': ^4.1.4
+    vitest: ^4.1.4
 
 onlyBuiltDependencies:
   - bun

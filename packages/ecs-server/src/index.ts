@@ -1,3 +1,4 @@
+// @ts-ignore
 import "../lib/libecs.wasm";
 
 export type {
