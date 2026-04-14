@@ -1,3 +1,4 @@
+// @ts-ignore
 import ECSModule from "../lib/libecs";
 // @ts-ignore
 import "../lib/libecs.wasm";
