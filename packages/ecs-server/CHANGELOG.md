@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/ecs-server@1.1.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-server@1.1.0...@nanoforge-dev/ecs-server@1.1.1) - (2026-04-14)
+
+## Bug Fixes
+
+- **lib-ecs:** Not builded type required ([af77aa8](https://github.com/NanoForge-dev/Engine/commit/af77aa894c41555db86b08e3823a22d3bdd54534))
+
+## Features
+
+- **ecs:** Allow component params to be enum ([06e70f7](https://github.com/NanoForge-dev/Engine/commit/06e70f79454d09e0ed930d909e85d7c788b0ec0c))
+
 # [@nanoforge-dev/ecs-server@1.1.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-server@1.0.1...@nanoforge-dev/ecs-server@1.1.0) - (2026-04-02)
 
 ## Features
