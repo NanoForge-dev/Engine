@@ -1,3 +1,4 @@
+import ECSModule from "../lib/libecs";
 // @ts-ignore
 import "../lib/libecs.wasm";
 
@@ -12,3 +13,5 @@ export type {
 } from "@nanoforge-dev/ecs-lib";
 
 export { ECSServerLibrary } from "./ecs-server-library";
+
+export const Module = ECSModule;
