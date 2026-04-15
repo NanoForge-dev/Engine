@@ -70,8 +70,8 @@ catalogs:
       specifier: ^10.1.8
       version: 10.1.8
     eslint-formatter-pretty:
-      specifier: ^7.0.0
-      version: 7.0.0
+      specifier: ^7.1.0
+      version: 7.1.0
     eslint-plugin-format:
       specifier: ^2.0.1
       version: 2.0.1
@@ -836,7 +836,7 @@ importers:
         version: 10.1.8(eslint@10.2.0(jiti@2.6.1))
       eslint-formatter-pretty:
         specifier: catalog:lint
-        version: 7.0.0
+        version: 7.1.0
       eslint-plugin-format:
         specifier: catalog:lint
         version: 2.0.1(eslint@10.2.0(jiti@2.6.1))
@@ -2623,8 +2623,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-formatter-pretty@7.0.0:
-    resolution: {integrity: sha512-1CaE7Pnce8Csy+tlTEbFC2q5qgT5cJo2a0UkEOds+Y5+mI1nX3DApIhcBP8EPwV8TgTpLlzOfw8mcBJBAs3Y9Q==}
+  eslint-formatter-pretty@7.1.0:
+    resolution: {integrity: sha512-iyPrgpwKC3MMM75Wxn0VouD89HolpG+BL95NOxgwOWO0R+Omapo7gFX2xcGVsUDS7KiXLtDuynLbNbOARSE7YA==}
     engines: {node: '>=18'}
 
   eslint-formatting-reporter@0.0.0:
@@ -5404,7 +5404,7 @@ snapshots:
     dependencies:
       eslint: 10.2.0(jiti@2.6.1)
 
-  eslint-formatter-pretty@7.0.0:
+  eslint-formatter-pretty@7.1.0:
     dependencies:
       '@types/eslint': 9.6.1
       ansi-escapes: 7.3.0
