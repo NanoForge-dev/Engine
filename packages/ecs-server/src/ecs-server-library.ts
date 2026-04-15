@@ -6,7 +6,7 @@ import { default as Module } from "../lib/libecs";
 export class ECSServerLibrary extends AbstractECSLibrary {
   constructor() {
     super();
-    this.path = "assets/libecs.wasm";
+    this.path = "libecs.wasm";
   }
 
   get __name(): string {

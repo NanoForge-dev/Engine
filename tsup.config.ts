@@ -22,7 +22,7 @@ export function createTsupConfig({
   dts = true,
   sourcemap = true,
   esbuildOptions = (options) => {
-    options.assetNames = "assets/[name]";
+    options.assetNames = "[name]";
   },
   esbuildPlugins = [],
   treeshake = false,
