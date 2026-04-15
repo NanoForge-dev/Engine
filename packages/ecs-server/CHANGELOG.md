@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/ecs-server@1.1.3](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-server@1.1.2...@nanoforge-dev/ecs-server@1.1.3) - (2026-04-15)
+
+## Bug Fixes
+
+- Rollback and remove assets dir in tsup config (#301) ([46df4b9](https://github.com/NanoForge-dev/Engine/commit/46df4b9bb88df445d300fa1bebe65548f1a6231e)) by @Exeloo
+
 # [@nanoforge-dev/ecs-server@1.1.2](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-server@1.1.1...@nanoforge-dev/ecs-server@1.1.2) - (2026-04-15)
 
 ## Bug Fixes
