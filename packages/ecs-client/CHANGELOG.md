@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/ecs-client@1.1.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-client@1.1.0...@nanoforge-dev/ecs-client@1.1.1) - (2026-04-15)
+
+## Bug Fixes
+
+- Change assets dir to fix wasm import (#298) ([eb33c16](https://github.com/NanoForge-dev/Engine/commit/eb33c166f9ba51a24e97e37b4c43fd14fd61291d)) by @Exeloo
+
 # [@nanoforge-dev/ecs-client@1.1.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-client@1.0.1...@nanoforge-dev/ecs-client@1.1.0) - (2026-04-02)
 
 ## Features
