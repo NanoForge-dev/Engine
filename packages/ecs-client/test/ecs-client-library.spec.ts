@@ -34,7 +34,7 @@ const configRegistry = {} as IConfigRegistry;
 const initContext = new InitContext(appContext, libraryManager, configRegistry, {
   // @ts-ignore
   canvas: null,
-  files: new Map([["/libecs.wasm", "./lib/libecs.wasm"]]),
+  files: new Map([["/assets/libecs.wasm", "./lib/libecs.wasm"]]),
 });
 const clearContext = new ClearContext(appContext, libraryManager);
 libraryManager.setAssetManager(assetManager);
