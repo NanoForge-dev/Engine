@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/ecs-lib@1.1.2](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-lib@1.1.1...@nanoforge-dev/ecs-lib@1.1.2) - (2026-04-16)
+
+## Bug Fixes
+
+- **ecs-lib:** Component params needs to be ordered (#309) ([c83b04f](https://github.com/NanoForge-dev/Engine/commit/c83b04f3b22f6b5d60a83b822d85c132c3df9652)) by @Tchips46
+
 # [@nanoforge-dev/ecs-lib@1.1.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-lib@1.1.0...@nanoforge-dev/ecs-lib@1.1.1) - (2026-04-14)
 
 ## Features
