@@ -111,7 +111,7 @@ export type EditorComponentManifest = {
   /**
    * Parameters of the component
    */
-  params: Map<string, ECSElement>;
+  params: ECSElement[];
 };
 
 /**
