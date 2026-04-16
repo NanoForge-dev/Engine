@@ -29,20 +29,20 @@ export default ExampleComponent.name;
 export const EDITOR_COMPONENT_MANIFEST: EditorComponentManifest = {
   name: "Example",
   description: "Example component description",
-  params: {
-    paramA: {
+  params: [
+    {
       type: "string",
       name: "Param A",
       description: "Param A description",
       example: "Example value",
     },
-    paramB: {
+    {
       type: "number",
       name: "Param B",
       description: "Param B description",
       example: 3,
     },
-    paramC: {
+    {
       type: "boolean",
       name: "Param C",
       description: "Param C description",
@@ -51,5 +51,5 @@ export const EDITOR_COMPONENT_MANIFEST: EditorComponentManifest = {
       // Not required because it has a default value
       optional: true,
     },
-  },
+  ],
 };
