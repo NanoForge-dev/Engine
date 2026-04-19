@@ -34,6 +34,10 @@ describe("Graphics2DLibrary", () => {
       expect(() => library.stage).toThrow();
     });
 
+    it("should throw when layer is accessed before __init", () => {
+      expect(() => library.baseLayer).toThrow();
+    });
+
     it("should throw when __init is called with a null canvas", async () => {
       await expect(library.__init(makeContext(null))).rejects.toThrow();
     });
