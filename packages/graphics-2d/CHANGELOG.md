@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/graphics-2d@1.0.2](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/graphics-2d@1.0.1...@nanoforge-dev/graphics-2d@1.0.2) - (2026-04-19)
+
+## Features
+
+- **graphics:** Add base layer and change stage size to fit the original canva (#312) ([3e9bc83](https://github.com/NanoForge-dev/Engine/commit/3e9bc83c7ba27f3636139fa858da35810dd90c2d)) by @Tchips46
+- Add core editor contribution ressources (#263) ([6c27bf0](https://github.com/NanoForge-dev/Engine/commit/6c27bf08b7d894d96940d2c572e224c01c48e374)) by @Exeloo
+
+## Testing
+
+- Add unit and e2e tests (#244) ([d593579](https://github.com/NanoForge-dev/Engine/commit/d593579f149370e1d4f32eec5cac5d251fc31f9c)) by @Exeloo
+
 # [@nanoforge-dev/graphics-2d@1.0.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/graphics-2d@1.0.0...@nanoforge-dev/graphics-2d@1.0.1) - (2026-02-16)
 
 ## Documentation
