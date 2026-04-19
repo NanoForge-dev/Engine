@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/ecs-client@1.1.3](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-client@1.1.2...@nanoforge-dev/ecs-client@1.1.3) - (2026-04-19)
+
 # [@nanoforge-dev/ecs-client@1.1.2](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-client@1.1.1...@nanoforge-dev/ecs-client@1.1.2) - (2026-04-15)
 
 ## Bug Fixes
