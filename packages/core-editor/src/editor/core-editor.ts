@@ -10,7 +10,10 @@ export class CoreEditor {
   constructor(editor: IEditorRunOptions["editor"], ecsLibrary: ECSClientLibrary) {
     this.editor = editor;
     this.ecsLibrary = ecsLibrary;
-    this.editor.coreEvents?.addListener(EventTypeEnum.HOT_RELOAD, this.askEntitiesHotReload);
+    this.editor.coreEvents?.addListener(
+      EventTypeEnum.HOT_RELOAD,
+      this.askEntitiesHotReload.bind(this),
+    );
   }
 
   public runEvents() {
@@ -44,7 +47,7 @@ export class CoreEditor {
     const reg = this.ecsLibrary.registry;
     return reg.entityFromIndex(
       reg
-        .getComponentsConst({ name: "__RESERVED_ENTITY_ID" })
+        .getComponents({ name: "__RESERVED_ENTITY_ID" })
         .getIndex({ name: "__RESERVED_ENTITY_ID", entityId: entityId }),
     );
   }
