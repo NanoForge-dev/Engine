@@ -37,7 +37,7 @@ describe("EditorFeatures", () => {
       const FakeRegistry = vi.fn(
         class {
           addComponent = vi.fn();
-          getComponentsConst = vi.fn(() => ({ getIndex }));
+          getComponents = vi.fn(() => ({ getIndex }));
           getEntityComponent = vi.fn((entity: number, component) => {
             return (
               {
@@ -121,7 +121,7 @@ describe("EditorFeatures", () => {
         } as any as IEditorRunOptions["editor"],
         { registry: fakeReg } as any as ECSClientLibrary,
       ).askEntitiesHotReload();
-      expect(fakeReg.getComponentsConst).toHaveBeenCalledWith({ name: "__RESERVED_ENTITY_ID" });
+      expect(fakeReg.getComponents).toHaveBeenCalledWith({ name: "__RESERVED_ENTITY_ID" });
       expect(getIndex).toHaveBeenNthCalledWith(1, {
         entityId: "ent2",
         name: "__RESERVED_ENTITY_ID",
