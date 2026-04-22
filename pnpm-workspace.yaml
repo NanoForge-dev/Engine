@@ -35,7 +35,7 @@ catalogs:
     eslint-plugin-format: ^2.0.1
     eslint-plugin-prettier: ^5.5.5
     globals: ^17.3.0
-    prettier: ^3.8.2
+    prettier: ^3.8.3
     typescript-eslint: ^8.57.1
   network:
     '@mapbox/node-pre-gyp': ^2.0.3
