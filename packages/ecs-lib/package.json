@@ -49,7 +49,7 @@
   },
   "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
-    "build": "tsc --noEmit && tsup",
+    "build": "tsc --noEmit && tsdown --config-loader unrun",
     "clean": "make fclean",
     "lint": "prettier --check . && eslint --format=pretty src",
     "format": "prettier --write . && eslint --fix --format=pretty src",
@@ -69,7 +69,7 @@
     "@types/node": "catalog:core",
     "eslint": "catalog:lint",
     "prettier": "catalog:lint",
-    "tsup": "catalog:build",
+    "tsdown": "catalog:build",
     "typescript": "catalog:core",
     "vitest": "catalog:test"
   },

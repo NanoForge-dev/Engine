@@ -27,9 +27,6 @@
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
     "prepare": "husky"
   },
-  "dependencies": {
-    "tslib": "^2.8.1"
-  },
   "devDependencies": {
     "@commitlint/cli": "catalog:ci",
     "@commitlint/config-conventional": "catalog:ci",
@@ -43,7 +40,7 @@
     "husky": "catalog:ci",
     "lint-staged": "catalog:ci",
     "prettier": "catalog:lint",
-    "tsup": "catalog:build",
+    "tsdown": "catalog:build",
     "turbo": "catalog:core",
     "typedoc": "catalog:docs",
     "typedoc-plugin-markdown": "catalog:docs",

@@ -41,9 +41,10 @@
     "isolatedModules": true,
 
     // Language and Environment
-    "experimentalDecorators": true,
+    "rootDir": ".",
     "lib": ["ESNext", "esnext.disposable", "DOM"],
     "target": "ESNext",
+    "experimentalDecorators": true,
     "useDefineForClassFields": true
   },
   "exclude": ["node_modules"]
