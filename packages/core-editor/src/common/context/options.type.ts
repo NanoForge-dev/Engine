@@ -4,7 +4,7 @@ import { type Save } from "./save.type";
 export type IEditorRunOptions = IEditorRunClientOptions | IEditorRunServerOptions;
 
 export interface IEditorRunClientOptions {
-  canvas: HTMLCanvasElement;
+  container: HTMLDivElement;
   files: Map<string, string>;
   env: Record<string, string | undefined>;
   editor: {

@@ -33,7 +33,7 @@ const appContext = new EditableApplicationContext(libraryManager);
 const configRegistry = {} as IConfigRegistry;
 const initContext = new InitContext(appContext, libraryManager, configRegistry, {
   // @ts-ignore
-  canvas: null,
+  container: null,
   files: new Map([["/libecs.wasm", "./lib/libecs.wasm"]]),
 });
 const clearContext = new ClearContext(appContext, libraryManager);

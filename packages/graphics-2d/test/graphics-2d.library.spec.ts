@@ -5,13 +5,13 @@ import { EditableApplicationContext } from "../../core/src/common/context/contex
 import { EditableLibraryManager } from "../../core/src/common/library/manager/library.manager";
 import { Graphics2DLibrary } from "../src";
 
-const makeContext = (canvas: HTMLCanvasElement | null) => {
+const makeContext = (container: HTMLDivElement | null) => {
   const libraryManager = new EditableLibraryManager();
   const appContext = new EditableApplicationContext(libraryManager);
   const configRegistry = {} as IConfigRegistry;
   return new InitContext(appContext, libraryManager, configRegistry, {
     // @ts-ignore
-    canvas,
+    container,
     files: new Map(),
   });
 };
@@ -38,7 +38,7 @@ describe("Graphics2DLibrary", () => {
       expect(() => library.baseLayer).toThrow();
     });
 
-    it("should throw when __init is called with a null canvas", async () => {
+    it("should throw when __init is called with a null container", async () => {
       await expect(library.__init(makeContext(null))).rejects.toThrow();
     });
   });

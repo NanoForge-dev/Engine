@@ -11,7 +11,7 @@ const makeContext = (files: Map<string, string>) => {
   const configRegistry = {} as IConfigRegistry;
   return new InitContext(appContext, libraryManager, configRegistry, {
     // @ts-ignore
-    canvas: null,
+    container: null,
     files,
   });
 };

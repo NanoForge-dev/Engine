@@ -21,13 +21,13 @@ export class Graphics2DLibrary extends BaseGraphicsLibrary {
   }
 
   public override async __init(context: InitContext): Promise<void> {
-    if (!context.canvas) {
-      throw new Error("Can't initialize the canvas context");
+    if (!context.container) {
+      throw new Error("Can't initialize the container context");
     }
     this._stage = new Graphics.Stage({
-      container: context.canvas.parentElement as HTMLDivElement,
-      width: context.canvas.offsetWidth,
-      height: context.canvas.offsetHeight,
+      container: context.container,
+      width: context.container.offsetWidth,
+      height: context.container.offsetHeight,
     });
     this._baseLayer = new Graphics.Layer();
     this._stage.add(this._baseLayer);

@@ -4,7 +4,7 @@ import { type ApplicationContext } from "../application.context";
 import { BaseContext } from "./base.context";
 
 export class InitContext extends BaseContext {
-  private readonly _canvas: IRunClientOptions["canvas"] | undefined;
+  private readonly _container: IRunClientOptions["container"] | undefined;
   private readonly _files: IRunOptions["files"];
   private readonly _env: Record<string, string | undefined>;
   private readonly _config: IConfigRegistry;
@@ -17,14 +17,14 @@ export class InitContext extends BaseContext {
   ) {
     super(context, libraryManager);
 
-    this._canvas = (options as IRunClientOptions)["canvas"];
+    this._container = (options as IRunClientOptions)["container"];
     this._files = options.files;
     this._env = options.env;
     this._config = configRegistry;
   }
 
-  get canvas(): IRunClientOptions["canvas"] | undefined {
-    return this._canvas;
+  get container(): IRunClientOptions["container"] | undefined {
+    return this._container;
   }
 
   get files(): IRunOptions["files"] {
