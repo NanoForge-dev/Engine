@@ -1,7 +1,7 @@
 export type IRunOptions = IRunClientOptions | IRunServerOptions;
 
 export interface IRunClientOptions {
-  canvas: HTMLCanvasElement;
+  container: HTMLDivElement;
   files: Map<string, string>;
   env: Record<string, string | undefined>;
 }
