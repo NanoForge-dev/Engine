@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/common@1.1.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/common@1.1.0...@nanoforge-dev/common@1.1.1) - (2026-04-29)
+
+## Bug Fixes
+
+- **render:** Change specific container canva for general html div (#323) ([6ea75f4](https://github.com/NanoForge-dev/Engine/commit/6ea75f4f3c1aa3d2f46bdbea1467f580cb9000bc)) by @Tchips46
+
 # [@nanoforge-dev/common@1.1.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/common@1.0.1...@nanoforge-dev/common@1.1.0) - (2026-04-02)
 
 ## Features
