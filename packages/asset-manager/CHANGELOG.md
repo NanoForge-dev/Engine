@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/asset-manager@1.0.2](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/asset-manager@1.0.1...@nanoforge-dev/asset-manager@1.0.2) - (2026-04-29)
+
+## Bug Fixes
+
+- **render:** Change specific container canva for general html div (#323) ([6ea75f4](https://github.com/NanoForge-dev/Engine/commit/6ea75f4f3c1aa3d2f46bdbea1467f580cb9000bc)) by @Tchips46
+
+## Features
+
+- Add core editor contribution ressources (#263) ([6c27bf0](https://github.com/NanoForge-dev/Engine/commit/6c27bf08b7d894d96940d2c572e224c01c48e374)) by @Exeloo
+
+## Testing
+
+- Add unit and e2e tests (#244) ([d593579](https://github.com/NanoForge-dev/Engine/commit/d593579f149370e1d4f32eec5cac5d251fc31f9c)) by @Exeloo
+
 # [@nanoforge-dev/asset-manager@1.0.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/asset-manager@1.0.0...@nanoforge-dev/asset-manager@1.0.1) - (2026-02-16)
 
 ## Documentation
