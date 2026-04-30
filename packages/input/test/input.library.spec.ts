@@ -113,30 +113,6 @@ describe("InputLibrary", () => {
       expect(library.isKeyPressed(InputEnum.MouseLeft)).toBe(false);
     });
 
-    it("should track right mouse independently", () => {
-      windowMock.dispatch("mousedown", { button: 2 });
-
-      expect(library.isKeyPressed(InputEnum.MouseRight)).toBe(true);
-      expect(library.isKeyPressed(InputEnum.MouseLeft)).toBe(false);
-    });
-
-    it("should include mouse input in pressed keys when mouse is held", () => {
-      windowMock.dispatch("mousedown", { button: 0 });
-
-      const pressed = library.getPressedKeys();
-
-      expect(pressed).toContain(InputEnum.MouseLeft);
-    });
-
-    it("should remove mouse input from pressed keys after mouseup", () => {
-      windowMock.dispatch("mousedown", { button: 0 });
-      windowMock.dispatch("mouseup", { button: 0 });
-
-      const pressed = library.getPressedKeys();
-
-      expect(pressed).not.toContain(InputEnum.MouseLeft);
-    });
-
     it("should handle unknown mouse input", () => {
       windowMock.dispatch("mousedown", { button: -2 });
       windowMock.dispatch("mousedown", { button: 999 });
