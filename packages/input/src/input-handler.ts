@@ -1,4 +1,4 @@
-import { InputEnum } from "./input.enum";
+import { InputEnum, MouseEnum } from "./input.enum";
 
 export class InputHandler {
   public inputs: Record<string, boolean> = {};
@@ -10,6 +10,20 @@ export class InputHandler {
 
     window.addEventListener("keyup", (e: KeyboardEvent) => {
       this.inputs[e.code] = false;
+    });
+
+    window.addEventListener("mousedown", (e: MouseEvent) => {
+      const mouseButton = MouseEnum[e.button];
+      if (!mouseButton) return;
+
+      this.inputs[mouseButton] = true;
+    });
+
+    window.addEventListener("mouseup", (e: MouseEvent) => {
+      const mouseButton = MouseEnum[e.button];
+      if (!mouseButton) return;
+
+      this.inputs[mouseButton] = false;
     });
 
     for (const key in InputEnum) {

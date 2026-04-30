@@ -2,15 +2,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { InputEnum, InputLibrary } from "../src";
 
+type MockInputEvent = {
+  code?: string;
+  button?: number;
+};
+
 const makeWindowMock = () => {
-  const listeners: Record<string, ((e: KeyboardEvent) => void)[]> = {};
+  const listeners: Record<string, ((e: MockInputEvent) => void)[]> = {};
   return {
-    addEventListener: vi.fn((event: string, handler: (e: KeyboardEvent) => void) => {
+    addEventListener: vi.fn((event: string, handler: (e: MockInputEvent) => void) => {
       if (!listeners[event]) listeners[event] = [];
       listeners[event].push(handler);
     }),
-    dispatch: (event: string, e: Partial<KeyboardEvent>) => {
-      listeners[event]?.forEach((h) => h(e as KeyboardEvent));
+    dispatch: (event: string, e: Partial<MockInputEvent>) => {
+      listeners[event]?.forEach((h) => h(e as MockInputEvent));
     },
   };
 };
@@ -95,6 +100,51 @@ describe("InputLibrary", () => {
       const pressed = library.getPressedKeys();
       expect(pressed).not.toContain(InputEnum.KeyA);
       expect(pressed).toContain(InputEnum.Space);
+    });
+
+    it("should return true for left mouse after mousedown", () => {
+      windowMock.dispatch("mousedown", { button: 0 });
+      expect(library.isKeyPressed(InputEnum.MouseLeft)).toBe(true);
+    });
+
+    it("should return false for left mouse after mousedown then mouseup", () => {
+      windowMock.dispatch("mousedown", { button: 0 });
+      windowMock.dispatch("mouseup", { button: 0 });
+      expect(library.isKeyPressed(InputEnum.MouseLeft)).toBe(false);
+    });
+
+    it("should track right mouse independently", () => {
+      windowMock.dispatch("mousedown", { button: 2 });
+
+      expect(library.isKeyPressed(InputEnum.MouseRight)).toBe(true);
+      expect(library.isKeyPressed(InputEnum.MouseLeft)).toBe(false);
+    });
+
+    it("should include mouse input in pressed keys when mouse is held", () => {
+      windowMock.dispatch("mousedown", { button: 0 });
+
+      const pressed = library.getPressedKeys();
+
+      expect(pressed).toContain(InputEnum.MouseLeft);
+    });
+
+    it("should remove mouse input from pressed keys after mouseup", () => {
+      windowMock.dispatch("mousedown", { button: 0 });
+      windowMock.dispatch("mouseup", { button: 0 });
+
+      const pressed = library.getPressedKeys();
+
+      expect(pressed).not.toContain(InputEnum.MouseLeft);
+    });
+
+    it("should handle unknown mouse input", () => {
+      windowMock.dispatch("mousedown", { button: -2 });
+      windowMock.dispatch("mousedown", { button: 999 });
+      windowMock.dispatch("mouseup", { button: 999 });
+
+      const pressed = library.getPressedKeys();
+
+      expect(pressed).toHaveLength(0);
     });
   });
 });

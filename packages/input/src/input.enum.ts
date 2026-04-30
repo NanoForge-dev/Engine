@@ -141,4 +141,17 @@ export enum InputEnum {
   BrowserBack = "BrowserBack",
   LaunchApp1 = "LaunchApp1",
   LaunchMail = "LaunchMail",
+  MouseLeft = "MouseLeft",
+  MouseMiddle = "MouseMiddle",
+  MouseRight = "MouseRight",
+  Back = "BackButton",
+  Forward = "Forward",
+}
+
+export enum MouseEnum {
+  MouseLeft,
+  MouseMiddle,
+  MouseRight,
+  Back,
+  Forward,
 }
