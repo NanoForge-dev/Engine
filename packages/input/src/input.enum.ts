@@ -147,11 +147,3 @@ export enum InputEnum {
   Back = "BackButton",
   Forward = "Forward",
 }
-
-export enum MouseEnum {
-  MouseLeft,
-  MouseMiddle,
-  MouseRight,
-  Back,
-  Forward,
-}
