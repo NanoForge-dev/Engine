@@ -270,3 +270,6 @@ src/**/*.d.ts
 public/
 compile_commands.json
 emsdk/
+
+# mint-tsdocs cache
+docs/.tsdocs/

@@ -1,0 +1,63 @@
+---
+title: "network-client API"
+icon: "book"
+description: "API reference for the client networking package"
+---
+
+# network-client API
+
+## TCPClient
+
+### connect()
+
+Initiate a WebSocket connection to the server, for example `ws://<ip>:<port>`.
+
+Returns: `Promise<void>`
+
+### isConnected()
+
+Return `true` when the underlying WebSocket is open.
+
+Returns: `boolean`
+
+### sendData(data)
+
+Send a payload to the server.
+
+Parameter `data`: `Uint8Array` raw payload bytes.
+
+Returns: `void`
+
+### getReceivedPackets()
+
+Return an array of complete packets that were reassembled from received chunks.
+
+Returns: `Uint8Array[]`
+
+## UDPClient
+
+### connect()
+
+Open a WebSocket for signaling, create an `RTCPeerConnection`, and initiate an SDP offer.
+
+Returns: `Promise<void>`
+
+### isConnected()
+
+Return `true` when the `RTCDataChannel` is open.
+
+Returns: `boolean`
+
+### sendData(data)
+
+Send a payload on the data channel.
+
+Parameter `data`: `Uint8Array` raw payload bytes.
+
+Returns: `void`
+
+### getReceivedPackets()
+
+Return an array of complete packets reassembled from received data-channel chunks.
+
+Returns: `Uint8Array[]`

@@ -275,3 +275,6 @@ lib/libecs.js
 compile_commands.json
 emsdk/
 docs/xml
+
+# mint-tsdocs cache
+docs/.tsdocs/

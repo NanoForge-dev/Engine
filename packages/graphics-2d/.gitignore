@@ -265,3 +265,6 @@ dist
 # Compiled files
 src/**/*.js
 src/**/*.d.ts
+
+# mint-tsdocs cache
+docs/.tsdocs/

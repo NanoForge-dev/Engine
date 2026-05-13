@@ -1,0 +1,23 @@
+---
+title: "Network Overview"
+icon: "book"
+description: "Overview of the engine networking docs"
+---
+
+# Network Overview
+
+This page describes the engine's networking libraries: `network-server` and `network-client`. Together they provide a small, pragmatic networking layer used by the example `pong-network` game.
+
+## Goals
+
+- Keep the protocol minimal and predictable for multiplayer games.
+- Use well-understood transports: TCP for reliable control messages and UDP for low-latency, best-effort state updates.
+- Provide clear validation hooks such as magic values and versioning so malformed packets are ignored early.
+
+## Related Pages
+
+- [Network Client](network-client.mdx)
+- [Network Server](network-server.mdx)
+- [Packet Framing](packet-framing.mdx)
+- [Network Server API](network-server-api.mdx)
+- [Network Client API](network-client-api.mdx)

@@ -56,7 +56,8 @@
     "test:unit": "make fclean && make -j 16 && vitest run --config ../../vitest.config.ts",
     "prepack": "pnpm run build && pnpm run lint",
     "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/ecs-lib/*'",
-    "release": "cliff-jumper"
+    "release": "cliff-jumper",
+    "mint-tsdocs": "mint-tsdocs generate"
   },
   "dependencies": {
     "@nanoforge-dev/common": "workspace:*"

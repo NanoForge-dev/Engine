@@ -24,6 +24,7 @@ catalogs:
   docs:
     typedoc: ^0.28.19
     typedoc-plugin-markdown: ^4.11.0
+    mint-tsdocs: ^0.0.8
   graphics:
     konva: ^10.2.3
   lint:

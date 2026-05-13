@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/mint-tsdocs/lib/schemas/config.schema.json",
+  "entryPoint": "dist/index.d.cts",
+  "outputFolder": "../../docs/network-server",
+  "lint": {
+    "eslint": {
+      "enabled": true
+    }
+  }
+}

@@ -1,0 +1,83 @@
+---
+title: "network-server API"
+icon: "book"
+description: "API reference for the server networking package"
+---
+
+# network-server API
+
+## TCPServer
+
+### listen()
+
+Start the WebSocket server and begin accepting clients.
+
+Returns: `void`
+
+### getConnectedClients()
+
+Return a snapshot array of numeric client IDs currently connected.
+
+Returns: `number[]`
+
+### sendToEverybody(data)
+
+Send a payload to every connected client.
+
+Parameter `data`: `Uint8Array` raw payload bytes.
+
+Returns: `void`
+
+### sendToClient(clientId, data)
+
+Send a payload to the client identified by `clientId`.
+
+Parameter `clientId`: `number` numeric client identifier.
+
+Parameter `data`: `Uint8Array` payload bytes.
+
+Returns: `void`
+
+### getReceivedPackets()
+
+Parse and return complete packets received from each client. Each packet is a `Uint8Array` buffer.
+
+Returns: `Map<number, Uint8Array[]>`
+
+## UDPServer
+
+### listen()
+
+Start the signaling WebSocket and accept incoming client offers.
+
+Returns: `void`
+
+### getConnectedClients()
+
+Return a snapshot array of client IDs with active data channels.
+
+Returns: `number[]`
+
+### sendToEverybody(data)
+
+Send a payload to every connected data channel.
+
+Parameter `data`: `Uint8Array` raw payload bytes.
+
+Returns: `void`
+
+### sendToClient(clientId, data)
+
+Send a payload to a single client data channel.
+
+Parameter `clientId`: `number`
+
+Parameter `data`: `Uint8Array`
+
+Returns: `void`
+
+### getReceivedPackets()
+
+Parse incoming channel chunks and return a map of complete packets per client.
+
+Returns: `Map<number, Uint8Array[]>`

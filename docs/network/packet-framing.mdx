@@ -1,0 +1,34 @@
+---
+title: "Packet Framing"
+icon: "book"
+description: "How packets are framed and reassembled"
+---
+
+# Packet Framing
+
+This note explains how packets are framed and reassembled in the network packages. The framing strategy is simple and robust against transport fragmentation or aggregation.
+
+## Concept
+
+- Each logical packet is a payload of bytes that the application wants to send, whether JSON or binary.
+- Before sending, the library appends a configurable terminator string, or magic value, to the end of the payload. The default value in the project config is `PACKET_END`.
+- The terminator is applied as bytes using UTF-8 encoding, so it becomes a unique byte suffix that marks the end of a logical packet.
+
+## Why Use an End Terminator
+
+- Transports like WebSocket and RTC DataChannel may split or combine application messages into arbitrary chunks. A terminator lets a receiver reliably detect the end of each logical packet regardless of how the transport fragments or aggregates bytes.
+- A short, human-readable terminator makes debugging easier.
+- The terminator is configurable so you can choose a value that does not collide with your payload contents, which matters especially for raw or binary payloads.
+
+## Sender Logic
+
+1. Serialize the application message into bytes, for example JSON to UTF-8 bytes or a binary codec output.
+2. Append the configured terminator bytes to the end of the payload.
+3. Send the resulting buffer on the transport, either WebSocket or DataChannel.
+
+## Receiver Logic
+
+1. Accumulate incoming chunks of bytes into a per-connection buffer.
+2. Repeatedly search the accumulated buffer for the terminator sequence.
+3. For each occurrence, extract bytes from the start of the buffer up to, but not including, the terminator. That is a complete logical packet.
+4. Remove the extracted packet and trailing terminator from the buffer, then continue searching. Keep any leftover bytes, which represent a partial packet, for the next incoming chunk.

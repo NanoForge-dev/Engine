@@ -1,0 +1,21 @@
+---
+title: "Registry"
+icon: "book"
+description: "Registry and WebAssembly notes"
+---
+
+# Registry
+
+The registry class is written in C++ and exposed to WebAssembly using Emscripten. That choice keeps the performance benefits of C++ for entity and component management while still making the code available to web applications.
+
+## Design Choices
+
+This design makes some trade-offs between performance and ease of use. A pure C++ ECS would be easier to use on its own, but exposing it to WebAssembly means the interface has to balance clarity and browser-friendly integration.
+
+### Const Correctness
+
+In a regular C++ ECS, const correctness is a given, but when exposing C++ to WebAssembly the boundaries do not map perfectly to JavaScript. Methods that would typically return const references in C++ may return non-const references or copies when exposed to WebAssembly. We keep the const correctness in the C++ code to preserve intent and clarity within the C++ domain, even if it does not fully carry over to the WebAssembly interface.
+
+### Error Handling
+
+Any thrown exceptions in C++ will result in a runtime error in JavaScript. That can make error messages less descriptive or user-friendly than native JavaScript errors. To mitigate that, thorough testing and validation in the C++ code is recommended before issues reach the WebAssembly layer.
