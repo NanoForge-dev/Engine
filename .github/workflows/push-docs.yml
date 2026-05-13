@@ -55,8 +55,8 @@ jobs:
           ./scripts/build_docs.sh
           cd ..
           rm docs/engine -rf
-          mkdir -p docs/engine
-          cp -r engine/docs/* docs/engine
+          mkdir -p docs/docs/engine
+          cp -r engine/docs/* docs/docs/engine
           cd docs
           git add . || echo "No changes to add"
           git commit -m "chore(engine): updating docs" || echo "No changes to commit"

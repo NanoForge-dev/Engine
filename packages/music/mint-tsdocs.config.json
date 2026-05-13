@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/mint-tsdocs/lib/schemas/config.schema.json",
   "entryPoint": "dist/index.d.cts",
-  "outputFolder": "../../docs/music",
+  "outputFolder": "../../docs/api/music",
   "lint": {
     "eslint": {
       "enabled": true

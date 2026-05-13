@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/mint-tsdocs/lib/schemas/config.schema.json",
   "entryPoint": "dist/index.d.cts",
-  "outputFolder": "../../docs/core-editor",
+  "outputFolder": "../../docs/api/core-editor",
   "lint": {
     "eslint": {
       "enabled": true

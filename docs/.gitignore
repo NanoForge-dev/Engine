@@ -1,16 +1,1 @@
-Doxyfile
-snippets
-sound/
-network-server
-network-client
-music
-input
-graphics-2d
-ecs-server
-ecs-lib
-ecs-client
-core
-core-editor
-config
-common
-asset-manager
+api
