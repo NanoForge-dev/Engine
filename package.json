@@ -45,8 +45,6 @@
     "prettier": "catalog:lint",
     "tsdown": "catalog:build",
     "turbo": "catalog:core",
-    "typedoc": "catalog:docs",
-    "typedoc-plugin-markdown": "catalog:docs",
     "typescript": "catalog:core",
     "vitest": "catalog:test"
   },
