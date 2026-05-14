@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/mint-tsdocs/lib/schemas/config.schema.json",
+  "entryPoint": "dist/index.d.cts",
+  "outputFolder": "../../docs/api/graphics-2d",
+  "lint": {
+    "eslint": {
+      "enabled": true
+    }
+  }
+}

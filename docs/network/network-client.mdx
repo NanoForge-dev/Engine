@@ -1,0 +1,59 @@
+---
+title: "Client Networking (network-client)"
+icon: "book"
+description: "How the client-side networking package works"
+---
+
+# Client Networking (network-client)
+
+This document describes how the `network-client` package connects to a `network-server` instance and the concrete APIs used from client-side code.
+
+## Overview
+
+A client connects to a single server instance. The package uses one TCP/WebSocket control channel and can also negotiate a single WebRTC data channel for unreliable traffic.
+
+Client responsibilities in a game are typically:
+
+- Initiate a TCP connection and send control commands such as join, play, and input.
+- Optionally negotiate a WebRTC data channel for receiving server snapshots or sending low-latency updates.
+
+## Example
+
+It works the same with UDP:
+
+```javascript
+// Wait for connection to be established
+async function waitForConnection() {
+  if (network.tcp?.isConnected()) return;
+
+  return new Promise((resolve) => {
+    const check = () => {
+      if (network.tcp.isConnected()) {
+        resolve();
+      } else {
+        setTimeout(check, 50);
+      }
+    };
+
+    check();
+  });
+}
+
+await waitForConnection();
+
+// Send a JSON-encoded packet
+network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ hello: "world" })));
+
+// Receive raw server packets
+const latestPackets = getReceivedPackets();
+
+// Decode packets if encoded as JSON
+const decodedPackets = latestPackets.map((packet) => {
+  return JSON.parse(new TextDecoder().decode(packet));
+});
+```
+
+## Notes
+
+- See [Network Client API](network-client-api.mdx) for the full list of available functions.
+- For packet framing and terminator semantics, see [Packet Framing](packet-framing.mdx).

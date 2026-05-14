@@ -1,0 +1,21 @@
+---
+title: "Writing Web Assembly"
+icon: "book"
+description: "Guidance for WebAssembly modules"
+---
+
+# Writing Web Assembly
+
+## Code Splitting
+
+When writing WebAssembly modules, it is important to consider code splitting for readability and maintainability. We try to split binding and logic into separate files wherever possible. That keeps the codebase organized and makes it easier to navigate.
+
+For example, in the ECS package, the binding logic is in `.cpp` files while the core logic resides in `.hpp` files. That separation lets developers focus on either the bindings or the logic without having to work through both at the same time.
+
+## Documentation
+
+When documenting WebAssembly modules, we follow the same general approach as C++ documentation. Doxygen-style comments are used to provide clear explanations of classes, methods, and parameters. That documentation is important for developers who will use or maintain the modules because it provides the necessary context and usage information.
+
+## Logging
+
+Logging in WebAssembly is costly in memory because of the interaction between C++ and JavaScript. For that reason, logging from the JavaScript side is preferred whenever possible. If logging from C++ is necessary, be aware of the performance implications and the risk of memory leaks. WebAssembly memory is limited, so excessive logging can lead to out-of-memory errors.

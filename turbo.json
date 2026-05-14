@@ -42,6 +42,19 @@
       ],
       "outputs": [],
       "outputLogs": "errors-only"
+    },
+    "mint-tsdocs": {
+      "dependsOn": ["^mint-tsdocs"],
+      "inputs": [
+        "src/**",
+        "wasm/**",
+        "test/**",
+        "package.json",
+        "tsconfig.json",
+        "mint-tsdocs.config.ts"
+      ],
+      "outputs": ["../../docs"],
+      "outputLogs": "errors-only"
     }
   }
 }

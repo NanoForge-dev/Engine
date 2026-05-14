@@ -25,11 +25,13 @@
     "test": "pnpm run test:unit && pnpm run test:e2e",
     "test:unit": "turbo run test:unit --concurrency=5",
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "docs": "turbo run mint-tsdocs --concurrency=5"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:ci",
     "@commitlint/config-conventional": "catalog:ci",
+    "@microsoft/api-extractor": "^7.58.7",
     "@nanoforge-dev/actions": "catalog:ci",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
@@ -39,11 +41,10 @@
     "eslint": "catalog:lint",
     "husky": "catalog:ci",
     "lint-staged": "catalog:ci",
+    "mint-tsdocs": "catalog:docs",
     "prettier": "catalog:lint",
     "tsdown": "catalog:build",
     "turbo": "catalog:core",
-    "typedoc": "catalog:docs",
-    "typedoc-plugin-markdown": "catalog:docs",
     "typescript": "catalog:core",
     "vitest": "catalog:test"
   },

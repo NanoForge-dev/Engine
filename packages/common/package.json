@@ -53,7 +53,8 @@
     "test:unit": "vitest run --config ../../vitest.config.ts",
     "prepack": "pnpm run build && pnpm run lint",
     "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/common/*'",
-    "release": "cliff-jumper"
+    "release": "cliff-jumper",
+    "mint-tsdocs": "mint-tsdocs generate"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "catalog:ci",

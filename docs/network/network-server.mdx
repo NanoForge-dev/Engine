@@ -1,0 +1,44 @@
+---
+title: "Server Networking (network-server)"
+icon: "book"
+description: "How the server-side networking package works"
+---
+
+# Server Networking (network-server)
+
+This document explains the `network-server` package implementation and the APIs used from server-side code.
+
+## Overview
+
+The server listens on configured ports and accepts client connections. A single server process can accept many clients, and typical responsibilities in a game are:
+
+- Accept reliable control messages from clients over the TCP/WebSocket channel.
+- Optionally establish `RTCPeerConnection`s via WebSocket signaling to receive unreliable, unordered data channels for low-latency state updates.
+
+## Example
+
+It works the same with UDP:
+
+```javascript
+// Send everybody a JSON-encoded packet
+network.tcp.sendToEverybody(new TextEncoder().encode(JSON.stringify({ type: "are you here" })));
+
+// Check connected clients
+const connectedClients = getConnectedClients();
+
+// Receive all packets
+const allPackets = network.tcp.getReceivedPackets();
+
+// Get first client packets
+const firstClientPackets = map.get(connectedClients[0]);
+
+// Decode packets if encoded as JSON
+const decodedPackets = firstClientPackets.map((packet) => {
+  return JSON.parse(new TextDecoder().decode(packet));
+});
+```
+
+## Notes
+
+- See [Network Server API](network-server-api.mdx) for the full list of available functions.
+- For packet framing and terminator semantics, see [Packet Framing](packet-framing.mdx).

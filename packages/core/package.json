@@ -53,7 +53,8 @@
     "test:unit": "vitest run --config ../../vitest.config.ts",
     "prepack": "pnpm run build && pnpm run lint",
     "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/core/*'",
-    "release": "cliff-jumper"
+    "release": "cliff-jumper",
+    "mint-tsdocs": "mint-tsdocs generate"
   },
   "dependencies": {
     "@nanoforge-dev/asset-manager": "workspace:*",

@@ -2,5 +2,14 @@
   "$schema": "https://json.schemastore.org/tsconfig.json",
   "extends": "../../tsconfig.json",
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "declaration": true,
+    "paths": {
+      "/snippets/*": ["./docs/snippets/*"]
+    }
+  },
+  "mdx": {
+    "checkMdx": true
+  }
 }

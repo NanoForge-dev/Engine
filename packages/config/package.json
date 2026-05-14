@@ -52,7 +52,8 @@
     "format": "prettier --write . && eslint --fix --format=pretty src",
     "prepack": "pnpm run build && pnpm run lint",
     "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/config/*'",
-    "release": "cliff-jumper"
+    "release": "cliff-jumper",
+    "mint-tsdocs": "mint-tsdocs generate"
   },
   "dependencies": {
     "class-transformer": "catalog:config",
