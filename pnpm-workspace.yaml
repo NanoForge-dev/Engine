@@ -19,7 +19,7 @@ catalogs:
     class-validator: ^0.14.3
   core:
     '@types/node': ^25.6.0
-    turbo: ^2.9.9
+    turbo: ^2.9.14
     typescript: ^6.0.3
   docs:
     typedoc: ^0.28.19
