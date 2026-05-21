@@ -19,7 +19,7 @@ export class InputLibrary extends BaseInputLibrary {
     this._inputHandler = new InputHandler();
   }
 
-  public async __run() {
+  public override async __run() {
     if (!this._inputHandler) this.throwNotInitializedError();
     this._inputHandler.resetPerFrame();
   }
