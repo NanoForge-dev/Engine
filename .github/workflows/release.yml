@@ -1,47 +1,21 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      package:
-        description: "The published name of a single package to release"
-        type: choice
-        required: false
-        options:
-          - "all"
-          - "@nanoforge-dev/asset-manager"
-          - "@nanoforge-dev/common"
-          - "@nanoforge-dev/config"
-          - "@nanoforge-dev/core"
-          - "@nanoforge-dev/core-editor"
-          - "@nanoforge-dev/ecs-client"
-          - "@nanoforge-dev/ecs-lib"
-          - "@nanoforge-dev/ecs-server"
-          - "@nanoforge-dev/graphics-2d"
-          - "@nanoforge-dev/input"
-          - "@nanoforge-dev/music"
-          - "@nanoforge-dev/network-client"
-          - "@nanoforge-dev/network-server"
-          - "@nanoforge-dev/sound"
-          - "@nanoforge-dev/utils-eslint-config"
-          - "@nanoforge-dev/utils-prettier-config"
-      exclude:
-        description: "Comma separated list of packages to exclude from release (if not depended upon)"
-        required: false
-        type: string
-      dry_run:
-        description: Perform a dry run?
-        type: boolean
-        default: false
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
-  npm-publish:
-    name: npm publish
+  release:
+    name: Release
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'NanoForge-dev'
+    if: github.repository_owner == 'NanoForge-dev' && github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/nanoforge@')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -50,11 +24,42 @@ jobs:
         uses: ./.github/actions/prepare
 
       - name: Release packages
-        uses: ./node_modules/@nanoforge-dev/actions/dist/release-packages
+        uses: ./node_modules/@nanoforge-dev/actions/actions/release-packages
         with:
-          package: ${{ inputs.package }}
-          exclude: ${{ inputs.exclude }}
-          dry: ${{ inputs.dry_run }}
+          packages: "@nanoforge-dev/asset-manager,@nanoforge-dev/common,@nanoforge-dev/config,@nanoforge-dev/core,@nanoforge-dev/core-editor,@nanoforge-dev/ecs-client,@nanoforge-dev/ecs-lib,@nanoforge-dev/ecs-server,@nanoforge-dev/graphics-2d,@nanoforge-dev/input,@nanoforge-dev/music,@nanoforge-dev/network-client,@nanoforge-dev/network-server,@nanoforge-dev/sound"
+          tag-format: "{version}"
+          latest: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-single-package:
+    name: Release
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'NanoForge-dev' && github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/') && !startsWith(github.head_ref, 'releases/nanoforge@')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Prepare
+        uses: ./.github/actions/prepare
+
+      - id: get-package
+        name: Get package name
+        uses: actions/github-script@0.9.0
+        with:
+          script: |
+            const branch = '${{ github.head_ref }}';
+            const nameAndVersion = branch.replace('releases/', '');
+            const name = nameAndVersion.split('@')[0];
+            const package = `@nanoforge-dev/${name}`;
+            core.setOutput('package', package)
+
+      - name: Release packages
+        uses: ./node_modules/@nanoforge-dev/actions/actions/release-packages
+        with:
+          packages: ${{ steps.get-package.outputs.package }}
+          latest: false
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
