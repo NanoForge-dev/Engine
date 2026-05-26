@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/sound@1.3.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/sound@1.0.1...@nanoforge-dev/sound@1.3.0) - (2026-05-26)
+
+## Features
+
+- Add core editor contribution ressources (#263) ([6c27bf0](https://github.com/NanoForge-dev/Engine/commit/6c27bf08b7d894d96940d2c572e224c01c48e374)) by @Exeloo
+
+## Refactor
+
+- **docs:** Migrate to mdx (#343) ([66f66a7](https://github.com/NanoForge-dev/Engine/commit/66f66a71fa0a50cf528645c0929702e973ba6178)) by @MartinFillon
+
+## Testing
+
+- Add unit and e2e tests (#244) ([d593579](https://github.com/NanoForge-dev/Engine/commit/d593579f149370e1d4f32eec5cac5d251fc31f9c)) by @Exeloo
+
 # [@nanoforge-dev/sound@1.0.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/sound@1.0.0...@nanoforge-dev/sound@1.0.1) - (2026-02-16)
 
 ## Documentation

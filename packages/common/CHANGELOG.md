@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/common@1.3.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/common@1.1.1...@nanoforge-dev/common@1.3.0) - (2026-05-26)
+
+## Features
+
+- **input:** Add mouse input event in input library (#332) ([39c185d](https://github.com/NanoForge-dev/Engine/commit/39c185d935771ddeae6d293e3a6e6f4096de3cf2)) by @bill-h4rper
+
+## Refactor
+
+- **docs:** Migrate to mdx (#343) ([66f66a7](https://github.com/NanoForge-dev/Engine/commit/66f66a71fa0a50cf528645c0929702e973ba6178)) by @MartinFillon
+
 # [@nanoforge-dev/common@1.1.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/common@1.1.0...@nanoforge-dev/common@1.1.1) - (2026-04-29)
 
 ## Bug Fixes

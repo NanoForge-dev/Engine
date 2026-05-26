@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/ecs-server@1.3.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-server@1.1.4...@nanoforge-dev/ecs-server@1.3.0) - (2026-05-26)
+
+## Refactor
+
+- **docs:** Migrate to mdx (#343) ([66f66a7](https://github.com/NanoForge-dev/Engine/commit/66f66a71fa0a50cf528645c0929702e973ba6178)) by @MartinFillon
+
 # [@nanoforge-dev/ecs-server@1.1.4](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/ecs-server@1.1.3...@nanoforge-dev/ecs-server@1.1.4) - (2026-04-29)
 
 ## Bug Fixes
