@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [@nanoforge-dev/config@1.3.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/config@1.1.0...@nanoforge-dev/config@1.3.0) - (2026-05-26)
+
+## Refactor
+
+- **docs:** Migrate to mdx (#343) ([66f66a7](https://github.com/NanoForge-dev/Engine/commit/66f66a71fa0a50cf528645c0929702e973ba6178)) by @MartinFillon
+
 # [@nanoforge-dev/config@1.1.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/config@1.0.1...@nanoforge-dev/config@1.1.0) - (2026-04-02)
 
 ## Features
