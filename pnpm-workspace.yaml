@@ -6,32 +6,32 @@ packages:
 
 catalogs:
   build:
-    tsdown: ^0.21.10
+    tsdown: ^0.22.0
   ci:
     '@commitlint/cli': ^21.0.1
     '@commitlint/config-conventional': ^21.0.1
     '@favware/cliff-jumper': ^6.0.0
-    '@nanoforge-dev/actions': 1.4.3-alpha.fix-release-ci.0
+    '@nanoforge-dev/actions': ^2.0.0
     husky: ^9.1.7
-    lint-staged: ^17.0.4
+    lint-staged: ^17.0.5
   config:
     class-transformer: ^0.5.1
     class-validator: ^0.14.3
   core:
-    '@types/node': ^25.6.0
-    turbo: ^2.9.9
+    '@types/node': ^25.9.1
+    turbo: ^2.9.14
     typescript: ^6.0.3
   docs:
     '@microsoft/api-extractor': ^7.58.7
+    mint-tsdocs: ^0.0.8
     typedoc: ^0.28.19
     typedoc-plugin-markdown: ^4.11.0
-    mint-tsdocs: ^0.0.8
   graphics:
     konva: ^10.2.3
   lint:
     '@eslint/js': ^10.0.1
     '@trivago/prettier-plugin-sort-imports': ^6.0.2
-    eslint: ^10.3.0
+    eslint: ^10.4.0
     eslint-config-prettier: ^10.1.8
     eslint-formatter-pretty: ^7.1.0
     eslint-plugin-format: ^2.0.1
@@ -45,8 +45,8 @@ catalogs:
     wrtc: ^0.4.7
     ws: ^8.20.1
   test:
-    '@vitest/coverage-v8': ^4.1.5
-    vitest: ^4.1.5
+    '@vitest/coverage-v8': ^4.1.7
+    vitest: ^4.1.7
 
 onlyBuiltDependencies:
   - bun
