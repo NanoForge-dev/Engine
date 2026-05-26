@@ -20,8 +20,8 @@ catalogs:
       specifier: ^6.0.0
       version: 6.1.0
     '@nanoforge-dev/actions':
-      specifier: 1.4.3-beta.97f50f4
-      version: 1.4.3-beta.97f50f4
+      specifier: 1.4.3-alpha.fix-release-ci.0
+      version: 1.4.3-alpha.fix-release-ci.0
     husky:
       specifier: ^9.1.7
       version: 9.1.7
@@ -123,7 +123,7 @@ importers:
         version: 7.58.7(@types/node@25.9.1)
       '@nanoforge-dev/actions':
         specifier: catalog:ci
-        version: 1.4.3-beta.97f50f4
+        version: 1.4.3-alpha.fix-release-ci.0
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:*
         version: link:utils/eslint-config
@@ -1465,8 +1465,8 @@ packages:
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
 
-  '@nanoforge-dev/actions@1.4.3-beta.97f50f4':
-    resolution: {integrity: sha512-twX5M6xCWF9X2OdUqinFPgOWMcLzSHFotxm0vyTdE+CMt+nWnAKFAQRbBnxWHC8jO/NY3qUyL+gMbF5D+0MViw==}
+  '@nanoforge-dev/actions@1.4.3-alpha.fix-release-ci.0':
+    resolution: {integrity: sha512-OXXCRJtklJMwczBexNwp2F55zIZlXGi4GT9i9IPt2y7sT8iK1CuSMgGJbtkYAE77LUqAy5+9srByIPozO5VgBQ==}
     engines: {node: '25'}
 
   '@nanoforge-dev/cli@1.4.2':
@@ -4746,7 +4746,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@nanoforge-dev/actions@1.4.3-beta.97f50f4':
+  '@nanoforge-dev/actions@1.4.3-alpha.fix-release-ci.0':
     dependencies:
       '@actions/core': 3.0.1
       '@actions/github': 9.1.1
