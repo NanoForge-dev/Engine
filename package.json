@@ -31,7 +31,7 @@
   "devDependencies": {
     "@commitlint/cli": "catalog:ci",
     "@commitlint/config-conventional": "catalog:ci",
-    "@microsoft/api-extractor": "^7.58.7",
+    "@microsoft/api-extractor": "catalog:docs",
     "@nanoforge-dev/actions": "catalog:ci",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",

@@ -1,8 +1,15 @@
-name: Pre-Release
+name: Pre-Release Single
 
 on:
   workflow_dispatch:
     inputs:
+      package:
+        description: "The published name of a single package to release"
+        type: choice
+        required: true
+        options:
+          - "@nanoforge-dev/utils-eslint-config"
+          - "@nanoforge-dev/utils-prettier-config"
       version:
         description: "New version for the packages"
         type: string
@@ -34,10 +41,8 @@ jobs:
       - name: Create release PR
         uses: ./node_modules/@nanoforge-dev/actions/actions/create-packages-release-pr
         with:
-          packages: "@nanoforge-dev/asset-manager,@nanoforge-dev/common,@nanoforge-dev/config,@nanoforge-dev/core,@nanoforge-dev/core-editor,@nanoforge-dev/ecs-client,@nanoforge-dev/ecs-lib,@nanoforge-dev/ecs-server,@nanoforge-dev/graphics-2d,@nanoforge-dev/input,@nanoforge-dev/music,@nanoforge-dev/network-client,@nanoforge-dev/network-server,@nanoforge-dev/sound"
+          packages: ${{ inputs.package }}
           version: ${{ inputs.version }}
-          branch-format: "releases/nanoforge@{version}"
-          commit-format: "chore: release nanoforge@{version}"
           dry: ${{ inputs.dry_run }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
