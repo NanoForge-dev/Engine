@@ -9,6 +9,9 @@ catalogs:
     tsdown:
       specifier: ^0.22.0
       version: 0.22.0
+    unrun:
+      specifier: ^0.3.0
+      version: 0.3.0
   ci:
     '@commitlint/cli':
       specifier: ^21.0.1
@@ -156,7 +159,7 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       turbo:
         specifier: catalog:core
         version: 2.9.14
@@ -298,10 +301,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -328,10 +334,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -365,10 +374,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
 
   packages/core:
     dependencies:
@@ -408,10 +420,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -457,10 +472,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -503,10 +521,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -540,10 +561,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -586,10 +610,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -623,10 +650,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -657,10 +687,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -691,10 +724,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -728,10 +764,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -777,10 +816,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -811,10 +853,13 @@ importers:
         version: 3.8.3
       tsdown:
         specifier: catalog:build
-        version: 0.22.0(typescript@6.0.3)
+        version: 0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12))
       typescript:
         specifier: catalog:core
         version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.0(synckit@0.11.12)
       vitest:
         specifier: catalog:test
         version: 4.1.7(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
@@ -3767,6 +3812,16 @@ packages:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
 
+  unrun@0.3.0:
+    resolution: {integrity: sha512-5xw2AIVS2WR9Lqhz76qDIQLxipKRidf7Nq+Iz5SZ8shk1OmRlxnc6FyI/1Q2m99WLj6cbqaKFdESfWE99KPzlA==}
+    engines: {node: ^22.13.0 || >=24.0.0}
+    hasBin: true
+    peerDependencies:
+      synckit: ^0.11.11
+    peerDependenciesMeta:
+      synckit:
+        optional: true
+
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
@@ -6702,7 +6757,7 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  tsdown@0.22.0(typescript@6.0.3):
+  tsdown@0.22.0(typescript@6.0.3)(unrun@0.3.0(synckit@0.11.12)):
     dependencies:
       ansis: 4.3.0
       cac: 7.0.0
@@ -6721,6 +6776,7 @@ snapshots:
       unconfig-core: 7.5.0
     optionalDependencies:
       typescript: 6.0.3
+      unrun: 0.3.0(synckit@0.11.12)
     transitivePeerDependencies:
       - '@ts-macro/tsc'
       - '@typescript/native-preview'
@@ -6775,6 +6831,12 @@ snapshots:
   universal-user-agent@7.0.3: {}
 
   universalify@2.0.1: {}
+
+  unrun@0.3.0(synckit@0.11.12):
+    dependencies:
+      rolldown: 1.0.2
+    optionalDependencies:
+      synckit: 0.11.12
 
   uri-js@4.4.1:
     dependencies:
