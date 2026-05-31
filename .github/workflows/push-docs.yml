@@ -10,6 +10,9 @@ on:
       - "packages/ecs-lib/wasm/**"
   workflow_dispatch:
 
+env:
+  SOURCE_PATH: "engine"
+
 jobs:
   synchronize:
     runs-on: ubuntu-latest
@@ -17,14 +20,7 @@ jobs:
       - name: Checkout engine
         uses: actions/checkout@v6
         with:
-          path: engine
-
-      - name: Checkout docs
-        uses: actions/checkout@v6
-        with:
-          path: docs-repo
-          repository: nanoforge-dev/docs
-          token: ${{ secrets.ACTIONS_KEY }}
+          path: ${{ env.SOURCE_PATH }}
 
       - name: Install Node.js
         uses: actions/setup-node@v6
@@ -33,27 +29,26 @@ jobs:
           package-manager-cache: false
           registry-url: https://registry.npmjs.org/
 
-      - uses: pnpm/action-setup@v6.0.8
-        name: Install pnpm
+      - uses: ./engine/.github/actions/pnpm-install
+        name: Install dependencies
         with:
-          run_install: false
+          path: ${{ env.SOURCE_PATH }}
 
-      - name: setup git
+      - uses: ./engine/.github/actions/emsdk-install
+        name: Install emsdk
+
+      - name: prepare docs
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "username@users.noreply.github.com"
-
-      - name: install deps
-        run: cd engine && pnpm i
+          pnpm run build
+          pnpm run docs
+        working-directory: ${{ env.SOURCE_PATH }}
 
       - name: synchronize docs
-        run: |
-          cd engine
-          pnpm run docs
-          cd ..
-          mkdir -p docs-repo/docs/engine
-          rsync -av engine/docs/* docs-repo/docs/engine/
-          cd docs-repo
-          git add . || echo "No changes to add"
-          git commit -m "chore(engine): updating docs" || echo "No changes to commit"
-          git push origin main || echo "No changes to push"
+        uses: ./engine/node_modules/@nanoforge-dev/actions/src/synchronize-docs
+        with:
+          source-docs: ${{ env.SOURCE_PATH }}/docs
+          destination-docs: docs/engine
+          repository: nanoforge-dev/docs
+          config: ${{ env.SOURCE_PATH }}/docs.json
+          token: ${{ secrets.ACTIONS_KEY }}
+          commit-message: "Update engine documentation"
