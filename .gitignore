@@ -238,3 +238,5 @@ docs/ecs-lib/api/typescript.md
 emsdk-cache/
 .vscode
 .tsdocs
+
+docs/api

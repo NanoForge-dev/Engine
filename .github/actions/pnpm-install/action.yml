@@ -1,5 +1,9 @@
 name: "pnpm install"
 description: "Run pnpm install with cache enabled"
+inputs:
+  path:
+    description: Path to run pnpm install in
+    default: "."
 runs:
   using: "composite"
   steps:
@@ -13,6 +17,7 @@ runs:
       name: Install pnpm
       with:
         run_install: false
+        package_json_file: ${{ inputs.path }}/package.json
 
     - name: Expose pnpm config(s) through "$GITHUB_OUTPUT"
       id: pnpm-config
@@ -40,3 +45,4 @@ runs:
         pnpm install --frozen-lockfile --prefer-offline --loglevel error
       env:
         HUSKY: "0"
+      working-directory: ${{ inputs.path }}
