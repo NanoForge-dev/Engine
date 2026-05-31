@@ -10,6 +10,9 @@ on:
       - "packages/ecs-lib/wasm/**"
   workflow_dispatch:
 
+env:
+  SOURCE_PATH: "engine"
+
 jobs:
   synchronize:
     runs-on: ubuntu-latest
@@ -17,7 +20,7 @@ jobs:
       - name: Checkout engine
         uses: actions/checkout@v6
         with:
-          path: engine
+          path: ${{ env.SOURCE_PATH }}
 
       - name: Checkout docs
         uses: actions/checkout@v6
@@ -44,16 +47,20 @@ jobs:
           git config --global user.email "username@users.noreply.github.com"
 
       - name: install deps
-        run: cd engine && pnpm i
+        run: pnpm i
+        working-directory: ${{ env.SOURCE_PATH }}
+
+      - name: prepare docs
+        run: |
+          pnpm run docs
+        working-directory: ${{ env.SOURCE_PATH }}
 
       - name: synchronize docs
-        run: |
-          cd engine
-          pnpm run docs
-          cd ..
-          mkdir -p docs-repo/docs/engine
-          rsync -av engine/docs/* docs-repo/docs/engine/
-          cd docs-repo
-          git add . || echo "No changes to add"
-          git commit -m "chore(engine): updating docs" || echo "No changes to commit"
-          git push origin main || echo "No changes to push"
+        uses: ./schematics/node_modules/@nanoforge-dev/actions/src/synchronize-docs
+        with:
+          source-docs: ${{ env.SOURCE_PATH }}/docs
+          destination-docs: docs/engine
+          repository: nanoforge-dev/docs
+          config: ${{ env.SOURCE_PATH }}/docs.json
+          token: ${{ secrets.ACTIONS_KEY }}
+          commit-message: "Update engine documentation"
