@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.3.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/nanoforge@1.3.0...@nanoforge-dev/nanoforge@1.3.1) - (2026-06-04)
+
+## Documentation
+
+- Setup new docs synchro action (#359) ([ff605f2](https://github.com/NanoForge-dev/Engine/commit/ff605f2b38a71f3f4b23707de2809da790e56c90)) by @MartinFillon
+
 # [1.3.0](https://github.com/NanoForge-dev/Engine/tree/@nanoforge-dev/nanoforge@1.3.0) - (2026-05-26)
 
 ## Refactor
