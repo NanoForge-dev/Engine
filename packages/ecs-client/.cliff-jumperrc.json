@@ -3,5 +3,6 @@
   "name": "ecs-client",
   "org": "nanoforge-dev",
   "packagePath": "packages/ecs-client",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

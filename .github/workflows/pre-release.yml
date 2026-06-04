@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "New version for the packages"
+        description: New version for the packages
         type: string
         required: true
       dry_run:

@@ -3,5 +3,6 @@
   "name": "network-client",
   "org": "nanoforge-dev",
   "packagePath": "packages/network-client",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

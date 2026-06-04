@@ -3,5 +3,6 @@
   "name": "sound",
   "org": "nanoforge-dev",
   "packagePath": "packages/sound",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

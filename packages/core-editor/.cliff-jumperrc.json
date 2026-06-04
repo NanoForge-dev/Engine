@@ -3,5 +3,6 @@
   "name": "core-editor",
   "org": "nanoforge-dev",
   "packagePath": "packages/core-editor",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

@@ -2,7 +2,7 @@ name: "pnpm install"
 description: "Run pnpm install with cache enabled"
 inputs:
   path:
-    description: Path to run pnpm install in
+    description: "Path to the directory containing the pnpm workspace"
     default: "."
 runs:
   using: "composite"

@@ -3,5 +3,6 @@
   "name": "asset-manager",
   "org": "nanoforge-dev",
   "packagePath": "packages/asset-manager",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

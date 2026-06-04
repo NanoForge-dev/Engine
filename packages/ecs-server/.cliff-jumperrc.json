@@ -3,5 +3,6 @@
   "name": "ecs-server",
   "org": "nanoforge-dev",
   "packagePath": "packages/ecs-server",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

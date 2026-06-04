@@ -3,5 +3,6 @@
   "name": "music",
   "org": "nanoforge-dev",
   "packagePath": "packages/music",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

@@ -3,5 +3,6 @@
   "name": "ecs-lib",
   "org": "nanoforge-dev",
   "packagePath": "packages/ecs-lib",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

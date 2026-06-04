@@ -3,5 +3,6 @@
   "name": "network-server",
   "org": "nanoforge-dev",
   "packagePath": "packages/network-server",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

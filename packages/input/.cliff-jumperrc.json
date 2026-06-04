@@ -3,5 +3,6 @@
   "name": "input",
   "org": "nanoforge-dev",
   "packagePath": "packages/input",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }
