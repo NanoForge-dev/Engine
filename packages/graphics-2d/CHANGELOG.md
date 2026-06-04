@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.3.1](https://github.com/NanoForge-dev/Engine/compare/1.3.0...1.3.1) - (2026-06-04)
+
 # [@nanoforge-dev/graphics-2d@1.3.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/graphics-2d@1.0.3...@nanoforge-dev/graphics-2d@1.3.0) - (2026-05-26)
 
 ## Refactor
