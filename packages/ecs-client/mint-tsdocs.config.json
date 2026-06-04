@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/mint-tsdocs/lib/schemas/config.schema.json",
   "entryPoint": "dist/index.d.cts",
-  "outputFolder": "../../docs/api/ecs-client",
+  "outputFolder": "../../references/ecs-client",
   "lint": {
     "eslint": {
       "enabled": true

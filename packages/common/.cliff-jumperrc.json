@@ -3,5 +3,6 @@
   "name": "common",
   "org": "nanoforge-dev",
   "packagePath": "packages/common",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }

@@ -53,7 +53,7 @@
         "tsconfig.json",
         "mint-tsdocs.config.ts"
       ],
-      "outputs": ["../../docs"],
+      "outputs": ["../../references"],
       "outputLogs": "errors-only"
     }
   }

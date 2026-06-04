@@ -34,7 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-single-package:
-    name: Release
+    name: Release Single
     runs-on: ubuntu-latest
     if: github.repository_owner == 'NanoForge-dev' && github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/') && !startsWith(github.head_ref, 'releases/nanoforge@')
     steps:
@@ -63,3 +63,34 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-docs:
+    name: Publish docs
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'NanoForge-dev'
+    needs: [release]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Checkout docs repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          path: docs-dist
+          repository: nanoforge-dev/docs
+          token: ${{ secrets.ACTIONS_KEY }}
+
+      - name: Prepare
+        uses: ./.github/actions/prepare
+
+      - name: Publish docs
+        uses: ./node_modules/@nanoforge-dev/actions/actions/synchronize-docs
+        with:
+          repository: engine
+          category: engine
+          references: true

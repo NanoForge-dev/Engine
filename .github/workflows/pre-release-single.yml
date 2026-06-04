@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "The published name of a single package to release"
+        description: The published name of a single package to release
         type: choice
         required: true
         options:
           - "@nanoforge-dev/utils-eslint-config"
           - "@nanoforge-dev/utils-prettier-config"
       version:
-        description: "New version for the packages"
+        description: New version for the packages
         type: string
         required: true
       dry_run:

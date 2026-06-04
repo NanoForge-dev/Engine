@@ -3,5 +3,6 @@
   "name": "config",
   "org": "nanoforge-dev",
   "packagePath": "packages/config",
+  "tagTemplate": "{{new-version}}",
   "identifierBase": false
 }
