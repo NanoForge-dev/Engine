@@ -1,9 +1,10 @@
 import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { EventTypeEnum } from "../src/common/context/event-emitter.type";
+import { CoreEvents } from "../src/common/context/events/core-events";
 import type { IEditorRunOptions } from "../src/common/context/options.type";
 import { type Save, type SaveComponent, type SaveEntity } from "../src/common/context/save.type";
+import { type Core } from "../src/core/core";
 import { CoreEditor } from "../src/editor/core-editor";
 import { EventEmitter } from "./helpers/event-emitter";
 
@@ -15,12 +16,13 @@ describe("EditorFeatures", () => {
   describe("eventEmitter", () => {
     it("should execute eventQueue once", async () => {
       const events = new EventEmitter();
-      events.emitEvent(EventTypeEnum.HOT_RELOAD);
-      events.emitEvent(EventTypeEnum.HOT_RELOAD);
+      events.emitEvent(CoreEvents.HOT_RELOAD);
+      events.emitEvent(CoreEvents.HOT_RELOAD);
       const spyHotReload = vi
         .spyOn(CoreEditor.prototype, "hotReloadEvent")
         .mockImplementation(() => {});
       new CoreEditor(
+        {} as Core,
         { coreEvents: events } as IEditorRunOptions["editor"],
         {} as ECSClientLibrary,
       ).runEvents();
@@ -113,6 +115,7 @@ describe("EditorFeatures", () => {
       ];
       const fakeReg = new FakeRegistry();
       new CoreEditor(
+        {} as Core,
         {
           save: {
             components,
