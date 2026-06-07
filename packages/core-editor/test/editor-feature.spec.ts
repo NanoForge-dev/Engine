@@ -22,8 +22,8 @@ describe("EditorFeatures", () => {
         .spyOn(CoreEditor.prototype, "hotReloadEvent")
         .mockImplementation(() => {});
       new CoreEditor(
-        { editor: { save: {} } } as unknown as Core,
-        { coreEvents: events } as IEditorRunOptions["editor"],
+        {} as unknown as Core,
+        { coreEvents: events, save: { libraries: [] } } as unknown as IEditorRunOptions["editor"],
         {} as ECSClientLibrary,
       ).runEvents();
       expect(spyHotReload).toHaveBeenCalledTimes(2);
@@ -115,7 +115,7 @@ describe("EditorFeatures", () => {
       ];
       const fakeReg = new FakeRegistry();
       new CoreEditor(
-        { editor: { save: {} } } as unknown as Core,
+        {} as unknown as Core,
         {
           save: {
             components,
@@ -140,13 +140,13 @@ describe("EditorFeatures", () => {
       expect(fakeReg.getEntityComponent).toHaveBeenNthCalledWith(1, 2, { name: "Position" });
       expect(fakeReg.getEntityComponent).toHaveBeenNthCalledWith(2, 2, { name: "Bullets" });
       expect(fakeReg.getEntityComponent).toHaveBeenNthCalledWith(3, 3, { name: "Position" });
-      expect(fakeReg.addComponent).toHaveBeenNthCalledWith(1, 2, { name: "Position", x: 1, y: 2 });
+      expect(fakeReg.addComponent).toHaveBeenNthCalledWith(1, 2, { name: "Position", x: 3, y: 4 });
       expect(fakeReg.addComponent).toHaveBeenNthCalledWith(2, 2, {
         name: "Bullets",
         bulletTypes: ["fire", "water", "rocket"],
-        number: 1000,
+        number: 4,
       });
-      expect(fakeReg.addComponent).toHaveBeenNthCalledWith(3, 3, { name: "Position", x: 5, y: 6 });
+      expect(fakeReg.addComponent).toHaveBeenNthCalledWith(3, 3, { name: "Position", x: 7, y: 8 });
     });
   });
 });
