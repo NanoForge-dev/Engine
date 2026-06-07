@@ -22,7 +22,7 @@ describe("EditorFeatures", () => {
         .spyOn(CoreEditor.prototype, "hotReloadEvent")
         .mockImplementation(() => {});
       new CoreEditor(
-        {} as Core,
+        { editor: { save: {} } } as unknown as Core,
         { coreEvents: events } as IEditorRunOptions["editor"],
         {} as ECSClientLibrary,
       ).runEvents();
@@ -115,7 +115,7 @@ describe("EditorFeatures", () => {
       ];
       const fakeReg = new FakeRegistry();
       new CoreEditor(
-        {} as Core,
+        { editor: { save: {} } } as unknown as Core,
         {
           save: {
             components,
