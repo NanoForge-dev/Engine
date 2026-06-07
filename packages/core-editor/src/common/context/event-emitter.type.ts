@@ -1,15 +1,15 @@
-/**
- * Events that the NanoForge editor can emit to the running engine.
- */
-export enum EventTypeEnum {
-  /** Reload modules without restarting the engine (live-patch). */
-  HOT_RELOAD = "hot-reload",
-  /** Fully restart the engine with the latest changes. */
-  HARD_RELOAD = "hard-reload",
-}
-
 /** Callback signature for event listeners. */
-export type ListenerType = (...args: any[]) => void;
+export type ListenerType<
+  Events extends string,
+  EventsMap extends Record<Events, unknown[]>,
+  K extends keyof EventsMap,
+> = (...args: EventsMap[K]) => void;
+
+/** Signature of the waiting for execution events. */
+export type QueuedEvent<EventsMap, K extends keyof EventsMap = keyof EventsMap> = {
+  event: K;
+  args: EventsMap[K];
+};
 
 /**
  * Simple event emitter interface used for communication between the NanoForge
@@ -19,14 +19,17 @@ export type ListenerType = (...args: any[]) => void;
  * Listeners are queued and processed via `runEvents` to keep the engine
  * loop deterministic.
  */
-export interface IEventEmitter {
+export interface IEventEmitter<Events extends string, EventsMap extends Record<Events, unknown[]>> {
   /** Map of event names to their registered listeners. */
-  listeners: Record<EventTypeEnum | string, ListenerType[]>;
+  listeners: {
+    [K in keyof EventsMap]?: ListenerType<Events, EventsMap, K>[];
+  };
+
   /** Queue of events waiting to be dispatched by `runEvents`. */
-  eventQueue: { event: EventTypeEnum | string; args: any[] }[];
+  eventQueue: QueuedEvent<EventsMap>[];
 
   /** Drain the event queue and invoke all matching listeners. */
-  runEvents: () => void;
+  runEvents(): void;
 
   /**
    * Enqueue an event for dispatching on the next `runEvents` call.
@@ -34,7 +37,7 @@ export interface IEventEmitter {
    * @param event - Event name or EventTypeEnum value.
    * @param args - Optional arguments forwarded to listeners.
    */
-  emitEvent: (event: EventTypeEnum, ...args: any) => void;
+  emitEvent<K extends keyof EventsMap>(event: K, ...args: EventsMap[K]): void;
 
   /**
    * Register a listener for an event.  Alias: `on`.
@@ -42,9 +45,12 @@ export interface IEventEmitter {
    * @param event - Event name to subscribe to.
    * @param listener - Callback invoked when the event fires.
    */
-  addListener: (event: EventTypeEnum | string, listener: ListenerType) => void;
+  addListener<K extends keyof EventsMap>(
+    event: K,
+    listener: ListenerType<Events, EventsMap, K>,
+  ): void;
   /** Alias for `addListener`. */
-  on: (event: EventTypeEnum | string, listener: ListenerType) => void;
+  on<K extends keyof EventsMap>(event: K, listener: ListenerType<Events, EventsMap, K>): void;
 
   /**
    * Remove a previously registered listener.  Alias: `off`.
@@ -52,16 +58,19 @@ export interface IEventEmitter {
    * @param event - Event name to unsubscribe from.
    * @param listener - The exact listener function to remove.
    */
-  removeListener: (event: EventTypeEnum | string, listener: ListenerType) => void;
+  removeListener<K extends keyof EventsMap>(
+    event: K,
+    listener: ListenerType<Events, EventsMap, K>,
+  ): void;
   /** Alias for `removeListener`. */
-  off: (event: EventTypeEnum | string, listener: ListenerType) => void;
+  off<K extends keyof EventsMap>(event: K, listener: ListenerType<Events, EventsMap, K>): void;
 
   /**
    * Remove all listeners registered for a specific event.
    *
    * @param event - Event name whose listeners should be cleared.
    */
-  removeListenersForEvent: (event: EventTypeEnum | string) => void;
+  removeListenersForEvent(event: keyof EventsMap): void;
   /** Remove every registered listener across all events. */
-  removeAllListeners: () => void;
+  removeAllListeners(): void;
 }

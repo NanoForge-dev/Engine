@@ -45,7 +45,7 @@ namespace nfo {
         SparseArray<emscripten::val> &register_component(const Component &component)
         {
             std::string component_type(get_js_class_name(component));
-            if (component_type == "entity" || component_type == "id")
+            if (component_type == "entity" || component_type == "id" || component_type == UNKNOWN_COMPONENT_TYPE)
                 throw std::runtime_error("Component type '" + component_type + "' not supported : you can't use : id, entity, " + UNKNOWN_COMPONENT_TYPE);
             if (!_components_arrays.contains(component_type))
                 _components_arrays.emplace(component_type, SparseArray<emscripten::val>());

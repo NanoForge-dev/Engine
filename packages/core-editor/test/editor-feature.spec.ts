@@ -18,7 +18,7 @@ describe("EditorFeatures", () => {
       events.emitEvent(EventTypeEnum.HOT_RELOAD);
       events.emitEvent(EventTypeEnum.HOT_RELOAD);
       const spyHotReload = vi
-        .spyOn(CoreEditor.prototype, "askEntitiesHotReload")
+        .spyOn(CoreEditor.prototype, "hotReloadEvent")
         .mockImplementation(() => {});
       new CoreEditor(
         { coreEvents: events } as IEditorRunOptions["editor"],
@@ -120,7 +120,7 @@ describe("EditorFeatures", () => {
           } as any as Save,
         } as any as IEditorRunOptions["editor"],
         { registry: fakeReg } as any as ECSClientLibrary,
-      ).askEntitiesHotReload();
+      ).hotReloadEvent();
       expect(fakeReg.getComponents).toHaveBeenCalledWith({ name: "__RESERVED_ENTITY_ID" });
       expect(getIndex).toHaveBeenNthCalledWith(1, {
         entityId: "ent2",
