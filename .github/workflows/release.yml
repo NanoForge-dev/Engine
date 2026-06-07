@@ -46,7 +46,7 @@ jobs:
 
       - id: get-package
         name: Get package name
-        uses: actions/github-script@0.9.0
+        uses: actions/github-script@v9.0.0
         with:
           script: |
             const branch = '${{ github.head_ref }}';
