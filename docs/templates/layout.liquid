@@ -1,0 +1,110 @@
+<!--
+  Mintlify TypeDoc Template
+
+  This template controls how layout documentation is generated.
+
+  Available variables:
+  - apiItem: The API item being documented
+  - page: Page metadata (title, description, icon, breadcrumb)
+  - properties, methods, constructors: Structured data for API members
+  - examples: Array of example code strings
+  - heritageTypes: Inheritance information
+
+  Learn more: https://mint-tsdocs.saulo.engineer/templates
+-->
+
+---
+title: "{{ page.title }}"
+{%- if page.icon %}
+icon: "{{ page.icon }}"
+{%- endif %}
+description: "{{ page.description }}"
+---
+
+import { PageLink } from '/snippets/tsdocs/PageLink.jsx';
+import { RefLink } from '/snippets/tsdocs/RefLink.jsx';
+
+# {{ apiItem.displayName }}
+
+{%- block warnings %}
+{%- if apiItem.isDeprecated %}
+
+<Warning>
+  **Deprecated**: This {{ apiItem.kind | downcase }} is deprecated and may be removed in a future version.
+</Warning>
+{%- endif %}
+{%- if apiItem.isAlpha %}
+
+<Warning>
+  **Alpha**: This {{ apiItem.kind | downcase }} is in alpha and may change without notice.
+</Warning>
+{%- endif %}
+{%- if apiItem.isBeta %}
+
+<Warning>
+  **Beta**: This {{ apiItem.kind | downcase }} is in beta and may change without notice.
+</Warning>
+{%- endif %}
+{%- endblock %}
+
+{%- block summary %}
+{%- if apiItem.summary and apiItem.summary.size > 0 %}
+
+## Summary
+
+{{ apiItem.summary | render_segments }}
+{%- endif %}
+{%- endblock %}
+
+{%- block heritage %}
+{%- if heritageTypes and heritageTypes.size > 0 %}
+
+## Heritage
+
+{%- for type in heritageTypes %}
+{%- if type.path %}
+* [{{ type.name }}]({{ type.path }})
+{%- else %}
+* {{ type.name }}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+{%- endblock %}
+
+{%- block content %}{% endblock %}
+
+{%- block remarks %}
+{%- if apiItem.remarks and apiItem.remarks.size > 0 %}
+
+## Remarks
+
+{{ apiItem.remarks | render_segments }}
+{%- endif %}
+{%- endblock %}
+
+{%- block examples %}
+{%- if examples and examples.size > 0 %}
+
+## Examples
+
+{%- for example in examples %}
+
+### Example {{ forloop.index }}
+
+```typescript
+{{ example }}
+```
+{%- endfor %}
+{%- endif %}
+{%- endblock %}
+
+{%- block guides %}
+{%- if guides and guides.size > 0 %}
+
+## Related Documentation
+
+{%- for guide in guides %}
+- <PageLink target="{{ guide.path }}">{{ guide.description }}</PageLink>
+{%- endfor %}
+{%- endif %}
+{%- endblock %}

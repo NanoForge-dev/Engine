@@ -4,8 +4,17 @@ import { type RawData, type WebSocket, WebSocketServer } from "ws";
 
 import { buildMagicPacket, parsePacketsFromChunks, rawDataToUint8Array } from "./utils";
 
-/** TCPServer
- * Reliable ordered send/receive of packets to multiple TCP clients
+/**
+ * Reliable, ordered WebSocket-based server that manages multiple TCP clients.
+ *
+ * @remarks
+ * Each client that connects is assigned a numeric ID.  Use
+ * `getConnectedClients` to enumerate active clients,
+ * `sendToClient` / `sendToEverybody` to push data, and
+ * `getReceivedPackets` to consume incoming packets per frame.
+ *
+ * Typical usage is through `NetworkServerLibrary` which instantiates and
+ * starts this class automatically during `__init`.
  */
 export class TCPServer {
   private _clients = new Map<

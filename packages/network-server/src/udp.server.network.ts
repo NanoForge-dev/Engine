@@ -5,8 +5,19 @@ import { type RawData, type WebSocket, WebSocketServer } from "ws";
 
 import { buildMagicPacket, parsePacketsFromChunks } from "./utils";
 
-/** UDPServer
- * Fast but less reliable unordered send/receive to multiple UDP clients
+/**
+ * Unreliable, unordered WebRTC data-channel server that manages multiple UDP
+ * clients.
+ *
+ * @remarks
+ * Uses a WebSocket signaling server to complete SDP/ICE handshakes and then
+ * communicates over RTCDataChannels.  Each connected client is assigned a
+ * numeric ID.  Use `getConnectedClients` to enumerate active clients,
+ * `sendToClient` / `sendToEverybody` to push data, and
+ * `getReceivedPackets` to consume incoming packets per frame.
+ *
+ * Typical usage is through `NetworkServerLibrary` which instantiates and
+ * starts this class automatically during `__init`.
  */
 export class UDPServer {
   private _clients = new Map<
@@ -109,7 +120,7 @@ export class UDPServer {
    * The packet will be framed with the server's configured magic terminator
    * bytes before being sent.
    *
-   * @param clientId - Numeric client identifier returned by `listen()` events
+   * @param clientId - Numeric client identifier returned by listen() events
    * @param data - Raw packet bytes (Uint8Array) to send
    * @returns void
    */

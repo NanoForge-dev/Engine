@@ -1,8 +1,14 @@
 import { type ILibrary } from "../../library.type";
 
+/**
+ * Interface for libraries that support muting/unmuting audio playback.
+ *
+ * @remarks
+ * Implemented by `ISoundLibrary` and `IMusicLibrary`.
+ */
 export interface IMutableLibrary extends ILibrary {
   /**
-   * mutes or unmutes the sound.
+   * Toggle the muted state.  Mutes when currently unmuted, and vice versa.
    */
   mute(): void;
 }

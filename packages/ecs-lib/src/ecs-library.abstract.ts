@@ -8,12 +8,24 @@ import {
 import { type MainModule, type Registry } from "../lib/libecs";
 
 /**
- * Abstract class representing an ECS (Entity Component System) library.
- * Extends the BaseComponentSystemLibrary to provide ECS-specific functionality.
- * Manages a registry of systems and ensures proper initialization before use.
- * @abstract
- * @class AbstractECSLibrary
- * @extends {BaseComponentSystemLibrary}
+ * Abstract base class for WASM-backed ECS (Entity Component System) libraries.
+ *
+ * @remarks
+ * Loads a compiled `libecs.wasm` binary via the asset manager and initialises
+ * a `Registry` from the resulting module.  Concrete subclasses only need to
+ * set `this.path` (the asset path to the `.wasm` file) and call `super()`
+ * — see `ECSClientLibrary` and `ECSServerLibrary`.
+ *
+ * Requires the `ASSET_MANAGER_LIBRARY` dependency and runs after
+ * `GRAPHICS_LIBRARY`.
+ *
+ * @example
+ * ```ts
+ * // Inside a system's __run hook:
+ * const ecs = ctx.libraries.getComponentSystem<ECSClientLibrary>().library;
+ * const player = ecs.registry.spawnEntity();
+ * ecs.registry.addComponent(player, new PositionComponent(0, 0));
+ * ```
  */
 export abstract class AbstractECSLibrary extends BaseComponentSystemLibrary {
   protected module?: MainModule;
@@ -28,22 +40,23 @@ export abstract class AbstractECSLibrary extends BaseComponentSystemLibrary {
     });
   }
 
+  /** @internal */
   abstract override get __name(): string;
 
-  /**
-   * Runs the ECS systems using the provided context.
-   * @param ctx - The context to be used for running the systems.
-   * @returns A promise that resolves when the systems have been run.
-   */
+  /** @internal */
   async __run(ctx: Context): Promise<void> {
     if (!this._registry) this.throwNotInitializedError();
     this._registry.runSystems(ctx);
   }
 
   /**
-   * Gets the registry.
-   * @throws Will throw an error if the library is not initialized.
-   * @returns The registry.
+   * The WASM-backed entity/component registry.
+   *
+   * @remarks
+   * Use this to spawn entities, register components, add systems, and query
+   * component data.
+   *
+   * @throws `NfNotInitializedException` When accessed before `__init` has resolved.
    */
   get registry(): Registry {
     if (!this._registry) this.throwNotInitializedError();

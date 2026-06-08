@@ -1,0 +1,109 @@
+<!--
+  Mintlify TypeDoc Template
+
+  This template controls how interface documentation is generated.
+
+  Available variables:
+  - apiItem: The API item being documented
+  - page: Page metadata (title, description, icon, breadcrumb)
+  - properties, methods, constructors: Structured data for API members
+  - examples: Array of example code strings
+  - heritageTypes: Inheritance information
+
+  Learn more: https://mint-tsdocs.saulo.engineer/templates
+-->
+
+{%- layout "layout" %}
+
+{%- block content %}
+
+{%- if apiItem.signature %}
+## Signature
+
+```typescript
+{{ apiItem.signature }}
+```
+{%- endif %}
+
+## Properties
+
+{%- if properties and properties.size > 0 %}
+{%- for property in properties %}
+
+### {{ property.title }}
+
+{%- if property.modifiers and property.modifiers.size > 0 %}
+**Modifiers**: {{ property.modifiers | join: ', ' }}
+{%- endif %}
+{%- if property.type %}
+{%- assign formatted_prop_type = property.type | format_type %}
+{%- if formatted_prop_type contains "```" %}
+**Type**:{{ formatted_prop_type }}
+{%- else %}
+**Type**: {%- if property.typeRef and autolink != false %}<RefLink target="{{ property.typeRef }}">`{{ formatted_prop_type }}`</RefLink>{%- elsif property.typePath %}[`{{ formatted_prop_type }}`]({{ property.typePath }}){%- else %}`{{ formatted_prop_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if property.isOptional %}
+**Optional**: Yes
+{%- endif %}
+{%- if property.isInherited %}
+**Inherited**: Yes
+{%- endif %}
+{%- if property.description %}
+
+{{ property.description }}
+{%- endif %}
+{%- endfor %}
+{%- else %}
+
+*No properties defined.*
+{%- endif %}
+
+## Methods
+
+{%- if methods and methods.size > 0 %}
+{%- for method in methods %}
+
+### {{ method.title }}
+
+{%- if method.modifiers and method.modifiers.size > 0 %}
+**Modifiers**: {{ method.modifiers | join: ', ' }}
+{%- endif %}
+{%- if method.isInherited %}
+**Inherited**: Yes
+{%- endif %}
+{%- if method.description %}
+
+{{ method.description }}
+{%- endif %}
+{%- endfor %}
+{%- else %}
+
+*No methods defined.*
+{%- endif %}
+
+## Events
+
+{%- if events and events.size > 0 %}
+{%- for event in events %}
+
+### {{ event.title }}
+
+{%- if event.type %}
+{%- assign formatted_event_type = event.type | format_type %}
+{%- if formatted_event_type contains "```" %}
+**Type**:{{ formatted_event_type }}
+{%- else %}
+**Type**: {%- if event.typeRef and autolink != false %}<RefLink target="{{ event.typeRef }}">`{{ formatted_event_type }}`</RefLink>{%- elsif event.typePath %}[`{{ formatted_event_type }}`]({{ event.typePath }}){%- else %}`{{ formatted_event_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if event.description %}
+
+{{ event.description }}
+{%- endif %}
+{%- endfor %}
+{%- else %}
+
+*No events defined.*
+{%- endif %}
+{%- endblock %}

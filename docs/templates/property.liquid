@@ -1,0 +1,41 @@
+<!--
+  Mintlify TypeDoc Template
+
+  This template controls how property documentation is generated.
+
+  Available variables:
+  - apiItem: The API item being documented
+  - page: Page metadata (title, description, icon, breadcrumb)
+  - properties, methods, constructors: Structured data for API members
+  - examples: Array of example code strings
+  - heritageTypes: Inheritance information
+
+  Learn more: https://mint-tsdocs.saulo.engineer/templates
+-->
+
+{%- layout "layout" %}
+
+{%- block content %}
+{%- if returnType %}
+
+## Type
+
+{%- if returnType.type %}
+{%- assign formatted_type = returnType.type | format_type %}
+{%- if formatted_type contains "```" %}
+
+**Type**:{{ formatted_type }}
+{%- else %}
+
+**Type**: {% if returnType.typePath -%}[`{{ formatted_type }}`]({{ returnType.typePath }}){%- else -%}`{{ formatted_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if returnType.description %}
+
+{{ returnType.description }}
+{%- endif %}
+{%- else %}
+
+*Type information not available.*
+{%- endif %}
+{%- endblock %}

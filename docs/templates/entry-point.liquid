@@ -1,0 +1,138 @@
+<!--
+  Mintlify TypeDoc Template
+
+  This template controls how entry-point documentation is generated.
+
+  Available variables:
+  - apiItem: The API item being documented
+  - page: Page metadata (title, description, icon, breadcrumb)
+  - properties, methods, constructors: Structured data for API members
+  - examples: Array of example code strings
+  - heritageTypes: Inheritance information
+
+  Learn more: https://mint-tsdocs.saulo.engineer/templates
+-->
+
+{% layout "layout" %}
+
+{% block content %}
+## Abstract Classes
+
+{% if abstractClasses and abstractClasses.size > 0 %}
+{% for item in abstractClasses %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{% if item.description %}
+{{ item.description }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*No abstract classes defined.*
+{% endif %}
+
+## Classes
+
+{% if classes and classes.size > 0 %}
+{% for item in classes %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{% if item.description %}
+{{ item.description }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*No classes defined.*
+{% endif %}
+
+## Enumerations
+
+{% if enumerations and enumerations.size > 0 %}
+{% for item in enumerations %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{% if item.description %}
+{{ item.description }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*No enumerations defined.*
+{% endif %}
+
+## Functions
+
+{% if functions and functions.size > 0 %}
+{% for item in functions %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{% if item.description %}
+{{ item.description }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*No functions defined.*
+{% endif %}
+
+## Interfaces
+
+{% if interfaces and interfaces.size > 0 %}
+{% for item in interfaces %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{% if item.description %}
+{{ item.description }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*No interfaces defined.*
+{% endif %}
+
+## Namespaces
+
+{% if namespaces and namespaces.size > 0 %}
+{% for item in namespaces %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{% if item.description %}
+{{ item.description }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*No namespaces defined.*
+{% endif %}
+
+## Type Aliases
+
+{% if typeAliases and typeAliases.size > 0 %}
+{% for item in typeAliases %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{% if item.description %}
+{{ item.description }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*No type aliases defined.*
+{% endif %}
+
+## Variables
+
+{% if variables and variables.size > 0 %}
+{% for item in variables %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{% if item.description %}
+{{ item.description }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*No variables defined.*
+{% endif %}
+{% endblock %}

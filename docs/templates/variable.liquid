@@ -1,0 +1,68 @@
+<!--
+  Mintlify TypeDoc Template
+
+  This template controls how variable documentation is generated.
+
+  Available variables:
+  - apiItem: The API item being documented
+  - page: Page metadata (title, description, icon, breadcrumb)
+  - properties, methods, constructors: Structured data for API members
+  - examples: Array of example code strings
+  - heritageTypes: Inheritance information
+
+  Learn more: https://mint-tsdocs.saulo.engineer/templates
+-->
+
+{% layout "layout" %}
+
+{% block content %}
+
+{% if apiItem.signature %}
+## Signature
+
+```typescript
+{{ apiItem.signature }}
+```
+{% endif %}
+
+## Parameters
+
+{% if parameters and parameters.size > 0 %}
+{% for parameter in parameters %}
+### {{ parameter.title }}
+
+{% if parameter.type %}
+**Type**: {% if parameter.typeRef and autolink != false %}<RefLink target="{{ parameter.typeRef }}">`{{ parameter.type }}`</RefLink>{% elsif parameter.typePath %}[{{ parameter.type }}]({{ parameter.typePath }}){% else %}{{ parameter.type }}{% endif %}
+{% endif %}
+
+{% if parameter.isOptional %}
+**Optional**: Yes
+{% endif %}
+
+{% if parameter.defaultValue %}
+**Default**: `{{ parameter.defaultValue }}`
+{% endif %}
+
+{% if parameter.description %}
+{{ parameter.description }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+*This function takes no parameters.*
+{% endif %}
+
+## Returns
+
+{% if returnType %}
+{% if returnType.type %}
+**Type**: {% if returnType.typeRef and autolink != false %}<RefLink target="{{ returnType.typeRef }}">`{{ returnType.type }}`</RefLink>{% elsif returnType.typePath %}[{{ returnType.type }}]({{ returnType.typePath }}){% else %}{{ returnType.type }}{% endif %}
+{% endif %}
+
+{% if returnType.description %}
+{{ returnType.description }}
+{% endif %}
+{% else %}
+*This function has no return value.*
+{% endif %}
+{% endblock %}

@@ -1,0 +1,59 @@
+<!--
+  Mintlify TypeDoc Template
+
+  This template controls how constructor documentation is generated.
+
+  Available variables:
+  - apiItem: The API item being documented
+  - page: Page metadata (title, description, icon, breadcrumb)
+  - properties, methods, constructors: Structured data for API members
+  - examples: Array of example code strings
+  - heritageTypes: Inheritance information
+
+  Learn more: https://mint-tsdocs.saulo.engineer/templates
+-->
+
+{%- layout "layout" %}
+
+{%- block content %}
+
+{%- if apiItem.signature %}
+## Signature
+
+```typescript
+{{ apiItem.signature }}
+```
+{%- endif %}
+
+{%- if parameters and parameters.size > 0 %}
+
+## Parameters
+
+{%- for parameter in parameters %}
+
+### {{ parameter.title }}
+
+{%- if parameter.type %}
+{%- assign formatted_param_type = parameter.type | format_type %}
+{%- if formatted_param_type contains "```" %}
+- **Type**:{{ formatted_param_type }}
+{%- else %}
+- **Type**: {%- if parameter.typeRef and autolink != false %}<RefLink target="{{ parameter.typeRef }}">`{{ formatted_param_type }}`</RefLink>{%- elsif parameter.typePath -%}[`{{ formatted_param_type }}`]({{ parameter.typePath }}){%- else -%}`{{ formatted_param_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if parameter.isOptional %}
+- **Optional**: Yes
+{%- endif %}
+{%- if parameter.defaultValue %}
+- **Default**: `{{ parameter.defaultValue }}`
+{%- endif %}
+{%- if parameter.description %}
+
+{{ parameter.description }}
+{%- endif %}
+{%- endfor %}
+{%- else %}
+
+*This constructor takes no parameters.*
+{%- endif %}
+{%- endblock %}

@@ -4,17 +4,50 @@ import { ClientConfigNetwork } from "./config.client.network";
 import { TCPClient } from "./tcp.client.network";
 import { UDPClient } from "./udp.client.network";
 
+/**
+ * Built-in network library for client-side applications.
+ *
+ * @remarks
+ * Reads network configuration from the environment via
+ * `ClientConfigNetwork` and automatically connects to the server over
+ * TCP (WebSocket), UDP (WebRTC data channel), or both.  Register with:
+ *
+ * ```ts
+ * client.useNetwork(new NetworkClientLibrary());
+ * ```
+ *
+ * Configuration (via environment variables):
+ * - `SERVER_ADDRESS` — hostname or IP of the server (required).
+ * - `SERVER_TCP_PORT` — WebSocket port for TCP (optional).
+ * - `SERVER_UDP_PORT` — signaling port for UDP/WebRTC (optional).
+ * - `MAGIC_VALUE` — packet framing delimiter (default: `"PACKET_END"`).
+ * - `WSS` — set to `"true"` to use `wss://` / `https://` (default: `false`).
+ *
+ * After `init`, access the connections via `tcp` and `udp`.
+ */
 export class NetworkClientLibrary extends BaseNetworkLibrary {
-  // Fast but less reliable send/receive of packets to a UDP server
-  public udp!: UDPClient;
-
-  // Reliable ordered send/receive of packets to a TCP server
+  /**
+   * Reliable, ordered WebSocket-based connection to the server.
+   *
+   * @remarks
+   * Only available when `SERVER_TCP_PORT` was specified in the environment.
+   */
   public tcp!: TCPClient;
 
+  /**
+   * Unreliable, unordered WebRTC data-channel connection to the server.
+   *
+   * @remarks
+   * Only available when `SERVER_UDP_PORT` was specified in the environment.
+   */
+  public udp!: UDPClient;
+
+  /** @internal */
   get __name(): string {
     return "NetworkClientLibrary";
   }
 
+  /** @internal */
   public override async __init(context: InitContext): Promise<void> {
     const config: ClientConfigNetwork = await context.config.registerConfig(ClientConfigNetwork);
 

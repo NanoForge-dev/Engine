@@ -1,0 +1,24 @@
+<!--
+  Mintlify TypeDoc Template
+
+  This template controls how generic documentation is generated.
+
+  Available variables:
+  - apiItem: The API item being documented
+  - page: Page metadata (title, description, icon, breadcrumb)
+  - properties, methods, constructors: Structured data for API members
+  - examples: Array of example code strings
+  - heritageTypes: Inheritance information
+
+  Learn more: https://mint-tsdocs.saulo.engineer/templates
+-->
+
+{% layout "layout" %}
+
+{% block content %}
+{% if apiItem.description %}
+## Description
+
+{{ apiItem.description }}
+{% endif %}
+{% endblock %}

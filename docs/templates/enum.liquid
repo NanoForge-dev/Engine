@@ -1,0 +1,43 @@
+<!--
+  Mintlify TypeDoc Template
+
+  This template controls how enum documentation is generated.
+
+  Available variables:
+  - apiItem: The API item being documented
+  - page: Page metadata (title, description, icon, breadcrumb)
+  - properties, methods, constructors: Structured data for API members
+  - examples: Array of example code strings
+  - heritageTypes: Inheritance information
+
+  Learn more: https://mint-tsdocs.saulo.engineer/templates
+-->
+
+{% layout "layout" %}
+
+{% block content %}
+## Members
+
+{% if members and members.size > 0 %}
+{%- assign showValues = true -%}
+{%- if rendering and rendering.hideStringEnumValues == true -%}
+  {%- assign showValues = false -%}
+{%- endif -%}
+
+{%- if showValues -%}
+| Member | Value | Description |
+| ------ | ----- | ----------- |
+{%- for member in members %}
+| `{{ member.title }}` | `{{ member.defaultValue }}` | {{ member.description | default: "" }} |
+{%- endfor %}
+{%- else -%}
+| Member | Description |
+| ------ | ----------- |
+{%- for member in members %}
+| `{{ member.title }}` | {{ member.description | default: "" }} |
+{%- endfor %}
+{%- endif -%}
+{% else %}
+*No members defined.*
+{% endif %}
+{% endblock %}

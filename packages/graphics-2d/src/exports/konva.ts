@@ -160,72 +160,107 @@ export type Wedge = Konva.Wedge;
 
 export type WedgeConfig = Konva.WedgeConfig;
 
+/** @internal */
 export const _global = Konva._global;
 
+/** @internal */
 export const _injectGlobal = Konva._injectGlobal;
 
+/** @internal */
 export const _mouseDblClickPointerId = Konva._mouseDblClickPointerId;
 
+/** @internal */
 export const _mouseInDblClickWindow = Konva._mouseInDblClickWindow;
 
+/** @internal */
 export const _mouseListenClick = Konva._mouseListenClick;
 
+/** @internal */
 export const _pointerDblClickPointerId = Konva._pointerDblClickPointerId;
 
+/** @internal */
 export const _pointerInDblClickWindow = Konva._pointerInDblClickWindow;
 
+/** @internal */
 export const _pointerListenClick = Konva._pointerListenClick;
 
+/** @internal */
 export const _renderBackend = Konva._renderBackend;
 
+/** @internal */
 export const _touchDblClickPointerId = Konva._touchDblClickPointerId;
 
+/** @internal */
 export const _touchInDblClickWindow = Konva._touchInDblClickWindow;
 
+/** @internal */
 export const _touchListenClick = Konva._touchListenClick;
 
+/** @internal */
 export const angleDeg = Konva.angleDeg;
 
+/** @internal */
 export const autoDrawEnabled = Konva.autoDrawEnabled;
 
+/** @internal */
 export const capturePointerEventsEnabled = Konva.capturePointerEventsEnabled;
 
+/** @internal */
 export const dblClickWindow = Konva.dblClickWindow;
 
+/** @internal */
 export const document = Konva.document;
 
+/** @internal */
 export const dragButtons = Konva.dragButtons;
 
+/** @internal */
 export const dragDistance = Konva.dragDistance;
 
+/** @internal */
 export const enableTrace = Konva.enableTrace;
 
+/** @internal */
 export const getAngle = Konva.getAngle;
 
+/** @internal */
 export const hitOnDragEnabled = Konva.hitOnDragEnabled;
 
+/** @internal */
 export const isBrowser = Konva.isBrowser;
 
+/** @internal */
 export const isDragReady = Konva.isDragReady;
 
+/** @internal */
 export const isDragging = Konva.isDragging;
 
+/** @internal */
 export const isTransforming = Konva.isTransforming;
 
+/** @internal */
 export const isUnminified = Konva.isUnminified;
 
+/** @internal */
 export const legacyTextRendering = Konva.legacyTextRendering;
 
+/** @internal */
 export const pixelRatio = Konva.pixelRatio;
 
+/** @internal */
 export const pointerEventsEnabled = Konva.pointerEventsEnabled;
 
+/** @internal */
 export const releaseCanvasOnDestroy = Konva.releaseCanvasOnDestroy;
 
+/** @internal */
 export const shapes = Konva.shapes;
 
+/** @internal */
 export const showWarnings = Konva.showWarnings;
 
+/** @internal */
 export const stages = Konva.stages;
 
+/** @internal */
 export const version = Konva.version;
