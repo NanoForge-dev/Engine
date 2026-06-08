@@ -1,3 +1,22 @@
+/**
+ * Enumeration of keyboard keys and mouse buttons supported by
+ * `InputLibrary`.
+ *
+ * @remarks
+ * Values correspond to the `KeyboardEvent.code` string for keyboard keys and
+ * to synthetic button identifiers for mouse buttons.  Use with
+ * `InputLibrary.isKeyPressed` and `InputLibrary.isDragging`.
+ *
+ * @example
+ * ```ts
+ * if (input.isKeyPressed(InputEnum.Space)) {
+ *   player.jump();
+ * }
+ * if (input.isDragging(InputEnum.MouseLeft)) {
+ *   camera.pan(input.getDragState());
+ * }
+ * ```
+ */
 export enum InputEnum {
   Escape = "Escape",
   Digit1 = "Digit1",

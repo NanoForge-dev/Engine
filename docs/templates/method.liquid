@@ -1,0 +1,67 @@
+{%- layout "layout" %}
+
+{%- block content %}
+
+{%- if apiItem.signature %}
+## Signature
+
+```typescript
+{{ apiItem.signature }}
+```
+{%- endif %}
+
+{%- if parameters and parameters.size > 0 or returnType %}
+
+## Parameters
+
+{%- if parameters and parameters.size > 0 %}
+{%- for parameter in parameters %}
+
+### {{ parameter.title }}
+
+{%- if parameter.type %}
+{%- assign formatted_param_type = parameter.type | format_type %}
+{%- if formatted_param_type contains "```" %}
+**Type**:{{ formatted_param_type }}
+{%- else %}
+**Type**: {%- if parameter.typeRef and autolink != false %}<RefLink target="{{ parameter.typeRef }}">`{{ formatted_param_type }}`</RefLink>{%- elsif parameter.typePath -%}[`{{ formatted_param_type }}`]({{ parameter.typePath }}){%- else -%}`{{ formatted_param_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if parameter.isOptional %}
+**Optional**: Yes
+{%- endif %}
+{%- if parameter.defaultValue %}
+**Default**: `{{ parameter.defaultValue }}`
+{%- endif %}
+{%- if parameter.description %}
+
+{{ parameter.description }}
+{%- endif %}
+{%- endfor %}
+{%- else %}
+
+*No parameters.*
+{%- endif %}
+
+## Returns
+
+{%- if returnType and returnType.type %}
+{%- assign formatted_return_type = returnType.type | format_type %}
+{%- if formatted_return_type contains "```" %}
+
+**Type**:{{ formatted_return_type }}
+{%- else %}
+
+**Type**: {%- if returnType.typeRef and autolink != false %}<RefLink target="{{ returnType.typeRef }}">`{{ formatted_return_type }}`</RefLink>{%- elsif returnType.typePath -%}[`{{ formatted_return_type }}`]({{ returnType.typePath }}){%- else -%}`{{ formatted_return_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if returnType and returnType.description %}
+
+{{ returnType.description }}
+{%- endif %}
+{%- if not returnType or not returnType.type %}
+
+`void`
+{%- endif %}
+{%- endif %}
+{%- endblock %}

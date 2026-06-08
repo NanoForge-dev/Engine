@@ -53,7 +53,7 @@
     "prepack": "pnpm run build && pnpm run lint",
     "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/config/*'",
     "release": "cliff-jumper",
-    "mint-tsdocs": "mint-tsdocs generate"
+    "docs": "mint-tsdocs generate"
   },
   "dependencies": {
     "class-transformer": "catalog:config",
@@ -70,7 +70,7 @@
     "typescript": "catalog:core",
     "unrun": "catalog:build"
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@11.5.2",
   "engines": {
     "node": "25"
   },

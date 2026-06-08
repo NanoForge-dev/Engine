@@ -1,7 +1,15 @@
 import { buildMagicPacket, parsePacketsFromChunks } from "./utils";
 
-/** TCPClient
- * Reliable ordered send/receive of packets to a TCP server
+/**
+ * Reliable, ordered WebSocket-based client connection to a NanoForge TCP server.
+ *
+ * @remarks
+ * Packets are framed with a configurable magic delimiter so that partial
+ * WebSocket frames can be reassembled.  The connection is established by
+ * calling `connect` and status can be queried with `isConnected`.
+ *
+ * Typical usage is through `NetworkClientLibrary` which instantiates and
+ * connects this class automatically during `__init`.
  */
 export class TCPClient {
   private _channel: WebSocket | null = null;
@@ -19,9 +27,12 @@ export class TCPClient {
   }
 
   /**
-   * Initiate a WebSocket connection to the server (e.g. `ws://<ip>:<port>`).
+   * Initiate a WebSocket connection to the server.
    *
-   * @returns Promise<void>
+   * @remarks
+   * Connects to `ws[s]://<ip>:<port>`.  Resolves as soon as the connection
+   * attempt is dispatched (the socket may not be fully open yet — check
+   * `isConnected`).
    */
   public async connect(): Promise<void> {
     this.connectToServerWebSocket();
@@ -29,8 +40,6 @@ export class TCPClient {
 
   /**
    * Return `true` when the underlying WebSocket is open.
-   *
-   * @returns boolean
    */
   public isConnected(): boolean {
     return this._channel !== null && this._channel.readyState === WebSocket.OPEN;
@@ -39,8 +48,10 @@ export class TCPClient {
   /**
    * Send a payload to the server.
    *
-   * @param data Uint8Array — raw payload bytes.
-   * @returns void
+   * @remarks
+   * The payload is wrapped in a magic framing packet before being sent.
+   *
+   * @param data - Raw payload bytes.
    */
   public sendData(data: Uint8Array): void {
     if (!this._channel) {
@@ -51,9 +62,13 @@ export class TCPClient {
   }
 
   /**
-   * Return an array of complete packets that were reassembled from received chunks.
+   * Parse and return all complete packets received since the last call.
    *
-   * @returns Uint8Array[] — array of packet buffers.
+   * @remarks
+   * Partial packets are retained internally and combined with future chunks
+   * until they are complete.  Call this method once per frame.
+   *
+   * @returns Array of complete packet buffers.
    */
   public getReceivedPackets(): Uint8Array[] {
     const { packets, data, chunkedData } = parsePacketsFromChunks(

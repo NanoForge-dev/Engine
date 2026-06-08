@@ -4,17 +4,50 @@ import { ServerConfigNetwork } from "./config.server.network";
 import { TCPServer } from "./tcp.server.network";
 import { UDPServer } from "./udp.server.network";
 
+/**
+ * Built-in network library for server-side applications.
+ *
+ * @remarks
+ * Reads network configuration from the environment via
+ * `ServerConfigNetwork` and starts TCP (WebSocket) and/or UDP (WebRTC)
+ * servers.  Register with:
+ *
+ * ```ts
+ * server.useNetwork(new NetworkServerLibrary());
+ * ```
+ *
+ * Configuration (via environment variables):
+ * - `LISTENING_INTERFACE` — bind address (default: `"0.0.0.0"`).
+ * - `LISTENING_TCP_PORT` — WebSocket listen port for TCP (optional).
+ * - `LISTENING_UDP_PORT` — signaling listen port for UDP (optional).
+ * - `MAGIC_VALUE` — packet framing delimiter (default: `"PACKET_END"`).
+ * - `WSS_CERT` / `WSS_KEY` — paths to TLS certificate and key files for WSS (optional).
+ *
+ * After `init`, access the servers via `tcp` and `udp`.
+ */
 export class NetworkServerLibrary extends BaseNetworkLibrary {
-  // Fast but less reliable unordered send/receive to multiple UDP clients
+  /**
+   * Unreliable, unordered WebRTC data-channel server for connected clients.
+   *
+   * @remarks
+   * Only available when `LISTENING_UDP_PORT` was specified in the environment.
+   */
   public udp!: UDPServer;
 
-  // Reliable ordered send/receive of packets to multiple TCP clients
+  /**
+   * Reliable, ordered WebSocket-based server for connected clients.
+   *
+   * @remarks
+   * Only available when `LISTENING_TCP_PORT` was specified in the environment.
+   */
   public tcp!: TCPServer;
 
+  /** @internal */
   get __name(): string {
     return "NetworkServerLibrary";
   }
 
+  /** @internal */
   public override async __init(context: InitContext): Promise<void> {
     const config: ServerConfigNetwork = await context.config.registerConfig(ServerConfigNetwork);
 

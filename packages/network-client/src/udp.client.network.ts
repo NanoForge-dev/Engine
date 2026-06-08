@@ -1,7 +1,16 @@
 import { buildMagicPacket, parsePacketsFromChunks } from "./utils";
 
-/** UDPClient
- * Fast but less reliable send/receive of packets to a UDP server
+/**
+ * Unreliable, unordered WebRTC data-channel client connection to a NanoForge
+ * UDP server.
+ *
+ * @remarks
+ * Uses a WebSocket signaling channel to perform the SDP/ICE handshake and then
+ * communicates over an RTCDataChannel with `ordered: false` and
+ * `maxRetransmits: 0` for minimal latency.
+ *
+ * Typical usage is through `NetworkClientLibrary` which instantiates and
+ * connects this class automatically during `__init`.
  */
 export class UDPClient {
   private _channel: RTCDataChannel | null = null;
@@ -19,9 +28,12 @@ export class UDPClient {
   }
 
   /**
-   * Open a WebSocket for signaling, create an RTCPeerConnection and initiate an SDP offer.
+   * Open the WebSocket signaling channel, create an RTCPeerConnection, and
+   * complete the SDP/ICE handshake with the server.
    *
-   * @returns Promise<void>
+   * @remarks
+   * Resolves once the offer has been dispatched.  The data channel may become
+   * open shortly after — check `isConnected`.
    */
   public async connect(): Promise<void> {
     const webSocket: WebSocket = this.connectToServerWebSocket();
@@ -32,8 +44,6 @@ export class UDPClient {
 
   /**
    * Return `true` when the RTCDataChannel is open.
-   *
-   * @returns boolean
    */
   public isConnected(): boolean {
     return this._channel !== null && this._channel.readyState === "open";
@@ -42,8 +52,10 @@ export class UDPClient {
   /**
    * Send a payload on the data channel.
    *
-   * @param data Uint8Array — raw payload bytes.
-   * @returns void
+   * @remarks
+   * The payload is wrapped in a magic framing packet before being sent.
+   *
+   * @param data - Raw payload bytes.
    */
   public sendData(data: Uint8Array): void {
     if (!this._channel) {
@@ -54,9 +66,13 @@ export class UDPClient {
   }
 
   /**
-   * Return an array of complete packets reassembled from received data-channel chunks.
+   * Parse and return all complete packets received since the last call.
    *
-   * @returns Uint8Array[] — array of packet buffers.
+   * @remarks
+   * Partial packets are retained internally and combined with future chunks
+   * until they are complete.  Call this method once per frame.
+   *
+   * @returns Array of complete packet buffers.
    */
   public getReceivedPackets(): Uint8Array[] {
     const { packets, data, chunkedData } = parsePacketsFromChunks(

@@ -1,0 +1,27 @@
+{%- layout "layout" %}
+
+{%- block content %}
+
+{%- if members and members.size > 0 %}
+{%- assign showValues = true %}
+{%- if rendering and rendering.hideStringEnumValues == true %}
+{%- assign showValues = false %}
+{%- endif %}
+
+## Members
+
+{%- if showValues %}
+| Member | Value | Description |
+| ------ | ----- | ----------- |
+{%- for member in members %}
+| `{{ member.title }}` | `{{ member.defaultValue }}` | {{ member.description | default: "" }} |
+{%- endfor %}
+{%- else %}
+| Member | Description |
+| ------ | ----------- |
+{%- for member in members %}
+| `{{ member.title }}` | {{ member.description | default: "" }} |
+{%- endfor %}
+{%- endif %}
+{%- endif %}
+{%- endblock %}

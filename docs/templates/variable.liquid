@@ -1,0 +1,32 @@
+{%- layout "layout" %}
+
+{%- block content %}
+
+{%- if apiItem.signature %}
+## Signature
+
+```typescript
+{{ apiItem.signature }}
+```
+{%- endif %}
+
+{%- if returnType %}
+
+## Type
+
+{%- if returnType.type %}
+{%- assign formatted_type = returnType.type | format_type %}
+{%- if formatted_type contains "```" %}
+
+**Type**:{{ formatted_type }}
+{%- else %}
+
+**Type**: {%- if returnType.typeRef and autolink != false %}<RefLink target="{{ returnType.typeRef }}">`{{ formatted_type }}`</RefLink>{%- elsif returnType.typePath -%}[`{{ formatted_type }}`]({{ returnType.typePath }}){%- else -%}`{{ formatted_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if returnType.description %}
+
+{{ returnType.description }}
+{%- endif %}
+{%- endif %}
+{%- endblock %}

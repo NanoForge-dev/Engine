@@ -1,0 +1,10 @@
+{%- layout "layout" %}
+
+{%- block content %}
+{%- if apiItem.defaultValue %}
+
+## Value
+
+`{{ apiItem.defaultValue }}`
+{%- endif %}
+{%- endblock %}

@@ -1,10 +1,13 @@
 {
   "$schema": "./node_modules/mint-tsdocs/lib/schemas/config.schema.json",
-  "entryPoint": "dist/index.d.cts",
-  "outputFolder": "../../references/ecs-client",
+  "entryPoint": "dist/index.d.ts",
+  "outputFolder": "../../docs/references/ecs-client",
   "lint": {
     "eslint": {
       "enabled": true
     }
+  },
+  "templates": {
+    "userTemplateDir": "../../docs/templates"
   }
 }

@@ -1,0 +1,41 @@
+{%- layout "layout" %}
+
+{%- block content %}
+
+{%- if apiItem.signature %}
+## Signature
+
+```typescript
+{{ apiItem.signature }}
+```
+{%- endif %}
+
+{%- if parameters and parameters.size > 0 %}
+
+## Type Parameters
+
+{%- for parameter in parameters %}
+
+### {{ parameter.title }}
+
+{%- if parameter.type %}
+{%- assign formatted_param_type = parameter.type | format_type %}
+{%- if formatted_param_type contains "```" %}
+**Type**:{{ formatted_param_type }}
+{%- else %}
+**Type**: {%- if parameter.typePath -%}[`{{ formatted_param_type }}`]({{ parameter.typePath }}){%- else -%}`{{ formatted_param_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if parameter.isOptional %}
+**Optional**: Yes
+{%- endif %}
+{%- if parameter.defaultValue %}
+**Default**: `{{ parameter.defaultValue }}`
+{%- endif %}
+{%- if parameter.description %}
+
+{{ parameter.description }}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+{%- endblock %}

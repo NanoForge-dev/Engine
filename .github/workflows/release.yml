@@ -94,3 +94,4 @@ jobs:
           repository: engine
           category: engine
           references: true
+          references-path: docs/references

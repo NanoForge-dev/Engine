@@ -1,0 +1,116 @@
+{%- layout "layout" %}
+
+{%- block content %}
+
+{%- if apiItem.signature %}
+## Signature
+
+```typescript
+{{ apiItem.signature }}
+```
+{%- endif %}
+
+{%- if abstractClasses and abstractClasses.size > 0 %}
+## Abstract Classes
+
+{%- for item in abstractClasses %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{%- if item.description %}
+{{ item.description }}
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}
+
+{%- if classes and classes.size > 0 %}
+## Classes
+
+{%- for item in classes %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{%- if item.description %}
+{{ item.description }}
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}
+
+{%- if enumerations and enumerations.size > 0 %}
+## Enumerations
+
+{%- for item in enumerations %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{%- if item.description %}
+{{ item.description }}
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}
+
+{%- if functions and functions.size > 0 %}
+## Functions
+
+{%- for item in functions %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{%- if item.description %}
+{{ item.description }}
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}
+
+{%- if interfaces and interfaces.size > 0 %}
+## Interfaces
+
+{%- for item in interfaces %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{%- if item.description %}
+{{ item.description }}
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}
+
+{%- if namespaces and namespaces.size > 0 %}
+## Namespaces
+
+{%- for item in namespaces %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{%- if item.description %}
+{{ item.description }}
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}
+
+{%- if typeAliases and typeAliases.size > 0 %}
+## Type Aliases
+
+{%- for item in typeAliases %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{%- if item.description %}
+{{ item.description }}
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}
+
+{%- if variables and variables.size > 0 %}
+## Variables
+
+{%- for item in variables %}
+### [{{ item.title }}]({{ item.titlePath }})
+
+{%- if item.description %}
+{{ item.description }}
+{%- endif %}
+
+{%- endfor %}
+{%- endif %}
+{%- endblock %}

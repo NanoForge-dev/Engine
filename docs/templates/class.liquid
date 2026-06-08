@@ -1,0 +1,109 @@
+{%- layout "layout" %}
+
+{%- block content %}
+
+{%- if apiItem.signature %}
+## Signature
+
+```typescript
+{{ apiItem.signature }}
+```
+{%- endif %}
+
+{%- if constructors and constructors.size > 0 %}
+
+## Constructors
+
+{%- for constructor in constructors %}
+
+### {{ constructor.title }}
+
+{%- if constructor.modifiers and constructor.modifiers.size > 0 %}
+**Modifiers**: {{ constructor.modifiers | join: ', ' }}
+{%- endif %}
+{%- if constructor.description %}
+
+{{ constructor.description }}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+
+{%- if properties and properties.size > 0 %}
+
+## Properties
+
+{%- for property in properties %}
+
+### {{ property.title }}
+
+{%- if property.modifiers and property.modifiers.size > 0 %}
+**Modifiers**: {{ property.modifiers | join: ', ' }}
+{%- endif %}
+{%- if property.type %}
+{%- assign formatted_prop_type = property.type | format_type %}
+{%- if formatted_prop_type contains "```" %}
+**Type**:{{ formatted_prop_type }}
+{%- else %}
+**Type**: {%- if property.typeRef and autolink != false %}<RefLink target="{{ property.typeRef }}">`{{ formatted_prop_type }}`</RefLink>{%- elsif property.typePath %}[`{{ formatted_prop_type }}`]({{ property.typePath }}){%- else %}`{{ formatted_prop_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if property.isOptional %}
+**Optional**: Yes
+{%- endif %}
+{%- if property.isInherited %}
+**Inherited**: Yes
+{%- endif %}
+{%- if property.defaultValue and property.defaultValue.size > 0 %}
+**Default**: `{{ property.defaultValue }}`
+{%- endif %}
+{%- if property.description %}
+
+{{ property.description }}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+
+{%- if methods and methods.size > 0 %}
+
+## Methods
+
+{%- for method in methods %}
+
+### {{ method.title }}
+
+{%- if method.modifiers and method.modifiers.size > 0 %}
+**Modifiers**: {{ method.modifiers | join: ', ' }}
+{%- endif %}
+{%- if method.isInherited %}
+**Inherited**: Yes
+{%- endif %}
+{%- if method.description %}
+
+{{ method.description }}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+
+{%- if events and events.size > 0 %}
+
+## Events
+
+{%- for event in events %}
+
+### {{ event.title }}
+
+{%- if event.type %}
+{%- assign formatted_event_type = event.type | format_type %}
+{%- if formatted_event_type contains "```" %}
+**Type**:{{ formatted_event_type }}
+{%- else %}
+**Type**: {%- if event.typeRef and autolink != false %}<RefLink target="{{ event.typeRef }}">`{{ formatted_event_type }}`</RefLink>{%- elsif event.typePath %}[`{{ formatted_event_type }}`]({{ event.typePath }}){%- else %}`{{ formatted_event_type }}`{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- if event.description %}
+
+{{ event.description }}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+{%- endblock %}
