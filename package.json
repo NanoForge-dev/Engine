@@ -26,7 +26,7 @@
     "test:unit": "turbo run test:unit --concurrency=5",
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
     "prepare": "husky",
-    "docs": "turbo run docs --concurrency=5"
+    "docs": "turbo run docs --concurrency=5 && ./scripts/sync-docs-references.sh"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:ci",

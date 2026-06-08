@@ -9,8 +9,8 @@ import {
  * Built-in asset-manager library.
  *
  * @remarks
- * Stores the file map injected by the NanoForge bundler (`nf build`) and
- * exposes assets via `getAsset`.  Register it with the application before
+ * Stores the file map injected by the NanoForge loader (`nf start`) and
+ * exposes assets via `getAsset`. Register it with the application before
  * calling `init`:
  *
  * ```ts

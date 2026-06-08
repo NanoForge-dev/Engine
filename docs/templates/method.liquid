@@ -1,18 +1,3 @@
-<!--
-  Mintlify TypeDoc Template
-
-  This template controls how method documentation is generated.
-
-  Available variables:
-  - apiItem: The API item being documented
-  - page: Page metadata (title, description, icon, breadcrumb)
-  - properties, methods, constructors: Structured data for API members
-  - examples: Array of example code strings
-  - heritageTypes: Inheritance information
-
-  Learn more: https://mint-tsdocs.saulo.engineer/templates
--->
-
 {%- layout "layout" %}
 
 {%- block content %}
@@ -55,7 +40,7 @@
 {%- endfor %}
 {%- else %}
 
-*This method takes no parameters.*
+*No parameters.*
 {%- endif %}
 
 ## Returns
@@ -76,7 +61,7 @@
 {%- endif %}
 {%- if not returnType or not returnType.type %}
 
-*This method has no return value.*
+`void`
 {%- endif %}
 {%- endif %}
 {%- endblock %}

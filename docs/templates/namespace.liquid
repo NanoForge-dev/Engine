@@ -1,147 +1,116 @@
-<!--
-  Mintlify TypeDoc Template
+{%- layout "layout" %}
 
-  This template controls how namespace documentation is generated.
+{%- block content %}
 
-  Available variables:
-  - apiItem: The API item being documented
-  - page: Page metadata (title, description, icon, breadcrumb)
-  - properties, methods, constructors: Structured data for API members
-  - examples: Array of example code strings
-  - heritageTypes: Inheritance information
-
-  Learn more: https://mint-tsdocs.saulo.engineer/templates
--->
-
-{% layout "layout" %}
-
-{% block content %}
-
-{% if apiItem.signature %}
+{%- if apiItem.signature %}
 ## Signature
 
 ```typescript
 {{ apiItem.signature }}
 ```
-{% endif %}
+{%- endif %}
 
+{%- if abstractClasses and abstractClasses.size > 0 %}
 ## Abstract Classes
 
-{% if abstractClasses and abstractClasses.size > 0 %}
-{% for item in abstractClasses %}
+{%- for item in abstractClasses %}
 ### [{{ item.title }}]({{ item.titlePath }})
 
-{% if item.description %}
+{%- if item.description %}
 {{ item.description }}
-{% endif %}
+{%- endif %}
 
-{% endfor %}
-{% else %}
-*No abstract classes defined.*
-{% endif %}
+{%- endfor %}
+{%- endif %}
 
+{%- if classes and classes.size > 0 %}
 ## Classes
 
-{% if classes and classes.size > 0 %}
-{% for item in classes %}
+{%- for item in classes %}
 ### [{{ item.title }}]({{ item.titlePath }})
 
-{% if item.description %}
+{%- if item.description %}
 {{ item.description }}
-{% endif %}
+{%- endif %}
 
-{% endfor %}
-{% else %}
-*No classes defined.*
-{% endif %}
+{%- endfor %}
+{%- endif %}
 
+{%- if enumerations and enumerations.size > 0 %}
 ## Enumerations
 
-{% if enumerations and enumerations.size > 0 %}
-{% for item in enumerations %}
+{%- for item in enumerations %}
 ### [{{ item.title }}]({{ item.titlePath }})
 
-{% if item.description %}
+{%- if item.description %}
 {{ item.description }}
-{% endif %}
+{%- endif %}
 
-{% endfor %}
-{% else %}
-*No enumerations defined.*
-{% endif %}
+{%- endfor %}
+{%- endif %}
 
+{%- if functions and functions.size > 0 %}
 ## Functions
 
-{% if functions and functions.size > 0 %}
-{% for item in functions %}
+{%- for item in functions %}
 ### [{{ item.title }}]({{ item.titlePath }})
 
-{% if item.description %}
+{%- if item.description %}
 {{ item.description }}
-{% endif %}
+{%- endif %}
 
-{% endfor %}
-{% else %}
-*No functions defined.*
-{% endif %}
+{%- endfor %}
+{%- endif %}
 
+{%- if interfaces and interfaces.size > 0 %}
 ## Interfaces
 
-{% if interfaces and interfaces.size > 0 %}
-{% for item in interfaces %}
+{%- for item in interfaces %}
 ### [{{ item.title }}]({{ item.titlePath }})
 
-{% if item.description %}
+{%- if item.description %}
 {{ item.description }}
-{% endif %}
+{%- endif %}
 
-{% endfor %}
-{% else %}
-*No interfaces defined.*
-{% endif %}
+{%- endfor %}
+{%- endif %}
 
+{%- if namespaces and namespaces.size > 0 %}
 ## Namespaces
 
-{% if namespaces and namespaces.size > 0 %}
-{% for item in namespaces %}
+{%- for item in namespaces %}
 ### [{{ item.title }}]({{ item.titlePath }})
 
-{% if item.description %}
+{%- if item.description %}
 {{ item.description }}
-{% endif %}
+{%- endif %}
 
-{% endfor %}
-{% else %}
-*No namespaces defined.*
-{% endif %}
+{%- endfor %}
+{%- endif %}
 
+{%- if typeAliases and typeAliases.size > 0 %}
 ## Type Aliases
 
-{% if typeAliases and typeAliases.size > 0 %}
-{% for item in typeAliases %}
+{%- for item in typeAliases %}
 ### [{{ item.title }}]({{ item.titlePath }})
 
-{% if item.description %}
+{%- if item.description %}
 {{ item.description }}
-{% endif %}
+{%- endif %}
 
-{% endfor %}
-{% else %}
-*No type aliases defined.*
-{% endif %}
+{%- endfor %}
+{%- endif %}
 
+{%- if variables and variables.size > 0 %}
 ## Variables
 
-{% if variables and variables.size > 0 %}
-{% for item in variables %}
+{%- for item in variables %}
 ### [{{ item.title }}]({{ item.titlePath }})
 
-{% if item.description %}
+{%- if item.description %}
 {{ item.description }}
-{% endif %}
+{%- endif %}
 
-{% endfor %}
-{% else %}
-*No variables defined.*
-{% endif %}
-{% endblock %}
+{%- endfor %}
+{%- endif %}
+{%- endblock %}
