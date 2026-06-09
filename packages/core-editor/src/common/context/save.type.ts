@@ -57,7 +57,7 @@ export interface SaveEntity {
 }
 
 /**
- * Root serialised scene state exchanged between the editor and the engine.
+ * Root serialized scene state exchanged between the editor and the engine.
  */
 export interface Save {
   /** All libraries registered in the scene. */
