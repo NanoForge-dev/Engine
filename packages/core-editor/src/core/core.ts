@@ -36,6 +36,7 @@ export class Core {
     this._configRegistry = new ConfigRegistry(options.env);
     await this.runInit(this.getInitContext(options));
     this.editor = new CoreEditor(
+      this,
       options.editor,
       this.config.getComponentSystemLibrary<ECSClientLibrary>().library,
     );
@@ -63,7 +64,7 @@ export class Core {
         return;
       }
       const tickStart = Date.now();
-      await runner(tickStart - previousTick);
+      if (this.editor?.isPaused) await runner(tickStart - previousTick);
       previousTick = tickStart;
       setTimeout(render, tickLengthMs + tickStart - Date.now());
     };
@@ -72,14 +73,14 @@ export class Core {
     setTimeout(render);
   }
 
+  public getExecutionContext(): EditableExecutionContext {
+    return new EditableExecutionContext(this.context, this.config.libraryManager);
+  }
+
   private getInitContext(options: IEditorRunOptions): InitContext {
     if (!this._configRegistry) throw new NfNotInitializedException("Core");
 
     return new InitContext(this.context, this.config.libraryManager, this._configRegistry, options);
-  }
-
-  private getExecutionContext(): EditableExecutionContext {
-    return new EditableExecutionContext(this.context, this.config.libraryManager);
   }
 
   private getClearContext(): ClearContext {

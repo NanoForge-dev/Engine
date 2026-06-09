@@ -1,9 +1,10 @@
 import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { EventTypeEnum } from "../src/common/context/event-emitter.type";
+import { CoreEvents } from "../src/common/context/events/core-events";
 import type { IEditorRunOptions } from "../src/common/context/options.type";
 import { type Save, type SaveComponent, type SaveEntity } from "../src/common/context/save.type";
+import { type Core } from "../src/core/core";
 import { CoreEditor } from "../src/editor/core-editor";
 import { EventEmitter } from "./helpers/event-emitter";
 
@@ -15,13 +16,14 @@ describe("EditorFeatures", () => {
   describe("eventEmitter", () => {
     it("should execute eventQueue once", async () => {
       const events = new EventEmitter();
-      events.emitEvent(EventTypeEnum.HOT_RELOAD);
-      events.emitEvent(EventTypeEnum.HOT_RELOAD);
+      events.emitEvent(CoreEvents.HOT_RELOAD);
+      events.emitEvent(CoreEvents.HOT_RELOAD);
       const spyHotReload = vi
-        .spyOn(CoreEditor.prototype, "askEntitiesHotReload")
+        .spyOn(CoreEditor.prototype, "hotReloadEvent")
         .mockImplementation(() => {});
       new CoreEditor(
-        { coreEvents: events } as IEditorRunOptions["editor"],
+        {} as unknown as Core,
+        { coreEvents: events, save: { libraries: [] } } as unknown as IEditorRunOptions["editor"],
         {} as ECSClientLibrary,
       ).runEvents();
       expect(spyHotReload).toHaveBeenCalledTimes(2);
@@ -113,6 +115,7 @@ describe("EditorFeatures", () => {
       ];
       const fakeReg = new FakeRegistry();
       new CoreEditor(
+        {} as unknown as Core,
         {
           save: {
             components,
@@ -120,7 +123,7 @@ describe("EditorFeatures", () => {
           } as any as Save,
         } as any as IEditorRunOptions["editor"],
         { registry: fakeReg } as any as ECSClientLibrary,
-      ).askEntitiesHotReload();
+      ).hotReloadEvent({ components, entities } as any as Save);
       expect(fakeReg.getComponents).toHaveBeenCalledWith({ name: "__RESERVED_ENTITY_ID" });
       expect(getIndex).toHaveBeenNthCalledWith(1, {
         entityId: "ent2",
@@ -137,13 +140,13 @@ describe("EditorFeatures", () => {
       expect(fakeReg.getEntityComponent).toHaveBeenNthCalledWith(1, 2, { name: "Position" });
       expect(fakeReg.getEntityComponent).toHaveBeenNthCalledWith(2, 2, { name: "Bullets" });
       expect(fakeReg.getEntityComponent).toHaveBeenNthCalledWith(3, 3, { name: "Position" });
-      expect(fakeReg.addComponent).toHaveBeenNthCalledWith(1, 2, { name: "Position", x: 1, y: 2 });
+      expect(fakeReg.addComponent).toHaveBeenNthCalledWith(1, 2, { name: "Position", x: 3, y: 4 });
       expect(fakeReg.addComponent).toHaveBeenNthCalledWith(2, 2, {
         name: "Bullets",
         bulletTypes: ["fire", "water", "rocket"],
-        number: 1000,
+        number: 4,
       });
-      expect(fakeReg.addComponent).toHaveBeenNthCalledWith(3, 3, { name: "Position", x: 5, y: 6 });
+      expect(fakeReg.addComponent).toHaveBeenNthCalledWith(3, 3, { name: "Position", x: 7, y: 8 });
     });
   });
 });

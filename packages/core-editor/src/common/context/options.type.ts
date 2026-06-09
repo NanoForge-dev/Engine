@@ -1,4 +1,6 @@
 import { type IEventEmitter } from "./event-emitter.type";
+import { type CoreEvents, type CoreEventsMap } from "./events/core-events";
+import { type EditorEvents, type EditorEventsMap } from "./events/editor-events";
 import { type Save } from "./save.type";
 
 /**
@@ -25,9 +27,9 @@ export interface IEditorRunClientOptions {
     /** Serialised scene state loaded or saved by the editor. */
     save: Save;
     /** Event emitter for core-to-editor communication. */
-    coreEvents: IEventEmitter;
+    coreEvents: IEventEmitter<CoreEvents, CoreEventsMap>;
     /** Event emitter for editor-to-core communication. */
-    editorEvents: IEventEmitter;
+    editorEvents: IEventEmitter<EditorEvents, EditorEventsMap>;
   };
 }
 
@@ -47,8 +49,8 @@ export interface IEditorRunServerOptions {
     /** Serialised scene state loaded or saved by the editor. */
     save: Save;
     /** Event emitter for core-to-editor communication. */
-    coreEvents: IEventEmitter;
+    coreEvents: IEventEmitter<CoreEvents, CoreEventsMap>;
     /** Event emitter for editor-to-core communication. */
-    editorEvents: IEventEmitter;
+    editorEvents: IEventEmitter<EditorEvents, EditorEventsMap>;
   };
 }

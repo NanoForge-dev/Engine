@@ -16,7 +16,7 @@ export interface ClassHandle {
   [Symbol.dispose](): void;
   clone(): this;
 }
-export interface container extends ClassHandle {
+export interface container extends ClassHandle, Iterable<any | undefined> {
   size(): number;
   get(_0: number): any | undefined | undefined;
   push_back(_0?: any): void;
