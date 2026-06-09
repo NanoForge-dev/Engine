@@ -33,9 +33,9 @@ export class CoreEditor {
     this.editor.coreEvents?.runEvents();
   }
 
-  public hotReloadEvent(): void {
+  public hotReloadEvent(save: Save): void {
     const reg = this.ecsLibrary.registry;
-    const save = this.editor.save;
+    this.lastLoadedSave = JSON.parse(JSON.stringify(save));
     save.entities.forEach(({ id, components }) => {
       Object.entries(components).forEach(([componentName, params]) => {
         const ogComponent = save.components.find(({ name }) => name === componentName);
@@ -55,12 +55,10 @@ export class CoreEditor {
         reg.addComponent(ecsEntity, ecsComponent);
       });
     });
-    this.lastLoadedSave = JSON.parse(JSON.stringify(save));
   }
 
   public hardReloadEvent(save: Save): void {
     const reg = this.ecsLibrary.registry;
-    this.editor.save = save;
     this.lastLoadedSave = JSON.parse(JSON.stringify(save));
     save.entities.forEach(({ id, components }) => {
       Object.entries(components).forEach(([componentName, params]) => {

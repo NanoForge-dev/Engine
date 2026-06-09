@@ -17,7 +17,7 @@ export enum CoreEvents {
 }
 
 export interface CoreEventsMap {
-  [CoreEvents.HOT_RELOAD]: [];
+  [CoreEvents.HOT_RELOAD]: [save: Save];
   [CoreEvents.HARD_RELOAD]: [save: Save];
   [CoreEvents.PAUSE_GAME]: [];
   [CoreEvents.STOP_GAME]: [];
