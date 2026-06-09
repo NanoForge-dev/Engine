@@ -6,7 +6,7 @@ export enum CoreEvents {
   HOT_RELOAD = "hot-reload",
   /** Reload all entities component params */
   HARD_RELOAD = "hard-reload",
-  /** Don't execute the run function for n ms or until UNPAUSE_GAME */
+  /** Don't execute the run function until UNPAUSE_GAME */
   PAUSE_GAME = "pause-game",
   /** End main loop and clear */
   STOP_GAME = "stop-game",
@@ -17,7 +17,7 @@ export enum CoreEvents {
 export interface CoreEventsMap {
   [CoreEvents.HOT_RELOAD]: [];
   [CoreEvents.HARD_RELOAD]: [];
-  [CoreEvents.PAUSE_GAME]: [duration: number];
+  [CoreEvents.PAUSE_GAME]: [];
   [CoreEvents.STOP_GAME]: [];
   [CoreEvents.UNPAUSE_GAME]: [];
 }
