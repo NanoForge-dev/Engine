@@ -123,7 +123,7 @@ describe("EditorFeatures", () => {
           } as any as Save,
         } as any as IEditorRunOptions["editor"],
         { registry: fakeReg } as any as ECSClientLibrary,
-      ).hotReloadEvent();
+      ).hotReloadEvent({ components, entities } as any as Save);
       expect(fakeReg.getComponents).toHaveBeenCalledWith({ name: "__RESERVED_ENTITY_ID" });
       expect(getIndex).toHaveBeenNthCalledWith(1, {
         entityId: "ent2",
