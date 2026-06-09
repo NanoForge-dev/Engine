@@ -11,14 +11,22 @@ export class CoreEditor {
   private ecsLibrary: ECSClientLibrary;
   private lastLoadedSave: Save;
   private core: Core;
+  private _isPaused: boolean = false;
 
   constructor(core: Core, editor: IEditorRunOptions["editor"], ecsLibrary: ECSClientLibrary) {
     this.editor = editor;
     this.lastLoadedSave = JSON.parse(JSON.stringify(this.editor.save));
     this.ecsLibrary = ecsLibrary;
     this.editor.coreEvents?.addListener(CoreEvents.HOT_RELOAD, this.hotReloadEvent.bind(this));
+    this.editor.coreEvents?.addListener(CoreEvents.HARD_RELOAD, this.hardReloadEvent.bind(this));
+    this.editor.coreEvents?.addListener(CoreEvents.PAUSE_GAME, this.pauseGameEvent.bind(this));
     this.editor.coreEvents?.addListener(CoreEvents.STOP_GAME, this.stopGameEvent.bind(this));
+    this.editor.coreEvents?.addListener(CoreEvents.UNPAUSE_GAME, this.unpauseGameEvent.bind(this));
     this.core = core;
+  }
+
+  get isPaused(): boolean {
+    return this._isPaused;
   }
 
   public runEvents() {
@@ -48,6 +56,35 @@ export class CoreEditor {
       });
     });
     this.lastLoadedSave = JSON.parse(JSON.stringify(save));
+  }
+
+  public hardReloadEvent(): void {
+    const reg = this.ecsLibrary.registry;
+    const save = this.editor.save;
+    save.entities.forEach(({ id, components }) => {
+      Object.entries(components).forEach(([componentName, params]) => {
+        const ogComponent = save.components.find(({ name }) => name === componentName);
+        if (!ogComponent) {
+          throw new NfNotFound("Component: " + componentName + " not found in saved components");
+        }
+        const ecsEntity: Entity = this.getEntityFromEntityId(id);
+        const ecsComponent = reg.getEntityComponent(ecsEntity, {
+          name: componentName,
+        });
+        Object.entries(params).forEach(([paramName, paramValue]) => {
+          ecsComponent[paramName] = paramValue;
+        });
+        reg.addComponent(ecsEntity, ecsComponent);
+      });
+    });
+    this.lastLoadedSave = JSON.parse(JSON.stringify(save));
+  }
+
+  public pauseGameEvent(): void {
+    this._isPaused = true;
+  }
+  public unpauseGameEvent(): void {
+    this._isPaused = false;
   }
 
   public stopGameEvent(): void {

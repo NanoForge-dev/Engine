@@ -64,7 +64,7 @@ export class Core {
         return;
       }
       const tickStart = Date.now();
-      await runner(tickStart - previousTick);
+      if (this.editor?.isPaused) await runner(tickStart - previousTick);
       previousTick = tickStart;
       setTimeout(render, tickLengthMs + tickStart - Date.now());
     };
