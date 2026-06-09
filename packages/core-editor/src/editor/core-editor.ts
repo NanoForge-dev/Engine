@@ -53,8 +53,8 @@ export class CoreEditor {
         });
         reg.addComponent(ecsEntity, ecsComponent);
       });
-      this.lastLoadedSave = JSON.parse(JSON.stringify(save));
     });
+    this.lastLoadedSave = JSON.parse(JSON.stringify(save));
   }
 
   public hardReloadEvent(save: Save): void {
