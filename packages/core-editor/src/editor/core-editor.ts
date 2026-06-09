@@ -85,6 +85,35 @@ export class CoreEditor {
     this._isPaused = false;
   }
 
+  public hardReloadEvent(): void {
+    const reg = this.ecsLibrary.registry;
+    const save = this.editor.save;
+    save.entities.forEach(({ id, components }) => {
+      Object.entries(components).forEach(([componentName, params]) => {
+        const ogComponent = save.components.find(({ name }) => name === componentName);
+        if (!ogComponent) {
+          throw new NfNotFound("Component: " + componentName + " not found in saved components");
+        }
+        const ecsEntity: Entity = this.getEntityFromEntityId(id);
+        const ecsComponent = reg.getEntityComponent(ecsEntity, {
+          name: componentName,
+        });
+        Object.entries(params).forEach(([paramName, paramValue]) => {
+          ecsComponent[paramName] = paramValue;
+        });
+        reg.addComponent(ecsEntity, ecsComponent);
+      });
+    });
+    this.lastLoadedSave = JSON.parse(JSON.stringify(save));
+  }
+
+  public pauseGameEvent(): void {
+    this._isPaused = true;
+  }
+  public unpauseGameEvent(): void {
+    this._isPaused = false;
+  }
+
   public stopGameEvent(): void {
     this.core.getExecutionContext().application.setIsRunning(false);
   }
