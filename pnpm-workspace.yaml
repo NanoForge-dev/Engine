@@ -10,7 +10,7 @@ allowBuilds:
 
 catalogs:
   build:
-    tsdown: ^0.22.1
+    tsdown: ^0.22.2
     unrun: ^0.3.0
   ci:
     '@commitlint/cli': ^21.0.2
