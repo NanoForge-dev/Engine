@@ -72,4 +72,9 @@ export class Graphics2DLibrary extends BaseGraphicsLibrary {
 
   /** @internal */
   public async __run(): Promise<void> {}
+
+  /** @internal */
+  public override async __clear(): Promise<void> {
+    this._stage?.destroy();
+  }
 }
