@@ -50,6 +50,7 @@ export interface Registry extends ClassHandle {
   getComponents(_0: Component): SparseArray;
   spawnEntity(): Entity;
   getZipper(_0: Component[]): any[];
+  getIndexedZipper(_0: Component[]): any[];
   killEntity(_0: Entity): void;
   clearEntities(): void;
   removeComponent(_0: Entity, _1: Component): void;

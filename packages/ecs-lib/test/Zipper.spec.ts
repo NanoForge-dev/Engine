@@ -97,18 +97,35 @@ describe("Zipper", () => {
       let zip = r.getZipper([Velocity]);
       expect(zip).toBeDefined();
 
-      for (let i = 0; i < 20; i++) {
-        if (zip[i]) {
-          zip[i]["Velocity"].y *= 2;
-        }
-      }
+      zip.forEach(({ Velocity }) => {
+        Velocity.y *= 2;
+      });
 
       zip = r.getZipper([Velocity]);
+      expect(zip).toBeDefined();
+
+      zip.forEach((entity) => {
+        expect(entity).toStrictEqual({ Velocity: new Velocity(0, 2) });
+      });
+    });
+  });
+
+  describe("indexed zipper", () => {
+    it("should reflect index of the zipped entities components", async () => {
+      const m = await Module();
+      const r = new m.Registry();
+
       for (let i = 0; i < 20; i++) {
-        if (zip[i]) {
-          expect(zip[i]).toStrictEqual({ Velocity: new Velocity(0, 2) });
-        }
+        const e = r.spawnEntity();
+        if (i % 5 === 0) r.addComponent(e, new Velocity(0, i));
       }
+
+      const zip = r.getIndexedZipper([Velocity]);
+      expect(zip).toBeDefined();
+
+      zip.forEach((entity, index) => {
+        expect(entity).toStrictEqual({ id: index * 5, Velocity: new Velocity(0, index * 5) });
+      });
     });
   });
 });
