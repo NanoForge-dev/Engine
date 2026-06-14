@@ -51,7 +51,6 @@ export class Core {
 
     const runner = async (delta: number) => {
       this.context.setDelta(delta);
-      this.editor?.runEvents();
       await this.runExecute(clientContext, libraries);
     };
 
@@ -64,6 +63,7 @@ export class Core {
         return;
       }
       const tickStart = Date.now();
+      this.editor?.runEvents();
       if (!this.editor?.isPaused) await runner(tickStart - previousTick);
       previousTick = tickStart;
       setTimeout(render, tickLengthMs + tickStart - Date.now());

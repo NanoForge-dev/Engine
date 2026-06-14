@@ -76,5 +76,6 @@ export class Graphics2DLibrary extends BaseGraphicsLibrary {
   /** @internal */
   public override async __clear(): Promise<void> {
     this._stage?.destroy();
+    delete (window as any).Konva;
   }
 }
