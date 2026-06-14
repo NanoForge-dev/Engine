@@ -323,6 +323,46 @@ namespace nfo {
             return ZipperOutput(arr);
         }
 
+        /**
+         * Get the indexed zipper output for the given components.
+         *
+         * @param comps An array of component types to zip.
+         * @return A ZipperOutput containing the id of the entity and it's zipped components.
+         * @throws std::runtime_error if the input is not an array.
+         */
+        ZipperOutput get_indexed_zipper(const ZipperInput &comps)
+        {
+            if (!comps.isArray())
+                throw std::runtime_error("getIndexedZipper: need an array of comps as parameter");
+
+            std::size_t max = SIZE_MAX;
+            std::map<std::string, SparseArray<emscripten::val> *> arrays;
+            for (int i = 0; i < comps["length"].as<unsigned int>(); i++) {
+                SparseArray<emscripten::val> &components = get_components(Component(comps[i]));
+                arrays[get_js_class_name(comps[i])] = &components;
+                max = (std::min)(components.size(), max);
+            }
+
+            emscripten::val arr = emscripten::val::array();
+            std:size_t zipper_idx = 0;
+            for (std::size_t idx = 0; idx < max; idx++) {
+                emscripten::val obj = emscripten::val::object();
+                bool need_to_add = true;
+                for (const auto &[name, sparse_array] : arrays) {
+                    if (!(*sparse_array)[idx].has_value()) {
+                        need_to_add = false;
+                        break;
+                    }
+                    obj.set(name, (*sparse_array)[idx].value());
+                }
+                if (need_to_add) {
+                    obj.set("id", idx);
+                    arr.set(zipper_idx++, obj);
+                }
+            }
+            return ZipperOutput(arr);
+        }
+
       private:
         std::unordered_map<std::string, std::any> _components_arrays;
 
