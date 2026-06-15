@@ -1,11 +1,10 @@
-import { NfNotFound } from "@nanoforge-dev/common";
-import { type ECSClientLibrary, type Entity } from "@nanoforge-dev/ecs-client";
+import { type IRunOptions, NfNotFound } from "@nanoforge-dev/common";
+import type { ECSClientLibrary, Entity } from "@nanoforge-dev/ecs-client";
 
 import { EventEmitter } from "../common/context/event-emitter";
 import { CoreEvents } from "../common/context/events/core-events";
-import { type IEditorRunOptions } from "../common/context/options.type";
-import { type Save } from "../common/context/save.type";
-import { type Core } from "../core/core";
+import type { Save } from "../common/context/save.type";
+import type { Core } from "../core/core";
 
 export class CoreEditor {
   public eventEmitter: EventEmitter;
@@ -14,7 +13,7 @@ export class CoreEditor {
   private core: Core;
   private _isPaused: boolean = false;
 
-  constructor(core: Core, editor: IEditorRunOptions["editor"], ecsLibrary: ECSClientLibrary) {
+  constructor(core: Core, editor: IRunOptions["editor"], ecsLibrary: ECSClientLibrary) {
     this.eventEmitter = new EventEmitter(editor);
     this.lastLoadedSave = JSON.parse(JSON.stringify(editor.save));
     this.ecsLibrary = ecsLibrary;

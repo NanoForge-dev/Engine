@@ -1,8 +1,8 @@
+import { type IRunOptions } from "@nanoforge-dev/common";
 import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CoreEvents } from "../src/common/context/events/core-events";
-import type { IEditorRunOptions } from "../src/common/context/options.type";
 import { type Save, type SaveComponent, type SaveEntity } from "../src/common/context/save.type";
 import { type Core } from "../src/core/core";
 import { CoreEditor } from "../src/editor/core-editor";
@@ -23,7 +23,7 @@ describe("EditorFeatures", () => {
         .mockImplementation(() => {});
       new CoreEditor(
         {} as unknown as Core,
-        { coreEvents: events, save: { libraries: [] } } as unknown as IEditorRunOptions["editor"],
+        { coreEvents: events, save: { libraries: [] } } as unknown as IRunOptions["editor"],
         {} as ECSClientLibrary,
       ).runEvents();
       expect(spyHotReload).toHaveBeenCalledTimes(2);
@@ -123,7 +123,7 @@ describe("EditorFeatures", () => {
             entities,
           } as any as Save,
           coreEvents: events,
-        } as any as IEditorRunOptions["editor"],
+        } as any as IRunOptions["editor"],
         { registry: fakeReg } as any as ECSClientLibrary,
       ).hotReloadEvent({ components, entities } as any as Save);
       expect(fakeReg.getComponents).toHaveBeenCalledWith({ name: "__RESERVED_ENTITY_ID" });

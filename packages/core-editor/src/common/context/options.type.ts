@@ -6,12 +6,15 @@ import { type Save } from "./save.type";
 /**
  * Union of client and server editor run options accepted by
  * `NanoforgeApplication.init` in editor mode.
+ *
+ * @deprecated Use `IRunOptions` instead.
  */
 export type IEditorRunOptions = IEditorRunClientOptions | IEditorRunServerOptions;
 
 /**
  * Run options for a client-side editor application.
  *
+ * @deprecated Use `IRunClientOptions` instead.
  * @remarks
  * Extends the base run options with editor-specific communication channels.
  */
@@ -36,6 +39,7 @@ export interface IEditorRunClientOptions {
 /**
  * Run options for a server-side editor application.
  *
+ * @deprecated Use `IRunServerOptions` instead.
  * @remarks
  * Extends the base server run options with editor-specific communication channels.
  */
