@@ -114,6 +114,7 @@ describe("EditorFeatures", () => {
         },
       ];
       const fakeReg = new FakeRegistry();
+      const events = new EventEmitter();
       new CoreEditor(
         {} as unknown as Core,
         {
@@ -121,6 +122,7 @@ describe("EditorFeatures", () => {
             components,
             entities,
           } as any as Save,
+          coreEvents: events,
         } as any as IEditorRunOptions["editor"],
         { registry: fakeReg } as any as ECSClientLibrary,
       ).hotReloadEvent({ components, entities } as any as Save);
