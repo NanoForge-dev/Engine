@@ -1,6 +1,5 @@
 import {
   COMPONENT_SYSTEM_LIBRARY,
-  type Context,
   GRAPHICS_LIBRARY,
   type InitContext,
   Library,
@@ -25,41 +24,40 @@ export class Graphics2DEditorLibrary extends Library {
 
   /** @internal */
   public override async __init(context: InitContext): Promise<void> {
-    this._eventEmitter = context.editor.eventEmitter;
+    this._eventEmitter = context.eventEmitter;
     const reg = context.libraries.getComponentSystem<AbstractECSLibrary>().library.registry;
     reg.addSystem(this._dragSystem.bind(this));
-    void context;
   }
 
-  private _dragSystem(registry: Registry, ctx: Context) {
-    void registry;
-    void ctx;
+  private _dragSystem(registry: Registry) {
     if (!this._eventEmitter) return;
-    registry
-      .getZipper([
-        { name: "__RESERVED_ENTITY_ID" },
-        { name: "DrawableCircle2D" },
-        { name: "DrawableRect2D" },
-        { name: "DrawableText2D" },
-      ])
-      .forEach(({ __RESERVED_ENTITY_ID, DrawableCircle2D, DrawableRect2D, DrawableText2D }) => {
-        if (!this._initComponents.has(__RESERVED_ENTITY_ID))
-          this._initComponents.set(__RESERVED_ENTITY_ID, new Set());
-        const m = this._initComponents.get(__RESERVED_ENTITY_ID) as Set<string>;
+
+    const entities = [
+      ...registry.getZipper([{ name: "__RESERVED_entityId" }, { name: "DrawableCircle2D" }]),
+      ...registry.getZipper([{ name: "__RESERVED_entityId" }, { name: "DrawableRect2D" }]),
+      ...registry.getZipper([{ name: "__RESERVED_entityId" }, { name: "DrawableText2D" }]),
+    ];
+    entities.forEach(
+      ({ __RESERVED_entityId, DrawableCircle2D, DrawableRect2D, DrawableText2D }: any) => {
+        const entityId = __RESERVED_entityId.entityId;
+        if (!this._initComponents.has(entityId)) this._initComponents.set(entityId, new Set());
+        const s = this._initComponents.get(entityId) as Set<string>;
         [DrawableCircle2D, DrawableRect2D, DrawableText2D].forEach((comp) => {
-          if (!m.has(comp.name)) {
+          if (!comp) return;
+          if (!s.has(comp.name)) {
             comp.shape.draggable(true);
-            comp.shape.on("dragend", () => {
+            comp.shape.on("dragend", ({ target }: any) => {
               this._eventEmitter?.emit(
                 EditorEvents.MOVE_COMPONENT,
-                __RESERVED_ENTITY_ID,
+                entityId,
                 comp.name,
-                comp.shape.getPosition(),
+                target._lastPos,
               );
             });
-            m.add(comp);
+            s.add(comp.name);
           }
         });
-      });
+      },
+    );
   }
 }

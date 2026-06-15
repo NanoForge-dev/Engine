@@ -30,9 +30,7 @@ declare module "@nanoforge-dev/common" {
   }
 
   interface InitContext {
-    editor: {
-      eventEmitter: EventEmitter;
-    };
+    eventEmitter: EventEmitter;
   }
 }
 

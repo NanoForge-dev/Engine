@@ -22,7 +22,7 @@ export class EditorInitContext extends InitContext {
     this._eventEmitter = eventEmitter;
   }
 
-  get eventEmitter(): EventEmitter {
+  override get eventEmitter(): EventEmitter {
     return this._eventEmitter;
   }
 }

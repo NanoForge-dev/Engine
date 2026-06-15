@@ -1,6 +1,7 @@
 import { type LibraryContext } from "../../../context";
 import { type ILibrary } from "../../libraries";
 import { LibraryHandle } from "../handle/library.handle";
+import { DefaultLibrariesEnum } from "./library.manager";
 
 export class BaseLibraryManager {
   protected _libraries: LibraryHandle[] = [];
@@ -16,7 +17,7 @@ export class BaseLibraryManager {
   }
 
   protected setNewLibrary(sym: symbol, library: ILibrary, context: LibraryContext): void {
-    const index = this._libraries.length;
+    const index = Math.max(this._libraries.length, Object.keys(DefaultLibrariesEnum).length);
     this._setIndex(sym, index);
     this._set(index, sym, library, context);
   }

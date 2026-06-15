@@ -93,8 +93,10 @@ export class CoreEditor {
     const reg = this.ecsLibrary.registry;
     return reg.entityFromIndex(
       reg
-        .getComponents({ name: "__RESERVED_ENTITY_ID" })
-        .getIndex({ name: "__RESERVED_ENTITY_ID", entityId: entityId }),
+        .getComponents({ name: "__RESERVED_entityId" })
+        // @todo There is an issue here, getIndex return index from 1 but entityFromIndex get index from 0
+        // This is a temp fix
+        .getIndex({ name: "__RESERVED_entityId", entityId: entityId }) - 1,
     );
   }
 }
