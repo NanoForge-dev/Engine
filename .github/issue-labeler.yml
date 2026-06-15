@@ -34,6 +34,10 @@ packages:graphics-2d:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\ngraphics-2d\\n"
 
+packages:graphics-2d-editor:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ngraphics-2d-editor\\n"
+
 packages:input:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\ninput\\n"

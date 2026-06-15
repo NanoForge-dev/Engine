@@ -1,0 +1,8 @@
+{
+  "$schema": "https://raw.githubusercontent.com/favware/cliff-jumper/main/assets/cliff-jumper.schema.json",
+  "name": "graphics-2d-editor",
+  "org": "nanoforge-dev",
+  "packagePath": "packages/graphics-2d-editor",
+  "tagTemplate": "{{new-version}}",
+  "identifierBase": false
+}
