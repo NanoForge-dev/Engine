@@ -59,8 +59,7 @@
   "dependencies": {
     "@nanoforge-dev/common": "workspace:*",
     "@nanoforge-dev/core-editor": "workspace:*",
-    "@nanoforge-dev/ecs-lib": "workspace:*",
-    "konva": "catalog:graphics"
+    "@nanoforge-dev/ecs-lib": "workspace:*"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "catalog:ci",
