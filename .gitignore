@@ -240,3 +240,4 @@ emsdk-cache/
 .tsdocs
 
 references/
+.direnv
