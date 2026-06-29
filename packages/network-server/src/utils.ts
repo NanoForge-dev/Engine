@@ -64,7 +64,7 @@ function uint8ArrayContains(haystack: Uint8Array, needle: Uint8Array): number {
   const buildKMPTable = (needle: Uint8Array): number[] => {
     const table = new Array(needle.length).fill(0);
     let len = 0;
-    for (let i = 1; i < needle.length; ) {
+    for (let i = 1; i < needle.length;) {
       if (needle[i] === needle[len]) {
         len++;
         table[i] = len;

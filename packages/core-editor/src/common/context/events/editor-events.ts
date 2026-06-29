@@ -1,9 +1,11 @@
-// ! Please do not remove this event unless a new one replaces it, it causes types issues
-
 export enum EditorEvents {
-  EMPTY = "empty",
+  MOVE_COMPONENT = "move-component",
 }
 
 export interface EditorEventsMap {
-  [EditorEvents.EMPTY]: [];
+  [EditorEvents.MOVE_COMPONENT]: [
+    entityId: string,
+    componentId: string,
+    position: { x: number; y: number },
+  ];
 }

@@ -1,27 +1,27 @@
-import { NfNotFound } from "@nanoforge-dev/common";
-import { type ECSClientLibrary, type Entity } from "@nanoforge-dev/ecs-client";
+import { type IRunOptions, NfNotFound } from "@nanoforge-dev/common";
+import type { ECSClientLibrary, Entity } from "@nanoforge-dev/ecs-client";
 
+import { EventEmitter } from "../common/context/event-emitter";
 import { CoreEvents } from "../common/context/events/core-events";
-import { type IEditorRunOptions } from "../common/context/options.type";
-import { type Save } from "../common/context/save.type";
-import { type Core } from "../core/core";
+import type { Save } from "../common/context/save.type";
+import type { Core } from "../core/core";
 
 export class CoreEditor {
-  private editor: IEditorRunOptions["editor"];
+  public eventEmitter: EventEmitter;
   private ecsLibrary: ECSClientLibrary;
   private lastLoadedSave: Save;
   private core: Core;
   private _isPaused: boolean = false;
 
-  constructor(core: Core, editor: IEditorRunOptions["editor"], ecsLibrary: ECSClientLibrary) {
-    this.editor = editor;
-    this.lastLoadedSave = JSON.parse(JSON.stringify(this.editor.save));
+  constructor(core: Core, editor: IRunOptions["editor"], ecsLibrary: ECSClientLibrary) {
+    this.eventEmitter = new EventEmitter(editor);
+    this.lastLoadedSave = JSON.parse(JSON.stringify(editor.save));
     this.ecsLibrary = ecsLibrary;
-    this.editor.coreEvents?.addListener(CoreEvents.HOT_RELOAD, this.hotReloadEvent.bind(this));
-    this.editor.coreEvents?.addListener(CoreEvents.HARD_RELOAD, this.hardReloadEvent.bind(this));
-    this.editor.coreEvents?.addListener(CoreEvents.PAUSE_GAME, this.pauseGameEvent.bind(this));
-    this.editor.coreEvents?.addListener(CoreEvents.STOP_GAME, this.stopGameEvent.bind(this));
-    this.editor.coreEvents?.addListener(CoreEvents.UNPAUSE_GAME, this.unpauseGameEvent.bind(this));
+    this.eventEmitter.on(CoreEvents.HOT_RELOAD, this.hotReloadEvent.bind(this));
+    this.eventEmitter.on(CoreEvents.HARD_RELOAD, this.hardReloadEvent.bind(this));
+    this.eventEmitter.on(CoreEvents.PAUSE_GAME, this.pauseGameEvent.bind(this));
+    this.eventEmitter.on(CoreEvents.STOP_GAME, this.stopGameEvent.bind(this));
+    this.eventEmitter.on(CoreEvents.UNPAUSE_GAME, this.unpauseGameEvent.bind(this));
     this.core = core;
   }
 
@@ -30,7 +30,7 @@ export class CoreEditor {
   }
 
   public runEvents() {
-    this.editor.coreEvents?.runEvents();
+    this.eventEmitter.runEvents();
   }
 
   public hotReloadEvent(save: Save): void {
@@ -93,8 +93,10 @@ export class CoreEditor {
     const reg = this.ecsLibrary.registry;
     return reg.entityFromIndex(
       reg
-        .getComponents({ name: "__RESERVED_ENTITY_ID" })
-        .getIndex({ name: "__RESERVED_ENTITY_ID", entityId: entityId }),
+        .getComponents({ name: "__RESERVED_entityId" })
+        // @todo There is an issue here, getIndex return index from 1 but entityFromIndex get index from 0
+        // This is a temp fix
+        .getIndex({ name: "__RESERVED_entityId", entityId: entityId }) - 1,
     );
   }
 }

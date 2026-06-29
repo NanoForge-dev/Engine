@@ -20,6 +20,7 @@ body:
         - ecs-lib
         - ecs-server
         - graphics-2d
+        - graphics-2d-editor
         - input
         - music
         - network-client

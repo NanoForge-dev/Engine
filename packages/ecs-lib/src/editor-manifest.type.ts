@@ -88,11 +88,7 @@ type ECSObjectElement = {
  * Type for component element
  */
 type ECSElement =
-  | ECSStringElement
-  | ECSNumberElement
-  | ECSBooleanElement
-  | ECSArrayElement
-  | ECSObjectElement;
+  ECSStringElement | ECSNumberElement | ECSBooleanElement | ECSArrayElement | ECSObjectElement;
 
 /**
  * Manifest for a component to be used in the NanoForge Editor

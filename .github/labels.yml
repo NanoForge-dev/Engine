@@ -78,6 +78,10 @@
   description: "Related to Graphics2D library"
   color: "aaa3dc"
 
+- name: "packages:graphics-2d-editor"
+  description: "Related to Graphics2D Editor library"
+  color: "aaa3dc"
+
 - name: "packages:input"
   description: "Related to Input library"
   color: "aaa3dc"

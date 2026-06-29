@@ -3,11 +3,12 @@ import {
   ClientLibraryManager,
   Context,
   type IRunnerLibrary,
-  InitContext,
+  type InitContext,
   type LibraryHandle,
   LibraryStatusEnum,
   NfNotInitializedException,
 } from "@nanoforge-dev/common";
+import { type IRunOptions } from "@nanoforge-dev/common";
 import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 
 import { type ApplicationConfig } from "../../../core/src/application/application-config";
@@ -16,7 +17,7 @@ import { type EditableApplicationContext } from "../../../core/src/common/contex
 import { EditableExecutionContext } from "../../../core/src/common/context/contexts/executions/execution.editable-context";
 import { type EditableLibraryContext } from "../../../core/src/common/context/contexts/library.editable-context";
 import { ConfigRegistry } from "../../../core/src/config/config-registry";
-import { type IEditorRunOptions } from "../common/context/options.type";
+import { EditorInitContext } from "../common/context/contexts/init.context";
 import { CoreEditor } from "../editor/core-editor";
 
 export class Core {
@@ -31,19 +32,19 @@ export class Core {
     this.context = context;
   }
 
-  public async init(options: IEditorRunOptions, appOptions: IApplicationOptions): Promise<void> {
+  public async init(options: IRunOptions, appOptions: IApplicationOptions): Promise<void> {
     this.options = appOptions;
     this._configRegistry = new ConfigRegistry(options.env);
-    await this.runInit(this.getInitContext(options));
     this.editor = new CoreEditor(
       this,
       options.editor,
       this.config.getComponentSystemLibrary<ECSClientLibrary>().library,
     );
+    await this.runInit(this.getInitContext(options));
   }
 
   public async run(): Promise<void> {
-    if (!this.options) throw new NfNotInitializedException("Core");
+    if (!this.options) throw new NfNotInitializedException("Core Editor");
 
     const context = this.getExecutionContext();
     const clientContext = this.getClientContext();
@@ -77,10 +78,16 @@ export class Core {
     return new EditableExecutionContext(this.context, this.config.libraryManager);
   }
 
-  private getInitContext(options: IEditorRunOptions): InitContext {
-    if (!this._configRegistry) throw new NfNotInitializedException("Core");
+  private getInitContext(options: IRunOptions): InitContext {
+    if (!this._configRegistry || !this.editor) throw new NfNotInitializedException("Core Editor");
 
-    return new InitContext(this.context, this.config.libraryManager, this._configRegistry, options);
+    return new EditorInitContext(
+      this.context,
+      this.config.libraryManager,
+      this._configRegistry,
+      options,
+      this.editor.eventEmitter,
+    );
   }
 
   private getClearContext(): ClearContext {

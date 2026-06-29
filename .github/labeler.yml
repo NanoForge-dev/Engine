@@ -52,6 +52,12 @@ packages:graphics-2d:
           - packages/graphics-2d/*
           - packages/graphics-2d/**/*
 
+packages:graphics-2d-editor:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/graphics-2d-editor/*
+          - packages/graphics-2d-editor/**/*
+
 packages:input:
   - changed-files:
       - any-glob-to-any-file:

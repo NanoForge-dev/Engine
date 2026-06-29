@@ -3,13 +3,13 @@ import {
   type IComponentSystemLibrary,
   type ILibrary,
   type INetworkLibrary,
+  type IRunOptions,
   NfNotInitializedException,
 } from "@nanoforge-dev/common";
 
 import { ApplicationConfig } from "../../../core/src/application/application-config";
 import type { IApplicationOptions } from "../../../core/src/application/application-options.type";
 import { EditableApplicationContext } from "../../../core/src/common/context/contexts/application.editable-context";
-import { type IEditorRunOptions } from "../common/context/options.type";
 import { Core } from "../core/core";
 
 /**
@@ -77,9 +77,9 @@ export abstract class NanoforgeApplication {
   /**
    * Initialise all registered libraries and prepare the engine for the game loop.
    *
-   * @param options - Editor run options including save/load callbacks and canvas container.
+   * @param options - Editor run options including save/events callbacks and canvas container.
    */
-  public init(options: IEditorRunOptions): Promise<void> {
+  public init(options: IRunOptions): Promise<void> {
     this._core = new Core(
       this.applicationConfig,
       new EditableApplicationContext(this.applicationConfig.libraryManager),
