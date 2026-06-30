@@ -9,7 +9,6 @@ import {
   NfNotInitializedException,
 } from "@nanoforge-dev/common";
 import { type IRunOptions } from "@nanoforge-dev/common";
-import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 
 import { type ApplicationConfig } from "../../../core/src/application/application-config";
 import type { IApplicationOptions } from "../../../core/src/application/application-options.type";
@@ -35,11 +34,7 @@ export class Core {
   public async init(options: IRunOptions, appOptions: IApplicationOptions): Promise<void> {
     this.options = appOptions;
     this._configRegistry = new ConfigRegistry(options.env);
-    this.editor = new CoreEditor(
-      this,
-      options.editor,
-      this.config.getComponentSystemLibrary<ECSClientLibrary>().library,
-    );
+    this.editor = new CoreEditor(this, options.editor, this.config);
     await this.runInit(this.getInitContext(options));
   }
 

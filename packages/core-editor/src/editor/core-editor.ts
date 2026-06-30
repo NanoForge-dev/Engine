@@ -1,6 +1,7 @@
-import { type IRunOptions, NfNotFound } from "@nanoforge-dev/common";
+import { type IAssetManagerLibrary, type IRunOptions, NfNotFound } from "@nanoforge-dev/common";
 import type { ECSClientLibrary, Entity } from "@nanoforge-dev/ecs-client";
 
+import type { ApplicationConfig } from "../../../core/src/application/application-config";
 import { EventEmitter } from "../common/context/event-emitter";
 import { CoreEvents } from "../common/context/events/core-events";
 import type { Save } from "../common/context/save.type";
@@ -9,19 +10,24 @@ import type { Core } from "../core/core";
 export class CoreEditor {
   public eventEmitter: EventEmitter;
   private ecsLibrary: ECSClientLibrary;
+  private assetLibrary: IAssetManagerLibrary;
   private lastLoadedSave: Save;
   private core: Core;
   private _isPaused: boolean = false;
 
-  constructor(core: Core, editor: IRunOptions["editor"], ecsLibrary: ECSClientLibrary) {
+  constructor(core: Core, editor: IRunOptions["editor"], config: ApplicationConfig) {
     this.eventEmitter = new EventEmitter(editor);
     this.lastLoadedSave = JSON.parse(JSON.stringify(editor.save));
-    this.ecsLibrary = ecsLibrary;
+
+    this.ecsLibrary = config.getComponentSystemLibrary<ECSClientLibrary>().library;
+    this.assetLibrary = config.getAssetManagerLibrary().library;
+
     this.eventEmitter.on(CoreEvents.HOT_RELOAD, this.hotReloadEvent.bind(this));
     this.eventEmitter.on(CoreEvents.HARD_RELOAD, this.hardReloadEvent.bind(this));
     this.eventEmitter.on(CoreEvents.PAUSE_GAME, this.pauseGameEvent.bind(this));
     this.eventEmitter.on(CoreEvents.STOP_GAME, this.stopGameEvent.bind(this));
     this.eventEmitter.on(CoreEvents.UNPAUSE_GAME, this.unpauseGameEvent.bind(this));
+
     this.core = core;
   }
 
@@ -34,48 +40,11 @@ export class CoreEditor {
   }
 
   public hotReloadEvent(save: Save): void {
-    const reg = this.ecsLibrary.registry;
-    save.entities.forEach(({ id, components }) => {
-      Object.entries(components).forEach(([componentName, params]) => {
-        const ogComponent = save.components.find(({ name }) => name === componentName);
-        if (!ogComponent) {
-          throw new NfNotFound("Component: " + componentName + " not found in saved components");
-        }
-        const ecsEntity: Entity = this.getEntityFromEntityId(id);
-        const ecsComponent = reg.getEntityComponent(ecsEntity, {
-          name: componentName,
-        });
-        Object.entries(params).forEach(([paramName, paramValue]) => {
-          const lastLoadedParam = this.lastLoadedSave.entities.find((e) => e.id === id)?.components[
-            componentName
-          ]?.[paramName];
-          if (lastLoadedParam !== paramValue) ecsComponent[paramName] = paramValue;
-        });
-        reg.addComponent(ecsEntity, ecsComponent);
-      });
-    });
-    this.lastLoadedSave = JSON.parse(JSON.stringify(save));
+    this.reloadEvent(save, false);
   }
 
   public hardReloadEvent(save: Save): void {
-    const reg = this.ecsLibrary.registry;
-    this.lastLoadedSave = JSON.parse(JSON.stringify(save));
-    save.entities.forEach(({ id, components }) => {
-      Object.entries(components).forEach(([componentName, params]) => {
-        const ogComponent = save.components.find(({ name }) => name === componentName);
-        if (!ogComponent) {
-          throw new NfNotFound("Component: " + componentName + " not found in saved components");
-        }
-        const ecsEntity: Entity = this.getEntityFromEntityId(id);
-        const ecsComponent = reg.getEntityComponent(ecsEntity, {
-          name: componentName,
-        });
-        Object.entries(params).forEach(([paramName, paramValue]) => {
-          ecsComponent[paramName] = paramValue;
-        });
-        reg.addComponent(ecsEntity, ecsComponent);
-      });
-    });
+    this.reloadEvent(save, true);
   }
 
   public pauseGameEvent(): void {
@@ -87,6 +56,40 @@ export class CoreEditor {
 
   public stopGameEvent(): void {
     this.core.getExecutionContext().application.setIsRunning(false);
+  }
+
+  private reloadEvent(save: Save, hard: boolean): void {
+    const reg = this.ecsLibrary.registry;
+    save.entities.forEach(({ id, components }) => {
+      Object.entries(components).forEach(([componentName, params]) => {
+        const ogComponent = save.components.find(({ name }) => name === componentName);
+        if (!ogComponent) {
+          throw new NfNotFound("Component: " + componentName + " not found in saved components");
+        }
+        const ecsEntity: Entity = this.getEntityFromEntityId(id);
+        const ecsComponent = reg.getEntityComponent(ecsEntity, {
+          name: componentName,
+        });
+        Object.entries(params).forEach(([paramName, paramValue]) => {
+          if (!hard) {
+            const lastLoadedParam = this.lastLoadedSave.entities.find((e) => e.id === id)
+              ?.components[componentName]?.[paramName];
+            if (lastLoadedParam === paramValue) return;
+          }
+
+          const ogParam = ogComponent.paramsNames.find(
+            (param) => param === paramName || param === `__RESERVED_ASSET_${paramName}`,
+          );
+          if (!ogParam) return;
+
+          ecsComponent[paramName] = ogParam.startsWith("__RESERVED_ASSET_")
+            ? this.assetLibrary.getAsset(paramValue)
+            : paramValue;
+        });
+        reg.addComponent(ecsEntity, ecsComponent);
+      });
+    });
+    this.lastLoadedSave = JSON.parse(JSON.stringify(save));
   }
 
   private getEntityFromEntityId(entityId: string): Entity {

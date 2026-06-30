@@ -1,7 +1,7 @@
 import { type IRunOptions } from "@nanoforge-dev/common";
-import { type ECSClientLibrary } from "@nanoforge-dev/ecs-client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { type ApplicationConfig } from "../../core/src/application/application-config";
 import { CoreEvents } from "../src/common/context/events/core-events";
 import { type Save, type SaveComponent, type SaveEntity } from "../src/common/context/save.type";
 import { type Core } from "../src/core/core";
@@ -24,7 +24,10 @@ describe("EditorFeatures", () => {
       new CoreEditor(
         {} as unknown as Core,
         { coreEvents: events, save: { libraries: [] } } as unknown as IRunOptions["editor"],
-        {} as ECSClientLibrary,
+        {
+          getAssetManagerLibrary: () => ({ library: {} }),
+          getComponentSystemLibrary: () => ({ library: {} }),
+        } as ApplicationConfig,
       ).runEvents();
       expect(spyHotReload).toHaveBeenCalledTimes(2);
     });
@@ -126,7 +129,12 @@ describe("EditorFeatures", () => {
           } as any as Save,
           coreEvents: events,
         } as any as IRunOptions["editor"],
-        { registry: fakeReg } as any as ECSClientLibrary,
+        {
+          getAssetManagerLibrary: () => ({
+            library: { getAsset: vi.fn((name: string) => ({ path: name })) },
+          }),
+          getComponentSystemLibrary: () => ({ library: { registry: fakeReg } }),
+        } as unknown as ApplicationConfig,
       ).hotReloadEvent({ components, entities } as any as Save);
       expect(fakeReg.getComponents).toHaveBeenCalledWith({ name: "__RESERVED_entityId" });
       expect(getIndex).toHaveBeenNthCalledWith(1, {
