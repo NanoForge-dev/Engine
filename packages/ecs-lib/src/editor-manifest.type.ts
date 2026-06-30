@@ -62,6 +62,12 @@ type ECSNumberElement = ECSElementDefaults<"number", number>;
 type ECSBooleanElement = ECSElementDefaults<"boolean", boolean>;
 
 /**
+ * * Editor Component Asset Element
+ * Type for asset element
+ */
+type ECSAssetElement = ECSElementDefaults<"asset", string>;
+
+/**
  * * Editor Component Array Element
  * Type for array element
  */
@@ -88,7 +94,12 @@ type ECSObjectElement = {
  * Type for component element
  */
 type ECSElement =
-  ECSStringElement | ECSNumberElement | ECSBooleanElement | ECSArrayElement | ECSObjectElement;
+  | ECSStringElement
+  | ECSNumberElement
+  | ECSBooleanElement
+  | ECSAssetElement
+  | ECSArrayElement
+  | ECSObjectElement;
 
 /**
  * Manifest for a component to be used in the NanoForge Editor

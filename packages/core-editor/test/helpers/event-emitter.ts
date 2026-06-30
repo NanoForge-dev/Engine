@@ -1,50 +1,82 @@
 import {
-  type EventTypeEnum,
   type IEventEmitter,
   type ListenerType,
+  type QueuedEvent,
 } from "../../src/common/context/event-emitter.type";
 
-export class EventEmitter implements IEventEmitter {
-  public listeners: Record<EventTypeEnum | string, ListenerType[]> = {};
-  public eventQueue: { event: EventTypeEnum | string; args: any[] }[] = [];
+export class EventEmitter<
+  Events extends string,
+  EventsMap extends Record<Events, unknown[]>,
+> implements IEventEmitter<Events, EventsMap> {
+  public listeners: {
+    [K in keyof EventsMap]?: ListenerType<Events, EventsMap, K>[];
+  } = {};
 
-  public runEvents = () => {
-    this.eventQueue.forEach(({ event, args }) => {
-      this.listeners[event]?.forEach((listener) => {
-        listener(...args);
-      });
-    });
-    this.eventQueue = [];
-  };
+  public eventQueue: QueuedEvent<EventsMap>[] = [];
+  private readonly _dequeueOnEmit: boolean;
 
-  public emitEvent(event: EventTypeEnum | string, ...args: any[]) {
-    this.eventQueue.push({ event, args });
+  constructor(dequeueOnEmit = false) {
+    this._dequeueOnEmit = dequeueOnEmit;
   }
 
-  public addListener(event: EventTypeEnum | string, listener: ListenerType): void {
+  runEvents(): void {
+    this.eventQueue.forEach((e) => {
+      this._executeEvent(e);
+    });
+
+    this.eventQueue = [];
+  }
+
+  emitEvent<K extends keyof EventsMap>(event: K, ...args: EventsMap[K]): void {
+    this.eventQueue.push({
+      event,
+      args,
+    });
+    if (this._dequeueOnEmit) this.runEvents();
+  }
+  addListener<K extends keyof EventsMap>(
+    event: K,
+    listener: ListenerType<Events, EventsMap, K>,
+  ): void {
     if (!this.listeners[event]) this.listeners[event] = [];
     this.listeners[event].push(listener);
   }
-  public on(event: EventTypeEnum | string, listener: ListenerType): void {
+  on<K extends keyof EventsMap>(event: K, listener: ListenerType<Events, EventsMap, K>): void {
     this.addListener(event, listener);
   }
 
-  public removeListener(event: EventTypeEnum | string, listener: ListenerType): void {
+  removeListener<K extends keyof EventsMap>(
+    event: K,
+    listener: ListenerType<Events, EventsMap, K>,
+  ): void {
     if (!this.listeners[event]) return;
     const index = this.listeners[event].indexOf(listener);
     if (index >= 0) {
       this.listeners[event].splice(index, 1);
     }
   }
-  public off(event: EventTypeEnum | string, listener: ListenerType): void {
+  off<K extends keyof EventsMap>(event: K, listener: ListenerType<Events, EventsMap, K>): void {
     this.removeListener(event, listener);
   }
 
-  public removeListenersForEvent(event: EventTypeEnum | string): void {
+  removeListenersForEvent(event: keyof EventsMap): void {
     if (!this.listeners[event]) return;
     this.listeners[event] = [];
   }
-  public removeAllListeners(): void {
+  removeAllListeners(): void {
     this.listeners = {};
+  }
+
+  private _executeEvent<K extends keyof EventsMap>({
+    event,
+    args,
+  }: QueuedEvent<EventsMap, K>): void {
+    this.listeners[event]?.forEach((listener) => {
+      try {
+        listener(...args);
+      } catch (error) {
+        console.error(`Error handling event [${String(event)}]:`, error);
+      }
+    });
   }
 }
