@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.4.0](https://github.com/NanoForge-dev/Engine/compare/1.3.1...1.4.0) - (2026-07-01)
+
+## Bug Fixes
+
+- **core-editor:** Run when don't paused (#377) ([09147d2](https://github.com/NanoForge-dev/Engine/commit/09147d2e71488c7028e1f5983f43d5ff724769ee)) by @Tchips46
+
+## Documentation
+
+- Add in code docs (#370) ([0146a0e](https://github.com/NanoForge-dev/Engine/commit/0146a0e3e7783c8f3bed9640ad3a452531791e0c)) by @Exeloo
+
+## Features
+
+- **core-editor:** Event listenner not runned if main loop is paused (#379) ([25053db](https://github.com/NanoForge-dev/Engine/commit/25053db388e277bc7e1181315f07249f121fcc94)) by @Tchips46
+- **graphic-2d:** Destroy konva js in the lib clear (#372) ([e1ae678](https://github.com/NanoForge-dev/Engine/commit/e1ae678e7420eb20a2152fc110550b786877e7a5)) by @Tchips46
+
 # [1.3.1](https://github.com/NanoForge-dev/Engine/compare/1.3.0...1.3.1) - (2026-06-04)
 
 # [@nanoforge-dev/graphics-2d@1.3.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/graphics-2d@1.0.3...@nanoforge-dev/graphics-2d@1.3.0) - (2026-05-26)

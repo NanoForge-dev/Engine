@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.4.0](https://github.com/NanoForge-dev/Engine/compare/1.3.1...1.4.0) - (2026-07-01)
+
+## Bug Fixes
+
+- Make get asset not throw if undefined (#385) ([c508d89](https://github.com/NanoForge-dev/Engine/commit/c508d893c4264645bd942261ee8bbdf3cea62323)) by @Exeloo
+
+## Documentation
+
+- Add in code docs (#370) ([0146a0e](https://github.com/NanoForge-dev/Engine/commit/0146a0e3e7783c8f3bed9640ad3a452531791e0c)) by @Exeloo
+
 # [1.3.1](https://github.com/NanoForge-dev/Engine/compare/1.3.0...1.3.1) - (2026-06-04)
 
 # [@nanoforge-dev/asset-manager@1.3.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/asset-manager@1.0.2...@nanoforge-dev/asset-manager@1.3.0) - (2026-05-26)
