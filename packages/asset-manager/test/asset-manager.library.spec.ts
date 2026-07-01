@@ -75,5 +75,10 @@ describe("AssetManagerLibrary", () => {
     it("should throw NfNotFound for an unknown wgsl", () => {
       expect(() => library.getAsset("unknown.wgsl")).toThrow(NfNotFound);
     });
+
+    it("should return undefined for an undefined path", () => {
+      expect(library.getAsset(undefined)).toBe(undefined);
+      expect(library.getAsset("")).toBe(undefined);
+    });
   });
 });

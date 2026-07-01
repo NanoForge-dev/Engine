@@ -43,12 +43,17 @@ export class AssetManagerLibrary extends BaseAssetManagerLibrary {
    * collapsed and trailing slashes are removed.
    *
    * @param path - Virtual path of the asset (e.g. "/textures/hero.png").
-   * @returns An `NfFile` handle for the requested asset.
+   * @returns An `NfFile` handle for the requested asset, or `undefined` if no asset path is provided.
    * @throws `NfNotFound` When no asset is registered at the given path.
    * @throws `NfNotInitializedException` When called before `__init` has resolved.
    */
-  public getAsset(path: string): NfFile {
+  public getAsset(path: string): NfFile;
+  public getAsset(path: "" | undefined): undefined;
+  public getAsset(path: string | undefined): NfFile | undefined {
     if (!this._assets) this.throwNotInitializedError();
+
+    if (!path) return undefined;
+
     const res = this._assets.get(this._parsePath(path));
     if (!res) throw new NfNotFound(path, "Asset");
     return new NfFile(res);
