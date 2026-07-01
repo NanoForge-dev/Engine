@@ -24,4 +24,5 @@ export abstract class BaseAssetManagerLibrary extends Library implements IAssetM
    * @throws `NfNotInitializedException` When called before `__init` has resolved.
    */
   public abstract getAsset(path: string): NfFile;
+  public abstract getAsset(path: "" | undefined): undefined;
 }
