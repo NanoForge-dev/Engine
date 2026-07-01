@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.4.0](https://github.com/NanoForge-dev/Engine/compare/1.3.1...1.4.0) - (2026-07-01)
+
+## Documentation
+
+- Add in code docs (#370) ([0146a0e](https://github.com/NanoForge-dev/Engine/commit/0146a0e3e7783c8f3bed9640ad3a452531791e0c)) by @Exeloo
+
+## Features
+
+- Add drag and drop on graphics (#380) ([afffa7a](https://github.com/NanoForge-dev/Engine/commit/afffa7afd1f51eba2d2cd0d96fe47e5db04ac534)) by @Exeloo
+
 # [1.3.1](https://github.com/NanoForge-dev/Engine/compare/1.3.0...1.3.1) - (2026-06-04)
 
 # [@nanoforge-dev/network-server@1.3.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/network-server@1.2.0...@nanoforge-dev/network-server@1.3.0) - (2026-05-26)
