@@ -13,7 +13,7 @@ catalogs:
     tsdown: ^0.22.3
     unrun: ^0.3.0
   ci:
-    '@commitlint/cli': ^21.1.0
+    '@commitlint/cli': ^21.2.0
     '@commitlint/config-conventional': ^21.1.0
     '@favware/cliff-jumper': ^6.0.0
     '@nanoforge-dev/actions': ^2.1.5
