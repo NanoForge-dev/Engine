@@ -3,7 +3,7 @@ import {
   Expose,
   IsBoolean,
   IsByteLength,
-  IsIpOrFQDN,
+  IsIpOrURL,
   IsOptional,
   IsPort,
   TransformToBoolean,
@@ -42,7 +42,7 @@ export class ClientConfigNetwork {
 
   /** Hostname or IP address of the game server. */
   @Expose()
-  @IsIpOrFQDN()
+  @IsIpOrURL()
   SERVER_ADDRESS!: string;
 
   /**

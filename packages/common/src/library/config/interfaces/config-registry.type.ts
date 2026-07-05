@@ -5,7 +5,7 @@
  * @remarks
  * An instance is available in `InitContext.config`.  Configuration
  * classes must be decorated with `class-transformer` (`@Expose`, `@Default`)
- * and `class-validator` (`@IsPort`, `@IsIpOrFQDN`, etc.) decorators from
+ * and `class-validator` (`@IsPort`, `@IsIpOrURL`, etc.) decorators from
  * `@nanoforge-dev/config`.
  *
  * @example

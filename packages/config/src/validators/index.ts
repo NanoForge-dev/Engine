@@ -1,1 +1,1 @@
-export { IsIpOrFQDN } from "./is-ip-or-fqdn.validator";
+export { IsIpOrURL } from "./is-ip-or-url.validator";
