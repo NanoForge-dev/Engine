@@ -101,7 +101,7 @@ import {
   Default,
   Expose,
   IsByteLength,
-  IsIpOrFQDN,
+  IsIpOrURL,
   IsOptional,
   IsPort,
 } from "@nanoforge-dev/config";
@@ -120,7 +120,7 @@ export class ClientConfigNetwork {
 
   // This var must be ip address or fqdn (it cannot be undefined)
   @Expose()
-  @IsIpOrFQDN()
+  @IsIpOrURL()
   SERVER_ADDRESS?: string;
 
   // This var must be a byte length between 2 and 64. It can be undefined as it as a default value.

@@ -2,7 +2,7 @@ import {
   Default,
   Expose,
   IsByteLength,
-  IsIpOrFQDN,
+  IsIpOrURL,
   IsOptional,
   IsPort,
   IsString,
@@ -46,7 +46,7 @@ export class ServerConfigNetwork {
    */
   @Expose()
   @Default("0.0.0.0")
-  @IsIpOrFQDN()
+  @IsIpOrURL()
   LISTENING_INTERFACE!: string;
 
   /**

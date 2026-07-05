@@ -1,11 +1,11 @@
-import { type ValidationOptions, isFQDN, isIP, registerDecorator } from "class-validator";
+import { type ValidationOptions, isIP, isURL, registerDecorator } from "class-validator";
 
 /**
  * Property decorator that validates whether the value is a valid IPv4/IPv6
- * address or a fully qualified domain name (FQDN).
+ * address or a fully qualified domain name (URL).
  *
  * @remarks
- * Built on top of `class-validator`'s `isIP` and `isFQDN` helpers.  Use on
+ * Built on top of `class-validator`'s `isIP` and `isURL` helpers.  Use on
  * config properties that represent server hostnames or addresses.
  *
  * @param validationOptions - Optional class-validator validation options.
@@ -14,12 +14,12 @@ import { type ValidationOptions, isFQDN, isIP, registerDecorator } from "class-v
  * ```ts
  * class MyConfig {
  *   \@Expose()
- *   \@IsIpOrFQDN()
+ *   \@IsIpOrURL()
  *   SERVER_ADDRESS!: string;
  * }
  * ```
  */
-export const IsIpOrFQDN = (validationOptions?: ValidationOptions) => {
+export const IsIpOrURL = (validationOptions?: ValidationOptions) => {
   return (object: object, propertyName: string) => {
     registerDecorator({
       target: object.constructor,
@@ -28,10 +28,10 @@ export const IsIpOrFQDN = (validationOptions?: ValidationOptions) => {
       constraints: [],
       validator: {
         validate(value: string) {
-          return isIP(value) || isFQDN(value);
+          return isIP(value) || isURL(value);
         },
         defaultMessage() {
-          return `$value must be a valid IP address or FQDN`;
+          return `$value must be a valid IP address or URL`;
         },
       },
     });
