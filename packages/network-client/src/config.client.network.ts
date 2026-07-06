@@ -42,7 +42,7 @@ export class ClientConfigNetwork {
 
   /** Hostname or IP address of the game server. */
   @Expose()
-  @IsIpOrURL()
+  @IsIpOrURL(undefined, undefined, { protocols: ["ws", "wss", "http", "https"] })
   SERVER_ADDRESS!: string;
 
   /**
