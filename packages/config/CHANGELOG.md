@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.4.1](https://github.com/NanoForge-dev/Engine/compare/1.4.0...1.4.1) - (2026-07-06)
+
+## Bug Fixes
+
+- Change check for address from fqdn to url (#394) ([8823c59](https://github.com/NanoForge-dev/Engine/commit/8823c5911f8c5a673a96c32df9888b2dea4d6370)) by @Exeloo
+
 # [1.4.0](https://github.com/NanoForge-dev/Engine/compare/1.3.1...1.4.0) - (2026-07-01)
 
 ## Documentation
