@@ -2,7 +2,7 @@ import { type IRunOptions } from "@nanoforge-dev/common";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { type ApplicationConfig } from "../../core/src/application/application-config";
-import { CoreEvents } from "../src/common/context/events/core-events";
+import { CoreEvents } from "../src";
 import { type Save, type SaveComponent, type SaveEntity } from "../src/common/context/save.type";
 import { type Core } from "../src/core/core";
 import { CoreEditor } from "../src/editor/core-editor";
@@ -35,14 +35,25 @@ describe("EditorFeatures", () => {
 
   describe("askEntitiesHotReload", () => {
     it("should reload entities with new save variables", async () => {
-      const getIndex = vi.fn((component) => {
-        return Number(component.entityId.slice(-1));
-      });
-
       const FakeRegistry = vi.fn(
         class {
           addComponent = vi.fn();
-          getComponents = vi.fn(() => ({ getIndex }));
+          getIndexedZipper = vi.fn(() => [
+            {
+              id: 2,
+              __RESERVED_entityId: {
+                entityId: "ent2",
+                name: "__RESERVED_entityId",
+              },
+            },
+            {
+              id: 3,
+              __RESERVED_entityId: {
+                entityId: "ent3",
+                name: "__RESERVED_entityId",
+              },
+            },
+          ]);
           getEntityComponent = vi.fn((entity: number, component) => {
             return (
               {
@@ -75,9 +86,7 @@ describe("EditorFeatures", () => {
             )[entity]?.[component.name];
           });
           entityFromIndex = vi.fn((index) => {
-            // @todo There is an issue here, see src/editor/core-editor.ts:97
-            // This is a temp fix
-            return index + 1;
+            return index;
           });
         },
       );
@@ -136,19 +145,7 @@ describe("EditorFeatures", () => {
           getComponentSystemLibrary: () => ({ library: { registry: fakeReg } }),
         } as unknown as ApplicationConfig,
       ).hotReloadEvent({ components, entities } as any as Save);
-      expect(fakeReg.getComponents).toHaveBeenCalledWith({ name: "__RESERVED_entityId" });
-      expect(getIndex).toHaveBeenNthCalledWith(1, {
-        entityId: "ent2",
-        name: "__RESERVED_entityId",
-      });
-      expect(getIndex).toHaveBeenNthCalledWith(2, {
-        entityId: "ent2",
-        name: "__RESERVED_entityId",
-      });
-      expect(getIndex).toHaveBeenNthCalledWith(3, {
-        entityId: "ent3",
-        name: "__RESERVED_entityId",
-      });
+      expect(fakeReg.getIndexedZipper).toHaveBeenCalledWith([{ name: "__RESERVED_entityId" }]);
       expect(fakeReg.getEntityComponent).toHaveBeenNthCalledWith(1, 2, { name: "Position" });
       expect(fakeReg.getEntityComponent).toHaveBeenNthCalledWith(2, 2, { name: "Bullets" });
       expect(fakeReg.getEntityComponent).toHaveBeenNthCalledWith(3, 3, { name: "Position" });
