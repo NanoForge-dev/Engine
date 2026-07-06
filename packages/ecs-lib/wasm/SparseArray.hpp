@@ -293,6 +293,7 @@ namespace nfo {
          */
         [[nodiscard]] size_type get_index(const_reference_type value) const
         {
+            // @todo This is not how we compare js values so this function is broken for now
             auto it = std::find(_data.begin(), _data.end(), value);
             if (it != _data.end()) {
                 return static_cast<size_type>(std::distance(_data.begin(), it));
