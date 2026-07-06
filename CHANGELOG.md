@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.4.2](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/nanoforge@1.4.1...@nanoforge-dev/nanoforge@1.4.2) - (2026-07-06)
+
+## Bug Fixes
+
+- Change url protocols validation on isIpOrURL validator in network (#398) ([541dd16](https://github.com/NanoForge-dev/Engine/commit/541dd16e307e355288ec49ec7ae75566bb7fe2b5)) by @Exeloo
+- **core-editor:** Reload event searching for entities (#396) ([eb07c7f](https://github.com/NanoForge-dev/Engine/commit/eb07c7f2fa7ea834c40c7f78517ee7104c85c9b0)) by @Tchips46
+
 # [1.4.1](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/nanoforge@1.4.0...@nanoforge-dev/nanoforge@1.4.1) - (2026-07-06)
 
 ## Bug Fixes

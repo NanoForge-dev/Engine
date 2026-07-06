@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.4.2](https://github.com/NanoForge-dev/Engine/compare/1.4.1...1.4.2) - (2026-07-06)
+
+## Bug Fixes
+
+- Change url protocols validation on isIpOrURL validator in network (#398) ([541dd16](https://github.com/NanoForge-dev/Engine/commit/541dd16e307e355288ec49ec7ae75566bb7fe2b5)) by @Exeloo
+
 # [1.4.1](https://github.com/NanoForge-dev/Engine/compare/1.4.0...1.4.1) - (2026-07-06)
 
 ## Bug Fixes

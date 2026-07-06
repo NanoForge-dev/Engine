@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.4.2](https://github.com/NanoForge-dev/Engine/compare/1.4.1...1.4.2) - (2026-07-06)
+
+## Bug Fixes
+
+- **core-editor:** Reload event searching for entities (#396) ([eb07c7f](https://github.com/NanoForge-dev/Engine/commit/eb07c7f2fa7ea834c40c7f78517ee7104c85c9b0)) by @Tchips46
+
 # [1.4.1](https://github.com/NanoForge-dev/Engine/compare/1.4.0...1.4.1) - (2026-07-06)
 
 # [1.4.0](https://github.com/NanoForge-dev/Engine/compare/1.3.1...1.4.0) - (2026-07-01)
