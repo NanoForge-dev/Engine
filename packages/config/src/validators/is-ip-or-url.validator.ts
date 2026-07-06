@@ -9,6 +9,8 @@ import { type ValidationOptions, isIP, isURL, registerDecorator } from "class-va
  * config properties that represent server hostnames or addresses.
  *
  * @param validationOptions - Optional class-validator validation options.
+ * @param isIPOptions - Optional options for `isIP` validation.
+ * @param isURLOptions - Optional options for `isURL` validation.
  *
  * @example
  * ```ts
@@ -19,7 +21,11 @@ import { type ValidationOptions, isIP, isURL, registerDecorator } from "class-va
  * }
  * ```
  */
-export const IsIpOrURL = (validationOptions?: ValidationOptions) => {
+export const IsIpOrURL = (
+  validationOptions?: ValidationOptions,
+  isIPOptions?: Parameters<typeof isIP>[1],
+  isURLOptions?: Parameters<typeof isURL>[1],
+) => {
   return (object: object, propertyName: string) => {
     registerDecorator({
       target: object.constructor,
@@ -28,7 +34,7 @@ export const IsIpOrURL = (validationOptions?: ValidationOptions) => {
       constraints: [],
       validator: {
         validate(value: string) {
-          return isIP(value) || isURL(value);
+          return isIP(value, isIPOptions) || isURL(value, isURLOptions);
         },
         defaultMessage() {
           return `$value must be a valid IP address or URL`;
