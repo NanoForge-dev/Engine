@@ -1,4 +1,4 @@
-import { BaseInputLibrary, GRAPHICS_LIBRARY } from "@nanoforge-dev/common";
+import { BaseInputLibrary, GRAPHICS_LIBRARY, type InitContext } from "@nanoforge-dev/common";
 
 import { InputHandler } from "./input-handler";
 import { type InputEnum } from "./input.enum";
@@ -37,8 +37,12 @@ export class InputLibrary extends BaseInputLibrary {
   }
 
   /** @internal */
-  public override async __init(): Promise<void> {
-    this._inputHandler = new InputHandler();
+  public override async __init(context: InitContext): Promise<void> {
+    if (!context.container)
+      throw new Error(
+        "Input library must be registered on client side (InitContext must contain a container element)",
+      );
+    this._inputHandler = new InputHandler(context.container);
   }
 
   /** @internal */

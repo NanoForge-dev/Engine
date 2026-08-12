@@ -1,5 +1,8 @@
+import { type IConfigRegistry, InitContext } from "@nanoforge-dev/common";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { EditableApplicationContext } from "../../core/src/common/context/contexts/application.editable-context";
+import { EditableLibraryManager } from "../../core/src/common/library/manager/library.manager";
 import { InputEnum, InputLibrary } from "../src";
 
 type MockInputEvent = {
@@ -26,14 +29,30 @@ const makeEventTargetMock = () => {
   };
 };
 
+const makeContext = (container: HTMLDivElement | null) => {
+  const libraryManager = new EditableLibraryManager();
+  const appContext = new EditableApplicationContext(libraryManager);
+  const configRegistry = {} as IConfigRegistry;
+  return new InitContext(appContext, libraryManager, configRegistry, {
+    // @ts-ignore
+    container,
+    files: new Map(),
+  });
+};
+
 describe("InputLibrary", () => {
-  let windowMock: ReturnType<typeof makeEventTargetMock>;
-  let documentMock: ReturnType<typeof makeEventTargetMock> & { hidden: boolean };
+  let windowMock: ReturnType<typeof makeEventTargetMock> & {
+    getBoundingClientRect: () => { x: number; y: number };
+  };
+  let documentMock: ReturnType<typeof makeEventTargetMock> & {
+    hidden: boolean;
+  };
 
   beforeEach(() => {
-    windowMock = makeEventTargetMock();
+    windowMock = { ...makeEventTargetMock(), getBoundingClientRect: () => ({ x: 0, y: 0 }) };
     documentMock = {
       ...makeEventTargetMock(),
+
       hidden: false,
     };
 
@@ -75,7 +94,8 @@ describe("InputLibrary", () => {
 
     beforeEach(async () => {
       library = new InputLibrary();
-      await library.__init();
+      console.log(window);
+      await library.__init(makeContext(window as unknown as HTMLDivElement));
     });
 
     it("should register all expected event listeners", () => {
@@ -88,7 +108,7 @@ describe("InputLibrary", () => {
       expect(windowMock.addEventListener).toHaveBeenCalledWith("mouseenter", expect.any(Function));
       expect(windowMock.addEventListener).toHaveBeenCalledWith("mouseleave", expect.any(Function));
       expect(windowMock.addEventListener).toHaveBeenCalledWith("blur", expect.any(Function));
-      expect(documentMock.addEventListener).toHaveBeenCalledWith(
+      expect(windowMock.addEventListener).toHaveBeenCalledWith(
         "visibilitychange",
         expect.any(Function),
       );
@@ -237,7 +257,7 @@ describe("InputLibrary", () => {
       windowMock.dispatch("keydown", { code: InputEnum.KeyA });
       documentMock.hidden = true;
 
-      documentMock.dispatch("visibilitychange", {});
+      windowMock.dispatch("visibilitychange", {});
 
       expect(library.isKeyPressed(InputEnum.KeyA)).toBe(false);
     });
