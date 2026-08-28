@@ -50,5 +50,5 @@ catalogs:
     wrtc: ^0.4.7
     ws: ^8.20.1
   test:
-    '@vitest/coverage-v8': ^4.1.9
+    '@vitest/coverage-v8': ^4.1.10
     vitest: ^4.1.9
