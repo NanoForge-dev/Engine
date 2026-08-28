@@ -70,9 +70,9 @@
     "typescript": "catalog:core",
     "unrun": "catalog:build"
   },
-  "packageManager": "pnpm@11.5.2",
+  "packageManager": "pnpm@11.24.0",
   "engines": {
-    "node": "25"
+    "node": "26"
   },
   "publishConfig": {
     "access": "public"
