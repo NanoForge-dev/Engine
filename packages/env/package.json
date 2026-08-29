@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@nanoforge-dev/common",
+  "name": "@nanoforge-dev/env",
   "version": "1.4.2",
-  "description": "NanoForge Engine - Common",
+  "description": "NanoForge Engine - Env",
   "keywords": [
     "nanoforge",
     "game",
@@ -44,7 +44,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
-    "directory": "packages/common"
+    "directory": "packages/env"
   },
   "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
@@ -53,9 +53,14 @@
     "format": "prettier --write . && eslint --fix --format=pretty src",
     "test:unit": "vitest run --config ../../vitest.config.ts",
     "prepack": "pnpm run build && pnpm run lint",
-    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/common/*'",
+    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/env/*'",
     "release": "cliff-jumper",
     "docs": "mint-tsdocs generate"
+  },
+  "dependencies": {
+    "@nanoforge-dev/common": "workspace:*",
+    "class-transformer": "catalog:config",
+    "class-validator": "catalog:config"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "catalog:ci",
