@@ -1,37 +1,36 @@
-import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
-import { type IRunOptions } from "@nanoforge-dev/common";
+import type { ClientRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { ECSClientLibrary } from "@nanoforge-dev/ecs-client";
+import { EcsLibrary } from "@nanoforge-dev/ecs-client";
 import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
-import { InputEnum } from "@nanoforge-dev/input";
-import { InputLibrary } from "@nanoforge-dev/input";
+import { InputEnum, InputLibrary } from "@nanoforge-dev/input";
 import { NetworkClientLibrary } from "@nanoforge-dev/network-client";
 
-import { CircleComponent, Controller, Position, RectangleComponent, Velocity } from "./components";
-import { controlPlayer, draw, move, packetHandler } from "./systems";
-
-export const app = NanoforgeFactory.createClient({
-  tickRate: 60,
-});
+import {
+  CircleComponent,
+  Controller,
+  Position,
+  RectangleComponent,
+  Velocity,
+} from "./components/components";
+import { controlPlayer, draw, move, packetHandler } from "./systems/systems";
 
 export const layer = new Layer();
 
-export const main = async (options: IRunOptions) => {
+export const main = async (options: ClientRunOptions): Promise<void> => {
+  const app = NanoforgeFactory.createClient({ tickRate: 60 });
   const graphics = new Graphics2DLibrary();
-  const ecsLibrary = new ECSClientLibrary();
+  const ecs = new EcsLibrary();
   const network = new NetworkClientLibrary();
-  const assetManager = new AssetManagerLibrary();
   const input = new InputLibrary();
 
-  app.useGraphics(graphics);
-  app.useComponentSystem(ecsLibrary);
-  app.useNetwork(network);
-  app.useAssetManager(assetManager);
-  app.useInput(input);
+  app.use(graphics);
+  app.use(ecs);
+  app.use(network);
+  app.use(input);
 
   await app.init(options);
 
-  const registry = ecsLibrary.registry;
+  const registry = ecs.registry;
 
   graphics.stage.add(layer);
 
@@ -102,5 +101,6 @@ export const main = async (options: IRunOptions) => {
 
   await waitForConnection();
   network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
-  app.run();
+
+  await app.run();
 };
