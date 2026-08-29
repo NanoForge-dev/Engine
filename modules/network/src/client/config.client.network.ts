@@ -7,15 +7,13 @@ import {
   IsOptional,
   IsPort,
   TransformToBoolean,
-} from "@nanoforge-dev/config";
+} from "@nanoforge-dev/env";
 
 /**
  * Environment-variable configuration for `NetworkClientLibrary`.
  *
  * @remarks
- * Resolved automatically by `IConfigRegistry.registerConfig` during `__init`.
- * Set these variables in the environment (or pass them via
- * `IRunClientOptions.env`) before running the application.
+ * Resolved via `registerEnv(ClientConfigNetwork, ctx.env)` during `__init`.
  */
 export class ClientConfigNetwork {
   /**
