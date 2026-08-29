@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { TCPClient } from "../src/tcp.client.network";
+import { TCPClient } from "../../src/client/tcp.client.network";
 
 const makeWsMock = (readyState = 0) => ({
   readyState,

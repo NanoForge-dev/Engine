@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { UDPServer } from "../src/udp.server.network";
+import { UDPServer } from "../../src/server/udp.server.network";
 
 vi.mock("ws", () => ({
   WebSocketServer: vi.fn(function (this: any) {

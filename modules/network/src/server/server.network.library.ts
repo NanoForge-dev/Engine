@@ -1,6 +1,8 @@
-import { BaseNetworkLibrary, type InitContext, NfConfigException } from "@nanoforge-dev/common";
+import { type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
+import { registerEnv } from "@nanoforge-dev/env";
 
 import { ServerConfigNetwork } from "./config.server.network";
+import type { NetworkServerContextApi } from "./network-server-context.type";
 import { TCPServer } from "./tcp.server.network";
 import { UDPServer } from "./udp.server.network";
 
@@ -8,13 +10,8 @@ import { UDPServer } from "./udp.server.network";
  * Built-in network library for server-side applications.
  *
  * @remarks
- * Reads network configuration from the environment via
- * `ServerConfigNetwork` and starts TCP (WebSocket) and/or UDP (WebRTC)
- * servers.  Register with:
- *
- * ```ts
- * server.useNetwork(new NetworkServerLibrary());
- * ```
+ * Reads network configuration from the environment via `ServerConfigNetwork`
+ * and starts TCP (WebSocket) and/or UDP (WebRTC) servers.
  *
  * Configuration (via environment variables):
  * - `LISTENING_INTERFACE` — bind address (default: `"0.0.0.0"`).
@@ -22,47 +19,27 @@ import { UDPServer } from "./udp.server.network";
  * - `LISTENING_UDP_PORT` — signaling listen port for UDP (optional).
  * - `MAGIC_VALUE` — packet framing delimiter (default: `"PACKET_END"`).
  * - `WSS_CERT` / `WSS_KEY` — paths to TLS certificate and key files for WSS (optional).
- *
- * After `init`, access the servers via `tcp` and `udp`.
  */
-export class NetworkServerLibrary extends BaseNetworkLibrary {
-  /**
-   * Unreliable, unordered WebRTC data-channel server for connected clients.
-   *
-   * @remarks
-   * Only available when `LISTENING_UDP_PORT` was specified in the environment.
-   */
-  public udp!: UDPServer;
+export class NetworkServerLibrary extends Library {
+  readonly key = defineLibraryKey("network");
 
-  /**
-   * Reliable, ordered WebSocket-based server for connected clients.
-   *
-   * @remarks
-   * Only available when `LISTENING_TCP_PORT` was specified in the environment.
-   */
-  public tcp!: TCPServer;
+  /** Only set when `LISTENING_TCP_PORT` was configured. */
+  public tcp?: TCPServer;
+  /** Only set when `LISTENING_UDP_PORT` was configured. */
+  public udp?: UDPServer;
 
-  /** @internal */
-  get __name(): string {
-    return "NetworkServerLibrary";
-  }
+  public override async __init(ctx: InitContext): Promise<void> {
+    const config = await registerEnv(ServerConfigNetwork, ctx.env);
 
-  /** @internal */
-  public override async __init(context: InitContext): Promise<void> {
-    const config: ServerConfigNetwork = await context.config.registerConfig(ServerConfigNetwork);
-
-    if (config.LISTENING_INTERFACE === undefined) {
-      throw new NfConfigException("No listenning address provided", this.__name);
-    }
     if (config.LISTENING_TCP_PORT === undefined && config.LISTENING_UDP_PORT === undefined) {
-      throw new NfConfigException("No listenning port specified", this.__name);
+      throw new Error("NetworkServerLibrary: no listening port specified.");
     }
 
     if (
       (config.WSS_CERT !== undefined && config.WSS_KEY === undefined) ||
       (config.WSS_CERT === undefined && config.WSS_KEY !== undefined)
     ) {
-      throw new NfConfigException("Both cert and key must be provided together", this.__name);
+      throw new Error("NetworkServerLibrary: both WSS_CERT and WSS_KEY must be provided together.");
     }
 
     if (config.LISTENING_TCP_PORT !== undefined) {
@@ -86,5 +63,20 @@ export class NetworkServerLibrary extends BaseNetworkLibrary {
       );
       this.udp.listen();
     }
+  }
+
+  public override expose(): NetworkServerContextApi {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const library = this;
+    return {
+      get tcp() {
+        if (!library.tcp) throw new Error("TCP isn't defined");
+        return library.tcp;
+      },
+      get udp() {
+        if (!library.udp) throw new Error("UDP isn't defined");
+        return library.udp;
+      },
+    };
   }
 }
