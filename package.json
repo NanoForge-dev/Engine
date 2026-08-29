@@ -8,8 +8,9 @@
   "license": "MIT",
   "contributors": [
     "Bill <timothe.jacquot@epitech.eu>",
-    "Exelo <exelo.corp@gmail.com>",
+    "Exelo <contact@exelo.dev>",
     "Fexkoser <martin.fillon@epitech.eu>",
+    "Josephine <josephine.chicouras@epitech.eu>",
     "Tchips <leo.outmizguine@epitech.eu>"
   ],
   "type": "module",
@@ -48,7 +49,7 @@
     "typescript": "catalog:core",
     "vitest": "catalog:test"
   },
-  "packageManager": "pnpm@11.24.0",
+  "packageManager": "pnpm@12.0.0",
   "engines": {
     "node": "26"
   },

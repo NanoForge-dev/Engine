@@ -42,7 +42,35 @@
   description: "This doesn't seem right"
   color: "e4e669"
 
-- name: "packages:asset-manager"
+- name: "modules:ecs"
+  description: "Related to ECS library"
+  color: "1c3f78"
+
+- name: "modules:editor"
+  description: "Related to Editor library"
+  color: "1c3f78"
+
+- name: "modules:graphics-2d"
+  description: "Related to Graphics2D library"
+  color: "1c3f78"
+
+- name: "modules:input"
+  description: "Related to Input library"
+  color: "1c3f78"
+
+- name: "modules:music"
+  description: "Related to Music library"
+  color: "1c3f78"
+
+- name: "modules:network"
+  description: "Related to Network library"
+  color: "1c3f78"
+
+- name: "modules:sound"
+  description: "Related to Sound library"
+  color: "1c3f78"
+
+- name: "packages:asset"
   description: "Related to AssetManager library"
   color: "aaa3dc"
 
@@ -50,56 +78,12 @@
   description: "Related to Common library"
   color: "aaa3dc"
 
-- name: "packages:config"
-  description: "Related to Config library"
-  color: "aaa3dc"
-
 - name: "packages:core"
   description: "Related to Core library"
   color: "aaa3dc"
 
-- name: "packages:core-editor"
-  description: "Related to Core Editor library"
-  color: "aaa3dc"
-
-- name: "packages:ecs-client"
-  description: "Related to ECSClient library"
-  color: "aaa3dc"
-
-- name: "packages:ecs-lib"
-  description: "Related to Abstract ECS library"
-  color: "aaa3dc"
-
-- name: "packages:ecs-server"
-  description: "Related to ECSServer library"
-  color: "aaa3dc"
-
-- name: "packages:graphics-2d"
-  description: "Related to Graphics2D library"
-  color: "aaa3dc"
-
-- name: "packages:graphics-2d-editor"
-  description: "Related to Graphics2D Editor library"
-  color: "aaa3dc"
-
-- name: "packages:input"
-  description: "Related to Input library"
-  color: "aaa3dc"
-
-- name: "packages:music"
-  description: "Related to Music library"
-  color: "aaa3dc"
-
-- name: "packages:network-client"
-  description: "Related to NetworkClient library"
-  color: "aaa3dc"
-
-- name: "packages:network-server"
-  description: "Related to NetworkServer library"
-  color: "aaa3dc"
-
-- name: "packages:sound"
-  description: "Related to Sound library"
+- name: "packages:env"
+  description: "Related to Env library"
   color: "aaa3dc"
 
 - name: "question"

@@ -1,62 +1,46 @@
-packages:asset-manager:
+modules:ecs:
   - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\nasset-manager\\n"
+    report|feature request) for\\?\\n\\necs\\n"
+
+modules:editor:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\neditor\\n"
+
+modules:graphics-2d:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ngraphics-2d\\n"
+
+modules:input:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ninput\\n"
+
+modules:music:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nmusic\\n"
+
+modules:network:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nnetwork\\n"
+
+modules:sound:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nsound\\n"
+
+packages:asset:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nasset\\n"
 
 packages:common:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\ncommon\\n"
 
-packages:config:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\nconfig\\n"
-
 packages:core:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\ncore\\n"
 
-packages:core-editor:
+packages:env:
   - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\ncore-editor\\n"
-
-packages:ecs-client:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\necs-client\\n"
-
-packages:ecs-lib:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\necs-lib\\n"
-
-packages:ecs-server:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\necs-server\\n"
-
-packages:graphics-2d:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\ngraphics-2d\\n"
-
-packages:graphics-2d-editor:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\ngraphics-2d-editor\\n"
-
-packages:input:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\ninput\\n"
-
-packages:music:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\nmusic\\n"
-
-packages:network-client:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\nnetwork-client\\n"
-
-packages:network-server:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\nnetwork-server\\n"
-
-packages:sound:
-  - "### Which (package|utils|package or utils) is this (bug
-    report|feature request) for\\?\\n\\nsound\\n"
+    report|feature request) for\\?\\n\\nenv\\n"
 
 utils:eslint-config:
   - "### Which (package|utils|package or utils) is this (bug
