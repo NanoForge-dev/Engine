@@ -267,6 +267,10 @@ dist
 src/**/*.js
 src/**/*.d.ts
 
+build/**/*.js
+build/**/*.wasm
+build/libecs-tmp.d.ts
+
 # pubilc directory
 lib/
 compile_commands.json

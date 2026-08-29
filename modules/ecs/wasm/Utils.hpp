@@ -7,17 +7,25 @@
 ** /_/ |_/\__,_/_/ /_/\____/_/    \____/_/   \__, /\___/    ⠸⣿⡄⠀⠀⠀⠀⣠⣾⣿⣿⣿⣤⠀⠀⠀⠀⢠⣿⠇
 **                                          /____/ ⠀         ⢿⣷⡀⠀⠀⠀⠉⠁⠀⠀⠈⠉⠀⠀⠀⢀⣾⡿⠀
 **                                                          ⠀⠀⠹⣿⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣿⠏⠀⠀
-**                      2025                                ⠀⠀⠀⠈⠙⢿⣷⣶⣤⣤⣤⣤⣶⣾⡿⠋⠁⠀⠀⠀
+**                      2026                                ⠀⠀⠀⠈⠙⢿⣷⣶⣤⣤⣤⣤⣶⣾⡿⠋⠁⠀⠀⠀
 **⠀                                                          ⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀
 */
 
-#include <emscripten/bind.h>
+#pragma once
 
-#include "Entity.hpp"
+#include <emscripten/val.h>
+#include <optional>
+#include <string>
 
-namespace nfo {
-    EMSCRIPTEN_BINDINGS(Entity)
-    {
-        emscripten::class_<Entity>("Entity").constructor<std::size_t>().function("getId", &Entity::get_id);
-    }
-} // namespace nfo
+#define UNKNOWN_COMPONENT_TYPE "__magic_unkown_component_type"
+
+EMSCRIPTEN_DECLARE_VAL_TYPE(Component);
+EMSCRIPTEN_DECLARE_VAL_TYPE(ComponentArray);
+EMSCRIPTEN_DECLARE_VAL_TYPE(ZipperInput);
+EMSCRIPTEN_DECLARE_VAL_TYPE(ZipperOutput);
+
+std::optional<std::string> json_to_str(const emscripten::val &c);
+std::optional<emscripten::val> get_js_member(const emscripten::val &c, const std::string &member);
+std::string get_js_class_name(const emscripten::val &c);
+std::optional<std::string> get_js_class_type_name(const emscripten::val &c);
+std::optional<std::string> get_js_class_var_name(const emscripten::val &c);

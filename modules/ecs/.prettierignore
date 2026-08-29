@@ -10,4 +10,4 @@ dist/
 coverage/
 CHANGELOG.md
 
-lib/
+build/

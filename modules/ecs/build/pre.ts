@@ -1,4 +1,4 @@
-import { Context } from "@nanoforge-dev/common";
+import type { Context } from "@nanoforge-dev/common";
 
 export type Component = { name: string; [key: string]: any };
 
