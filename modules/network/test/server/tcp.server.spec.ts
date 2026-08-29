@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { TCPServer } from "../src/tcp.server.network";
+import { TCPServer } from "../../src/server/tcp.server.network";
 
 vi.mock("ws", () => ({
   WebSocketServer: vi.fn(function (this: any) {

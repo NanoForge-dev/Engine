@@ -1,14 +1,13 @@
-import { type InitContext, NfConfigException } from "@nanoforge-dev/common";
+import type { InitContext } from "@nanoforge-dev/common";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { NetworkClientLibrary } from "../src";
+import { NetworkClientLibrary } from "../../src/client";
 
-const makeContext = (config: Record<string, unknown>) =>
-  ({
-    config: {
-      registerConfig: vi.fn().mockResolvedValue(config),
-    },
-  }) as unknown as InitContext;
+const makeInitContext = (env: Record<string, string>): InitContext => ({
+  vars: { get: () => undefined, set: () => {} },
+  env,
+  files: new Map(),
+});
 
 describe("NetworkClientLibrary", () => {
   beforeEach(() => {
@@ -53,21 +52,21 @@ describe("NetworkClientLibrary", () => {
   });
 
   describe("metadata", () => {
-    it("should expose the correct library name", () => {
-      expect(new NetworkClientLibrary().__name).toBe("NetworkClientLibrary");
+    it("should expose the reserved 'network' key", () => {
+      expect(new NetworkClientLibrary().key).toBe("network");
     });
   });
 
   describe("config validation", () => {
-    it("should throw NfConfigException when neither TCP nor UDP port is provided", async () => {
-      const ctx = makeContext({ SERVER_ADDRESS: "127.0.0.1", MAGIC_VALUE: "END" });
-      await expect(new NetworkClientLibrary().__init(ctx)).rejects.toThrow(NfConfigException);
+    it("should throw when neither TCP nor UDP port is provided", async () => {
+      const ctx = makeInitContext({ SERVER_ADDRESS: "127.0.0.1", MAGIC_VALUE: "END" });
+      await expect(new NetworkClientLibrary().__init(ctx)).rejects.toThrow();
     });
   });
 
   describe("initialization", () => {
     it("should initialize a TCP client when only SERVER_TCP_PORT is provided", async () => {
-      const ctx = makeContext({
+      const ctx = makeInitContext({
         SERVER_TCP_PORT: "8080",
         SERVER_ADDRESS: "127.0.0.1",
         MAGIC_VALUE: "END",
@@ -79,7 +78,7 @@ describe("NetworkClientLibrary", () => {
     });
 
     it("should initialize a UDP client when only SERVER_UDP_PORT is provided", async () => {
-      const ctx = makeContext({
+      const ctx = makeInitContext({
         SERVER_UDP_PORT: "8081",
         SERVER_ADDRESS: "127.0.0.1",
         MAGIC_VALUE: "END",
@@ -91,7 +90,7 @@ describe("NetworkClientLibrary", () => {
     });
 
     it("should initialize both TCP and UDP clients when both ports are provided", async () => {
-      const ctx = makeContext({
+      const ctx = makeInitContext({
         SERVER_TCP_PORT: "8080",
         SERVER_UDP_PORT: "8081",
         SERVER_ADDRESS: "127.0.0.1",
@@ -101,6 +100,26 @@ describe("NetworkClientLibrary", () => {
       await lib.__init(ctx);
       expect(lib.tcp).toBeDefined();
       expect(lib.udp).toBeDefined();
+    });
+
+    it("should default MAGIC_VALUE and WSS when not provided", async () => {
+      const ctx = makeInitContext({ SERVER_TCP_PORT: "8080", SERVER_ADDRESS: "127.0.0.1" });
+      const lib = new NetworkClientLibrary();
+      await expect(lib.__init(ctx)).resolves.toBeUndefined();
+    });
+  });
+
+  describe("expose", () => {
+    it("returns the tcp/udp clients", async () => {
+      const ctx = makeInitContext({
+        SERVER_TCP_PORT: "8080",
+        SERVER_ADDRESS: "127.0.0.1",
+        MAGIC_VALUE: "END",
+      });
+      const lib = new NetworkClientLibrary();
+      await lib.__init(ctx);
+      expect(lib.expose().tcp).toBe(lib.tcp);
+      expect(lib.expose().udp).toBeUndefined();
     });
   });
 });
