@@ -1,5 +1,5 @@
 import { type Context } from "@nanoforge-dev/common";
-import { type Registry } from "@nanoforge-dev/ecs-client";
+import { type Registry } from "@nanoforge-dev/ecs/client";
 
 import {
   CircleComponent,

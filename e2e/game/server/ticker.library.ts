@@ -1,4 +1,4 @@
-import { BaseNetworkLibrary, type Context } from "@nanoforge-dev/common";
+import { BaseNetworkLibrary, type Context } from "@nanoforge-dev/common-legacy";
 
 /**
  * A runner library that stops the game loop after a fixed number of ticks.

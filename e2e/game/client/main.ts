@@ -1,12 +1,12 @@
 import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
-import { type IRunOptions } from "@nanoforge-dev/common";
-import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { ECSClientLibrary } from "@nanoforge-dev/ecs-client";
-import { Graphics2DLibrary } from "@nanoforge-dev/graphics-2d";
-import { InputLibrary } from "@nanoforge-dev/input";
-import { MusicLibrary } from "@nanoforge-dev/music";
-import { NetworkClientLibrary } from "@nanoforge-dev/network-client";
-import { SoundLibrary } from "@nanoforge-dev/sound";
+import { type IRunOptions } from "@nanoforge-dev/common-legacy";
+import { NanoforgeFactory } from "@nanoforge-dev/core-legacy";
+import { ECSClientLibrary } from "@nanoforge-dev/ecs-client-legacy";
+import { Graphics2DLibrary } from "@nanoforge-dev/graphics-2d-legacy";
+import { InputLibrary } from "@nanoforge-dev/input-legacy";
+import { MusicLibrary } from "@nanoforge-dev/music-legacy";
+import { NetworkClientLibrary } from "@nanoforge-dev/network-client-legacy";
+import { SoundLibrary } from "@nanoforge-dev/sound-legacy";
 
 import { ExampleComponent } from "./components/example.component";
 import { exampleSystem } from "./systems/example.system";

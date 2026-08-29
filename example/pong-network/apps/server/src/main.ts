@@ -1,7 +1,7 @@
 import type { RunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { EcsLibrary } from "@nanoforge-dev/ecs-server";
-import { NetworkServerLibrary } from "@nanoforge-dev/network-server";
+import { EcsLibrary } from "@nanoforge-dev/ecs/server";
+import { NetworkServerLibrary } from "@nanoforge-dev/network/server";
 
 import { Position, Velocity } from "./components/components";
 import { bounce, move, packetHandler } from "./systems/systems";

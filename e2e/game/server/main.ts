@@ -1,7 +1,7 @@
 import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
-import { type IRunOptions } from "@nanoforge-dev/common";
-import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { ECSServerLibrary } from "@nanoforge-dev/ecs-server";
+import { type IRunOptions } from "@nanoforge-dev/common-legacy";
+import { NanoforgeFactory } from "@nanoforge-dev/core-legacy";
+import { ECSServerLibrary } from "@nanoforge-dev/ecs-server-legacy";
 
 import { ExampleComponent } from "./components/example.component";
 import { exampleSystem } from "./systems/example.system";
