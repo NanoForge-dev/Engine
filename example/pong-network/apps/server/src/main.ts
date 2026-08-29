@@ -1,28 +1,22 @@
-import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
-import { type IRunOptions } from "@nanoforge-dev/common";
+import type { RunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { ECSServerLibrary } from "@nanoforge-dev/ecs-server";
+import { EcsLibrary } from "@nanoforge-dev/ecs-server";
 import { NetworkServerLibrary } from "@nanoforge-dev/network-server";
 
-import { Position, Velocity } from "./components";
-import { bounce, move, packetHandler } from "./systems";
+import { Position, Velocity } from "./components/components";
+import { bounce, move, packetHandler } from "./systems/systems";
 
-export const app = NanoforgeFactory.createServer({
-  tickRate: 60,
-});
-
-export const main = async (options: IRunOptions) => {
-  const ecsLibrary = new ECSServerLibrary();
+export const main = async (options: RunOptions): Promise<void> => {
+  const app = NanoforgeFactory.createServer({ tickRate: 60 });
+  const ecs = new EcsLibrary();
   const network = new NetworkServerLibrary();
-  const assetManager = new AssetManagerLibrary();
 
-  app.useComponentSystem(ecsLibrary);
-  app.useNetwork(network);
-  app.useAssetManager(assetManager);
+  app.use(ecs);
+  app.use(network);
 
   await app.init(options);
 
-  const registry = ecsLibrary.registry;
+  const registry = ecs.registry;
 
   const ball = registry.spawnEntity();
   registry.addComponent(ball, new Position(960, 540));
@@ -40,5 +34,5 @@ export const main = async (options: IRunOptions) => {
   registry.addSystem(bounce);
   registry.addSystem(move);
 
-  app.run();
+  await app.run();
 };

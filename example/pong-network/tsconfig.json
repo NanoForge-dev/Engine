@@ -1,42 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig.json",
-  // Mapped from https://www.typescriptlang.org/tsconfig
-  "compilerOptions": {
-    // Type Checking
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "exactOptionalPropertyTypes": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": false,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strict": true,
-
-    // Modules
-    "allowArbitraryExtensions": false,
-    "allowImportingTsExtensions": false,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "resolveJsonModule": true,
-    "resolvePackageJsonExports": true,
-    "resolvePackageJsonImports": true,
-
-    // Interop Constraints
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-
-    // Language and Environment
-    "rootDir": ".",
-    "lib": ["ESNext", "esnext.disposable", "DOM"],
-    "target": "ESNext",
-    "experimentalDecorators": true,
-    "useDefineForClassFields": true
-  },
-  "include": ["client/**/*.ts", "server/**/*.ts"],
-  "exclude": ["node_modules", ".nanoforge"]
+  "extends": "../../tsconfig.json",
+  "include": ["apps/*/src/**/*.ts", "test/**/*.ts"],
+  "exclude": ["node_modules", "**/dist", "**/.nanoforge"]
 }

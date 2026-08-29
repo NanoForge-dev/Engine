@@ -2,7 +2,7 @@ import { type Context } from "@nanoforge-dev/common";
 import { type Registry } from "@nanoforge-dev/ecs-server";
 import { type NetworkServerLibrary } from "@nanoforge-dev/network-server";
 
-import { Position, Velocity } from "./components";
+import { Position, Velocity } from "../components/components";
 
 let cli1 = -1;
 let cli2 = -1;
@@ -84,7 +84,7 @@ function handleClientInput(clientId: number, key: string, network: NetworkServer
 
 export function packetHandler(registry: Registry, ctx: Context) {
   const zip = registry.getZipper([Position, Velocity]);
-  const network = ctx.libs.getNetwork<NetworkServerLibrary>();
+  const network = ctx.network;
 
   if (network.tcp.getConnectedClients().indexOf(cli1) == -1) cli1 = -1;
   if (network.tcp.getConnectedClients().indexOf(cli2) == -1) cli2 = -1;
@@ -124,7 +124,7 @@ function checkOutOfTerrain(id: number, paddle: any, network: NetworkServerLibrar
 }
 
 export const bounce = (registry: Registry, ctx: Context) => {
-  const network = ctx.libs.getNetwork<NetworkServerLibrary>();
+  const network = ctx.network;
   const zip = registry.getZipper([Position, Velocity]);
   checkOutOfTerrain(1, zip[1], network);
   checkOutOfTerrain(2, zip[2], network);
