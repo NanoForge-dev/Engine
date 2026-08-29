@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { UDPClient } from "../src/udp.client.network";
+import { UDPClient } from "../../src/client/udp.client.network";
 
 describe("UDPClient", () => {
   beforeEach(() => {

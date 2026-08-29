@@ -6,15 +6,13 @@ import {
   IsOptional,
   IsPort,
   IsString,
-} from "@nanoforge-dev/config";
+} from "@nanoforge-dev/env";
 
 /**
  * Environment-variable configuration for `NetworkServerLibrary`.
  *
  * @remarks
- * Resolved automatically by `IConfigRegistry.registerConfig` during `__init`.
- * Set these variables in the environment (or pass them via
- * `IRunServerOptions.env`) before running the application.
+ * Resolved via `registerEnv(ServerConfigNetwork, ctx.env)` during `__init`.
  */
 export class ServerConfigNetwork {
   /**
