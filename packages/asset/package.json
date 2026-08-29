@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@nanoforge-dev/asset-manager",
+  "name": "@nanoforge-dev/asset",
   "version": "1.4.2",
-  "description": "NanoForge Engine - Asset Manager",
+  "description": "NanoForge Engine - Asset",
   "keywords": [
     "nanoforge",
     "game",
@@ -13,8 +13,9 @@
   "license": "MIT",
   "contributors": [
     "Bill <timothe.jacquot@epitech.eu>",
-    "Exelo <exelo.corp@gmail.com>",
+    "Exelo <contact@exelo.dev>",
     "Fexkoser <martin.fillon@epitech.eu>",
+    "Josephine <josephine.chicouras@epitech.eu>",
     "Tchips <leo.outmizguine@epitech.eu>"
   ],
   "files": [
@@ -43,7 +44,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NanoForge-dev/Engine.git",
-    "directory": "packages/asset-manager"
+    "directory": "packages/asset"
   },
   "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
   "scripts": {
@@ -52,7 +53,7 @@
     "format": "prettier --write . && eslint --fix --format=pretty src",
     "test:unit": "vitest run --config ../../vitest.config.ts",
     "prepack": "pnpm run build && pnpm run lint",
-    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/asset-manager/*'",
+    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'packages/asset/*'",
     "release": "cliff-jumper",
     "docs": "mint-tsdocs generate"
   },
@@ -71,7 +72,7 @@
     "unrun": "catalog:build",
     "vitest": "catalog:test"
   },
-  "packageManager": "pnpm@11.24.0",
+  "packageManager": "pnpm@12.0.0",
   "engines": {
     "node": "26"
   },
