@@ -11,20 +11,16 @@ body:
     attributes:
       label: Which package or utils is this feature request for?
       options:
-        - asset-manager
+        - asset
         - common
-        - config
         - core
-        - core-editor
-        - ecs-client
-        - ecs-lib
-        - ecs-server
+        - ecs
+        - editor
+        - env
         - graphics-2d
-        - graphics-2d-editor
         - input
         - music
-        - network-client
-        - network-server
+        - network
         - sound
         - eslint-config
         - prettier-config

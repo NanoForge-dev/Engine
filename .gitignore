@@ -241,3 +241,5 @@ emsdk-cache/
 
 references/
 .direnv
+
+packages/old-core/
