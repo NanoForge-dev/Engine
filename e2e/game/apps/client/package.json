@@ -1,5 +1,5 @@
 {
-  "name": "pong-network-client",
+  "name": "e2e-client",
   "version": "0.0.0",
   "description": "",
   "author": "",
@@ -18,12 +18,6 @@
     "@nanoforge-dev/network": "workspace:*",
     "@nanoforge-dev/graphics-2d": "workspace:*",
     "@nanoforge-dev/input": "workspace:*",
-    "@nanoforge-dev/utils-eslint-config": "workspace:*",
-    "@nanoforge-dev/utils-prettier-config": "workspace:*",
-    "@trivago/prettier-plugin-sort-imports": "catalog:lint",
-    "eslint": "catalog:lint",
-    "lint-staged": "catalog:ci",
-    "prettier": "catalog:lint",
     "typescript": "catalog:core"
   },
   "private": true,

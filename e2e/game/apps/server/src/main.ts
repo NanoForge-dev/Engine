@@ -1,25 +1,19 @@
-import { AssetManagerLibrary } from "@nanoforge-dev/asset-manager";
-import { type IRunOptions } from "@nanoforge-dev/common";
+import { type RunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { ECSServerLibrary } from "@nanoforge-dev/ecs-server";
+import { EcsLibrary } from "@nanoforge-dev/ecs/server";
 
 import { ExampleComponent } from "./components/example.component";
 import { exampleSystem } from "./systems/example.system";
 import { TickerLibrary } from "./ticker.library";
 
-const TICKER = Symbol.for("ticker");
-
-export async function main(options: IRunOptions) {
+export const main = async (options: RunOptions): Promise<void> => {
   const app = NanoforgeFactory.createServer({ tickRate: 60 });
 
-  const assetManager = new AssetManagerLibrary();
-  const ecs = new ECSServerLibrary();
-
+  const ecs = new EcsLibrary();
   const ticker = new TickerLibrary(5);
 
-  app.useAssetManager(assetManager);
-  app.useComponentSystem(ecs);
-  app.use(TICKER, ticker);
+  app.use(ecs);
+  app.use(ticker);
 
   await app.init(options);
 
@@ -33,4 +27,4 @@ export async function main(options: IRunOptions) {
   await app.run();
 
   await ticker.done;
-}
+};

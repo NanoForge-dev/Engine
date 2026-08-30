@@ -9,18 +9,11 @@
     "start": "nf start"
   },
   "devDependencies": {
-    "@nanoforge-dev/asset-manager": "workspace:*",
+    "@nanoforge-dev/asset": "workspace:*",
     "@nanoforge-dev/cli": "latest",
     "@nanoforge-dev/common": "workspace:*",
     "@nanoforge-dev/core": "workspace:*",
-    "@nanoforge-dev/ecs-client": "workspace:*",
-    "@nanoforge-dev/ecs-server": "workspace:*",
-    "@nanoforge-dev/graphics-2d": "workspace:*",
-    "@nanoforge-dev/input": "workspace:*",
-    "@nanoforge-dev/music": "workspace:*",
-    "@nanoforge-dev/network-client": "workspace:*",
-    "@nanoforge-dev/network-server": "workspace:*",
-    "@nanoforge-dev/sound": "workspace:*",
+    "@nanoforge-dev/env": "workspace:*",
     "typescript": "catalog:core"
   },
   "private": true,

@@ -1,6 +1,6 @@
 import { type Context } from "@nanoforge-dev/common";
-import { type Registry } from "@nanoforge-dev/ecs-server";
-import { type NetworkServerLibrary } from "@nanoforge-dev/network-server";
+import { type Registry } from "@nanoforge-dev/ecs/server";
+import { type NetworkServerContextApi } from "@nanoforge-dev/network/server";
 
 import { Position, Velocity } from "../components/components";
 
@@ -19,7 +19,7 @@ export function move(registry: Registry, ctx: Context) {
   });
 }
 
-function sendMoveAll(id: number, vel: Velocity, pos: Position, network: NetworkServerLibrary) {
+function sendMoveAll(id: number, vel: Velocity, pos: Position, network: NetworkServerContextApi) {
   network.tcp.sendToEverybody(
     new TextEncoder().encode(
       JSON.stringify({
@@ -32,7 +32,7 @@ function sendMoveAll(id: number, vel: Velocity, pos: Position, network: NetworkS
   );
 }
 
-function connectNewClient(newCli: number, network: NetworkServerLibrary, zip: any) {
+function connectNewClient(newCli: number, network: NetworkServerContextApi, zip: any) {
   network.tcp.sendToClient(
     newCli,
     new TextEncoder().encode(JSON.stringify({ type: "assignId", assigned: "ball", id: 0 })),
@@ -50,7 +50,12 @@ function connectNewClient(newCli: number, network: NetworkServerLibrary, zip: an
   sendMoveAll(2, zip[2].Velocity, zip[2].Position, network);
 }
 
-function handleClientInput(clientId: number, key: string, network: NetworkServerLibrary, zip: any) {
+function handleClientInput(
+  clientId: number,
+  key: string,
+  network: NetworkServerContextApi,
+  zip: any,
+) {
   let id;
 
   if (clientId === cli1) {
@@ -110,7 +115,7 @@ export function packetHandler(registry: Registry, ctx: Context) {
   });
 }
 
-function checkOutOfTerrain(id: number, paddle: any, network: NetworkServerLibrary) {
+function checkOutOfTerrain(id: number, paddle: any, network: NetworkServerContextApi) {
   if (paddle.Position.y < 0) {
     paddle.Position.y = 0;
     paddle.Velocity.y = 0;
