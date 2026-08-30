@@ -1,8 +1,0 @@
-{
-  "$schema": "https://raw.githubusercontent.com/favware/cliff-jumper/main/assets/cliff-jumper.schema.json",
-  "name": "network-server",
-  "org": "nanoforge-dev",
-  "packagePath": "packages/network-server",
-  "tagTemplate": "{{new-version}}",
-  "identifierBase": false
-}
