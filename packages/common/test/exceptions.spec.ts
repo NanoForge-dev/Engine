@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { NfConfigException, NfFetchException, NfNotFound, NfNotInitializedException } from "../src";
+import {
+  NfDuplicateLibraryException,
+  NfFetchException,
+  NfNotFound,
+  NfNotInitializedException,
+} from "../src";
 
 describe("NfNotInitializedException", () => {
   it("should have code 404", () => {
@@ -78,28 +83,20 @@ describe("NfFetchException", () => {
   });
 });
 
-describe("NfConfigException", () => {
-  it("should have code 400", () => {
-    expect(new NfConfigException("bad value").code).toBe(400);
+describe("NfDuplicateLibraryException", () => {
+  it("should have code 409", () => {
+    expect(new NfDuplicateLibraryException("ecs").code).toBe(409);
   });
 
-  it("should include message in output", () => {
-    expect(new NfConfigException("bad value").message).toContain("bad value");
-  });
-
-  it("should include library name when provided", () => {
-    expect(new NfConfigException("bad value", "MyLib").message).toContain("(MyLib)");
-  });
-
-  it("should omit library name when not provided", () => {
-    expect(new NfConfigException("bad value").message).not.toContain("(");
+  it("should include the key in message", () => {
+    expect(new NfDuplicateLibraryException("ecs").message).toContain('"ecs"');
   });
 
   it("should have [NANOFORGE] prefix", () => {
-    expect(new NfConfigException("bad value").message).toMatch(/^\[NANOFORGE]/);
+    expect(new NfDuplicateLibraryException("ecs").message).toMatch(/^\[NANOFORGE]/);
   });
 
   it("should be an instance of Error", () => {
-    expect(new NfConfigException("bad value")).toBeInstanceOf(Error);
+    expect(new NfDuplicateLibraryException("ecs")).toBeInstanceOf(Error);
   });
 });
