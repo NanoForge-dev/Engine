@@ -2,7 +2,7 @@
  * Options accepted by `NanoforgeFactory.createClient` and
  * `NanoforgeFactory.createServer`.
  */
-export interface IApplicationOptions {
+export interface ApplicationOptions {
   /**
    * Target game-loop frequency in ticks per second.
    *
@@ -10,3 +10,7 @@ export interface IApplicationOptions {
    */
   tickRate: number;
 }
+
+export const DEFAULT_APPLICATION_OPTIONS: ApplicationOptions = {
+  tickRate: 60,
+};
