@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@nanoforge-dev/editor-lib",
+  "version": "1.4.2",
+  "description": "NanoForge Engine - Editor",
+  "keywords": [
+    "nanoforge",
+    "game",
+    "engine"
+  ],
+  "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "bugs": "https://github.com/NanoForge-dev/Engine/issues",
+  "license": "MIT",
+  "contributors": [
+    "Bill <timothe.jacquot@epitech.eu>",
+    "Exelo <contact@exelo.dev>",
+    "Fexkoser <martin.fillon@epitech.eu>",
+    "Josephine <josephine.chicouras@epitech.eu>",
+    "Tchips <leo.outmizguine@epitech.eu>"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "type": "module",
+  "directories": {
+    "lib": "src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanoForge-dev/Engine.git",
+    "directory": "modules/editor"
+  },
+  "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
+  "scripts": {
+    "build": "tsc --noEmit && tsdown --config-loader unrun",
+    "lint": "prettier --check . && eslint --format=pretty src",
+    "format": "prettier --write . && eslint --fix --format=pretty src",
+    "test:unit": "vitest run --config ../../vitest.config.ts",
+    "prepack": "pnpm run build && pnpm run lint",
+    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'modules/editor/*'",
+    "release": "cliff-jumper",
+    "docs": "mint-tsdocs generate"
+  },
+  "dependencies": {
+    "@nanoforge-dev/common": "workspace:*"
+  },
+  "devDependencies": {
+    "@favware/cliff-jumper": "catalog:ci",
+    "@nanoforge-dev/core": "workspace:*",
+    "@nanoforge-dev/utils-eslint-config": "workspace:*",
+    "@nanoforge-dev/utils-prettier-config": "workspace:*",
+    "@trivago/prettier-plugin-sort-imports": "catalog:lint",
+    "eslint": "catalog:lint",
+    "prettier": "catalog:lint",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:core",
+    "unrun": "catalog:build",
+    "vitest": "catalog:test"
+  },
+  "packageManager": "pnpm@12.0.0",
+  "engines": {
+    "node": "26"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "**": [
+      "prettier --ignore-unknown --write"
+    ],
+    "src/**/*.ts": [
+      "eslint --fix"
+    ]
+  }
+}
