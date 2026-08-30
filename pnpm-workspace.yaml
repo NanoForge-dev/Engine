@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - modules/*
   - utils/*
   - e2e/game/**
   - example/**
@@ -18,14 +19,14 @@ catalogs:
     '@favware/cliff-jumper': ^6.0.0
     '@nanoforge-dev/actions': ^2.1.5
     husky: ^9.1.7
-    lint-staged: ^17.3.0
+    lint-staged: ^17.4.1
   config:
     class-transformer: ^0.5.1
     class-validator: ^0.14.3
   core:
     '@types/node': ^26.4.0
     turbo: ^2.10.12
-    typescript: ^7.0.2
+    typescript: ^6.0.3
   docs:
     '@microsoft/api-extractor': ^7.59.0
     mint-tsdocs: ^0.0.8

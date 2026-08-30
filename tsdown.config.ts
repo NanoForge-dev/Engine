@@ -1,9 +1,14 @@
 import { defineConfig } from "tsdown";
 
-export function createTsdownConfig() {
+export function createTsdownConfig(options?: {
+  entry?: string | string[];
+  outDir?: string;
+  tsconfig?: string;
+}) {
   return defineConfig({
-    entry: ["src/index.ts"],
-    outDir: "dist",
+    entry: options?.entry ?? ["src/index.ts"],
+    outDir: options?.outDir ?? "dist",
+    tsconfig: options?.tsconfig ?? "tsconfig.json",
     format: ["esm", "cjs"],
     shims: true,
     dts: true,
