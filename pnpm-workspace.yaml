@@ -1,8 +1,8 @@
 packages:
   - packages/*
   - utils/*
-  - e2e/game
-  - example/*
+  - e2e/game/**
+  - example/**
 
 allowBuilds:
   bun: true
