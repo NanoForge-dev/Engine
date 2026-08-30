@@ -12,11 +12,10 @@
   "devDependencies": {
     "@nanoforge-dev/asset": "workspace:*",
     "@nanoforge-dev/common": "workspace:*",
-    "@nanoforge-dev/config": "workspace:*",
     "@nanoforge-dev/core": "workspace:*",
     "@nanoforge-dev/env": "workspace:*",
-    "@nanoforge-dev/ecs-server": "workspace:*",
-    "@nanoforge-dev/network-server": "workspace:*",
+    "@nanoforge-dev/ecs": "workspace:*",
+    "@nanoforge-dev/network": "workspace:*",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",
