@@ -1,8 +1,4 @@
-import {
-  type IGraphicsLibrary,
-  type IInputLibrary,
-  type ISoundLibrary,
-} from "@nanoforge-dev/common";
+import type { ClientRunOptions } from "@nanoforge-dev/common";
 
 import { NanoforgeApplication } from "./nanoforge-application";
 
@@ -17,39 +13,26 @@ import { NanoforgeApplication } from "./nanoforge-application";
  * @example
  * ```ts
  * const client = NanoforgeFactory.createClient();
- * client.useAssetManager(new AssetManagerLibrary());
- * client.useGraphics(new Graphics2DLibrary());
- * client.useInput(new InputLibrary());
- * client.useSound(new SoundLibrary());
+ * client.use(new Graphics2DLibrary());
+ * client.use(new InputLibrary());
+ * client.use(new SoundLibrary());
  * await client.init(`container, files, env `);
  * client.run();
  * ```
  */
 export class NanoforgeClient extends NanoforgeApplication {
   /**
-   * Register the graphics library used to render the game.
+   * Initialise all registered libraries in dependency order and prepare the
+   * engine for the game loop.
    *
-   * @param library - Graphics library instance (e.g. Graphics2DLibrary).
-   */
-  public useGraphics(library: IGraphicsLibrary) {
-    this.applicationConfig.useGraphicsLibrary(library);
-  }
-
-  /**
-   * Register the input library used to read keyboard and mouse state.
+   * @remarks
+   * Must be called before `run`.  Resolves once every library's `__init`
+   * hook has completed.
    *
-   * @param library - Input library instance (e.g. InputLibrary).
+   * @param options - Run options providing the canvas container, files map, and
+   *   environment variables.
    */
-  public useInput(library: IInputLibrary) {
-    this.applicationConfig.useInputLibrary(library);
-  }
-
-  /**
-   * Register the sound-effect library.
-   *
-   * @param library - Sound library instance (e.g. SoundLibrary).
-   */
-  public useSound(library: ISoundLibrary) {
-    this.applicationConfig.useSoundLibrary(library);
+  public async init(options: ClientRunOptions): Promise<void> {
+    await this.initialize(options);
   }
 }

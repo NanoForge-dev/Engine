@@ -1,0 +1,66 @@
+import {
+  Default,
+  Expose,
+  IsBoolean,
+  IsByteLength,
+  IsIpOrURL,
+  IsOptional,
+  IsPort,
+  TransformToBoolean,
+} from "@nanoforge-dev/env";
+
+/**
+ * Environment-variable configuration for `NetworkClientLibrary`.
+ *
+ * @remarks
+ * Resolved via `registerEnv(ClientConfigNetwork, ctx.env)` during `__init`.
+ */
+export class ClientConfigNetwork {
+  /**
+   * Port of the server's TCP WebSocket endpoint.
+   *
+   * @remarks
+   * Either this or `SERVER_UDP_PORT` (or both) must be set.
+   */
+  @Expose()
+  @IsOptional()
+  @IsPort()
+  SERVER_TCP_PORT?: string;
+
+  /**
+   * Port of the server's UDP (WebRTC signaling) endpoint.
+   *
+   * @remarks
+   * Either this or `SERVER_TCP_PORT` (or both) must be set.
+   */
+  @Expose()
+  @IsOptional()
+  @IsPort()
+  SERVER_UDP_PORT?: string;
+
+  /** Hostname or IP address of the game server. */
+  @Expose()
+  @IsIpOrURL(undefined, undefined, { protocols: ["ws", "wss", "http", "https"] })
+  SERVER_ADDRESS!: string;
+
+  /**
+   * Delimiter bytes appended to each packet for framing.
+   *
+   * @default "PACKET_END"
+   */
+  @Expose()
+  @Default("PACKET_END")
+  @IsByteLength(2, 64)
+  MAGIC_VALUE!: string;
+
+  /**
+   * Use secure WebSocket (`wss://`) connections.
+   *
+   * @default false
+   */
+  @Expose()
+  @TransformToBoolean()
+  @IsBoolean()
+  @Default(false)
+  WSS!: boolean;
+}

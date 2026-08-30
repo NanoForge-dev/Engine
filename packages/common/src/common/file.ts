@@ -4,8 +4,8 @@ import { NfFetchException } from "../exception";
  * Represents a file asset that has been registered with the engine.
  *
  * @remarks
- * Instances are returned by `AssetManagerLibrary.getAsset`.  Each method
- * lazily fetches the file from the engine's virtual file system and returns the
+ * Instances are returned by `AssetContext.getAsset`. Each method lazily
+ * fetches the file from the engine's virtual file system and returns the
  * content in the requested format.
  *
  * All read methods throw `NfFetchException` when the underlying `fetch`
@@ -13,7 +13,7 @@ import { NfFetchException } from "../exception";
  *
  * @example
  * ```ts
- * const file = assetManager.getAsset("/textures/hero.png");
+ * const file = asset.getAsset("/textures/hero.png");
  * const buffer = await file.arrayBuffer();
  * ```
  */

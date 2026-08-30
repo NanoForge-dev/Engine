@@ -1,0 +1,38 @@
+{
+  "name": "pong-network-client",
+  "version": "0.0.0",
+  "description": "",
+  "author": "",
+  "scripts": {
+    "build": "nf build",
+    "start": "nf start",
+    "lint": "prettier --check . && eslint --format=pretty \"{client,server}/**/*.ts\"",
+    "format": "prettier --write . && eslint --fix --format=pretty \"{client,server}/**/*.ts\""
+  },
+  "devDependencies": {
+    "@nanoforge-dev/asset": "workspace:*",
+    "@nanoforge-dev/common": "workspace:*",
+    "@nanoforge-dev/core": "workspace:*",
+    "@nanoforge-dev/env": "workspace:*",
+    "@nanoforge-dev/ecs": "workspace:*",
+    "@nanoforge-dev/network": "workspace:*",
+    "@nanoforge-dev/graphics-2d": "workspace:*",
+    "@nanoforge-dev/input": "workspace:*",
+    "@nanoforge-dev/utils-eslint-config": "workspace:*",
+    "@nanoforge-dev/utils-prettier-config": "workspace:*",
+    "@trivago/prettier-plugin-sort-imports": "catalog:lint",
+    "eslint": "catalog:lint",
+    "lint-staged": "catalog:ci",
+    "prettier": "catalog:lint",
+    "typescript": "catalog:core"
+  },
+  "private": true,
+  "lint-staged": {
+    "**": [
+      "prettier --ignore-unknown --write"
+    ],
+    "{client,server}/**/*.ts": [
+      "eslint --fix"
+    ]
+  }
+}

@@ -13,20 +13,16 @@ body:
     attributes:
       label: Which package is this bug report for?
       options:
-        - asset-manager
+        - asset
         - common
-        - config
         - core
-        - core-editor
-        - ecs-client
-        - ecs-lib
-        - ecs-server
+        - ecs
+        - editor
+        - env
         - graphics-2d
-        - graphics-2d-editor
         - input
         - music
-        - network-client
-        - network-server
+        - network
         - sound
         - other
     validations:
@@ -63,7 +59,7 @@ body:
       description: List necessary versions here. This includes your package version, runtime version, operating system etc.
       placeholder: |
         - @nanoforge-dev/common 1.0.0 (`npm ls @nanoforge-dev/common` or another package)
-        - Node.js 25 (`node --version`)
+        - Node.js 26 (`node --version`)
         - TypeScript 5.9.3 (`npm ls typescript` if you use it)
         - macOS Ventura 13.3.1
     validations:

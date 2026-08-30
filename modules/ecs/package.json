@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@nanoforge-dev/ecs",
+  "version": "1.4.2",
+  "description": "NanoForge Engine - ECS",
+  "keywords": [
+    "nanoforge",
+    "game",
+    "engine"
+  ],
+  "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "bugs": "https://github.com/NanoForge-dev/Engine/issues",
+  "license": "MIT",
+  "contributors": [
+    "Bill <timothe.jacquot@epitech.eu>",
+    "Exelo <contact@exelo.dev>",
+    "Fexkoser <martin.fillon@epitech.eu>",
+    "Josephine <josephine.chicouras@epitech.eu>",
+    "Tchips <leo.outmizguine@epitech.eu>"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/client/index.cjs",
+  "module": "./dist/client/index.js",
+  "types": "./dist/client/index.d.cts",
+  "exports": {
+    "./client": {
+      "require": {
+        "types": "./dist/client/index.d.cts",
+        "default": "./dist/client/index.cjs"
+      },
+      "import": {
+        "types": "./dist/client/index.d.ts",
+        "default": "./dist/client/index.js"
+      }
+    },
+    "./server": {
+      "require": {
+        "types": "./dist/server/index.d.cts",
+        "default": "./dist/server/index.cjs"
+      },
+      "import": {
+        "types": "./dist/server/index.d.ts",
+        "default": "./dist/server/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "type": "module",
+  "directories": {
+    "lib": "src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanoForge-dev/Engine.git",
+    "directory": "modules/ecs"
+  },
+  "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
+  "scripts": {
+    "build": "pnpm build:wasm && pnpm build:script",
+    "build:script": "tsc --noEmit && tsdown --config-loader unrun",
+    "build:wasm": "make",
+    "clean": "make fclean",
+    "lint": "prettier --check . && eslint --format=pretty src",
+    "format": "prettier --write . && eslint --fix --format=pretty src",
+    "test:unit": "make fclean && make tests -j 16 && vitest run --config ../../vitest.config.ts && make fclean",
+    "prepack": "pnpm run build && pnpm run lint",
+    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'modules/ecs/*'",
+    "release": "cliff-jumper",
+    "docs": "pnpm run build:wasm && mint-tsdocs generate"
+  },
+  "dependencies": {
+    "@nanoforge-dev/common": "workspace:*"
+  },
+  "devDependencies": {
+    "@favware/cliff-jumper": "catalog:ci",
+    "@nanoforge-dev/utils-eslint-config": "workspace:*",
+    "@nanoforge-dev/utils-prettier-config": "workspace:*",
+    "@trivago/prettier-plugin-sort-imports": "catalog:lint",
+    "eslint": "catalog:lint",
+    "prettier": "catalog:lint",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:core",
+    "unrun": "catalog:build",
+    "vitest": "catalog:test"
+  },
+  "packageManager": "pnpm@12.0.0",
+  "engines": {
+    "node": "26"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "**": [
+      "prettier --ignore-unknown --write"
+    ],
+    "src/**/*.ts": [
+      "eslint --fix"
+    ]
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@nanoforge-dev/network",
+  "version": "1.4.2",
+  "description": "NanoForge Engine - Network",
+  "keywords": [
+    "nanoforge",
+    "game",
+    "engine"
+  ],
+  "homepage": "https://github.com/NanoForge-dev/Engine#readme",
+  "bugs": "https://github.com/NanoForge-dev/Engine/issues",
+  "license": "MIT",
+  "contributors": [
+    "Bill <timothe.jacquot@epitech.eu>",
+    "Exelo <contact@exelo.dev>",
+    "Fexkoser <martin.fillon@epitech.eu>",
+    "Josephine <josephine.chicouras@epitech.eu>",
+    "Tchips <leo.outmizguine@epitech.eu>"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/client/index.cjs",
+  "module": "./dist/client/index.js",
+  "types": "./dist/client/index.d.cts",
+  "exports": {
+    "./client": {
+      "require": {
+        "types": "./dist/client/index.d.cts",
+        "default": "./dist/client/index.cjs"
+      },
+      "import": {
+        "types": "./dist/client/index.d.ts",
+        "default": "./dist/client/index.js"
+      }
+    },
+    "./server": {
+      "require": {
+        "types": "./dist/server/index.d.cts",
+        "default": "./dist/server/index.cjs"
+      },
+      "import": {
+        "types": "./dist/server/index.d.ts",
+        "default": "./dist/server/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "type": "module",
+  "directories": {
+    "lib": "src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanoForge-dev/Engine.git",
+    "directory": "modules/network"
+  },
+  "funding": "https://github.com/NanoForge-dev/Engine?sponsor",
+  "scripts": {
+    "build": "tsc -p tsconfig.client.json --noEmit && tsc -p tsconfig.server.json --noEmit && tsdown --config-loader unrun",
+    "lint": "prettier --check . && eslint --format=pretty src",
+    "format": "prettier --write . && eslint --fix --format=pretty src",
+    "test:unit": "vitest run --config ../../vitest.config.ts",
+    "prepack": "pnpm run build && pnpm run lint",
+    "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'modules/network/*'",
+    "release": "cliff-jumper",
+    "docs": "mint-tsdocs generate"
+  },
+  "dependencies": {
+    "@mapbox/node-pre-gyp": "catalog:network",
+    "@nanoforge-dev/common": "workspace:*",
+    "@nanoforge-dev/env": "workspace:*",
+    "wrtc": "catalog:network",
+    "ws": "catalog:network"
+  },
+  "devDependencies": {
+    "@favware/cliff-jumper": "catalog:ci",
+    "@nanoforge-dev/utils-eslint-config": "workspace:*",
+    "@nanoforge-dev/utils-prettier-config": "workspace:*",
+    "@trivago/prettier-plugin-sort-imports": "catalog:lint",
+    "@types/ws": "catalog:network",
+    "eslint": "catalog:lint",
+    "prettier": "catalog:lint",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:core",
+    "unrun": "catalog:build",
+    "vitest": "catalog:test"
+  },
+  "packageManager": "pnpm@12.0.0",
+  "engines": {
+    "node": "26"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "**": [
+      "prettier --ignore-unknown --write"
+    ],
+    "src/**/*.ts": [
+      "eslint --fix"
+    ]
+  }
+}
