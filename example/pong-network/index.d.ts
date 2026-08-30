@@ -1,5 +1,5 @@
 // Ambient stub for the `nf` CLI's own `nanoforge/config` resolution. Keep this
-// shape in sync with @nanoforge-dev/config's real types; revisit/remove once
+// shape in sync with @nanoforge-dev/env's real types; revisit/remove once
 // the CLI's actual resolution contract for `nanoforge.config.ts` is confirmed.
 declare module "nanoforge/config" {
   type ContainLibConfig = {

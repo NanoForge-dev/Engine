@@ -1,9 +1,9 @@
 import type { ClientRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { EcsLibrary } from "@nanoforge-dev/ecs-client";
+import { EcsLibrary } from "@nanoforge-dev/ecs/client";
 import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
 import { InputEnum, InputLibrary } from "@nanoforge-dev/input";
-import { NetworkClientLibrary } from "@nanoforge-dev/network-client";
+import { NetworkClientLibrary } from "@nanoforge-dev/network/client";
 
 import {
   CircleComponent,
@@ -89,7 +89,7 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
 
     return new Promise((resolve) => {
       const check = () => {
-        if (network.tcp.isConnected()) {
+        if (network.tcp?.isConnected()) {
           resolve();
         } else {
           setTimeout(check, 50);
@@ -100,7 +100,7 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   }
 
   await waitForConnection();
-  network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
+  network.tcp?.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
 
   await app.run();
 };

@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_DIR = resolve(__dirname, "./game");
 
-const wasmPath = resolve(PROJECT_DIR, "../../packages/ecs-server/dist/assets/libecs.wasm");
+const wasmPath = resolve(PROJECT_DIR, "../../modules/ecs/lib/node/libecs.wasm");
 
 const timeout = setTimeout(() => {
   console.error("[E2E] Server timed out after 10s — aborting");

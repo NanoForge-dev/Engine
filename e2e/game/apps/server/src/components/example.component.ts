@@ -1,4 +1,4 @@
-import { type EditorComponentManifest } from "@nanoforge-dev/ecs-server";
+import { type EditorComponentManifest } from "@nanoforge-dev/ecs/server";
 
 export class ExampleComponent {
   name = this.constructor.name;
