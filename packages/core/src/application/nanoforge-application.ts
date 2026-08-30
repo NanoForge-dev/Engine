@@ -1,16 +1,17 @@
+import { AssetLibrary } from "@nanoforge-dev/asset";
 import {
-  type IAssetManagerLibrary,
-  type IComponentSystemLibrary,
-  type ILibrary,
-  type INetworkLibrary,
-  type IRunOptions,
+  type ClientRunOptions,
+  type Context,
+  type InitContext,
+  type Library,
   NfNotInitializedException,
+  type RunOptions,
 } from "@nanoforge-dev/common";
 
-import { EditableApplicationContext } from "../common/context/contexts/application.editable-context";
-import { Core } from "../core/core";
-import { ApplicationConfig } from "./application-config";
-import type { IApplicationOptions } from "./application-options.type";
+import { InternalAppState } from "../internal/internal-app-state";
+import { InternalVarsState } from "../internal/internal-vars-state";
+import { LibraryRegistry } from "../library-registry/library-registry";
+import { type ApplicationOptions, DEFAULT_APPLICATION_OPTIONS } from "./application-options.type";
 
 /**
  * Base class for client and server NanoForge applications.
@@ -30,81 +31,34 @@ import type { IApplicationOptions } from "./application-options.type";
  * ```
  */
 export abstract class NanoforgeApplication {
-  protected applicationConfig: ApplicationConfig;
-  private _core?: Core;
-  private readonly _options: IApplicationOptions;
+  private readonly registry = new LibraryRegistry();
+  private readonly appState: InternalAppState;
+  private readonly varsState = new InternalVarsState();
+  private readonly options: ApplicationOptions;
+
+  private context?: Context;
 
   /**
    * @param options - Optional application-level settings such as tickRate.
    */
-  constructor(options?: Partial<IApplicationOptions>) {
-    this.applicationConfig = new ApplicationConfig();
-
-    this._options = {
-      tickRate: 60,
-      ...(options ?? {}),
-    };
+  constructor(options?: Partial<ApplicationOptions>) {
+    this.options = { ...DEFAULT_APPLICATION_OPTIONS, ...options };
+    this.appState = new InternalAppState(this.options.tickRate);
+    this.registry.registerBuiltin(new AssetLibrary());
   }
 
   /**
-   * Register a library under a custom symbol.
+   * Registers a library. Single argument — the library owns its own
+   * context key (see `defineLibraryKey`).
    *
-   * @remarks
-   * Use this method for libraries that do not have a dedicated shorthand (e.g.
-   * game-specific custom libraries).  For built-in library types prefer the
-   * typed helpers such as `useAssetManager`, `useNetwork`, etc.
-   *
-   * @param sym - Unique symbol identifying the library slot.
    * @param library - Library instance to register.
-   */
-  public use(sym: symbol, library: ILibrary): void {
-    this.applicationConfig.useLibrary(sym, library);
-  }
-
-  /**
-   * Register the component-system (ECS) library.
    *
-   * @param library - ECS library instance (e.g. ECSClientLibrary or ECSServerLibrary).
+   * @throws {@link NfDuplicateLibraryException} If the key is already
+   * registered or reserved (`"app"`, `"vars"`, `"assets"`).
    */
-  public useComponentSystem(library: IComponentSystemLibrary) {
-    this.applicationConfig.useComponentSystemLibrary(library);
-  }
-
-  /**
-   * Register the network library.
-   *
-   * @param library - Network library instance (e.g. NetworkClientLibrary or NetworkServerLibrary).
-   */
-  public useNetwork(library: INetworkLibrary) {
-    this.applicationConfig.useNetworkLibrary(library);
-  }
-
-  /**
-   * Register the asset-manager library.
-   *
-   * @param library - Asset manager instance (e.g. AssetManagerLibrary).
-   */
-  public useAssetManager(library: IAssetManagerLibrary) {
-    this.applicationConfig.useAssetManagerLibrary(library);
-  }
-
-  /**
-   * Initialise all registered libraries in dependency order and prepare the
-   * engine for the game loop.
-   *
-   * @remarks
-   * Must be called before `run`.  Resolves once every library's `__init`
-   * hook has completed.
-   *
-   * @param options - Run options providing the canvas container, files map, and
-   *   environment variables.
-   */
-  public init(options: IRunOptions): Promise<void> {
-    this._core = new Core(
-      this.applicationConfig,
-      new EditableApplicationContext(this.applicationConfig.libraryManager),
-    );
-    return this._core.init(options, this._options);
+  public use<L extends Library>(library: L): void {
+    if (this.context) throw new Error("Cannot register libraries after init() has been called.");
+    this.registry.register(library);
   }
 
   /**
@@ -115,8 +69,49 @@ export abstract class NanoforgeApplication {
    *
    * @throws `NfNotInitializedException` When called before `init`.
    */
-  public run() {
-    if (!this._core) throw new NfNotInitializedException("Core");
-    return this._core?.run();
+  public async run(): Promise<void> {
+    if (!this.context) throw new NfNotInitializedException("NanoforgeApplication");
+    const context = this.context;
+    const orderedForRun = this.registry.getOrderedForRun();
+
+    const tickLengthMs = 1000 / this.options.tickRate;
+    let previousTick = Date.now();
+
+    const loop = async (): Promise<void> => {
+      if (!context.app.isRunning) {
+        for (const library of orderedForRun) await library.__clear(context);
+        return;
+      }
+
+      const tickStart = Date.now();
+
+      for (const library of orderedForRun) await library.__events(context);
+
+      if (context.app.isPaused) {
+        previousTick = tickStart;
+      } else {
+        this.appState.setDelta(tickStart - previousTick);
+        for (const library of orderedForRun) await library.__run(context);
+        previousTick = tickStart;
+      }
+
+      setTimeout(loop, tickLengthMs + tickStart - Date.now());
+    };
+
+    this.appState.setIsRunning(true);
+    setTimeout(loop);
+  }
+
+  protected async initialize(options: RunOptions | ClientRunOptions): Promise<void> {
+    const initContext: InitContext = { ...options, vars: this.varsState.asVarsContext() };
+
+    for (const library of this.registry.getOrderedForInit()) {
+      await library.__init(initContext);
+    }
+
+    this.context = this.registry.buildContext(
+      this.appState.asAppContext(),
+      this.varsState.asVarsContext(),
+    );
   }
 }
