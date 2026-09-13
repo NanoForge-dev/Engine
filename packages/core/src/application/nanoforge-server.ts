@@ -1,4 +1,4 @@
-import type { RunOptions } from "@nanoforge-dev/common";
+import type { ServerRunOptions } from "@nanoforge-dev/common";
 
 import { NanoforgeApplication } from "./nanoforge-application";
 
@@ -30,7 +30,7 @@ export class NanoforgeServer extends NanoforgeApplication {
    * @param options - Run options providing the canvas container, files map, and
    *   environment variables.
    */
-  public async init(options: RunOptions): Promise<void> {
+  public async init(options: ServerRunOptions): Promise<void> {
     await this.initialize(options);
   }
 }
