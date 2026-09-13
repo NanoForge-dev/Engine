@@ -21,10 +21,20 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/client/index.cjs",
-  "module": "./dist/client/index.js",
-  "types": "./dist/client/index.d.cts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
   "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
     "./client": {
       "require": {
         "types": "./dist/client/index.d.cts",
