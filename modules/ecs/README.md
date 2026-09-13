@@ -15,7 +15,7 @@
 
 ## About
 
-`@nanoforge-dev/ecs` is NanoForge's built-in entity-component-system library, backed by a WebAssembly registry (compiled from C++). It ships two subpath entry points — `@nanoforge-dev/ecs/client` and `@nanoforge-dev/ecs/server` — each loading its own WASM build (browser-targeted vs Node-targeted) behind the same `EcsLibrary` API, so a client bundle never pulls in the server build or vice versa.
+`@nanoforge-dev/ecs` is NanoForge's built-in entity-component-system library, backed by a WebAssembly registry (compiled from C++). It ships two subpath entry points — `@nanoforge-dev/ecs/client` and `@nanoforge-dev/ecs/server` — each loading its own WASM build (browser-targeted vs Node-targeted) behind the same `EcsLibrary` API, so a client bundle never pulls in the server build or vice versa. The root entry point, `@nanoforge-dev/ecs`, only exposes the shared types (`Registry`, `Component`, `System`, `Entity`, `SparseArray`, `Context`, `EcsContextApi`) and pulls in no WASM binary, so it's safe to import from code that targets both client and server.
 
 ## Installation
 
@@ -44,6 +44,18 @@ app.use(new EcsLibrary());
 import { EcsLibrary } from "@nanoforge-dev/ecs/server";
 
 app.use(new EcsLibrary());
+```
+
+Shared types like `Registry`, `Component`, and `System` are available from the root entry point, regardless of which platform you're targeting:
+
+```ts
+import type { Component, Context, Registry, System } from "@nanoforge-dev/ecs";
+
+const Position: Component = { name: "Position" };
+
+const gravity: System = (registry: Registry, ctx: Context) => {
+  // ...
+};
 ```
 
 Once registered, `Context.ecs.registry` gives every other library access to the entity/component registry:
