@@ -32,6 +32,11 @@ export interface ClientRunOptions extends RunOptions {
 }
 
 /**
+ * Options a server application is started with.
+ */
+export interface ServerRunOptions extends RunOptions {}
+
+/**
  * Narrow context available to a library's `__init` hook.
  *
  * @remarks
