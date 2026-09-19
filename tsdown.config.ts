@@ -1,10 +1,6 @@
-import { defineConfig } from "tsdown";
+import { type UserConfig, defineConfig } from "tsdown";
 
-export function createTsdownConfig(options?: {
-  entry?: string | string[];
-  outDir?: string;
-  tsconfig?: string;
-}) {
+export function createTsdownConfig(options?: UserConfig) {
   return defineConfig({
     entry: options?.entry ?? ["src/index.ts"],
     outDir: options?.outDir ?? "dist",
@@ -20,11 +16,9 @@ export function createTsdownConfig(options?: {
     target: "esnext",
     treeshake: false,
     deps: {
-      skipNodeModulesBundle: true,
+      neverBundle: true,
     },
-    loader: { ".wasm": "copy" },
-    outputOptions: {
-      assetFileNames: "[name][extname]",
-    },
+    copy: options?.copy,
+    banner: options?.banner,
   });
 }
