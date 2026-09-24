@@ -3,20 +3,22 @@
   "version": "0.0.0",
   "description": "",
   "author": "",
+  "type": "module",
   "scripts": {
     "start": "nf start",
-    "lint": "prettier --check . && eslint --format=pretty \"{client,server}/**/*.ts\"",
-    "format": "prettier --write . && eslint --fix --format=pretty \"{client,server}/**/*.ts\"",
+    "lint": "prettier --check .",
+    "format": "prettier --write .",
     "test:unit": "vitest run --config ../../vitest.config.ts"
   },
   "devDependencies": {
     "@nanoforge-dev/asset": "workspace:*",
+    "@nanoforge-dev/cli": "^2.3.0",
     "@nanoforge-dev/common": "workspace:*",
     "@nanoforge-dev/core": "workspace:*",
     "@nanoforge-dev/env": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",
-    "eslint": "catalog:lint",
     "lint-staged": "catalog:ci",
+    "nanoforge": "workspace:*",
     "prettier": "catalog:lint",
     "typescript": "catalog:core",
     "vitest": "catalog:test"
@@ -25,9 +27,6 @@
   "lint-staged": {
     "**": [
       "prettier --ignore-unknown --write"
-    ],
-    "{client,server}/**/*.ts": [
-      "eslint --fix"
     ]
   }
 }

@@ -71,6 +71,7 @@
     "@nanoforge-dev/asset": "workspace:*",
     "@nanoforge-dev/common": "workspace:*",
     "@nanoforge-dev/core": "workspace:*",
+    "@nanoforge-dev/config": "catalog:config",
     "@nanoforge-dev/env": "workspace:*"
   },
   "devDependencies": {

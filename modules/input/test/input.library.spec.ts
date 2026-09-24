@@ -81,7 +81,7 @@ describe("InputLibrary", () => {
 
     it("should throw when __run is called before __init", async () => {
       const library = new InputLibrary();
-      await expect(library.__run({} as any)).rejects.toThrow();
+      await expect(library.__run()).rejects.toThrow();
     });
   });
 
@@ -162,7 +162,7 @@ describe("InputLibrary", () => {
       windowMock.dispatch("wheel", { deltaX: 4, deltaY: 5, deltaZ: 6 });
       expect(library.getWheelState()).toStrictEqual({ deltaX: 5, deltaY: 7, deltaZ: 9 });
 
-      await library.__run({} as any);
+      await library.__run();
 
       expect(library.getWheelState()).toStrictEqual({ deltaX: 0, deltaY: 0, deltaZ: 0 });
     });
@@ -194,7 +194,7 @@ describe("InputLibrary", () => {
       const library = new InputLibrary();
       await library.__init(makeInitContext(windowMock));
 
-      await library.__clear({} as any);
+      await library.__clear();
 
       expect(windowMock.removeEventListener).toHaveBeenCalledWith("keydown", expect.any(Function));
       expect(windowMock.removeEventListener).toHaveBeenCalledWith("keyup", expect.any(Function));
@@ -206,7 +206,7 @@ describe("InputLibrary", () => {
     });
 
     it("does not throw when called before __init", async () => {
-      await expect(new InputLibrary().__clear({} as any)).resolves.toBeUndefined();
+      await expect(new InputLibrary().__clear()).resolves.toBeUndefined();
     });
   });
 

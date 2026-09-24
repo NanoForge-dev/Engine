@@ -23,7 +23,7 @@ class Velocity {
 const makeInitContext = (): InitContext => ({
   vars: { get: () => undefined, set: () => {} },
   env: {},
-  files: new Map([["libecs.wasm", "./lib/node/libecs.wasm"]]),
+  files: new Map([["/libecs.wasm", "./lib/node/libecs.wasm"]]),
 });
 
 const makeContext = (): Context =>

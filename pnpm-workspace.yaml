@@ -1,10 +1,9 @@
 packages:
   - packages/*
-  - "!packages/nanoforge"
   - modules/*
   - utils/*
-#  - e2e/game/**
-#  - example/**
+  - e2e/game/**
+  - example/**
 
 allowBuilds:
   bun: true
@@ -24,8 +23,7 @@ catalogs:
     husky: ^9.1.7
     lint-staged: ^17.4.1
   config:
-    class-transformer: ^0.5.1
-    class-validator: ^0.14.3
+    '@nanoforge-dev/config': ^2.3.0
   core:
     '@types/bun': ^1.4.2
     '@types/node': ^26.4.0
@@ -36,6 +34,9 @@ catalogs:
     mint-tsdocs: ^0.0.8
     typedoc: ^0.28.19
     typedoc-plugin-markdown: ^4.11.0
+  env:
+    class-transformer: ^0.5.1
+    class-validator: ^0.14.3
   graphics:
     konva: ^10.2.3
   lint:
@@ -54,3 +55,11 @@ catalogs:
   test:
     '@vitest/coverage-v8': ^4.1.11
     vitest: ^4.1.11
+
+minimumReleaseAgeExclude:
+  - '@nanoforge-dev/config@2.3.0'
+  - '@nanoforge-dev/cli@2.3.0'
+  - '@nanoforge-dev/loader-client@1.5.1'
+  - '@nanoforge-dev/loader-server@1.5.1'
+  - '@nanoforge-dev/loader-website@1.5.1'
+  - '@nanoforge-dev/schematics@2.3.0'
