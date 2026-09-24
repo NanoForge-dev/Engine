@@ -39,8 +39,8 @@ export abstract class EcsLibrary extends Library {
   }
 
   public override async __init(ctx: InitContext): Promise<void> {
-    const wasmUrl = ctx.files.get("libecs.wasm");
-    if (!wasmUrl) throw new NfNotFound("libecs.wasm", "Asset");
+    const wasmUrl = ctx.files.get("/libecs.wasm");
+    if (!wasmUrl) throw new NfNotFound("/libecs.wasm", "Asset");
 
     this._module = await this.loadModule({ locateFile: () => wasmUrl });
     this._registry = new this._module.Registry();
