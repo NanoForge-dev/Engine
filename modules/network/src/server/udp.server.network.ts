@@ -1,20 +1,61 @@
-import fs from "fs";
-import { createServer } from "https";
-import { RTCPeerConnection } from "wrtc";
-import { type RawData, type WebSocket, WebSocketServer } from "ws";
+import type { Server, ServerWebSocket } from "bun";
+import { type RTCDataChannel, RTCPeerConnection } from "node-datachannel/polyfill";
 
-import { buildMagicPacket, parsePacketsFromChunks } from "./utils";
+import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
+import { rawDataToUint8Array } from "./utils";
+
+/**
+ * Address field of a `typ host` ICE candidate, in both the SDP (`a=candidate:`)
+ * and trickle (`candidate:`) forms.
+ */
+const HOST_CANDIDATE_ADDRESS = /^((?:a=)?candidate:\S+ \d+ \S+ \d+ )(\S+)( \d+ typ host)/gm;
+
+/**
+ * Peer connection options, including the libdatachannel settings the polyfill
+ * forwards to the native layer but does not declare on `RTCConfiguration`.
+ */
+type PeerConnectionConfig = RTCConfiguration & {
+  enableIceUdpMux?: boolean;
+  portRangeBegin?: number;
+  portRangeEnd?: number;
+};
+
+/**
+ * ICE options for {@link UDPServer}, used to make the server reachable from
+ * behind a NAT on a predictable port.
+ */
+export type UDPServerIceConfig = {
+  /** STUN and TURN servers used while gathering candidates. */
+  iceServers?: RTCIceServer[];
+  /** Fixed UDP port shared by every peer through ICE UDP multiplexing. */
+  port?: number;
+  /** Public address substituted into host candidates before they are sent. */
+  advertiseIp?: string;
+};
+
+/** Per-connection signaling state attached to each upgraded socket. */
+type SignalingSocketData = {
+  /** Peer connection for this client, created once the socket opens. */
+  peerConnection?: RTCPeerConnection;
+  /** ICE candidates received before the remote description was set. */
+  pendingCandidates: RTCIceCandidateInit[];
+  /** Remote address, resolved during the upgrade for logging. */
+  ip: string;
+};
 
 /**
  * Unreliable, unordered WebRTC data-channel server that manages multiple UDP
  * clients.
  *
  * @remarks
- * Uses a WebSocket signaling server to complete SDP/ICE handshakes and then
- * communicates over RTCDataChannels.  Each connected client is assigned a
+ * Uses a Bun WebSocket signaling server to complete SDP/ICE handshakes and
+ * then communicates over RTCDataChannels.  Each connected client is assigned a
  * numeric ID.  Use `getConnectedClients` to enumerate active clients,
  * `sendToClient` / `sendToEverybody` to push data, and
  * `getReceivedPackets` to consume incoming packets per frame.
+ *
+ * Runs on Bun's native WebSocket server (`Bun.serve`) and therefore requires
+ * the Bun runtime.
  *
  * Typical usage is through `NetworkServerLibrary` which instantiates and
  * starts this class automatically during `__init`.
@@ -26,7 +67,7 @@ export class UDPServer {
   >();
   private _nextClientId: number = 0;
   private readonly _magicData = new Uint8Array();
-  private _httpsServer: ReturnType<typeof createServer> | undefined;
+  private _server: Server<SignalingSocketData> | undefined;
 
   constructor(
     private _port: number,
@@ -34,18 +75,13 @@ export class UDPServer {
     magicValue: string,
     private _cert?: string,
     private _key?: string,
+    private _ice: UDPServerIceConfig = {},
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
-    if (this._cert && this._key) {
-      this._httpsServer = createServer({
-        cert: fs.readFileSync(this._cert),
-        key: fs.readFileSync(this._key),
-      });
-    } else {
+    if (!this._cert || !this._key) {
       console.warn(
         "No TLS cert/key provided for UDP server, WebSocket connections will be unencrypted",
       );
-      this._httpsServer = undefined;
     }
   }
 
@@ -55,41 +91,71 @@ export class UDPServer {
    * @returns void
    */
   public listen() {
-    const webSocketServer = this.startWebSocketServer();
+    const cert = this._cert;
+    const key = this._key;
+    const secure = cert !== undefined && key !== undefined;
 
-    if (this._httpsServer) {
-      this._httpsServer.listen(this._port, this._host, () => {
-        console.log(
-          "Secure WebSocketServer for UDP listening on wss://" + this._host + ":" + this._port,
-        );
-      });
-    }
+    this._server = Bun.serve<SignalingSocketData>({
+      port: this._port,
+      hostname: this._host,
+      ...(cert !== undefined && key !== undefined
+        ? { tls: { cert: Bun.file(cert), key: Bun.file(key) } }
+        : {}),
+      fetch: (request, server) => {
+        const ip = server.requestIP(request)?.address ?? "unknown";
 
-    webSocketServer.on("connection", (webSocket, request) => {
-      const pendingCandidates: any[] = [];
-      const pc = this.setupRtcSendIceCandidates(webSocket);
-      this.receiveClientDataChannel(pc, request.socket.remoteAddress);
-
-      webSocket.on("message", async (raw: RawData) => {
-        const data = JSON.parse(raw.toString());
-
-        if (data.type === "offer") {
-          await this.receiveClientOffer(pc, data.offer, pendingCandidates, webSocket);
+        if (server.upgrade(request, { data: { pendingCandidates: [], ip } })) {
+          return undefined;
         }
+        return new Response("Expected a WebSocket connection", { status: 426 });
+      },
+      websocket: {
+        open: (webSocket) => {
+          const peerConnection = this.setupRtcSendIceCandidates(webSocket);
+          webSocket.data.peerConnection = peerConnection;
+          this.receiveClientDataChannel(peerConnection, webSocket.data.ip);
+        },
+        message: async (webSocket, message) => {
+          const peerConnection = webSocket.data.peerConnection;
+          if (!peerConnection) return;
 
-        if (data.type === "ice" && data.candidate && data.candidate.candidate) {
-          if (pc.remoteDescription) {
-            await pc.addIceCandidate(data.candidate);
-          } else {
-            pendingCandidates.push(data.candidate);
+          const data = JSON.parse(
+            typeof message === "string" ? message : new TextDecoder().decode(message),
+          );
+
+          if (data.type === "offer") {
+            await this.receiveClientOffer(peerConnection, data.offer, webSocket);
           }
-        }
-      });
 
-      webSocket.on("close", () => {
-        pc.close();
-      });
+          if (data.type === "ice" && data.candidate && data.candidate.candidate) {
+            if (peerConnection.remoteDescription) {
+              await peerConnection.addIceCandidate(data.candidate);
+            } else {
+              webSocket.data.pendingCandidates.push(data.candidate);
+            }
+          }
+        },
+        close: (webSocket) => {
+          webSocket.data.peerConnection?.close();
+        },
+      },
     });
+
+    console.log(
+      `${secure ? "Secure " : ""}WebSocketServer for UDP listening on ` +
+        `${secure ? "wss" : "ws"}://${this._host}:${this._port}`,
+    );
+  }
+
+  /**
+   * Stop the signaling server and close every peer connection.
+   *
+   * @returns void
+   */
+  public close() {
+    this._server?.stop(true);
+    this._server = undefined;
+    this._clients.clear();
   }
 
   /**
@@ -157,59 +223,94 @@ export class UDPServer {
   }
 
   private async receiveClientOffer(
-    pc: RTCPeerConnection,
-    offer: any,
-    pendingCandidates: any[],
-    webSocket: WebSocket,
+    peerConnection: RTCPeerConnection,
+    offer: RTCSessionDescriptionInit,
+    webSocket: ServerWebSocket<SignalingSocketData>,
   ) {
-    await pc.setRemoteDescription(offer);
+    await peerConnection.setRemoteDescription(offer);
 
-    for (const cand of pendingCandidates) {
-      await pc.addIceCandidate(cand);
+    for (const candidate of webSocket.data.pendingCandidates) {
+      await peerConnection.addIceCandidate(candidate);
     }
-    pendingCandidates.length = 0;
+    webSocket.data.pendingCandidates.length = 0;
 
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
-    webSocket.send(JSON.stringify({ type: "answer", answer: pc.localDescription }));
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+
+    const localDescription = peerConnection.localDescription;
+    webSocket.send(
+      JSON.stringify({
+        type: "answer",
+        answer: localDescription
+          ? {
+              type: localDescription.type,
+              sdp: this.advertiseHostCandidates(localDescription.sdp),
+            }
+          : null,
+      }),
+    );
   }
 
-  private setupRtcSendIceCandidates(webSocket: WebSocket) {
-    const pc = new RTCPeerConnection();
-    pc.onconnectionstatechange = () => {
-      if (pc.connectionState === "failed") {
+  private setupRtcSendIceCandidates(webSocket: ServerWebSocket<SignalingSocketData>) {
+    const peerConnection = new RTCPeerConnection(this.buildPeerConnectionConfig());
+    peerConnection.onconnectionstatechange = () => {
+      if (peerConnection.connectionState === "failed") {
         console.error("ICE failed");
-        pc.close();
+        peerConnection.close();
       }
     };
 
-    pc.onicecandidate = (ev: { candidate: any }) => {
-      if (ev.candidate) {
-        webSocket.send(JSON.stringify({ type: "ice", candidate: ev.candidate }));
+    peerConnection.onicecandidate = (event) => {
+      if (event.candidate) {
+        webSocket.send(
+          JSON.stringify({
+            type: "ice",
+            candidate: {
+              ...event.candidate.toJSON(),
+              candidate: this.advertiseHostCandidates(event.candidate.candidate),
+            },
+          }),
+        );
       }
     };
-    return pc;
+    return peerConnection;
   }
 
-  private receiveClientDataChannel(pc: any, clientIp: string | undefined) {
-    pc.ondatachannel = (event: { channel: RTCDataChannel }) => {
+  private buildPeerConnectionConfig(): PeerConnectionConfig {
+    const { iceServers = [], port } = this._ice;
+
+    return {
+      iceServers,
+      ...(port !== undefined
+        ? { enableIceUdpMux: true, portRangeBegin: port, portRangeEnd: port }
+        : {}),
+    };
+  }
+
+  private advertiseHostCandidates(value: string): string {
+    const advertiseIp = this._ice.advertiseIp;
+    if (advertiseIp === undefined) return value;
+
+    return value.replace(HOST_CANDIDATE_ADDRESS, `$1${advertiseIp}$3`);
+  }
+
+  private receiveClientDataChannel(peerConnection: RTCPeerConnection, clientIp: string) {
+    peerConnection.ondatachannel = (event) => {
       const channel = event.channel;
-      this._clients.set(this._nextClientId, {
+      const id = this._nextClientId++;
+      this._clients.set(id, {
         channel: channel,
         data: new Uint8Array(),
         chunkedData: [],
       });
-      const id = this._nextClientId;
       const client = this._clients.get(id);
-      this._nextClientId++;
 
       channel.onopen = () => {
         console.log("UDP openned for user: " + id + ", ip: " + clientIp);
       };
 
-      channel.onmessage = (msg: { data: any }) => {
-        const chunk = new Uint8Array(msg.data);
-        client?.chunkedData.push(chunk);
+      channel.onmessage = (message) => {
+        client?.chunkedData.push(rawDataToUint8Array(message.data as ArrayBuffer));
       };
 
       channel.onclose = () => {
@@ -217,31 +318,10 @@ export class UDPServer {
         this._clients.delete(id);
       };
 
-      channel.onerror = (ev: RTCErrorEvent): void => {
-        console.error('UDP error for user: " + id + ", ip: " + clientIp', { cause: ev });
+      channel.onerror = (event) => {
+        console.error(`UDP error for user: ${id}, ip: ${clientIp}`, { cause: event });
         this._clients.delete(id);
       };
     };
-  }
-
-  private startWebSocketServer(): WebSocketServer {
-    if (this._httpsServer) {
-      const webSocketServer = new WebSocketServer({
-        server: this._httpsServer,
-      });
-
-      console.log(
-        "Secure WebSocketServer for UDP listening on wss://" + this._host + ":" + this._port,
-      );
-      return webSocketServer;
-    } else {
-      const webSocketServer = new WebSocketServer({
-        port: this._port,
-        host: this._host,
-      });
-
-      console.log("WebSocketServer for UDP listening on ws://" + this._host + ":" + this._port);
-      return webSocketServer;
-    }
   }
 }

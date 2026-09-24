@@ -1,8 +1,15 @@
-import fs from "fs";
-import { createServer } from "https";
-import { type RawData, type WebSocket, WebSocketServer } from "ws";
+import type { Server, ServerWebSocket } from "bun";
 
-import { buildMagicPacket, parsePacketsFromChunks, rawDataToUint8Array } from "./utils";
+import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
+import { rawDataToUint8Array } from "./utils";
+
+/** Per-connection state attached to each upgraded socket. */
+type TCPSocketData = {
+  /** Numeric client identifier, assigned once the socket opens. */
+  id: number;
+  /** Remote address, resolved during the upgrade for logging. */
+  ip: string;
+};
 
 /**
  * Reliable, ordered WebSocket-based server that manages multiple TCP clients.
@@ -13,17 +20,20 @@ import { buildMagicPacket, parsePacketsFromChunks, rawDataToUint8Array } from ".
  * `sendToClient` / `sendToEverybody` to push data, and
  * `getReceivedPackets` to consume incoming packets per frame.
  *
+ * Runs on Bun's native WebSocket server (`Bun.serve`) and therefore requires
+ * the Bun runtime.
+ *
  * Typical usage is through `NetworkServerLibrary` which instantiates and
  * starts this class automatically during `__init`.
  */
 export class TCPServer {
   private _clients = new Map<
     number,
-    { channel: WebSocket; data: Uint8Array; chunkedData: Uint8Array[] }
+    { channel: ServerWebSocket<TCPSocketData>; data: Uint8Array; chunkedData: Uint8Array[] }
   >();
   private _nextClientId: number = 0;
   private readonly _magicData = new Uint8Array();
-  private _httpsServer: ReturnType<typeof createServer> | undefined;
+  private _server: Server<TCPSocketData> | undefined;
 
   constructor(
     private _port: number,
@@ -33,16 +43,10 @@ export class TCPServer {
     private _key?: string,
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
-    if (this._cert && this._key) {
-      this._httpsServer = createServer({
-        cert: fs.readFileSync(this._cert),
-        key: fs.readFileSync(this._key),
-      });
-    } else {
+    if (!this._cert || !this._key) {
       console.warn(
         "No TLS cert/key provided for TCP server, WebSocket connections will be unencrypted",
       );
-      this._httpsServer = undefined;
     }
   }
 
@@ -52,39 +56,67 @@ export class TCPServer {
    * @returns void
    */
   public listen() {
-    const webSocketServer = this.startWebSocketServer();
+    const cert = this._cert;
+    const key = this._key;
+    const secure = cert !== undefined && key !== undefined;
 
-    if (this._httpsServer) {
-      this._httpsServer.listen(this._port, this._host, () => {
-        console.log(
-          "Secure WebSocketServer for TCP listening on wss://" + this._host + ":" + this._port,
-        );
-      });
-    }
+    this._server = Bun.serve<TCPSocketData>({
+      port: this._port,
+      hostname: this._host,
+      ...(cert !== undefined && key !== undefined
+        ? { tls: { cert: Bun.file(cert), key: Bun.file(key) } }
+        : {}),
+      fetch: (request, server) => {
+        const ip = server.requestIP(request)?.address ?? "unknown";
 
-    webSocketServer.on("connection", (webSocket, request) => {
-      webSocket.binaryType = "arraybuffer";
-      this._clients.set(this._nextClientId, {
-        channel: webSocket,
-        data: new Uint8Array(),
-        chunkedData: [],
-      });
-      const id = this._nextClientId;
-      const client = this._clients.get(id);
-      this._nextClientId++;
+        if (server.upgrade(request, { data: { id: -1, ip } })) {
+          return undefined;
+        }
+        return new Response("Expected a WebSocket connection", { status: 426 });
+      },
+      websocket: {
+        open: (webSocket) => {
+          const id = this._nextClientId++;
+          webSocket.data.id = id;
+          this._clients.set(id, {
+            channel: webSocket,
+            data: new Uint8Array(),
+            chunkedData: [],
+          });
 
-      console.log("TCP openned for user: " + id + ", ip: " + request.socket.remoteAddress);
+          console.log("TCP openned for user: " + id + ", ip: " + webSocket.data.ip);
+        },
+        message: (webSocket, message) => {
+          if (typeof message === "string") {
+            console.error("TCP received an unexpected text frame from user: " + webSocket.data.id);
+            return;
+          }
 
-      webSocket.on("message", (msg: RawData) => {
-        const chunk = rawDataToUint8Array(msg);
-        client?.chunkedData.push(chunk);
-      });
-
-      webSocket.on("close", () => {
-        console.log("TCP closed for user: " + id + ", ip: " + request.socket.remoteAddress);
-        this._clients.delete(id);
-      });
+          const client = this._clients.get(webSocket.data.id);
+          client?.chunkedData.push(rawDataToUint8Array(message));
+        },
+        close: (webSocket) => {
+          console.log("TCP closed for user: " + webSocket.data.id + ", ip: " + webSocket.data.ip);
+          this._clients.delete(webSocket.data.id);
+        },
+      },
     });
+
+    console.log(
+      `${secure ? "Secure " : ""}WebSocketServer for TCP listening on ` +
+        `${secure ? "wss" : "ws"}://${this._host}:${this._port}`,
+    );
+  }
+
+  /**
+   * Stop the server and drop every connected client.
+   *
+   * @returns void
+   */
+  public close() {
+    this._server?.stop(true);
+    this._server = undefined;
+    this._clients.clear();
   }
 
   /**
@@ -144,26 +176,5 @@ export class TCPServer {
       packets.set(clientId, clientPackets);
     });
     return packets;
-  }
-
-  private startWebSocketServer(): WebSocketServer {
-    if (this._httpsServer) {
-      const webSocketServer = new WebSocketServer({
-        server: this._httpsServer,
-      });
-
-      console.log(
-        "Secure WebSocketServer for TCP listening on wss://" + this._host + ":" + this._port,
-      );
-      return webSocketServer;
-    } else {
-      const webSocketServer = new WebSocketServer({
-        port: this._port,
-        host: this._host,
-      });
-
-      console.log("WebSocketServer for TCP listening on ws://" + this._host + ":" + this._port);
-      return webSocketServer;
-    }
   }
 }

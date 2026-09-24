@@ -112,25 +112,29 @@ describe("EcsLibrary (server)", () => {
   });
 
   describe("editor hot-reload", () => {
-    it("registers a 'hot-reload' listener on ctx.editor once (via __events, not __run), and applies it via addComponent", async () => {
-      const lib = new EcsLibrary();
-      await lib.__init(makeInitContext());
-      const reg = lib.registry;
-      const entity = reg.spawnEntity();
-
+    it("registers a 'hot-reload' listener on the editor bridge once, during __init, and applies it via addComponent", async () => {
       const on = vi.fn();
-      const ctx = { ...makeContext(), editor: { emit: vi.fn(), on } };
+      const lib = new EcsLibrary();
+      await lib.__init({
+        ...makeInitContext(),
+        editor: {
+          toEditor: { emit: vi.fn(), on: vi.fn() },
+          fromEditor: { emit: vi.fn(), on },
+        } as any,
+      });
 
-      await lib.__events(ctx as any);
       expect(on).toHaveBeenCalledTimes(1);
       expect(on).toHaveBeenCalledWith("hot-reload", expect.any(Function));
 
-      const handler = on.mock.calls[0]![1] as (...args: unknown[]) => void;
+      const reg = lib.registry;
+      const entity = reg.spawnEntity();
+      const handler = on.mock.calls[0]?.[1] as (...args: unknown[]) => void;
       handler(entity, new Position(5, 5));
       expect(reg.getComponents(Position).get(entity.getId())).toStrictEqual(new Position(5, 5));
 
-      await lib.__events(ctx as any);
-      expect(on).toHaveBeenCalledTimes(1); // still only wired once
+      await lib.__events(makeContext());
+      await lib.__run(makeContext());
+      expect(on).toHaveBeenCalledTimes(1); // wired once, never per tick
     });
   });
 

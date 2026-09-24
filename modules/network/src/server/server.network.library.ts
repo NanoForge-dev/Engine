@@ -1,4 +1,4 @@
-import { type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
+import { type Context, type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
 import { registerEnv } from "@nanoforge-dev/env";
 
 import { ServerConfigNetwork } from "./config.server.network";
@@ -19,6 +19,9 @@ import { UDPServer } from "./udp.server.network";
  * - `LISTENING_UDP_PORT` — signaling listen port for UDP (optional).
  * - `MAGIC_VALUE` — packet framing delimiter (default: `"PACKET_END"`).
  * - `WSS_CERT` / `WSS_KEY` — paths to TLS certificate and key files for WSS (optional).
+ * - `ICE_SERVERS` — STUN/TURN servers for the UDP transport, comma-separated or a JSON array (default: `[]`).
+ * - `ICE_PORT` — fixed, multiplexed UDP port for the UDP transport (optional).
+ * - `ADVERTISE_IP` — public address written into host ICE candidates (optional).
  */
 export class NetworkServerLibrary extends Library {
   readonly key = defineLibraryKey("network");
@@ -29,6 +32,13 @@ export class NetworkServerLibrary extends Library {
   public udp?: UDPServer;
 
   public override async __init(ctx: InitContext): Promise<void> {
+    if (typeof Bun === "undefined") {
+      throw new Error(
+        "NetworkServerLibrary: the Bun runtime is required. The server is built on " +
+          "Bun.serve and cannot run on Node.js — start the server process with Bun.",
+      );
+    }
+
     const config = await registerEnv(ServerConfigNetwork, ctx.env);
 
     if (config.LISTENING_TCP_PORT === undefined && config.LISTENING_UDP_PORT === undefined) {
@@ -60,9 +70,22 @@ export class NetworkServerLibrary extends Library {
         config.MAGIC_VALUE,
         config.WSS_CERT,
         config.WSS_KEY,
+        {
+          iceServers: config.ICE_SERVERS,
+          ...(config.ICE_PORT !== undefined ? { port: +config.ICE_PORT } : {}),
+          ...(config.ADVERTISE_IP !== undefined ? { advertiseIp: config.ADVERTISE_IP } : {}),
+        },
       );
       this.udp.listen();
     }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public override async __clear(_ctx: Context): Promise<void> {
+    this.tcp?.close();
+    this.udp?.close();
+    delete this.tcp;
+    delete this.udp;
   }
 
   public override expose(): NetworkServerContextApi {

@@ -21,10 +21,20 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/client/index.cjs",
-  "module": "./dist/client/index.js",
-  "types": "./dist/client/index.d.cts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
   "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
     "./client": {
       "require": {
         "types": "./dist/client/index.d.cts",
@@ -68,18 +78,16 @@
     "docs": "mint-tsdocs generate"
   },
   "dependencies": {
-    "@mapbox/node-pre-gyp": "catalog:network",
     "@nanoforge-dev/common": "workspace:*",
     "@nanoforge-dev/env": "workspace:*",
-    "wrtc": "catalog:network",
-    "ws": "catalog:network"
+    "node-datachannel": "catalog:network"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "catalog:ci",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",
-    "@types/ws": "catalog:network",
+    "@types/bun": "catalog:core",
     "eslint": "catalog:lint",
     "prettier": "catalog:lint",
     "tsdown": "catalog:build",

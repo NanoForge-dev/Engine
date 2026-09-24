@@ -1,4 +1,4 @@
-import { buildMagicPacket, parsePacketsFromChunks } from "./utils";
+import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
 
 /**
  * Unreliable, unordered WebRTC data-channel client connection to a NanoForge
@@ -23,6 +23,7 @@ export class UDPClient {
     private _ip: string,
     magicValue: string,
     private _wss: boolean,
+    private _iceServers: RTCIceServer[] = [],
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
   }
@@ -97,7 +98,7 @@ export class UDPClient {
   }
 
   private getRtcChannelFromIceServer(): RTCPeerConnection {
-    const rtcPeerConnection = new RTCPeerConnection();
+    const rtcPeerConnection = new RTCPeerConnection({ iceServers: this._iceServers });
     this._channel = rtcPeerConnection.createDataChannel("game", {
       ordered: false,
       maxRetransmits: 0,
