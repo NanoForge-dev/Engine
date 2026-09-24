@@ -1,4 +1,4 @@
-import { buildMagicPacket, parsePacketsFromChunks } from "./utils";
+import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
 
 /**
  * Reliable, ordered WebSocket-based client connection to a NanoForge TCP server.

@@ -77,6 +77,18 @@ describe("NetworkClientLibrary", () => {
       expect(lib.udp).toBeUndefined();
     });
 
+    it("should hand ICE_SERVERS from the environment to the peer connection", async () => {
+      const ctx = makeInitContext({
+        SERVER_UDP_PORT: "8081",
+        SERVER_ADDRESS: "127.0.0.1",
+        ICE_SERVERS: "stun:stun.example.com:3478",
+      });
+      await new NetworkClientLibrary().__init(ctx);
+      expect(RTCPeerConnection).toHaveBeenCalledWith({
+        iceServers: [{ urls: "stun:stun.example.com:3478" }],
+      });
+    });
+
     it("should initialize a UDP client when only SERVER_UDP_PORT is provided", async () => {
       const ctx = makeInitContext({
         SERVER_UDP_PORT: "8081",
@@ -119,7 +131,7 @@ describe("NetworkClientLibrary", () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
       expect(lib.expose().tcp).toBe(lib.tcp);
-      expect(lib.expose().udp).toBeUndefined();
+      expect(() => lib.expose().udp).toThrow("UDP isn't defined");
     });
   });
 });
