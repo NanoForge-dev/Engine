@@ -1,6 +1,7 @@
 import { createTsdownConfig } from "../../tsdown.config";
 
 export default [
+  createTsdownConfig({ tsconfig: "tsconfig.shared.json" }),
   createTsdownConfig({
     entry: "src/client/index.ts",
     outDir: "dist/client",

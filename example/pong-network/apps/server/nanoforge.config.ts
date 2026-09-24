@@ -1,5 +1,3 @@
-import { defineConfig } from "nanoforge/config";
-
-export default defineConfig({
+export default {
   type: "server",
-});
+};

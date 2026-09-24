@@ -45,7 +45,6 @@ tests: $(OBJ)
 	@mkdir -p $(WEB_DIR) $(NODE_DIR)
 	$(CC) $(OBJ) $(LDFLAGS) -o $(WEB_DIR)/$(NAME).js
 	cp $(BASE_DIR)/$(NAME).d.ts $(WEB_DIR)/$(NAME).d.ts
-	sed -i 's/@nanoforge-dev\/common-legacy/@nanoforge-dev\/common/' $(WEB_DIR)/$(NAME).d.ts
 	cp $(WEB_DIR)/$(NAME).js $(NODE_DIR)/$(NAME).js
 	cp $(WEB_DIR)/$(NAME).wasm $(NODE_DIR)/$(NAME).wasm
 	cp $(WEB_DIR)/$(NAME).d.ts $(NODE_DIR)/$(NAME).d.ts
