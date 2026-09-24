@@ -1,15 +1,9 @@
 import type { InitContext } from "@nanoforge-dev/common";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { NetworkServerLibrary } from "../../src/server";
 
-vi.mock("ws", () => ({
-  WebSocketServer: vi.fn(function (this: any) {
-    this.on = vi.fn();
-  }),
-}));
-
-vi.mock("wrtc", () => ({
+vi.mock("node-datachannel/polyfill", () => ({
   RTCPeerConnection: vi.fn(function (this: any) {
     this.onconnectionstatechange = null;
     this.onicecandidate = null;
@@ -17,6 +11,14 @@ vi.mock("wrtc", () => ({
     this.close = vi.fn();
   }),
 }));
+
+const serve = vi.fn();
+const file = vi.fn((path: string) => ({ path }));
+
+beforeEach(() => {
+  serve.mockImplementation(() => ({ stop: vi.fn() }));
+  vi.stubGlobal("Bun", { serve, file });
+});
 
 const makeInitContext = (env: Record<string, string>): InitContext => ({
   vars: { get: () => undefined, set: () => {} },
@@ -26,12 +28,24 @@ const makeInitContext = (env: Record<string, string>): InitContext => ({
 
 describe("NetworkServerLibrary", () => {
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.clearAllMocks();
   });
 
   describe("metadata", () => {
     it("should expose the reserved 'network' key", () => {
       expect(new NetworkServerLibrary().key).toBe("network");
+    });
+  });
+
+  describe("runtime", () => {
+    it("should refuse to start outside the Bun runtime with a clear message", async () => {
+      vi.unstubAllGlobals();
+      const ctx = makeInitContext({ LISTENING_TCP_PORT: "9000", MAGIC_VALUE: "END" });
+
+      await expect(new NetworkServerLibrary().__init(ctx)).rejects.toThrow(
+        "the Bun runtime is required",
+      );
     });
   });
 
@@ -89,7 +103,29 @@ describe("NetworkServerLibrary", () => {
       const lib = new NetworkServerLibrary();
       await lib.__init(ctx);
       expect(lib.expose().tcp).toBe(lib.tcp);
-      expect(lib.expose().udp).toBeUndefined();
+      expect(() => lib.expose().udp).toThrow("UDP isn't defined");
+    });
+  });
+  describe("teardown", () => {
+    it("should stop both servers and drop them on __clear", async () => {
+      const stop = vi.fn();
+      serve.mockImplementation(() => ({ stop }));
+
+      const ctx = makeInitContext({
+        LISTENING_TCP_PORT: "9000",
+        LISTENING_UDP_PORT: "9001",
+        MAGIC_VALUE: "END",
+      });
+      const lib = new NetworkServerLibrary();
+      await lib.__init(ctx);
+      expect(lib.tcp).toBeDefined();
+      expect(lib.udp).toBeDefined();
+
+      await lib.__clear({} as never);
+
+      expect(stop).toHaveBeenCalledTimes(2);
+      expect(lib.tcp).toBeUndefined();
+      expect(lib.udp).toBeUndefined();
     });
   });
 });

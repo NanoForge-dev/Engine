@@ -57,9 +57,9 @@ function uint8ArrayContains(haystack: Uint8Array, needle: Uint8Array): number {
   if (needle.length === 0) return 0;
   if (needle.length > haystack.length) return -1;
 
-  const table: number[] = buildKMPTable(needle);
-  let i: number = 0;
-  let j: number = 0;
+  const table = buildKMPTable(needle);
+  let i = 0,
+    j = 0;
 
   while (i < haystack.length) {
     if (haystack[i] === needle[j]) {
@@ -69,9 +69,9 @@ function uint8ArrayContains(haystack: Uint8Array, needle: Uint8Array): number {
         return i - j;
       }
     } else {
-      if (j > 0) {
+      if (j !== 0) {
         const element = table[j - 1];
-        if (element == undefined) return -1;
+        if (element === undefined) return -1;
         j = element;
       } else {
         i++;

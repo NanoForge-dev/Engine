@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildMagicPacket, parsePacketsFromChunks } from "../../src/client/utils";
+import { buildMagicPacket, parsePacketsFromChunks } from "../../src/shared/utils";
 
 const magic = new TextEncoder().encode("END");
 
@@ -71,7 +71,7 @@ describe("parsePacketsFromChunks", () => {
     expect(packets[0]).toStrictEqual(payload);
   });
 
-  it("should return empty packets and an empty chunkedData on an empty input", () => {
+  it("should return empty packets and empty chunkedData on empty input", () => {
     const { packets, data, chunkedData } = parsePacketsFromChunks(new Uint8Array(), [], magic);
     expect(packets).toHaveLength(0);
     expect(data.length).toBe(0);

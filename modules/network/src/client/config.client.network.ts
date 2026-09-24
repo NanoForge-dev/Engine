@@ -2,12 +2,13 @@ import {
   Default,
   Expose,
   IsBoolean,
-  IsByteLength,
   IsIpOrURL,
   IsOptional,
   IsPort,
   TransformToBoolean,
 } from "@nanoforge-dev/env";
+
+import { NetworkConfig } from "../shared/config.network";
 
 /**
  * Environment-variable configuration for `NetworkClientLibrary`.
@@ -15,7 +16,7 @@ import {
  * @remarks
  * Resolved via `registerEnv(ClientConfigNetwork, ctx.env)` during `__init`.
  */
-export class ClientConfigNetwork {
+export class ClientConfigNetwork extends NetworkConfig {
   /**
    * Port of the server's TCP WebSocket endpoint.
    *
@@ -42,16 +43,6 @@ export class ClientConfigNetwork {
   @Expose()
   @IsIpOrURL(undefined, undefined, { protocols: ["ws", "wss", "http", "https"] })
   SERVER_ADDRESS!: string;
-
-  /**
-   * Delimiter bytes appended to each packet for framing.
-   *
-   * @default "PACKET_END"
-   */
-  @Expose()
-  @Default("PACKET_END")
-  @IsByteLength(2, 64)
-  MAGIC_VALUE!: string;
 
   /**
    * Use secure WebSocket (`wss://`) connections.

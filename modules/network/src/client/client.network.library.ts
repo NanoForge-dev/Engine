@@ -20,6 +20,7 @@ import { UDPClient } from "./udp.client.network";
  * - `SERVER_UDP_PORT` — signaling port for UDP/WebRTC (optional).
  * - `MAGIC_VALUE` — packet framing delimiter (default: `"PACKET_END"`).
  * - `WSS` — set to `"true"` to use `wss://` / `https://` (default: `false`).
+ * - `ICE_SERVERS` — STUN/TURN servers for the UDP transport, comma-separated or a JSON array (default: `[]`).
  */
 export class NetworkClientLibrary extends Library {
   readonly key = defineLibraryKey("network");
@@ -52,6 +53,7 @@ export class NetworkClientLibrary extends Library {
         config.SERVER_ADDRESS,
         config.MAGIC_VALUE,
         config.WSS,
+        config.ICE_SERVERS,
       );
       await this.udp.connect();
     }

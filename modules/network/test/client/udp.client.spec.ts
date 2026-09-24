@@ -7,36 +7,40 @@ describe("UDPClient", () => {
     vi.stubGlobal(
       "WebSocket",
       Object.assign(
-        vi.fn(() => ({
-          readyState: 0,
-          binaryType: "",
-          send: vi.fn(),
-          onerror: null,
-          onopen: null,
-          onmessage: null,
-          onclose: null,
-        })),
+        vi.fn(function () {
+          return {
+            readyState: 0,
+            binaryType: "",
+            send: vi.fn(),
+            onerror: null,
+            onopen: null,
+            onmessage: null,
+            onclose: null,
+          };
+        }),
         { OPEN: 1 },
       ),
     );
 
     vi.stubGlobal(
       "RTCPeerConnection",
-      vi.fn(() => ({
-        createDataChannel: vi.fn(() => ({
-          readyState: "closed",
-          send: vi.fn(),
-          onopen: null,
-          onmessage: null,
-          onerror: null,
-          onclose: null,
-        })),
-        onicecandidate: null,
-        createOffer: vi.fn().mockResolvedValue({}),
-        setLocalDescription: vi.fn().mockResolvedValue(undefined),
-        setRemoteDescription: vi.fn().mockResolvedValue(undefined),
-        addIceCandidate: vi.fn().mockResolvedValue(undefined),
-      })),
+      vi.fn(function () {
+        return {
+          createDataChannel: vi.fn(() => ({
+            readyState: "closed",
+            send: vi.fn(),
+            onopen: null,
+            onmessage: null,
+            onerror: null,
+            onclose: null,
+          })),
+          onicecandidate: null,
+          createOffer: vi.fn().mockResolvedValue({}),
+          setLocalDescription: vi.fn().mockResolvedValue(undefined),
+          setRemoteDescription: vi.fn().mockResolvedValue(undefined),
+          addIceCandidate: vi.fn().mockResolvedValue(undefined),
+        };
+      }),
     );
   });
 
@@ -58,6 +62,20 @@ describe("UDPClient", () => {
     it("should not throw when sendData is called before connect", () => {
       const client = new UDPClient(8081, "127.0.0.1", "END", false);
       expect(() => client.sendData(new Uint8Array([1, 2, 3]))).not.toThrow();
+    });
+  });
+  describe("ice servers", () => {
+    it("should create the peer connection without ice servers by default", async () => {
+      const client = new UDPClient(8081, "127.0.0.1", "END", false);
+      await client.connect();
+      expect(RTCPeerConnection).toHaveBeenCalledWith({ iceServers: [] });
+    });
+
+    it("should create the peer connection with the configured ice servers", async () => {
+      const iceServers = [{ urls: "stun:stun.example.com:3478" }];
+      const client = new UDPClient(8081, "127.0.0.1", "END", false, iceServers);
+      await client.connect();
+      expect(RTCPeerConnection).toHaveBeenCalledWith({ iceServers });
     });
   });
 });
