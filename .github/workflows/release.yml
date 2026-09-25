@@ -26,7 +26,7 @@ jobs:
       - name: Release packages
         uses: ./node_modules/@nanoforge-dev/actions/actions/release-packages
         with:
-          packages: "@nanoforge-dev/asset,@nanoforge-dev/common,@nanoforge-dev/core,@nanoforge-dev/ecs,@nanoforge-dev/editor-lib,@nanoforge-dev/env,@nanoforge-dev/graphics-2d,@nanoforge-dev/input,@nanoforge-dev/music,nanoforge,@nanoforge-dev/network,@nanoforge-dev/sound"
+          packages: "@nanoforge-dev/asset,@nanoforge-dev/common,@nanoforge-dev/core,@nanoforge-dev/ecs,@nanoforge-dev/editor-lib,@nanoforge-dev/env,@nanoforge-dev/graphics-2d,@nanoforge-dev/input,@nanoforge-dev/music,@nanoforge-dev/network,@nanoforge-dev/sound"
           tag-format: "{version}"
           latest: true
         env:

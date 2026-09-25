@@ -14,11 +14,11 @@
     "@nanoforge-dev/asset": "workspace:*",
     "@nanoforge-dev/cli": "^2.3.0",
     "@nanoforge-dev/common": "workspace:*",
+    "@nanoforge-dev/config": "catalog:config",
     "@nanoforge-dev/core": "workspace:*",
     "@nanoforge-dev/env": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",
     "lint-staged": "catalog:ci",
-    "nanoforge": "workspace:*",
     "prettier": "catalog:lint",
     "typescript": "catalog:core",
     "vitest": "catalog:test"
