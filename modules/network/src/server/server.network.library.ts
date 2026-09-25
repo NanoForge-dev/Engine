@@ -1,7 +1,14 @@
 import { type Context, type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
 import { registerEnv } from "@nanoforge-dev/env";
 
-import { ClientRegistry, type ClientsApi } from "./client-registry";
+import {
+  CHANNELS,
+  type Channel,
+  type ChannelOptions,
+  DEFAULT_CHANNEL,
+  isReliableChannel,
+} from "../shared/channels";
+import { type ClientId, type ClientInfo, ClientRegistry, type ClientsApi } from "./client-registry";
 import { ServerConfigNetwork } from "./config.server.network";
 import type { NetworkServerContextApi } from "./network-server-context.type";
 import { TCPServer } from "./tcp.server.network";
@@ -12,25 +19,30 @@ import { UDPServer } from "./udp.server.network";
  *
  * @remarks
  * Reads network configuration from the environment via `ServerConfigNetwork`
- * and starts TCP (WebSocket) and/or UDP (WebRTC) servers.
+ * and starts TCP (WebSocket) and/or UDP (WebRTC) servers.  TCP carries the
+ * reliable channels and UDP the unreliable ones.
  *
  * Configuration (via environment variables):
  * - `LISTENING_INTERFACE` — bind address (default: `"0.0.0.0"`).
  * - `LISTENING_TCP_PORT` — WebSocket listen port for TCP (optional).
  * - `LISTENING_UDP_PORT` — signaling listen port for UDP (optional).
- * - `MAGIC_VALUE` — packet framing delimiter (default: `"PACKET_END"`).
  * - `WSS_CERT` / `WSS_KEY` — paths to TLS certificate and key files for WSS (optional).
  * - `ICE_SERVERS` — STUN/TURN servers for the UDP transport, comma-separated or a JSON array (default: `[]`).
  * - `ICE_PORT` — fixed, multiplexed UDP port for the UDP transport (optional).
  * - `ADVERTISE_IP` — public address written into host ICE candidates (optional).
+ *
+ * @example
+ * ```ts
+ * ctx.network.sendToAll(data); // Channel.ReliableOrdered
+ * ctx.network.sendToAll(data, { channel: Channel.UnreliableUnordered });
+ * ctx.network.getReceivedPackets().forEach((packets, clientId) => {}); // every channel
+ * ```
  */
 export class NetworkServerLibrary extends Library {
   readonly key = defineLibraryKey("network");
 
-  /** Only set when `LISTENING_TCP_PORT` was configured. */
-  public tcp?: TCPServer;
-  /** Only set when `LISTENING_UDP_PORT` was configured. */
-  public udp?: UDPServer;
+  private _tcp?: TCPServer;
+  private _udp?: UDPServer;
 
   private readonly _registry = new ClientRegistry();
 
@@ -61,22 +73,20 @@ export class NetworkServerLibrary extends Library {
     }
 
     if (config.LISTENING_TCP_PORT !== undefined) {
-      this.tcp = new TCPServer(
+      this._tcp = new TCPServer(
         +config.LISTENING_TCP_PORT,
         config.LISTENING_INTERFACE,
-        config.MAGIC_VALUE,
         config.WSS_CERT,
         config.WSS_KEY,
         this._registry,
       );
-      this.tcp.listen();
+      this._tcp.listen();
     }
 
     if (config.LISTENING_UDP_PORT !== undefined) {
-      this.udp = new UDPServer(
+      this._udp = new UDPServer(
         +config.LISTENING_UDP_PORT,
         config.LISTENING_INTERFACE,
-        config.MAGIC_VALUE,
         config.WSS_CERT,
         config.WSS_KEY,
         {
@@ -86,34 +96,133 @@ export class NetworkServerLibrary extends Library {
         },
         this._registry,
       );
-      this.udp.listen();
+      this._udp.listen();
     }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override async __clear(_ctx: Context): Promise<void> {
-    this.tcp?.close();
-    this.udp?.close();
+    this._tcp?.close();
+    this._udp?.close();
     this._registry.clear();
-    delete this.tcp;
-    delete this.udp;
+    delete this._tcp;
+    delete this._udp;
+  }
+
+  /**
+   * Send a payload to every client reachable on a channel.
+   *
+   * @param data - Raw payload bytes.
+   * @param options - `channel` to send on, `Channel.ReliableOrdered` by default.
+   * @throws When the channel's port was not configured.
+   */
+  public sendToAll(data: Uint8Array, { channel = DEFAULT_CHANNEL }: ChannelOptions = {}): void {
+    if (isReliableChannel(channel)) this.requireTcp(channel).sendToEverybody(channel, data);
+    else this.requireUdp(channel).sendToEverybody(channel, data);
+  }
+
+  /**
+   * Send a payload to one client.
+   *
+   * @param clientId - Client identifier.
+   * @param data - Raw payload bytes.
+   * @param options - `channel` to send on, `Channel.ReliableOrdered` by default.
+   * @throws When the channel's port was not configured.
+   */
+  public sendToClient(
+    clientId: ClientId,
+    data: Uint8Array,
+    { channel = DEFAULT_CHANNEL }: ChannelOptions = {},
+  ): void {
+    if (isReliableChannel(channel)) this.requireTcp(channel).sendToClient(channel, clientId, data);
+    else this.requireUdp(channel).sendToClient(channel, clientId, data);
+  }
+
+  /**
+   * Return the packets each client sent since the last call.
+   *
+   * @remarks
+   * Call this method once per frame.  Without a `channel`, the packets of every
+   * configured channel are merged per client, reliable channels first.
+   *
+   * @param options - `channel` to read from, every channel by default.
+   * @returns Map of client id to packet buffers.
+   * @throws When the channel's port was not configured.
+   */
+  public getReceivedPackets({ channel }: ChannelOptions = {}): Map<ClientId, Uint8Array[]> {
+    if (channel !== undefined) {
+      if (isReliableChannel(channel)) return this.requireTcp(channel).getReceivedPackets(channel);
+      return this.requireUdp(channel).getReceivedPackets(channel);
+    }
+
+    const merged = new Map<ClientId, Uint8Array[]>();
+    for (const c of this.configuredChannels()) {
+      this.getReceivedPackets({ channel: c }).forEach((packets, clientId) => {
+        merged.set(clientId, [...(merged.get(clientId) ?? []), ...packets]);
+      });
+    }
+    return merged;
+  }
+
+  /**
+   * Return the clients reachable on a channel.
+   *
+   * @param options - `channel` to check, any configured channel by default.
+   * @returns Snapshot array of client ids.
+   * @throws When the channel's port was not configured.
+   */
+  public getConnectedClients({ channel }: ChannelOptions = {}): ClientId[] {
+    if (channel !== undefined) {
+      if (isReliableChannel(channel)) return this.requireTcp(channel).getConnectedClients();
+      return this.requireUdp(channel).getConnectedClients(channel);
+    }
+    return [
+      ...new Set([
+        ...(this._tcp?.getConnectedClients() ?? []),
+        ...(this._udp?.getConnectedClients() ?? []),
+      ]),
+    ];
+  }
+
+  /**
+   * Return what is known about a client session: its address, user agent,
+   * query parameters and attached transports.
+   *
+   * @param clientId - Client identifier.
+   * @returns The live session info, or `undefined` when the client is gone.
+   */
+  public getClientInfo(clientId: ClientId): ClientInfo | undefined {
+    return this._registry.get(clientId);
   }
 
   public override expose(): NetworkServerContextApi {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const library = this;
     return {
-      get tcp() {
-        if (!library.tcp) throw new Error("TCP isn't defined");
-        return library.tcp;
-      },
-      get udp() {
-        if (!library.udp) throw new Error("UDP isn't defined");
-        return library.udp;
-      },
+      sendToAll: (data, options) => library.sendToAll(data, options),
+      sendToClient: (clientId, data, options) => library.sendToClient(clientId, data, options),
+      getReceivedPackets: (options) => library.getReceivedPackets(options),
+      getConnectedClients: (options) => library.getConnectedClients(options),
+      getClientInfo: (clientId) => library.getClientInfo(clientId),
       get clients() {
         return library.clients;
       },
     };
+  }
+
+  private configuredChannels(): Channel[] {
+    return CHANNELS.filter((channel) =>
+      isReliableChannel(channel) ? this._tcp !== undefined : this._udp !== undefined,
+    );
+  }
+
+  private requireTcp(channel: Channel): TCPServer {
+    if (!this._tcp) throw new Error(`Channel ${channel} needs LISTENING_TCP_PORT to be set`);
+    return this._tcp;
+  }
+
+  private requireUdp(channel: Channel): UDPServer {
+    if (!this._udp) throw new Error(`Channel ${channel} needs LISTENING_UDP_PORT to be set`);
+    return this._udp;
   }
 }

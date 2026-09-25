@@ -15,7 +15,7 @@
 
 ## About
 
-`@nanoforge-dev/network` is NanoForge's built-in networking library. It ships two subpath entry points — `@nanoforge-dev/network/client` and `@nanoforge-dev/network/server` — each providing reliable, ordered TCP (WebSocket) and unreliable, unordered UDP (WebRTC data channel) transports. The root entry, `@nanoforge-dev/network`, exposes the types shared by both, such as `NetworkConfig`. Splitting client and server into separate entry points keeps the server's runtime-only dependencies (`Bun.serve`, `node-datachannel`) out of a client's bundle graph entirely.
+`@nanoforge-dev/network` is NanoForge's built-in networking library. It ships two subpath entry points — `@nanoforge-dev/network/client` and `@nanoforge-dev/network/server` — each sending packets on four channels: `Channel.ReliableOrdered` and `Channel.ReliableUnordered` over TCP (WebSocket), `Channel.UnreliableOrdered` and `Channel.UnreliableUnordered` over UDP (WebRTC data channels). The root entry, `@nanoforge-dev/network`, exposes the types shared by both, such as `NetworkConfig`. Splitting client and server into separate entry points keeps the server's runtime-only dependencies (`Bun.serve`, `node-datachannel`) out of a client's bundle graph entirely.
 
 > **The server entry point requires the [Bun](https://bun.sh) runtime.** `@nanoforge-dev/network/server` is built on Bun's native WebSocket server (`Bun.serve`) and does not run on Node.js. The client entry point is runtime-agnostic and targets the browser.
 
@@ -46,7 +46,28 @@ LISTENING_TCP_PORT=4445
 LISTENING_UDP_PORT=4444
 ```
 
-Either the TCP port or the UDP port (or both) must be set on each side.
+Either the TCP port or the UDP port (or both) must be set on each side. The TCP
+port enables the reliable channels, the UDP port the unreliable ones.
+
+### Channels
+
+Every method takes an optional `{ channel }`. Sending defaults to
+`Channel.ReliableOrdered`; reading covers every configured channel.
+
+| Channel               | Lost?    | Order                    | Transport |
+| --------------------- | -------- | ------------------------ | --------- |
+| `ReliableOrdered`     | Never    | Send order               | TCP       |
+| `ReliableUnordered`   | Never    | No promise               | TCP       |
+| `UnreliableOrdered`   | Possibly | Late packets are dropped | WebRTC    |
+| `UnreliableUnordered` | Possibly | Any order                | WebRTC    |
+
+One WebSocket per client carries both reliable channels: each binary frame
+starts with a one-byte channel tag. Each unreliable channel is its own data
+channel (`ordered: false`, `maxRetransmits: 0`); `UnreliableOrdered` packets
+carry a `uint32` sequence number so the receiver drops any packet older than
+the last one it delivered. One message is one packet on every channel, so
+payloads may contain any bytes. Over TCP, `ReliableUnordered` is delivered in
+order in practice.
 
 ### Running the server behind a NAT
 
@@ -120,38 +141,45 @@ publicHoistPattern:
 
 ```ts
 // Client app
-import { NetworkClientLibrary } from "@nanoforge-dev/network/client";
+import { Channel, NetworkClientLibrary } from "@nanoforge-dev/network/client";
 
 app.use(new NetworkClientLibrary());
 
-public override async __run(ctx: Context): Promise<void> {
-  ctx.network.tcp?.sendData(payload);
-  for (const packet of ctx.network.tcp?.getReceivedPackets() ?? []) {
-    // Handle incoming packets.
-  }
+// Once, at game start: open the channels the game uses and wait for them.
+await ctx.network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
+
+// Every frame:
+ctx.network.sendData(joinPayload); // Channel.ReliableOrdered
+ctx.network.sendData(positionPayload, { channel: Channel.UnreliableOrdered });
+for (const packet of ctx.network.getReceivedPackets()) {
+  // Handle incoming packets, from every channel.
 }
 ```
 
 ```ts
 // Server app
-import { NetworkServerLibrary } from "@nanoforge-dev/network/server";
+import { Channel, NetworkServerLibrary } from "@nanoforge-dev/network/server";
 
 app.use(new NetworkServerLibrary());
 
-public override async __run(ctx: Context): Promise<void> {
-  for (const clientId of ctx.network.tcp?.getConnectedClients() ?? []) {
-    ctx.network.tcp?.sendToClient(clientId, payload);
-  }
-  ctx.network.tcp?.sendToEverybody(broadcastPayload);
-}
+// Every frame:
+ctx.network.getReceivedPackets().forEach((packets, clientId) => {
+  // Handle each client's packets, from every channel.
+});
+ctx.network.sendToAll(snapshotPayload, { channel: Channel.UnreliableOrdered });
+ctx.network.sendToClient(clientId, eventPayload); // Channel.ReliableOrdered
 ```
+
+`connect` only opens the transports its channels need, and rejects when a
+transport fails or the channels are not open within `timeout` milliseconds
+(10 seconds by default). The server starts listening during `__init`.
 
 ### Client identification
 
 Each client gets a `ClientId` (a random UUID string) shared by its TCP and UDP
 connections: the first transport receives the id and a session token in a
 `welcome` message, and the client presents the token when opening the other one.
-Use `ctx.network.clients` to follow sessions and `getClientInfo` to read what
+Use `ctx.network.clients` to follow sessions and `ctx.network.getClientInfo` to read what
 the server knows about a client (address, port, user agent, origin, query
 parameters):
 
@@ -159,13 +187,13 @@ parameters):
 ctx.network.clients.onConnect((info) => console.log(`${info.id} joined`));
 ctx.network.clients.onDisconnect((info) => console.log(`${info.id} left`));
 
-const info = ctx.network.tcp.getClientInfo(clientId);
+const info = ctx.network.getClientInfo(clientId);
 ```
 
-On the client, `ctx.network.clientId` holds the id once welcomed. A page reload
+On the client, `ctx.network.clientId` holds the id once `connect` has been welcomed. A page reload
 starts a new session with a new id.
 
-`ctx.network.tcp`/`.udp` are `undefined` when the corresponding port wasn't configured on that side.
+Using a channel whose port wasn't configured on that side throws.
 
 ## Links
 
