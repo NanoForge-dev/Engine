@@ -8,7 +8,7 @@ export const exampleSystem = (registry: Registry, ctx: Context) => {
 
   entities.forEach((entity) => {
     if (entity.ExampleComponent.paramA === "end") {
-      ctx.app.setIsRunning(false);
+      ctx.app.requestStop();
       return;
     }
 
