@@ -30,22 +30,23 @@ const makeEventTargetMock = () => {
   };
 };
 
-const makeInitContext = (container: unknown): InitContext =>
+const makeInitContext = (container: unknown, viewport?: unknown): InitContext =>
   ({
     vars: { get: () => undefined, set: () => {} },
     env: {},
     files: new Map(),
     container,
+    viewport,
   }) as InitContext;
 
 describe("InputLibrary", () => {
   let windowMock: ReturnType<typeof makeEventTargetMock> & {
-    getBoundingClientRect: () => { x: number; y: number };
+    getBoundingClientRect: () => { left: number; top: number };
   };
   let documentMock: ReturnType<typeof makeEventTargetMock> & { hidden: boolean };
 
   beforeEach(() => {
-    windowMock = { ...makeEventTargetMock(), getBoundingClientRect: () => ({ x: 0, y: 0 }) };
+    windowMock = { ...makeEventTargetMock(), getBoundingClientRect: () => ({ left: 0, top: 0 }) };
     documentMock = { ...makeEventTargetMock(), hidden: false };
 
     vi.stubGlobal("window", windowMock);
@@ -186,6 +187,43 @@ describe("InputLibrary", () => {
 
       windowMock.dispatch("mouseleave", {});
       expect(library.getMouseState().focus).toBe(false);
+    });
+  });
+
+  describe("coordinates", () => {
+    it("should report positions relative to the container's current rect", async () => {
+      const library = new InputLibrary();
+      let rect = { left: 0, top: 0 };
+      const container = { ...windowMock, getBoundingClientRect: () => rect };
+      await library.__init(makeInitContext(container));
+
+      // The container moved (resize/scroll) after init: the offset must not go stale.
+      rect = { left: 50, top: 30 };
+      container.dispatch("mousemove", { clientX: 150, clientY: 130, buttons: 0 });
+
+      expect(library.getMousePosition()).toStrictEqual({ x: 100, y: 100 });
+    });
+
+    it("should map mouse and drag positions to game coordinates through the viewport", async () => {
+      const library = new InputLibrary();
+      const viewport = {
+        screenToGame: vi.fn((x: number, y: number) => ({ x: x * 2, y: y * 2 })),
+      };
+      await library.__init(makeInitContext(windowMock, viewport));
+
+      windowMock.dispatch("mousedown", { button: 0, clientX: 10, clientY: 20 });
+      windowMock.dispatch("mousemove", { clientX: 25, clientY: 45, buttons: 1 });
+
+      expect(viewport.screenToGame).toHaveBeenCalledWith(25, 45);
+      expect(library.getMousePosition()).toStrictEqual({ x: 50, y: 90 });
+      expect(library.getDragState()).toMatchObject({
+        startX: 20,
+        startY: 40,
+        x: 50,
+        y: 90,
+        deltaX: 30,
+        deltaY: 50,
+      });
     });
   });
 

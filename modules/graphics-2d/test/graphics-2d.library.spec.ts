@@ -103,7 +103,7 @@ describe("Graphics2DLibrary", () => {
       expect(shape.on).toHaveBeenCalledWith("dragend", expect.any(Function));
 
       const dragEndHandler = shape.on.mock.calls[0]![1] as (e: any) => void;
-      dragEndHandler({ target: { _lastPos: { x: 1, y: 2 } } });
+      dragEndHandler({ target: { position: () => ({ x: 1, y: 2 }) } });
       expect(emit).toHaveBeenCalledWith("move-component", "entity-1", "DrawableCircle2D", {
         x: 1,
         y: 2,

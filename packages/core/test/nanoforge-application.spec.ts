@@ -7,7 +7,9 @@ import {
 } from "@nanoforge-dev/common";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { NanoforgeClient } from "../src/application/nanoforge-client";
 import { NanoforgeServer } from "../src/application/nanoforge-server";
+import { InternalViewportState } from "../src/internal/internal-viewport-state";
 
 class RecordingLibrary extends Library {
   public capturedContext?: Context;
@@ -86,6 +88,9 @@ describe("NanoforgeApplication", () => {
       expect(() => server.use(new RecordingLibrary("vars", []))).toThrow(
         NfDuplicateLibraryException,
       );
+      expect(() => server.use(new RecordingLibrary("viewport", []))).toThrow(
+        NfDuplicateLibraryException,
+      );
     });
 
     it("throws after init() has been called", async () => {
@@ -121,6 +126,53 @@ describe("NanoforgeApplication", () => {
 
       expect(probe.capturedContext?.assets).toBeDefined();
       expect(typeof probe.capturedContext?.assets.getAsset).toBe("function");
+    });
+
+    it("does not provide a viewport on the server", async () => {
+      const server = new NanoforgeServer();
+      const probe = new RecordingLibrary("probe", []);
+      server.use(probe);
+      await server.init(makeRunOptions());
+
+      vi.useFakeTimers();
+      await server.run();
+      await vi.advanceTimersByTimeAsync(50);
+
+      expect(probe.capturedContext?.viewport).toBeUndefined();
+    });
+
+    it("provides the same viewport to __init and ctx on the client, and disposes it on stop", async () => {
+      const container = {
+        style: {} as Record<string, string>,
+        clientWidth: 2560,
+        clientHeight: 1440,
+        getBoundingClientRect: () => ({ left: 0, top: 0 }),
+      };
+      const client = new NanoforgeClient({ viewport: { width: 1920, height: 1080 } });
+      let initViewport: InitContext["viewport"];
+      class ViewportProbe extends RecordingLibrary {
+        override async __init(ctx: InitContext): Promise<void> {
+          initViewport = ctx.viewport;
+        }
+      }
+      const probe = new ViewportProbe("probe", []);
+      const stopper = new StoppingLibrary();
+      client.use(probe);
+      client.use(stopper);
+      await client.init({ ...makeRunOptions(), container: container as unknown as HTMLDivElement });
+
+      expect(initViewport?.state.scaleX).toBeCloseTo(4 / 3);
+      expect(container.style.overflow).toBe("hidden");
+
+      const dispose = vi.spyOn(InternalViewportState.prototype, "dispose");
+      vi.useFakeTimers();
+      await client.run();
+      await vi.advanceTimersByTimeAsync(50);
+
+      expect(probe.capturedContext?.viewport?.state).toBe(initViewport?.state);
+      expect(stopper.clearCount).toBe(1);
+      expect(dispose).toHaveBeenCalledOnce();
+      dispose.mockRestore();
     });
 
     it("assigns a library's expose() result to ctx[key]", async () => {

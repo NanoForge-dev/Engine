@@ -4,11 +4,12 @@ import {
   type Library,
   NfDuplicateLibraryException,
   type VarsContext,
+  type ViewportContext,
 } from "@nanoforge-dev/common";
 
 import { orderByDependencies, orderByRunSequence } from "./ordering";
 
-const RESERVED_KEYS = new Set(["app", "vars", "assets"]);
+const RESERVED_KEYS = new Set(["app", "vars", "assets", "viewport"]);
 
 /**
  * Owns every registered library, enforces key uniqueness, and assembles
@@ -48,8 +49,9 @@ export class LibraryRegistry {
     return orderByRunSequence(this.getAll());
   }
 
-  buildContext(app: AppContext, vars: VarsContext): Context {
+  buildContext(app: AppContext, vars: VarsContext, viewport?: ViewportContext): Context {
     const ctx: Record<string, any> = { app, vars };
+    if (viewport) ctx.viewport = viewport;
     for (const library of this.getAll()) {
       const exposed = library.expose();
       if (exposed !== undefined) ctx[library.key] = exposed;

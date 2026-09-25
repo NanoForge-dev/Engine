@@ -1,4 +1,5 @@
 import type { NfFile } from "../common/file";
+import type { ViewportContext } from "../viewport/viewport.type";
 
 /**
  * Read-only application state plus the actions available to affect it.
@@ -52,7 +53,8 @@ export interface AssetContext {
  * to game code.
  *
  * @remarks
- * `app`, `vars` and `assets` are always present (core-provided). Every other
+ * `app`, `vars` and `assets` are always present (core-provided); `viewport`
+ * is core-provided on the client only. Every other
  * key is contributed by a registered `Library` via its `expose()` method.
  * Library packages add their own key by augmenting this interface:
  *
@@ -68,4 +70,6 @@ export interface Context {
   readonly app: AppContext;
   readonly vars: VarsContext;
   readonly assets: AssetContext;
+  /** Screen/game viewport. Client-only (core-provided); `undefined` on the server. */
+  readonly viewport?: ViewportContext;
 }
