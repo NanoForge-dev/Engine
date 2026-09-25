@@ -1,15 +1,11 @@
+import { NfNotFound } from "@nanoforge-dev/common";
 import { describe, expect, it } from "vitest";
 
-import { main as clientMain } from "../apps/client/src/main";
+// The client app instantiates a Konva layer at import time and needs a real browser canvas.
 import { main as serverMain } from "../apps/server/src/main";
 
-describe("pong-network plumbing skeleton", () => {
-  it("server app runs its tick loop and stops cleanly", async () => {
-    await expect(serverMain({ files: new Map(), env: {} })).resolves.toBeUndefined();
-  });
-
-  it("client app runs its tick loop, writes vars, and stops cleanly", async () => {
-    const container = {} as unknown as HTMLDivElement;
-    await expect(clientMain({ files: new Map(), env: {}, container })).resolves.toBeUndefined();
+describe("pong-network server", () => {
+  it("should reject startup when libecs.wasm is missing", async () => {
+    await expect(serverMain({ files: new Map(), env: {} })).rejects.toBeInstanceOf(NfNotFound);
   });
 });

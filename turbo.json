@@ -15,7 +15,7 @@
         "tsconfig.json",
         "tsdown.config.ts"
       ],
-      "outputs": ["dist/**", ".nanoforge/client/**", ".nanoforge/server/**"],
+      "outputs": ["dist/**", "apps/*/dist/**"],
       "outputLogs": "errors-only"
     },
     "format": {

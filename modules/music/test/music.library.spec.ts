@@ -93,7 +93,7 @@ describe("MusicLibrary", () => {
       library.load("theme", "theme.mp3");
       library.play("theme");
 
-      await library.__clear({} as any);
+      await library.__clear();
 
       expect(mock.pause).toHaveBeenCalled();
       expect(() => library.play("theme")).toThrow(NfNotFound);
@@ -101,7 +101,7 @@ describe("MusicLibrary", () => {
     });
 
     it("does not throw when called before __init", async () => {
-      await expect(new MusicLibrary().__clear({} as any)).resolves.toBeUndefined();
+      await expect(new MusicLibrary().__clear()).resolves.toBeUndefined();
     });
   });
 

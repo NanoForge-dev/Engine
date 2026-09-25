@@ -3,11 +3,10 @@
   "version": "0.0.0",
   "description": "",
   "author": "",
+  "type": "module",
   "scripts": {
-    "build": "nf build",
-    "start": "nf start",
-    "lint": "prettier --check . && eslint --format=pretty \"{client,server}/**/*.ts\"",
-    "format": "prettier --write . && eslint --fix --format=pretty \"{client,server}/**/*.ts\""
+    "lint": "prettier --check . && eslint --format=pretty \"src/**/*.ts\"",
+    "format": "prettier --write . && eslint --fix --format=pretty \"src/**/*.ts\""
   },
   "devDependencies": {
     "@nanoforge-dev/asset": "workspace:*",
@@ -17,7 +16,9 @@
     "@nanoforge-dev/ecs": "workspace:*",
     "@nanoforge-dev/network": "workspace:*",
     "@nanoforge-dev/graphics-2d": "workspace:*",
+    "@nanoforge-dev/sound": "workspace:*",
     "@nanoforge-dev/input": "workspace:*",
+    "@nanoforge-dev/music": "workspace:*",
     "typescript": "catalog:core"
   },
   "private": true,
@@ -25,7 +26,7 @@
     "**": [
       "prettier --ignore-unknown --write"
     ],
-    "{client,server}/**/*.ts": [
+    "src/**/*.ts": [
       "eslint --fix"
     ]
   }

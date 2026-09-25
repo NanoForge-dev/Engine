@@ -93,7 +93,7 @@ describe("SoundLibrary", () => {
       await library.__init();
       library.load("click", "click.mp3");
 
-      await library.__clear({} as any);
+      await library.__clear();
 
       expect(mock.pause).toHaveBeenCalled();
       expect(() => library.play("click")).toThrow(NfNotFound);
@@ -101,7 +101,7 @@ describe("SoundLibrary", () => {
     });
 
     it("does not throw when called before __init", async () => {
-      await expect(new SoundLibrary().__clear({} as any)).resolves.toBeUndefined();
+      await expect(new SoundLibrary().__clear()).resolves.toBeUndefined();
     });
   });
 

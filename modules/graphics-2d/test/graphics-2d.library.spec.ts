@@ -49,7 +49,7 @@ describe("Graphics2DLibrary", () => {
     });
 
     it("does not throw when called before __init", async () => {
-      await expect(new Graphics2DLibrary().__clear({} as any)).resolves.toBeUndefined();
+      await expect(new Graphics2DLibrary().__clear()).resolves.toBeUndefined();
     });
   });
 
