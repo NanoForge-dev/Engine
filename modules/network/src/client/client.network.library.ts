@@ -1,6 +1,7 @@
 import { type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
 import { registerEnv } from "@nanoforge-dev/env";
 
+import type { ClientSession } from "./client-session";
 import { ClientConfigNetwork } from "./config.client.network";
 import type { NetworkClientContextApi } from "./network-client-context.type";
 import { TCPClient } from "./tcp.client.network";
@@ -12,7 +13,9 @@ import { UDPClient } from "./udp.client.network";
  * @remarks
  * Reads network configuration from the environment via `ClientConfigNetwork`
  * and automatically connects to the server over TCP (WebSocket), UDP
- * (WebRTC data channel), or both.
+ * (WebRTC data channel), or both.  TCP connects first; once welcomed, UDP
+ * presents the session token so both transports share one client id.  A
+ * transport that fails to connect is logged and does not fail initialization.
  *
  * Configuration (via environment variables):
  * - `SERVER_ADDRESS` — hostname or IP of the server (required).
@@ -30,6 +33,13 @@ export class NetworkClientLibrary extends Library {
   /** Only set when `SERVER_UDP_PORT` was configured. */
   public udp?: UDPClient;
 
+  private readonly _session: ClientSession = {};
+
+  /** Client id assigned by the server, `undefined` until a transport is welcomed. */
+  public get clientId(): string | undefined {
+    return this._session.id;
+  }
+
   public override async __init(ctx: InitContext): Promise<void> {
     const config = await registerEnv(ClientConfigNetwork, ctx.env);
 
@@ -43,8 +53,9 @@ export class NetworkClientLibrary extends Library {
         config.SERVER_ADDRESS,
         config.MAGIC_VALUE,
         config.WSS,
+        this._session,
       );
-      await this.tcp.connect();
+      await this.connectTransport("TCP", this.tcp);
     }
 
     if (config.SERVER_UDP_PORT !== undefined) {
@@ -54,8 +65,9 @@ export class NetworkClientLibrary extends Library {
         config.MAGIC_VALUE,
         config.WSS,
         config.ICE_SERVERS,
+        this._session,
       );
-      await this.udp.connect();
+      await this.connectTransport("UDP", this.udp);
     }
   }
 
@@ -71,6 +83,17 @@ export class NetworkClientLibrary extends Library {
         if (!library.udp) throw new Error("UDP isn't defined");
         return library.udp;
       },
+      get clientId() {
+        return library.clientId;
+      },
     };
+  }
+
+  private async connectTransport(name: string, client: TCPClient | UDPClient): Promise<void> {
+    try {
+      await client.connect();
+    } catch (error) {
+      console.error(`${name} connection failed`, { cause: error });
+    }
   }
 }

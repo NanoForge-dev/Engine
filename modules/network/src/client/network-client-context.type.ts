@@ -7,4 +7,6 @@ export interface NetworkClientContextApi {
   readonly tcp: TCPClient;
   /** Unreliable, unordered WebRTC data-channel connection. Only set when `SERVER_UDP_PORT` was configured. */
   readonly udp: UDPClient;
+  /** Client id assigned by the server, shared by TCP and UDP. `undefined` until welcomed. */
+  readonly clientId: string | undefined;
 }

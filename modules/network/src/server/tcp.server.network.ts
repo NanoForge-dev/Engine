@@ -1,22 +1,35 @@
 import type { Server, ServerWebSocket } from "bun";
 
+import type { WelcomeMessage } from "../shared/session";
 import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
+import {
+  type ClientId,
+  type ClientInfo,
+  ClientRegistry,
+  type ConnectionInfo,
+  buildConnectionInfo,
+  getSessionToken,
+} from "./client-registry";
 import { rawDataToUint8Array } from "./utils";
 
 /** Per-connection state attached to each upgraded socket. */
 type TCPSocketData = {
-  /** Numeric client identifier, assigned once the socket opens. */
-  id: number;
-  /** Remote address, resolved during the upgrade for logging. */
-  ip: string;
+  /** Session identifier, assigned once the socket opens and joins a session. */
+  id?: ClientId;
+  /** Session token presented in the upgrade request, `null` for a new session. */
+  token: string | null;
+  /** What is known about the connection, resolved during the upgrade. */
+  connection: ConnectionInfo;
 };
 
 /**
  * Reliable, ordered WebSocket-based server that manages multiple TCP clients.
  *
  * @remarks
- * Each client that connects is assigned a numeric ID.  Use
- * `getConnectedClients` to enumerate active clients,
+ * Each client that connects joins a session identified by a {@link ClientId},
+ * shared with the UDP transport when the client presents its session token.
+ * On open, the server sends a `welcome` text frame carrying the id and token.
+ * Use `getConnectedClients` to enumerate active clients,
  * `sendToClient` / `sendToEverybody` to push data, and
  * `getReceivedPackets` to consume incoming packets per frame.
  *
@@ -28,10 +41,9 @@ type TCPSocketData = {
  */
 export class TCPServer {
   private _clients = new Map<
-    number,
+    ClientId,
     { channel: ServerWebSocket<TCPSocketData>; data: Uint8Array; chunkedData: Uint8Array[] }
   >();
-  private _nextClientId: number = 0;
   private readonly _magicData = new Uint8Array();
   private _server: Server<TCPSocketData> | undefined;
 
@@ -41,6 +53,7 @@ export class TCPServer {
     magicValue: string,
     private _cert?: string,
     private _key?: string,
+    private readonly _registry: ClientRegistry = new ClientRegistry(),
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
     if (!this._cert || !this._key) {
@@ -67,24 +80,35 @@ export class TCPServer {
         ? { tls: { cert: Bun.file(cert), key: Bun.file(key) } }
         : {}),
       fetch: (request, server) => {
-        const ip = server.requestIP(request)?.address ?? "unknown";
+        const token = getSessionToken(request);
+        if (!this._registry.canAttach(token, "tcp")) {
+          return new Response("Invalid session token", { status: 401 });
+        }
 
-        if (server.upgrade(request, { data: { id: -1, ip } })) {
+        const connection = buildConnectionInfo("tcp", request, server);
+        if (server.upgrade(request, { data: { token, connection } })) {
           return undefined;
         }
         return new Response("Expected a WebSocket connection", { status: 426 });
       },
       websocket: {
         open: (webSocket) => {
-          const id = this._nextClientId++;
+          const session = this._registry.attach(webSocket.data.token, webSocket.data.connection);
+          if (!session) {
+            webSocket.close(1008, "Invalid session token");
+            return;
+          }
+
+          const { id, token } = session;
           webSocket.data.id = id;
           this._clients.set(id, {
             channel: webSocket,
             data: new Uint8Array(),
             chunkedData: [],
           });
+          webSocket.send(JSON.stringify({ type: "welcome", id, token } satisfies WelcomeMessage));
 
-          console.log("TCP openned for user: " + id + ", ip: " + webSocket.data.ip);
+          console.log("TCP openned for user: " + id + ", ip: " + webSocket.data.connection.address);
         },
         message: (webSocket, message) => {
           if (typeof message === "string") {
@@ -92,12 +116,17 @@ export class TCPServer {
             return;
           }
 
+          if (webSocket.data.id === undefined) return;
           const client = this._clients.get(webSocket.data.id);
           client?.chunkedData.push(rawDataToUint8Array(message));
         },
         close: (webSocket) => {
-          console.log("TCP closed for user: " + webSocket.data.id + ", ip: " + webSocket.data.ip);
-          this._clients.delete(webSocket.data.id);
+          const id = webSocket.data.id;
+          if (id === undefined) return;
+
+          console.log("TCP closed for user: " + id + ", ip: " + webSocket.data.connection.address);
+          this._clients.delete(id);
+          this._registry.detach(id, "tcp");
         },
       },
     });
@@ -120,12 +149,23 @@ export class TCPServer {
   }
 
   /**
-   * Return a snapshot array of numeric client IDs currently connected.
+   * Return a snapshot array of the client IDs currently connected over TCP.
    *
-   * @returns number[]
+   * @returns ClientId[]
    */
-  public getConnectedClients(): number[] {
+  public getConnectedClients(): ClientId[] {
     return [...this._clients.keys()];
+  }
+
+  /**
+   * Return what is known about a client session: its address, user agent,
+   * query parameters and attached transports.
+   *
+   * @param clientId ClientId — client identifier.
+   * @returns ClientInfo | undefined — `undefined` when the client is gone.
+   */
+  public getClientInfo(clientId: ClientId): ClientInfo | undefined {
+    return this._registry.get(clientId);
   }
 
   /**
@@ -144,11 +184,11 @@ export class TCPServer {
   /**
    * Send a payload to the client identified by `clientId`.
    *
-   * @param clientId number — numeric client identifier.
+   * @param clientId ClientId — client identifier.
    * @param data Uint8Array — payload bytes.
    * @returns void
    */
-  public sendToClient(clientId: number, data: Uint8Array) {
+  public sendToClient(clientId: ClientId, data: Uint8Array) {
     const client = this._clients.get(clientId);
     if (!client) {
       console.error(`Unknown client: ${clientId}`);
@@ -160,10 +200,10 @@ export class TCPServer {
   /**
    * Parse and return complete packets received from each client. Each packet is a `Uint8Array` buffer.
    *
-   * @returns Map<number, Uint8Array[]> — mapping client ID to array of packets.
+   * @returns Map<ClientId, Uint8Array[]> — mapping client ID to array of packets.
    */
-  public getReceivedPackets(): Map<number, Uint8Array[]> {
-    const packets = new Map<number, Uint8Array[]>();
+  public getReceivedPackets(): Map<ClientId, Uint8Array[]> {
+    const packets = new Map<ClientId, Uint8Array[]>();
 
     this._clients.forEach((client, clientId) => {
       const {

@@ -1,4 +1,12 @@
 import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
+import {
+  type ClientSession,
+  type WelcomeWait,
+  applyWelcome,
+  buildServerUrl,
+  toError,
+  waitForWelcome,
+} from "./client-session";
 
 /**
  * Unreliable, unordered WebRTC data-channel client connection to a NanoForge
@@ -9,6 +17,9 @@ import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
  * communicates over an RTCDataChannel with `ordered: false` and
  * `maxRetransmits: 0` for minimal latency.
  *
+ * The signaling socket also carries the server's `welcome`, which assigns the
+ * client id, or links this transport to the TCP session when a token is known.
+ *
  * Typical usage is through `NetworkClientLibrary` which instantiates and
  * connects this class automatically during `__init`.
  */
@@ -17,6 +28,7 @@ export class UDPClient {
   private _data: Uint8Array = new Uint8Array();
   private _chunkedData: Uint8Array[] = [];
   private readonly _magicData: Uint8Array = new Uint8Array();
+  private _welcome: WelcomeWait | null = null;
 
   constructor(
     private _port: number,
@@ -24,6 +36,7 @@ export class UDPClient {
     magicValue: string,
     private _wss: boolean,
     private _iceServers: RTCIceServer[] = [],
+    private readonly _session: ClientSession = {},
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
   }
@@ -33,14 +46,31 @@ export class UDPClient {
    * complete the SDP/ICE handshake with the server.
    *
    * @remarks
-   * Resolves once the offer has been dispatched.  The data channel may become
-   * open shortly after — check `isConnected`.
+   * Joins the current session when it already has a token.  Resolves once the
+   * server's welcome is received.  The data channel may become open shortly
+   * after — check `isConnected`.
+   *
+   * @throws When the signaling socket fails or closes before the welcome, or
+   * when no welcome arrives within `WELCOME_TIMEOUT_MS`.
    */
   public async connect(): Promise<void> {
-    const webSocket: WebSocket = this.connectToServerWebSocket();
-    const rtcPeerConnection: RTCPeerConnection = this.getRtcChannelFromIceServer();
-    this.setupIceConnection(rtcPeerConnection, webSocket);
-    await this.sendIceOffer(rtcPeerConnection, webSocket);
+    const welcome = (this._welcome = waitForWelcome("UDP"));
+    try {
+      const webSocket: WebSocket = this.connectToServerWebSocket();
+      const rtcPeerConnection: RTCPeerConnection = this.getRtcChannelFromIceServer();
+      this.setupIceConnection(rtcPeerConnection, webSocket);
+      await this.sendIceOffer(rtcPeerConnection, webSocket);
+    } catch (error) {
+      welcome.settle(toError(error));
+    }
+    await welcome.promise;
+  }
+
+  /**
+   * Return the client id assigned by the server, once welcomed.
+   */
+  public getClientId(): string | undefined {
+    return this._session.id;
   }
 
   /**
@@ -87,12 +117,16 @@ export class UDPClient {
   }
 
   private connectToServerWebSocket(): WebSocket {
-    const serverUrl = `ws${this._wss ? "s" : ""}://${this._ip}:${this._port}`;
-    console.log("Try to connect for UDP to " + serverUrl);
+    const serverUrl = buildServerUrl(this._wss, this._ip, this._port, this._session);
+    console.log("Try to connect for UDP to " + serverUrl.split("?")[0]);
     const webSocket = new WebSocket(serverUrl);
 
     webSocket.onerror = (e: Event) => {
-      throw new Error("UDP connection error : WebSocket Error", { cause: e });
+      console.error("UDP connection error : WebSocket Error", { cause: e });
+      this._welcome?.settle(new Error("UDP connection error", { cause: e }));
+    };
+    webSocket.onclose = (): void => {
+      this._welcome?.settle(new Error("UDP signaling closed before the server welcome"));
     };
     return webSocket;
   }
@@ -135,6 +169,12 @@ export class UDPClient {
 
     webSocket.onmessage = async (ev: MessageEvent<any>): Promise<void> => {
       const msg = JSON.parse(ev.data);
+
+      if (applyWelcome(this._session, msg)) {
+        console.log("UDP joined session: " + this._session.id);
+        this._welcome?.settle();
+        return;
+      }
 
       if (msg.type === "answer" && msg.answer) {
         await rtcPeerConnection.setRemoteDescription(msg.answer);
