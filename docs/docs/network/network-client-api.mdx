@@ -6,55 +6,33 @@ description: "API reference for the client networking package"
 
 # network-client API
 
-## TCPClient
+`NetworkClientLibrary` exposes one client per [channel](packet-framing) on
+`ctx.network`:
 
-### connect()
+| Property              | Class                       | Needs             |
+| --------------------- | --------------------------- | ----------------- |
+| `reliableOrdered`     | `ReliableOrderedClient`     | `SERVER_TCP_PORT` |
+| `reliableUnordered`   | `ReliableUnorderedClient`   | `SERVER_TCP_PORT` |
+| `unreliableOrdered`   | `UnreliableOrderedClient`   | `SERVER_UDP_PORT` |
+| `unreliableUnordered` | `UnreliableUnorderedClient` | `SERVER_UDP_PORT` |
 
-Initiate a WebSocket connection to the server, for example `ws://<ip>:<port>`,
-joining the current session when a token is already known.
+Reading a property whose port is not configured throws.
 
-Resolves once the server's `welcome` is received. Rejects when the socket fails
-or closes before it, or when no welcome arrives within 5 seconds.
+The library connects during `__init`: TCP first, then UDP with the TCP session
+token, so both transports share one client id. Each connection resolves once the
+server's `welcome` is received, or gives up after 5 seconds. A transport that
+fails to connect is logged and does not fail initialization.
 
-Returns: `Promise<void>`
+## Channel clients
 
-### getClientId()
+All four classes have the same methods. Each one only sends and returns the
+packets of its own channel.
 
-Return the client id assigned by the server, once welcomed.
+### channel
 
-Returns: `string | undefined`
+The `Channel` this client sends and receives on.
 
-### isConnected()
-
-Return `true` when the underlying WebSocket is open.
-
-Returns: `boolean`
-
-### sendData(data)
-
-Send a payload to the server.
-
-Parameter `data`: `Uint8Array` raw payload bytes.
-
-Returns: `void`
-
-### getReceivedPackets()
-
-Return an array of complete packets that were reassembled from received chunks.
-
-Returns: `Uint8Array[]`
-
-## UDPClient
-
-### connect()
-
-Open a WebSocket for signaling, create an `RTCPeerConnection`, and initiate an SDP offer.
-Presents the TCP session token, when known, so both transports share one client id.
-
-Resolves once the server's `welcome` is received. The data channel may open
-shortly after; check `isConnected()`.
-
-Returns: `Promise<void>`
+Type: `Channel`
 
 ### getClientId()
 
@@ -64,13 +42,15 @@ Returns: `string | undefined`
 
 ### isConnected()
 
-Return `true` when the `RTCDataChannel` is open.
+Return `true` when packets can be sent and received on this channel: the
+WebSocket is open for reliable channels, the channel's data channel is open for
+unreliable ones. Data channels may open shortly after `__init` resolves.
 
 Returns: `boolean`
 
 ### sendData(data)
 
-Send a payload on the data channel.
+Send a payload to the server on this channel.
 
 Parameter `data`: `Uint8Array` raw payload bytes.
 
@@ -78,15 +58,19 @@ Returns: `void`
 
 ### getReceivedPackets()
 
-Return an array of complete packets reassembled from received data-channel chunks.
+Return the packets received on this channel since the last call. Call it once
+per frame.
 
 Returns: `Uint8Array[]`
+
+## Channel
+
+Enum of the four channels: `Channel.ReliableOrdered`,
+`Channel.ReliableUnordered`, `Channel.UnreliableOrdered` and
+`Channel.UnreliableUnordered`.
 
 ## clientId (`ctx.network.clientId`)
 
 Client id assigned by the server, shared by TCP and UDP. `undefined` until a
 transport has been welcomed. It is only kept in memory: a page reload gets a new
 id.
-
-`NetworkClientLibrary` connects TCP first, then UDP with the TCP session token.
-A transport that fails to connect is logged and does not fail initialization.

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { ServerConfigNetwork } from "../../src/server";
 
-const base = { LISTENING_UDP_PORT: "9000", MAGIC_VALUE: "END" };
+const base = { LISTENING_UDP_PORT: "9000" };
 
 describe("ServerConfigNetwork", () => {
   describe("ICE_PORT", () => {

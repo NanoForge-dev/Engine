@@ -1,4 +1,10 @@
-import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
+import {
+  Channel,
+  PacketSequencer,
+  UNRELIABLE_CHANNELS,
+  UNRELIABLE_CHANNEL_OPTIONS,
+  type UnreliableChannel,
+} from "../shared/channels";
 import {
   type ClientSession,
   type WelcomeWait,
@@ -8,38 +14,44 @@ import {
   waitForWelcome,
 } from "./client-session";
 
+/** Client side of one WebRTC data channel. */
+type DataChannelState = {
+  channel: RTCDataChannel;
+  packets: Uint8Array[];
+  /** Only set on `UnreliableOrdered`. */
+  sequencer?: PacketSequencer;
+};
+
 /**
- * Unreliable, unordered WebRTC data-channel client connection to a NanoForge
- * UDP server.
+ * WebRTC connection to a NanoForge UDP server, carrying the unreliable
+ * channels.
  *
  * @remarks
- * Uses a WebSocket signaling channel to perform the SDP/ICE handshake and then
- * communicates over an RTCDataChannel with `ordered: false` and
- * `maxRetransmits: 0` for minimal latency.
+ * Uses a WebSocket signaling channel to perform the SDP/ICE handshake, then
+ * opens one RTCDataChannel per unreliable channel, labelled with its
+ * {@link Channel} value.  Both use `ordered: false` and `maxRetransmits: 0`
+ * for minimal latency.  Each data channel message is one packet;
+ * `UnreliableOrdered` packets carry a sequence number and late ones are
+ * dropped.
  *
  * The signaling socket also carries the server's `welcome`, which assigns the
  * client id, or links this transport to the TCP session when a token is known.
  *
- * Typical usage is through `NetworkClientLibrary` which instantiates and
- * connects this class automatically during `__init`.
+ * Internal: games use it through `UnreliableOrderedClient` and
+ * `UnreliableUnorderedClient`, which `NetworkClientLibrary` sets up during
+ * `__init`.
  */
 export class UDPClient {
-  private _channel: RTCDataChannel | null = null;
-  private _data: Uint8Array = new Uint8Array();
-  private _chunkedData: Uint8Array[] = [];
-  private readonly _magicData: Uint8Array = new Uint8Array();
+  private readonly _channels = new Map<UnreliableChannel, DataChannelState>();
   private _welcome: WelcomeWait | null = null;
 
   constructor(
     private _port: number,
     private _ip: string,
-    magicValue: string,
     private _wss: boolean,
     private _iceServers: RTCIceServer[] = [],
     private readonly _session: ClientSession = {},
-  ) {
-    this._magicData = new TextEncoder().encode(magicValue);
-  }
+  ) {}
 
   /**
    * Open the WebSocket signaling channel, create an RTCPeerConnection, and
@@ -47,7 +59,7 @@ export class UDPClient {
    *
    * @remarks
    * Joins the current session when it already has a token.  Resolves once the
-   * server's welcome is received.  The data channel may become open shortly
+   * server's welcome is received.  The data channels may become open shortly
    * after — check `isConnected`.
    *
    * @throws When the signaling socket fails or closes before the welcome, or
@@ -74,45 +86,40 @@ export class UDPClient {
   }
 
   /**
-   * Return `true` when the RTCDataChannel is open.
+   * Return `true` when the data channel of `channel` is open.
+   *
+   * @param channel - Unreliable channel to check.
    */
-  public isConnected(): boolean {
-    return this._channel !== null && this._channel.readyState === "open";
+  public isConnected(channel: UnreliableChannel): boolean {
+    return this._channels.get(channel)?.channel.readyState === "open";
   }
 
   /**
-   * Send a payload on the data channel.
+   * Send a payload to the server on an unreliable channel.
    *
-   * @remarks
-   * The payload is wrapped in a magic framing packet before being sent.
-   *
+   * @param channel - Unreliable channel to send on.
    * @param data - Raw payload bytes.
    */
-  public sendData(data: Uint8Array): void {
-    if (!this._channel) {
+  public sendData(channel: UnreliableChannel, data: Uint8Array): void {
+    const state = this._channels.get(channel);
+    if (!state) {
       console.error("UDP not connected");
       return;
     }
-    this._channel.send(buildMagicPacket(data, this._magicData));
+    state.channel.send(state.sequencer ? state.sequencer.wrap(data) : new Uint8Array(data));
   }
 
   /**
-   * Parse and return all complete packets received since the last call.
+   * Return the packets received on an unreliable channel since the last call.
    *
-   * @remarks
-   * Partial packets are retained internally and combined with future chunks
-   * until they are complete.  Call this method once per frame.
-   *
-   * @returns Array of complete packet buffers.
+   * @param channel - Unreliable channel to read.
+   * @returns Array of packet buffers, in arrival order.
    */
-  public getReceivedPackets(): Uint8Array[] {
-    const { packets, data, chunkedData } = parsePacketsFromChunks(
-      this._data,
-      this._chunkedData,
-      this._magicData,
-    );
-    this._data = data;
-    this._chunkedData = chunkedData;
+  public getReceivedPackets(channel: UnreliableChannel): Uint8Array[] {
+    const state = this._channels.get(channel);
+    if (!state) return [];
+    const packets = state.packets;
+    state.packets = [];
     return packets;
   }
 
@@ -133,36 +140,53 @@ export class UDPClient {
 
   private getRtcChannelFromIceServer(): RTCPeerConnection {
     const rtcPeerConnection = new RTCPeerConnection({ iceServers: this._iceServers });
-    this._channel = rtcPeerConnection.createDataChannel("game", {
-      ordered: false,
-      maxRetransmits: 0,
-    });
-
-    this._channel.onopen = (): void => {
-      console.log("UDP connected");
-    };
-
-    this._channel.onmessage = (ev: MessageEvent<any>): void => {
-      const chunk = new Uint8Array(ev.data);
-      this._chunkedData.push(chunk);
-    };
-
-    this._channel.onerror = (ev: RTCErrorEvent): void => {
-      this._channel = null;
-      console.error("UDP error", { cause: ev });
-    };
-
-    this._channel.onclose = (): void => {
-      this._channel = null;
-    };
+    for (const channel of UNRELIABLE_CHANNELS) {
+      this.openDataChannel(rtcPeerConnection, channel);
+    }
     return rtcPeerConnection;
+  }
+
+  private openDataChannel(rtcPeerConnection: RTCPeerConnection, channel: UnreliableChannel): void {
+    const dataChannel = rtcPeerConnection.createDataChannel(channel, UNRELIABLE_CHANNEL_OPTIONS);
+    dataChannel.binaryType = "arraybuffer";
+    const state: DataChannelState = {
+      channel: dataChannel,
+      packets: [],
+      ...(channel === Channel.UnreliableOrdered ? { sequencer: new PacketSequencer() } : {}),
+    };
+    this._channels.set(channel, state);
+
+    /** Drop the entry unless a newer data channel already replaced it. */
+    const removeChannel = () => {
+      if (this._channels.get(channel) === state) this._channels.delete(channel);
+    };
+
+    dataChannel.onopen = (): void => {
+      console.log(`UDP ${channel} connected`);
+    };
+
+    dataChannel.onmessage = (ev: MessageEvent<any>): void => {
+      const packet = new Uint8Array(ev.data);
+      const payload = state.sequencer ? state.sequencer.unwrap(packet) : packet;
+      if (payload) state.packets.push(payload);
+    };
+
+    dataChannel.onerror = (ev: RTCErrorEvent): void => {
+      console.error(`UDP ${channel} error`, { cause: ev });
+      removeChannel();
+    };
+
+    dataChannel.onclose = (): void => {
+      removeChannel();
+    };
   }
 
   private setupIceConnection(rtcPeerConnection: RTCPeerConnection, webSocket: WebSocket): void {
     let pendingCandidates: any[] = [];
 
     rtcPeerConnection.onicecandidate = (ev: RTCPeerConnectionIceEvent): void => {
-      if (ev.candidate) {
+      // Gathering can outlive the signaling socket, and a closed socket throws on send.
+      if (ev.candidate && webSocket.readyState === WebSocket.OPEN) {
         webSocket.send(JSON.stringify({ type: "ice", candidate: ev.candidate }));
       }
     };
@@ -187,9 +211,9 @@ export class UDPClient {
 
       if (msg.type === "ice" && msg.candidate) {
         if (rtcPeerConnection.remoteDescription) {
-          pendingCandidates.push(msg.candidate);
-        } else {
           await rtcPeerConnection.addIceCandidate(msg.candidate);
+        } else {
+          pendingCandidates.push(msg.candidate);
         }
       }
     };

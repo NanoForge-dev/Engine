@@ -1,4 +1,9 @@
-import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
+import {
+  RELIABLE_CHANNELS,
+  type ReliableChannel,
+  decodeReliableFrame,
+  encodeReliableFrame,
+} from "../shared/channels";
 import {
   type ClientSession,
   type WelcomeWait,
@@ -9,36 +14,35 @@ import {
 } from "./client-session";
 
 /**
- * Reliable, ordered WebSocket-based client connection to a NanoForge TCP server.
+ * WebSocket connection to a NanoForge TCP server, carrying the reliable
+ * channels.
  *
  * @remarks
- * Packets are framed with a configurable magic delimiter so that partial
- * WebSocket frames can be reassembled.  The connection is established by
- * calling `connect` and status can be queried with `isConnected`.
+ * Each binary frame is one packet, prefixed with the tag of its reliable
+ * channel.  The connection is established by calling `connect` and status
+ * can be queried with `isConnected`.
  *
  * Text frames are reserved for control messages: the server's `welcome`
  * assigns the client id and the token that links the UDP transport to the
  * same session.
  *
- * Typical usage is through `NetworkClientLibrary` which instantiates and
- * connects this class automatically during `__init`.
+ * Internal: games use it through `ReliableOrderedClient` and
+ * `ReliableUnorderedClient`, which `NetworkClientLibrary` sets up during
+ * `__init`.
  */
 export class TCPClient {
   private _channel: WebSocket | null = null;
-  private _data: Uint8Array = new Uint8Array();
-  private _chunkedData: Uint8Array[] = [];
-  private readonly _magicData: Uint8Array = new Uint8Array();
+  private readonly _packets = new Map<ReliableChannel, Uint8Array[]>(
+    RELIABLE_CHANNELS.map((channel) => [channel, []]),
+  );
   private _welcome: WelcomeWait | null = null;
 
   constructor(
     private _port: number,
     private _ip: string,
-    magicValue: string,
     private _wss: boolean,
     private readonly _session: ClientSession = {},
-  ) {
-    this._magicData = new TextEncoder().encode(magicValue);
-  }
+  ) {}
 
   /**
    * Initiate a WebSocket connection to the server.
@@ -75,38 +79,28 @@ export class TCPClient {
   }
 
   /**
-   * Send a payload to the server.
+   * Send a payload to the server on a reliable channel.
    *
-   * @remarks
-   * The payload is wrapped in a magic framing packet before being sent.
-   *
+   * @param channel - Reliable channel to send on.
    * @param data - Raw payload bytes.
    */
-  public sendData(data: Uint8Array): void {
+  public sendData(channel: ReliableChannel, data: Uint8Array): void {
     if (!this._channel) {
       console.error("TCP not connected");
       return;
     }
-    this._channel.send(buildMagicPacket(data, this._magicData));
+    this._channel.send(encodeReliableFrame(channel, data));
   }
 
   /**
-   * Parse and return all complete packets received since the last call.
+   * Return the packets received on a reliable channel since the last call.
    *
-   * @remarks
-   * Partial packets are retained internally and combined with future chunks
-   * until they are complete.  Call this method once per frame.
-   *
-   * @returns Array of complete packet buffers.
+   * @param channel - Reliable channel to read.
+   * @returns Array of packet buffers, oldest first.
    */
-  public getReceivedPackets(): Uint8Array[] {
-    const { packets, data, chunkedData } = parsePacketsFromChunks(
-      this._data,
-      this._chunkedData,
-      this._magicData,
-    );
-    this._data = data;
-    this._chunkedData = chunkedData;
+  public getReceivedPackets(channel: ReliableChannel): Uint8Array[] {
+    const packets = this._packets.get(channel) ?? [];
+    this._packets.set(channel, []);
     return packets;
   }
 
@@ -130,8 +124,12 @@ export class TCPClient {
         this.handleControlMessage(ev.data);
         return;
       }
-      const chunk = new Uint8Array(ev.data);
-      this._chunkedData.push(chunk);
+      const frame = decodeReliableFrame(new Uint8Array(ev.data));
+      if (!frame) {
+        console.error("TCP received a frame on an unknown channel");
+        return;
+      }
+      this._packets.get(frame.channel)?.push(frame.data);
     };
 
     this._channel.onclose = (): void => {

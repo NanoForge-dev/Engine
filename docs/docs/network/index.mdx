@@ -11,13 +11,13 @@ This page describes the engine's networking libraries: `network-server` and `net
 ## Goals
 
 - Keep the protocol minimal and predictable for multiplayer games.
-- Use well-understood transports: TCP for reliable control messages and UDP for low-latency, best-effort state updates.
-- Provide clear validation hooks such as magic values and versioning so malformed packets are ignored early.
+- Let each packet pick its delivery guarantees through four channels: reliable or unreliable, ordered or unordered.
+- Use well-understood transports: TCP for the reliable channels and UDP (WebRTC) for low-latency, best-effort ones.
 
 ## Related Pages
 
 - [Network Client](network-client)
 - [Network Server](network-server)
-- [Packet Framing](packet-framing)
+- [Packet Channels](packet-framing)
 - [Network Server API](network-server-api)
 - [Network Client API](network-client-api)

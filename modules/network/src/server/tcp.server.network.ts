@@ -1,7 +1,12 @@
 import type { Server, ServerWebSocket } from "bun";
 
+import {
+  RELIABLE_CHANNELS,
+  type ReliableChannel,
+  decodeReliableFrame,
+  encodeReliableFrame,
+} from "../shared/channels";
 import type { WelcomeMessage } from "../shared/session";
-import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
 import {
   type ClientId,
   type ClientInfo,
@@ -22,40 +27,39 @@ type TCPSocketData = {
   connection: ConnectionInfo;
 };
 
+/** Server side of one client's WebSocket. */
+type TCPClientState = {
+  channel: ServerWebSocket<TCPSocketData>;
+  packets: Map<ReliableChannel, Uint8Array[]>;
+};
+
 /**
- * Reliable, ordered WebSocket-based server that manages multiple TCP clients.
+ * WebSocket server carrying the reliable channels of every TCP client.
  *
  * @remarks
- * Each client that connects joins a session identified by a {@link ClientId},
+ * Each binary frame is one packet, prefixed with the tag of its reliable
+ * channel.  Each client that connects joins a session identified by a {@link ClientId},
  * shared with the UDP transport when the client presents its session token.
  * On open, the server sends a `welcome` text frame carrying the id and token.
- * Use `getConnectedClients` to enumerate active clients,
- * `sendToClient` / `sendToEverybody` to push data, and
- * `getReceivedPackets` to consume incoming packets per frame.
  *
  * Runs on Bun's native WebSocket server (`Bun.serve`) and therefore requires
  * the Bun runtime.
  *
- * Typical usage is through `NetworkServerLibrary` which instantiates and
- * starts this class automatically during `__init`.
+ * Internal: games use it through `ReliableOrderedServer` and
+ * `ReliableUnorderedServer`, which `NetworkServerLibrary` sets up during
+ * `__init`.
  */
 export class TCPServer {
-  private _clients = new Map<
-    ClientId,
-    { channel: ServerWebSocket<TCPSocketData>; data: Uint8Array; chunkedData: Uint8Array[] }
-  >();
-  private readonly _magicData = new Uint8Array();
+  private _clients = new Map<ClientId, TCPClientState>();
   private _server: Server<TCPSocketData> | undefined;
 
   constructor(
     private _port: number,
     private _host: string,
-    magicValue: string,
     private _cert?: string,
     private _key?: string,
     private readonly _registry: ClientRegistry = new ClientRegistry(),
   ) {
-    this._magicData = new TextEncoder().encode(magicValue);
     if (!this._cert || !this._key) {
       console.warn(
         "No TLS cert/key provided for TCP server, WebSocket connections will be unencrypted",
@@ -103,8 +107,7 @@ export class TCPServer {
           webSocket.data.id = id;
           this._clients.set(id, {
             channel: webSocket,
-            data: new Uint8Array(),
-            chunkedData: [],
+            packets: new Map(RELIABLE_CHANNELS.map((channel) => [channel, []])),
           });
           webSocket.send(JSON.stringify({ type: "welcome", id, token } satisfies WelcomeMessage));
 
@@ -118,7 +121,16 @@ export class TCPServer {
 
           if (webSocket.data.id === undefined) return;
           const client = this._clients.get(webSocket.data.id);
-          client?.chunkedData.push(rawDataToUint8Array(message));
+          if (!client) return;
+
+          const frame = decodeReliableFrame(rawDataToUint8Array(message));
+          if (!frame) {
+            console.error(
+              "TCP received a frame on an unknown channel from user: " + client.channel.data.id,
+            );
+            return;
+          }
+          client.packets.get(frame.channel)?.push(frame.data);
         },
         close: (webSocket) => {
           const id = webSocket.data.id;
@@ -151,6 +163,9 @@ export class TCPServer {
   /**
    * Return a snapshot array of the client IDs currently connected over TCP.
    *
+   * @remarks
+   * Both reliable channels share the WebSocket, so the channel is ignored.
+   *
    * @returns ClientId[]
    */
   public getConnectedClients(): ClientId[] {
@@ -169,51 +184,48 @@ export class TCPServer {
   }
 
   /**
-   * Send a payload to every connected client.
+   * Send a payload to every connected client on a reliable channel.
    *
+   * @param channel ReliableChannel — channel to send on.
    * @param data Uint8Array — raw payload bytes.
    * @returns void
    */
-  public sendToEverybody(data: Uint8Array) {
-    const magicPacket = buildMagicPacket(data, this._magicData);
+  public sendToEverybody(channel: ReliableChannel, data: Uint8Array) {
+    const frame = encodeReliableFrame(channel, data);
     this._clients.forEach((client) => {
-      client.channel.send(magicPacket);
+      client.channel.send(frame);
     });
   }
 
   /**
-   * Send a payload to the client identified by `clientId`.
+   * Send a payload to the client identified by `clientId` on a reliable channel.
    *
+   * @param channel ReliableChannel — channel to send on.
    * @param clientId ClientId — client identifier.
    * @param data Uint8Array — payload bytes.
    * @returns void
    */
-  public sendToClient(clientId: ClientId, data: Uint8Array) {
+  public sendToClient(channel: ReliableChannel, clientId: ClientId, data: Uint8Array) {
     const client = this._clients.get(clientId);
     if (!client) {
       console.error(`Unknown client: ${clientId}`);
       return;
     }
-    client.channel.send(buildMagicPacket(data, this._magicData));
+    client.channel.send(encodeReliableFrame(channel, data));
   }
 
   /**
-   * Parse and return complete packets received from each client. Each packet is a `Uint8Array` buffer.
+   * Return the packets each client sent on a reliable channel since the last call.
    *
+   * @param channel ReliableChannel — channel to read.
    * @returns Map<ClientId, Uint8Array[]> — mapping client ID to array of packets.
    */
-  public getReceivedPackets(): Map<ClientId, Uint8Array[]> {
+  public getReceivedPackets(channel: ReliableChannel): Map<ClientId, Uint8Array[]> {
     const packets = new Map<ClientId, Uint8Array[]>();
 
     this._clients.forEach((client, clientId) => {
-      const {
-        packets: clientPackets,
-        data,
-        chunkedData,
-      } = parsePacketsFromChunks(client.data, client.chunkedData, this._magicData);
-      client.data = data;
-      client.chunkedData = chunkedData;
-      packets.set(clientId, clientPackets);
+      packets.set(clientId, client.packets.get(channel) ?? []);
+      client.packets.set(channel, []);
     });
     return packets;
   }
