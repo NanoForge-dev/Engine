@@ -1,6 +1,7 @@
 import { type Context, type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
 import { registerEnv } from "@nanoforge-dev/env";
 
+import { ClientRegistry, type ClientsApi } from "./client-registry";
 import { ServerConfigNetwork } from "./config.server.network";
 import type { NetworkServerContextApi } from "./network-server-context.type";
 import { TCPServer } from "./tcp.server.network";
@@ -31,6 +32,13 @@ export class NetworkServerLibrary extends Library {
   /** Only set when `LISTENING_UDP_PORT` was configured. */
   public udp?: UDPServer;
 
+  private readonly _registry = new ClientRegistry();
+
+  /** Client sessions shared by the TCP and UDP servers. */
+  public get clients(): ClientsApi {
+    return this._registry;
+  }
+
   public override async __init(ctx: InitContext): Promise<void> {
     if (typeof Bun === "undefined") {
       throw new Error(
@@ -59,6 +67,7 @@ export class NetworkServerLibrary extends Library {
         config.MAGIC_VALUE,
         config.WSS_CERT,
         config.WSS_KEY,
+        this._registry,
       );
       this.tcp.listen();
     }
@@ -75,6 +84,7 @@ export class NetworkServerLibrary extends Library {
           ...(config.ICE_PORT !== undefined ? { port: +config.ICE_PORT } : {}),
           ...(config.ADVERTISE_IP !== undefined ? { advertiseIp: config.ADVERTISE_IP } : {}),
         },
+        this._registry,
       );
       this.udp.listen();
     }
@@ -84,6 +94,7 @@ export class NetworkServerLibrary extends Library {
   public override async __clear(_ctx: Context): Promise<void> {
     this.tcp?.close();
     this.udp?.close();
+    this._registry.clear();
     delete this.tcp;
     delete this.udp;
   }
@@ -99,6 +110,9 @@ export class NetworkServerLibrary extends Library {
       get udp() {
         if (!library.udp) throw new Error("UDP isn't defined");
         return library.udp;
+      },
+      get clients() {
+        return library.clients;
       },
     };
   }

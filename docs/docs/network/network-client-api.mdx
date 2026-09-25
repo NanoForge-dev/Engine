@@ -10,9 +10,19 @@ description: "API reference for the client networking package"
 
 ### connect()
 
-Initiate a WebSocket connection to the server, for example `ws://<ip>:<port>`.
+Initiate a WebSocket connection to the server, for example `ws://<ip>:<port>`,
+joining the current session when a token is already known.
+
+Resolves once the server's `welcome` is received. Rejects when the socket fails
+or closes before it, or when no welcome arrives within 5 seconds.
 
 Returns: `Promise<void>`
+
+### getClientId()
+
+Return the client id assigned by the server, once welcomed.
+
+Returns: `string | undefined`
 
 ### isConnected()
 
@@ -39,8 +49,18 @@ Returns: `Uint8Array[]`
 ### connect()
 
 Open a WebSocket for signaling, create an `RTCPeerConnection`, and initiate an SDP offer.
+Presents the TCP session token, when known, so both transports share one client id.
+
+Resolves once the server's `welcome` is received. The data channel may open
+shortly after; check `isConnected()`.
 
 Returns: `Promise<void>`
+
+### getClientId()
+
+Return the client id assigned by the server, once welcomed.
+
+Returns: `string | undefined`
 
 ### isConnected()
 
@@ -61,3 +81,12 @@ Returns: `void`
 Return an array of complete packets reassembled from received data-channel chunks.
 
 Returns: `Uint8Array[]`
+
+## clientId (`ctx.network.clientId`)
+
+Client id assigned by the server, shared by TCP and UDP. `undefined` until a
+transport has been welcomed. It is only kept in memory: a page reload gets a new
+id.
+
+`NetworkClientLibrary` connects TCP first, then UDP with the TCP session token.
+A transport that fails to connect is logged and does not fail initialization.

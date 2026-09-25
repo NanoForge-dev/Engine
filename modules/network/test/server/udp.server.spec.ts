@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ClientRegistry, type ConnectionInfo } from "../../src/server/client-registry";
 import { UDPServer } from "../../src/server/udp.server.network";
 
 vi.mock("node-datachannel/polyfill", () => ({
@@ -25,12 +26,17 @@ const serve = vi.fn();
 const file = vi.fn((path: string) => ({ path }));
 
 beforeEach(() => {
+  let nextId = 0;
+  vi.spyOn(crypto, "randomUUID").mockImplementation(
+    () => `client-${nextId++}` as ReturnType<typeof crypto.randomUUID>,
+  );
   serve.mockImplementation(() => ({ stop: vi.fn() }));
   vi.stubGlobal("Bun", { serve, file });
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
   vi.clearAllMocks();
 });
 
@@ -41,7 +47,7 @@ const getServeOptions = () => serve.mock.calls[0]?.[0];
  * Drive a signaling connection through the same sequence Bun uses: `fetch`
  * performs the upgrade and seeds `ws.data`, then `websocket.open` fires.
  */
-const connect = (ip = "127.0.0.1") => {
+const connect = (ip = "127.0.0.1", url = "http://localhost:9100/") => {
   const options = getServeOptions();
   let data: any;
 
@@ -53,11 +59,25 @@ const connect = (ip = "127.0.0.1") => {
     }),
   };
 
-  options.fetch({}, server);
-  const webSocket = { data, send: vi.fn() };
-  options.websocket.open(webSocket);
-  return { webSocket, options, peerConnection: webSocket.data.peerConnection };
+  const response = options.fetch(new Request(url), server);
+  const webSocket = { data, send: vi.fn(), close: vi.fn() };
+  if (data) options.websocket.open(webSocket);
+  return { webSocket, options, response, peerConnection: webSocket.data?.peerConnection };
 };
+
+/** Parse the last signaling message sent to the client. */
+const getLastSent = (webSocket: { send: ReturnType<typeof vi.fn> }) =>
+  JSON.parse(webSocket.send.mock.calls.at(-1)?.[0]);
+
+/** A TCP connection, as attached by the TCP server. */
+const tcpConnection = (): ConnectionInfo => ({
+  transport: "tcp",
+  address: "127.0.0.1",
+  port: 1234,
+  family: "IPv4",
+  params: {},
+  connectedAt: 0,
+});
 
 /** Minimal stand-in for an `RTCDataChannel` handed to `ondatachannel`. */
 const makeDataChannel = () => ({
@@ -82,7 +102,7 @@ describe("UDPServer", () => {
 
     it("should not throw when sendToClient is called with an unknown clientId", () => {
       const server = new UDPServer(9100, "127.0.0.1", "END");
-      expect(() => server.sendToClient(99, new Uint8Array([1, 2, 3]))).not.toThrow();
+      expect(() => server.sendToClient("unknown", new Uint8Array([1, 2, 3]))).not.toThrow();
     });
 
     it("should not throw when sendToEverybody is called with no clients", () => {
@@ -125,6 +145,59 @@ describe("UDPServer", () => {
 
       options.websocket.close(webSocket);
       expect(peerConnection.close).toHaveBeenCalled();
+    });
+  });
+
+  describe("sessions", () => {
+    it("should send a welcome with the client id and session token on open", () => {
+      const server = new UDPServer(9130, "0.0.0.0", "END");
+      server.listen();
+      const { webSocket } = connect();
+
+      expect(JSON.parse(webSocket.send.mock.calls[0]?.[0])).toStrictEqual({
+        type: "welcome",
+        id: "client-0",
+        token: expect.stringMatching(/^[0-9a-f]{64}$/),
+      });
+    });
+
+    it("should join the TCP session when its token is presented", () => {
+      const registry = new ClientRegistry();
+      const tcp = registry.attach(null, tcpConnection())!;
+      const server = new UDPServer(9131, "0.0.0.0", "END", undefined, undefined, {}, registry);
+      server.listen();
+
+      const { webSocket, peerConnection } = connect("127.0.0.1", `http://h/?token=${tcp.token}`);
+      expect(getLastSent(webSocket)).toStrictEqual({ type: "welcome", ...tcp });
+
+      peerConnection.ondatachannel({ channel: makeDataChannel() });
+      expect(server.getConnectedClients()).toStrictEqual([tcp.id]);
+      expect(Object.keys(server.getClientInfo(tcp.id)!.transports)).toStrictEqual(["tcp", "udp"]);
+    });
+
+    it("should reject an upgrade presenting an unknown session token", () => {
+      const server = new UDPServer(9132, "0.0.0.0", "END");
+      server.listen();
+
+      const { response, webSocket } = connect("127.0.0.1", "http://h/?token=forged");
+      expect(response.status).toBe(401);
+      expect(webSocket.data).toBeUndefined();
+    });
+
+    it("should leave the session when the signaling socket closes", () => {
+      const registry = new ClientRegistry();
+      const tcp = registry.attach(null, tcpConnection())!;
+      const server = new UDPServer(9133, "0.0.0.0", "END", undefined, undefined, {}, registry);
+      server.listen();
+      const { webSocket, options, peerConnection } = connect(
+        "127.0.0.1",
+        `http://h/?token=${tcp.token}`,
+      );
+      peerConnection.ondatachannel({ channel: makeDataChannel() });
+
+      options.websocket.close(webSocket);
+      expect(server.getConnectedClients()).toStrictEqual([]);
+      expect(Object.keys(registry.get(tcp.id)!.transports)).toStrictEqual(["tcp"]);
     });
   });
 
@@ -221,7 +294,7 @@ describe("UDPServer", () => {
       const { peerConnection } = connect();
 
       peerConnection.ondatachannel({ channel: makeDataChannel() });
-      expect(server.getConnectedClients()).toStrictEqual([0]);
+      expect(server.getConnectedClients()).toStrictEqual(["client-0"]);
     });
 
     it("should remove a client when its data channel closes", () => {
@@ -249,8 +322,8 @@ describe("UDPServer", () => {
       channel.onmessage?.({ data: chunk.buffer as ArrayBuffer });
 
       const packets = server.getReceivedPackets();
-      expect(packets.get(0)).toHaveLength(1);
-      expect(packets.get(0)?.[0]).toStrictEqual(payload);
+      expect(packets.get("client-0")).toHaveLength(1);
+      expect(packets.get("client-0")?.[0]).toStrictEqual(payload);
     });
 
     it("should send framed packets over the data channel", () => {
@@ -329,7 +402,7 @@ describe("UDPServer", () => {
         JSON.stringify({ type: "offer", offer: { type: "offer", sdp: "v=0" } }),
       );
 
-      const sent = JSON.parse(vi.mocked(webSocket.send).mock.calls[0]?.[0]);
+      const sent = JSON.parse(vi.mocked(webSocket.send).mock.calls.at(-1)?.[0]);
       expect(sent.answer.sdp).toContain(`a=${hostCandidate("203.0.113.7")}`);
       expect(sent.answer.sdp).not.toContain("10.244.3.17");
     });
@@ -351,7 +424,7 @@ describe("UDPServer", () => {
         JSON.stringify({ type: "offer", offer: { type: "offer", sdp: "v=0" } }),
       );
 
-      const sent = JSON.parse(vi.mocked(webSocket.send).mock.calls[0]?.[0]);
+      const sent = JSON.parse(vi.mocked(webSocket.send).mock.calls.at(-1)?.[0]);
       expect(sent.answer.sdp).toContain(srflxCandidate);
     });
 
@@ -369,7 +442,7 @@ describe("UDPServer", () => {
         },
       });
 
-      const sent = JSON.parse(vi.mocked(webSocket.send).mock.calls[0]?.[0]);
+      const sent = JSON.parse(vi.mocked(webSocket.send).mock.calls.at(-1)?.[0]);
       expect(sent.candidate.candidate).toBe(hostCandidate("203.0.113.7"));
       expect(sent.candidate.sdpMid).toBe("0");
     });
@@ -386,7 +459,7 @@ describe("UDPServer", () => {
         },
       });
 
-      const sent = JSON.parse(vi.mocked(webSocket.send).mock.calls[0]?.[0]);
+      const sent = JSON.parse(vi.mocked(webSocket.send).mock.calls.at(-1)?.[0]);
       expect(sent.candidate.candidate).toBe(hostCandidate("10.244.3.17"));
     });
   });

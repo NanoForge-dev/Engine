@@ -6,6 +6,11 @@ description: "API reference for the server networking package"
 
 # network-server API
 
+## ClientId
+
+`string`: an opaque, random identifier (UUID) of a client session. A client
+connected over both TCP and UDP has the same `ClientId` on both servers.
+
 ## TCPServer
 
 ### listen()
@@ -16,9 +21,17 @@ Returns: `void`
 
 ### getConnectedClients()
 
-Return a snapshot array of numeric client IDs currently connected.
+Return a snapshot array of the client IDs currently connected over TCP.
 
-Returns: `number[]`
+Returns: `ClientId[]`
+
+### getClientInfo(clientId)
+
+Return what is known about a client session. See [ClientInfo](#clientinfo).
+
+Parameter `clientId`: `ClientId`
+
+Returns: `ClientInfo | undefined` (`undefined` once the client is gone)
 
 ### sendToEverybody(data)
 
@@ -32,7 +45,7 @@ Returns: `void`
 
 Send a payload to the client identified by `clientId`.
 
-Parameter `clientId`: `number` numeric client identifier.
+Parameter `clientId`: `ClientId` client identifier.
 
 Parameter `data`: `Uint8Array` payload bytes.
 
@@ -42,7 +55,7 @@ Returns: `void`
 
 Parse and return complete packets received from each client. Each packet is a `Uint8Array` buffer.
 
-Returns: `Map<number, Uint8Array[]>`
+Returns: `Map<ClientId, Uint8Array[]>`
 
 ## UDPServer
 
@@ -56,7 +69,13 @@ Returns: `void`
 
 Return a snapshot array of client IDs with active data channels.
 
-Returns: `number[]`
+Returns: `ClientId[]`
+
+### getClientInfo(clientId)
+
+Same as [`TCPServer.getClientInfo`](#getclientinfo-clientid).
+
+Returns: `ClientInfo | undefined`
 
 ### sendToEverybody(data)
 
@@ -70,7 +89,7 @@ Returns: `void`
 
 Send a payload to a single client data channel.
 
-Parameter `clientId`: `number`
+Parameter `clientId`: `ClientId`
 
 Parameter `data`: `Uint8Array`
 
@@ -80,4 +99,59 @@ Returns: `void`
 
 Parse incoming channel chunks and return a map of complete packets per client.
 
-Returns: `Map<number, Uint8Array[]>`
+Returns: `Map<ClientId, Uint8Array[]>`
+
+## clients (`ctx.network.clients`)
+
+Client sessions shared by the TCP and UDP servers. Also available as
+`NetworkServerLibrary.clients`.
+
+### get(clientId)
+
+Returns: `ClientInfo | undefined`
+
+### list()
+
+Return every connected client session.
+
+Returns: `ClientInfo[]`
+
+### onConnect(listener)
+
+Call `listener(info)` when a new client session starts, i.e. when its first
+transport is up. With TCP and UDP, it fires on TCP open, before UDP is linked:
+`udp.sendToClient(info.id)` may still report an unknown client at that point.
+With UDP only, it fires when the signaling socket opens, before the data channel
+exists, so `udp.sendToClient(info.id)` may also report an unknown client.
+
+Returns: `() => void` that removes the listener.
+
+### onDisconnect(listener)
+
+Call `listener(info)` when a client session ends, i.e. when its last transport
+closes.
+
+Returns: `() => void` that removes the listener.
+
+## ClientInfo
+
+| Field         | Type                                             | Description                                       |
+| ------------- | ------------------------------------------------ | ------------------------------------------------- |
+| `id`          | `ClientId`                                       | Session identifier.                               |
+| `connectedAt` | `number`                                         | Timestamp (ms) of the first transport connection. |
+| `transports`  | `{ tcp?: ConnectionInfo; udp?: ConnectionInfo }` | Transports currently attached (live object).      |
+
+## ConnectionInfo
+
+| Field         | Type                     | Description                                                 |
+| ------------- | ------------------------ | ----------------------------------------------------------- |
+| `transport`   | `"tcp" \| "udp"`         | Transport of this connection.                               |
+| `address`     | `string`                 | Remote address.                                             |
+| `port`        | `number`                 | Remote port.                                                |
+| `family`      | `string`                 | `"IPv4"` or `"IPv6"`.                                       |
+| `userAgent`   | `string \| undefined`    | `User-Agent` header of the upgrade request.                 |
+| `origin`      | `string \| undefined`    | `Origin` header of the upgrade request.                     |
+| `params`      | `Record<string, string>` | Query parameters of the upgrade request, without the token. |
+| `connectedAt` | `number`                 | Timestamp (ms) of the upgrade request.                      |
+
+`Cookie` and `Authorization` headers are never recorded.

@@ -1,11 +1,15 @@
 import { type Context } from "@nanoforge-dev/common";
 import { type Registry } from "@nanoforge-dev/ecs/server";
-import { type NetworkServerContextApi } from "@nanoforge-dev/network/server";
+import {
+  type ClientId,
+  type ClientInfo,
+  type NetworkServerContextApi,
+} from "@nanoforge-dev/network/server";
 
 import { Position, Velocity } from "../components/components";
 
-let cli1 = -1;
-let cli2 = -1;
+let cli1: ClientId | null = null;
+let cli2: ClientId | null = null;
 const paddleSpeed = 1;
 
 let roundStart = 0;
@@ -32,7 +36,13 @@ function sendMoveAll(id: number, vel: Velocity, pos: Position, network: NetworkS
   );
 }
 
-function connectNewClient(newCli: number, network: NetworkServerContextApi, zip: any) {
+/** Free the paddle of a player who left. */
+export function onClientDisconnect(info: ClientInfo) {
+  if (info.id === cli1) cli1 = null;
+  if (info.id === cli2) cli2 = null;
+}
+
+function connectNewClient(newCli: ClientId, network: NetworkServerContextApi, zip: any) {
   network.tcp.sendToClient(
     newCli,
     new TextEncoder().encode(JSON.stringify({ type: "assignId", assigned: "ball", id: 0 })),
@@ -51,7 +61,7 @@ function connectNewClient(newCli: number, network: NetworkServerContextApi, zip:
 }
 
 function handleClientInput(
-  clientId: number,
+  clientId: ClientId,
   key: string,
   network: NetworkServerContextApi,
   zip: any,
@@ -91,23 +101,20 @@ export function packetHandler(registry: Registry, ctx: Context) {
   const zip = registry.getZipper([Position, Velocity]);
   const network = ctx.network;
 
-  if (network.tcp.getConnectedClients().indexOf(cli1) == -1) cli1 = -1;
-  if (network.tcp.getConnectedClients().indexOf(cli2) == -1) cli2 = -1;
-  const clientPackets: Map<number, Uint8Array[]> = network.tcp.getReceivedPackets();
+  const clientPackets: Map<ClientId, Uint8Array[]> = network.tcp.getReceivedPackets();
   clientPackets.forEach((packets, client) => {
     packets.forEach((packet) => {
       const data = JSON.parse(new TextDecoder().decode(packet));
       if (data.type == "play") {
-        let newCli = -1;
         if (client == cli1 || client == cli2) return;
-        if (cli1 == -1) {
+        if (cli1 === null) {
           cli1 = client;
-          newCli = client;
-        } else if (cli2 == -1) {
+        } else if (cli2 === null) {
           cli2 = client;
-          newCli = client;
+        } else {
+          return;
         }
-        connectNewClient(newCli, network, zip);
+        connectNewClient(client, network, zip);
       } else if (data.type == "input") {
         handleClientInput(client, data.key, network, zip);
       }
