@@ -1,6 +1,13 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  plugins: [
+    {
+      name: "ignore-wasm-imports",
+      enforce: "pre",
+      load: (id) => (id.split("?")[0]?.endsWith(".wasm") ? "export {};" : undefined),
+    },
+  ],
   test: {
     exclude: ["**/node_modules", "**/dist", ".idea", ".git", ".cache"],
     passWithNoTests: true,

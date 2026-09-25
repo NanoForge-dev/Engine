@@ -5,11 +5,17 @@ import { fileURLToPath } from "url";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const PROJECT_DIR = join(dirname(fileURLToPath(import.meta.url)), "./game");
+const CLIENT_DIST = join(PROJECT_DIR, "apps/client/dist");
+const SERVER_DIST = join(PROJECT_DIR, "apps/server/dist");
+
+const cleanDists = () => {
+  for (const dir of [CLIENT_DIST, SERVER_DIST]) rmSync(dir, { recursive: true, force: true });
+};
 
 describe("E2E Game", () => {
   beforeAll(() => {
-    rmSync(join(PROJECT_DIR, ".nanoforge"), { recursive: true, force: true });
-    execSync("pnpm run build", {
+    cleanDists();
+    execSync("pnpm exec nf build", {
       cwd: PROJECT_DIR,
       stdio: "pipe",
       timeout: 120_000,
@@ -17,20 +23,20 @@ describe("E2E Game", () => {
   }, 130_000);
 
   afterAll(() => {
-    rmSync(join(PROJECT_DIR, ".nanoforge"), { recursive: true, force: true });
+    cleanDists();
   }, 130_000);
 
   describe("Build", () => {
     it("should produce a server bundle", () => {
-      expect(existsSync(join(PROJECT_DIR, ".nanoforge/server/main.js"))).toBe(true);
+      expect(existsSync(join(SERVER_DIST, "main.js"))).toBe(true);
     });
 
-    it("should produce a client bundle directory", () => {
-      expect(existsSync(join(PROJECT_DIR, ".nanoforge/client"))).toBe(true);
+    it("should produce a client bundle", () => {
+      expect(existsSync(join(CLIENT_DIST, "main.js"))).toBe(true);
     });
 
     it("should include the WASM file in the server bundle", () => {
-      expect(existsSync(join(PROJECT_DIR, ".nanoforge/server/libecs.wasm"))).toBe(true);
+      expect(existsSync(join(SERVER_DIST, "libecs.wasm"))).toBe(true);
     });
   });
 });

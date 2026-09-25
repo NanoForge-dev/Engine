@@ -10,4 +10,5 @@ export class EcsLibrary extends BaseEcsLibrary {
 }
 
 export type { EcsContextApi } from "../shared/ecs-context.type";
+export type { EditorComponentManifest, EditorSystemManifest } from "../shared/editor-manifest.type";
 export type { Component, Entity, Registry, SparseArray, System } from "../../lib/web/libecs";

@@ -1,4 +1,4 @@
-import { defineConfig } from "nanoforge/config";
+import { defineConfig } from "@nanoforge-dev/config";
 
 export default defineConfig({
   type: "workspace",

@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_DIR = resolve(__dirname, "./game");
 
-const wasmPath = resolve(PROJECT_DIR, "../../modules/ecs/lib/node/libecs.wasm");
+const wasmPath = resolve(PROJECT_DIR, "./apps/server/dist/libecs.wasm");
 
 const timeout = setTimeout(() => {
   console.error("[E2E] Server timed out after 10s — aborting");
@@ -12,7 +12,7 @@ const timeout = setTimeout(() => {
 }, 10_000);
 
 try {
-  const { main } = await import("./game/.nanoforge/server/main.js");
+  const { main } = await import("./game/apps/server/dist/main.js");
 
   const files = new Map([["/libecs.wasm", wasmPath]]);
   console.log(`[E2E] Starting server (WASM: ${wasmPath})`);

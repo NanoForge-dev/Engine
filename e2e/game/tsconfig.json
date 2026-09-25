@@ -8,6 +8,6 @@
     "noUnusedParameters": false,
     "strict": false
   },
-  "include": ["client/**/*.ts", "server/**/*.ts"],
-  "exclude": ["node_modules", ".nanoforge"]
+  "include": ["apps/*/src/**/*.ts"],
+  "exclude": ["node_modules", "**/dist", ".nanoforge"]
 }

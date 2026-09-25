@@ -7,11 +7,11 @@
   "bugs": "https://github.com/NanoForge-dev/Engine/issues",
   "license": "MIT",
   "contributors": [
-    "Bill <timothe.jacquot@epitech.eu>",
     "Exelo <contact@exelo.dev>",
     "Fexkoser <martin.fillon@epitech.eu>",
+    "Harper <timothe.jacquot@epitech.eu>",
     "Josephine <josephine.chicouras@epitech.eu>",
-    "Tchips <leo.outmizguine@epitech.eu>"
+    "Leo <leo.outmizguine@epitech.eu>"
   ],
   "type": "module",
   "repository": {
