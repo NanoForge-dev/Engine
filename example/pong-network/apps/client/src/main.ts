@@ -3,7 +3,7 @@ import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { EcsLibrary } from "@nanoforge-dev/ecs/client";
 import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
 import { InputEnum, InputLibrary } from "@nanoforge-dev/input";
-import { NetworkClientLibrary } from "@nanoforge-dev/network/client";
+import { Channel, NetworkClientLibrary } from "@nanoforge-dev/network/client";
 
 import {
   CircleComponent,
@@ -87,23 +87,11 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   registry.addSystem(controlPlayer);
   registry.addSystem(draw);
 
-  async function waitForConnection(): Promise<void> {
-    if (network.tcp?.isConnected()) return;
-
-    return new Promise((resolve) => {
-      const check = () => {
-        if (network.tcp?.isConnected()) {
-          resolve();
-        } else {
-          setTimeout(check, 50);
-        }
-      };
-      check();
-    });
-  }
-
-  await waitForConnection();
-  network.tcp?.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
+  // Wait for every channel the game uses, so no early move is missed.
+  await network.connect({
+    channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered, Channel.UnreliableUnordered],
+  });
+  network.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
 
   await app.run();
 };
