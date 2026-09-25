@@ -15,6 +15,38 @@ The server listens on configured ports and accepts client connections. A single 
 - Accept reliable control messages from clients over the TCP/WebSocket channel.
 - Optionally establish `RTCPeerConnection`s via WebSocket signaling to receive unreliable, unordered data channels for low-latency state updates.
 
+## Client identification
+
+Every client gets a `ClientId`: a random string (UUID) shared by the TCP and UDP
+transports.
+
+1. The first transport a client opens starts a session. The server answers with a
+   `welcome` message carrying the id and a secret session token (a text frame on
+   TCP, where game data is always binary, and a JSON message on the UDP signaling
+   socket).
+2. The client presents that token (`?token=...`) when it opens its other
+   transport, which joins the same session. An unknown token, or a second
+   connection on a transport the session already has, is rejected with `401`.
+3. The session ends when its last transport closes.
+
+A page reload opens a new session, with a new `ClientId`.
+
+```javascript
+network.clients.onConnect((info) => {
+  console.log(`${info.id} joined from ${info.transports.tcp?.address}`);
+});
+
+network.clients.onDisconnect((info) => {
+  console.log(`${info.id} left`);
+});
+
+// Anytime: what is known about a client
+const info = network.tcp.getClientInfo(clientId);
+```
+
+`onConnect` fires as soon as the first transport is up, so when both transports
+are used, UDP may not be linked yet.
+
 ## Example
 
 It works the same with UDP:
@@ -24,13 +56,13 @@ It works the same with UDP:
 network.tcp.sendToEverybody(new TextEncoder().encode(JSON.stringify({ type: "are you here" })));
 
 // Check connected clients
-const connectedClients = getConnectedClients();
+const connectedClients = network.tcp.getConnectedClients();
 
 // Receive all packets
 const allPackets = network.tcp.getReceivedPackets();
 
 // Get first client packets
-const firstClientPackets = map.get(connectedClients[0]);
+const firstClientPackets = allPackets.get(connectedClients[0]);
 
 // Decode packets if encoded as JSON
 const decodedPackets = firstClientPackets.map((packet) => {

@@ -4,7 +4,7 @@ import { EcsLibrary } from "@nanoforge-dev/ecs/server";
 import { NetworkServerLibrary } from "@nanoforge-dev/network/server";
 
 import { Position, Velocity } from "./components/components";
-import { bounce, move, packetHandler } from "./systems/systems";
+import { bounce, move, onClientDisconnect, packetHandler } from "./systems/systems";
 
 export const main = async (options: RunOptions): Promise<void> => {
   const app = NanoforgeFactory.createServer({ tickRate: 60 });
@@ -15,6 +15,8 @@ export const main = async (options: RunOptions): Promise<void> => {
   app.use(network);
 
   await app.init(options);
+
+  network.clients.onDisconnect(onClientDisconnect);
 
   const registry = ecs.registry;
 

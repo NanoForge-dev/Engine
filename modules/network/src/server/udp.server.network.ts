@@ -1,7 +1,16 @@
 import type { Server, ServerWebSocket } from "bun";
 import { type RTCDataChannel, RTCPeerConnection } from "node-datachannel/polyfill";
 
+import type { WelcomeMessage } from "../shared/session";
 import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
+import {
+  type ClientId,
+  type ClientInfo,
+  ClientRegistry,
+  type ConnectionInfo,
+  buildConnectionInfo,
+  getSessionToken,
+} from "./client-registry";
 import { rawDataToUint8Array } from "./utils";
 
 /**
@@ -35,12 +44,16 @@ export type UDPServerIceConfig = {
 
 /** Per-connection signaling state attached to each upgraded socket. */
 type SignalingSocketData = {
+  /** Session identifier, assigned once the socket opens and joins a session. */
+  id?: ClientId;
+  /** Session token presented in the upgrade request, `null` for a new session. */
+  token: string | null;
+  /** What is known about the connection, resolved during the upgrade. */
+  connection: ConnectionInfo;
   /** Peer connection for this client, created once the socket opens. */
   peerConnection?: RTCPeerConnection;
   /** ICE candidates received before the remote description was set. */
   pendingCandidates: RTCIceCandidateInit[];
-  /** Remote address, resolved during the upgrade for logging. */
-  ip: string;
 };
 
 /**
@@ -49,8 +62,12 @@ type SignalingSocketData = {
  *
  * @remarks
  * Uses a Bun WebSocket signaling server to complete SDP/ICE handshakes and
- * then communicates over RTCDataChannels.  Each connected client is assigned a
- * numeric ID.  Use `getConnectedClients` to enumerate active clients,
+ * then communicates over RTCDataChannels.  Each signaling client joins a session
+ * identified by a {@link ClientId}, shared with the TCP transport when the
+ * client presents its session token.  On open, the server sends a `welcome`
+ * signaling message carrying the id and token.  The UDP transport is part of
+ * the session for as long as its signaling socket is open.
+ * Use `getConnectedClients` to enumerate active clients,
  * `sendToClient` / `sendToEverybody` to push data, and
  * `getReceivedPackets` to consume incoming packets per frame.
  *
@@ -62,10 +79,9 @@ type SignalingSocketData = {
  */
 export class UDPServer {
   private _clients = new Map<
-    number,
+    ClientId,
     { channel: RTCDataChannel; data: Uint8Array; chunkedData: Uint8Array[] }
   >();
-  private _nextClientId: number = 0;
   private readonly _magicData = new Uint8Array();
   private _server: Server<SignalingSocketData> | undefined;
 
@@ -76,6 +92,7 @@ export class UDPServer {
     private _cert?: string,
     private _key?: string,
     private _ice: UDPServerIceConfig = {},
+    private readonly _registry: ClientRegistry = new ClientRegistry(),
   ) {
     this._magicData = new TextEncoder().encode(magicValue);
     if (!this._cert || !this._key) {
@@ -102,18 +119,32 @@ export class UDPServer {
         ? { tls: { cert: Bun.file(cert), key: Bun.file(key) } }
         : {}),
       fetch: (request, server) => {
-        const ip = server.requestIP(request)?.address ?? "unknown";
+        const token = getSessionToken(request);
+        if (!this._registry.canAttach(token, "udp")) {
+          return new Response("Invalid session token", { status: 401 });
+        }
 
-        if (server.upgrade(request, { data: { pendingCandidates: [], ip } })) {
+        const connection = buildConnectionInfo("udp", request, server);
+        if (server.upgrade(request, { data: { token, connection, pendingCandidates: [] } })) {
           return undefined;
         }
         return new Response("Expected a WebSocket connection", { status: 426 });
       },
       websocket: {
         open: (webSocket) => {
+          const session = this._registry.attach(webSocket.data.token, webSocket.data.connection);
+          if (!session) {
+            webSocket.close(1008, "Invalid session token");
+            return;
+          }
+
+          const { id, token } = session;
+          webSocket.data.id = id;
+          webSocket.send(JSON.stringify({ type: "welcome", id, token } satisfies WelcomeMessage));
+
           const peerConnection = this.setupRtcSendIceCandidates(webSocket);
           webSocket.data.peerConnection = peerConnection;
-          this.receiveClientDataChannel(peerConnection, webSocket.data.ip);
+          this.receiveClientDataChannel(peerConnection, id, webSocket.data.connection.address);
         },
         message: async (webSocket, message) => {
           const peerConnection = webSocket.data.peerConnection;
@@ -137,6 +168,11 @@ export class UDPServer {
         },
         close: (webSocket) => {
           webSocket.data.peerConnection?.close();
+
+          const id = webSocket.data.id;
+          if (id === undefined) return;
+          this._clients.delete(id);
+          this._registry.detach(id, "udp");
         },
       },
     });
@@ -161,10 +197,21 @@ export class UDPServer {
   /**
    * Return a snapshot array of client IDs with active data channels.
    *
-   * @returns number[]
+   * @returns ClientId[]
    */
-  public getConnectedClients(): number[] {
+  public getConnectedClients(): ClientId[] {
     return [...this._clients.keys()];
+  }
+
+  /**
+   * Return what is known about a client session: its address, user agent,
+   * query parameters and attached transports.
+   *
+   * @param clientId - Client identifier
+   * @returns ClientInfo | undefined — `undefined` when the client is gone.
+   */
+  public getClientInfo(clientId: ClientId): ClientInfo | undefined {
+    return this._registry.get(clientId);
   }
 
   /**
@@ -186,11 +233,11 @@ export class UDPServer {
    * The packet will be framed with the server's configured magic terminator
    * bytes before being sent.
    *
-   * @param clientId - Numeric client identifier returned by listen() events
+   * @param clientId - Client identifier, as listed by `getConnectedClients`
    * @param data - Raw packet bytes (Uint8Array) to send
    * @returns void
    */
-  public sendToClient(clientId: number, data: Uint8Array) {
+  public sendToClient(clientId: ClientId, data: Uint8Array) {
     const client = this._clients.get(clientId);
     if (!client) {
       console.error(`Unknown client: ${clientId}`);
@@ -204,10 +251,10 @@ export class UDPServer {
    * Partial packets are retained internally for the next call so callers may
    * repeatedly poll this method to consume newly arrived data.
    *
-   * @returns Map<number, Uint8Array[]>
+   * @returns Map<ClientId, Uint8Array[]>
    */
-  public getReceivedPackets(): Map<number, Uint8Array[]> {
-    const packets = new Map<number, Uint8Array[]>();
+  public getReceivedPackets(): Map<ClientId, Uint8Array[]> {
+    const packets = new Map<ClientId, Uint8Array[]>();
 
     this._clients.forEach((client, clientId) => {
       const {
@@ -294,33 +341,37 @@ export class UDPServer {
     return value.replace(HOST_CANDIDATE_ADDRESS, `$1${advertiseIp}$3`);
   }
 
-  private receiveClientDataChannel(peerConnection: RTCPeerConnection, clientIp: string) {
+  private receiveClientDataChannel(
+    peerConnection: RTCPeerConnection,
+    id: ClientId,
+    clientIp: string,
+  ) {
     peerConnection.ondatachannel = (event) => {
       const channel = event.channel;
-      const id = this._nextClientId++;
-      this._clients.set(id, {
-        channel: channel,
-        data: new Uint8Array(),
-        chunkedData: [],
-      });
-      const client = this._clients.get(id);
+      const client = { channel, data: new Uint8Array(), chunkedData: [] as Uint8Array[] };
+      this._clients.set(id, client);
+
+      /** Drop the entry unless a newer channel already replaced it. */
+      const removeClient = () => {
+        if (this._clients.get(id) === client) this._clients.delete(id);
+      };
 
       channel.onopen = () => {
         console.log("UDP openned for user: " + id + ", ip: " + clientIp);
       };
 
       channel.onmessage = (message) => {
-        client?.chunkedData.push(rawDataToUint8Array(message.data as ArrayBuffer));
+        client.chunkedData.push(rawDataToUint8Array(message.data as ArrayBuffer));
       };
 
       channel.onclose = () => {
         console.log("UDP closed for user: " + id + ", ip: " + clientIp);
-        this._clients.delete(id);
+        removeClient();
       };
 
       channel.onerror = (event) => {
         console.error(`UDP error for user: ${id}, ip: ${clientIp}`, { cause: event });
-        this._clients.delete(id);
+        removeClient();
       };
     };
   }

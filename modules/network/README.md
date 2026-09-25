@@ -146,6 +146,25 @@ public override async __run(ctx: Context): Promise<void> {
 }
 ```
 
+### Client identification
+
+Each client gets a `ClientId` (a random UUID string) shared by its TCP and UDP
+connections: the first transport receives the id and a session token in a
+`welcome` message, and the client presents the token when opening the other one.
+Use `ctx.network.clients` to follow sessions and `getClientInfo` to read what
+the server knows about a client (address, port, user agent, origin, query
+parameters):
+
+```ts
+ctx.network.clients.onConnect((info) => console.log(`${info.id} joined`));
+ctx.network.clients.onDisconnect((info) => console.log(`${info.id} left`));
+
+const info = ctx.network.tcp.getClientInfo(clientId);
+```
+
+On the client, `ctx.network.clientId` holds the id once welcomed. A page reload
+starts a new session with a new id.
+
 `ctx.network.tcp`/`.udp` are `undefined` when the corresponding port wasn't configured on that side.
 
 ## Links

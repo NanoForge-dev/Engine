@@ -9,8 +9,14 @@ const makeInitContext = (env: Record<string, string>): InitContext => ({
   files: new Map(),
 });
 
+const welcome = { type: "welcome", id: "client-0", token: "t0k3n" };
+
 describe("NetworkClientLibrary", () => {
+  /** How the server answers each socket opened by the test, in order. Defaults to a welcome. */
+  let answers: ("welcome" | "close")[];
+
   beforeEach(() => {
+    answers = [];
     vi.stubGlobal(
       "WebSocket",
       Object.assign(
@@ -22,6 +28,11 @@ describe("NetworkClientLibrary", () => {
           this.onopen = null;
           this.onmessage = null;
           this.onclose = null;
+          const answer = answers.shift() ?? "welcome";
+          setTimeout(() => {
+            if (answer === "close") this.onclose?.();
+            else this.onmessage?.({ data: JSON.stringify(welcome) });
+          });
         }),
         { OPEN: 1 },
       ),
@@ -49,6 +60,7 @@ describe("NetworkClientLibrary", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   describe("metadata", () => {
@@ -114,6 +126,37 @@ describe("NetworkClientLibrary", () => {
       expect(lib.udp).toBeDefined();
     });
 
+    it("should link UDP to the session received over TCP", async () => {
+      const ctx = makeInitContext({
+        SERVER_TCP_PORT: "8080",
+        SERVER_UDP_PORT: "8081",
+        SERVER_ADDRESS: "127.0.0.1",
+      });
+      const lib = new NetworkClientLibrary();
+      await lib.__init(ctx);
+
+      expect(vi.mocked(WebSocket).mock.calls.map(([url]) => url)).toStrictEqual([
+        "ws://127.0.0.1:8080",
+        "ws://127.0.0.1:8081/?token=t0k3n",
+      ]);
+      expect(lib.clientId).toBe("client-0");
+    });
+
+    it("should still connect UDP, without a token, when TCP fails", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      answers = ["close"];
+      const ctx = makeInitContext({
+        SERVER_TCP_PORT: "8080",
+        SERVER_UDP_PORT: "8081",
+        SERVER_ADDRESS: "127.0.0.1",
+      });
+      const lib = new NetworkClientLibrary();
+
+      await expect(lib.__init(ctx)).resolves.toBeUndefined();
+      expect(vi.mocked(WebSocket).mock.calls[1]?.[0]).toBe("ws://127.0.0.1:8081");
+      expect(lib.clientId).toBe("client-0");
+    });
+
     it("should default MAGIC_VALUE and WSS when not provided", async () => {
       const ctx = makeInitContext({ SERVER_TCP_PORT: "8080", SERVER_ADDRESS: "127.0.0.1" });
       const lib = new NetworkClientLibrary();
@@ -132,6 +175,7 @@ describe("NetworkClientLibrary", () => {
       await lib.__init(ctx);
       expect(lib.expose().tcp).toBe(lib.tcp);
       expect(() => lib.expose().udp).toThrow("UDP isn't defined");
+      expect(lib.expose().clientId).toBe("client-0");
     });
   });
 });
