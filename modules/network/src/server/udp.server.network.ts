@@ -1,8 +1,13 @@
 import type { Server, ServerWebSocket } from "bun";
 import { type RTCDataChannel, RTCPeerConnection } from "node-datachannel/polyfill";
 
+import {
+  Channel,
+  PacketSequencer,
+  type UnreliableChannel,
+  unreliableChannelFromLabel,
+} from "../shared/channels";
 import type { WelcomeMessage } from "../shared/session";
-import { buildMagicPacket, parsePacketsFromChunks } from "../shared/utils";
 import {
   type ClientId,
   type ClientInfo,
@@ -56,45 +61,48 @@ type SignalingSocketData = {
   pendingCandidates: RTCIceCandidateInit[];
 };
 
+/** Server side of one client data channel. */
+type DataChannelState = {
+  channel: RTCDataChannel;
+  packets: Uint8Array[];
+  /** Only set on `UnreliableOrdered`. */
+  sequencer?: PacketSequencer;
+};
+
 /**
- * Unreliable, unordered WebRTC data-channel server that manages multiple UDP
- * clients.
+ * WebRTC server carrying the unreliable channels of every UDP client.
  *
  * @remarks
- * Uses a Bun WebSocket signaling server to complete SDP/ICE handshakes and
- * then communicates over RTCDataChannels.  Each signaling client joins a session
+ * Uses a Bun WebSocket signaling server to complete SDP/ICE handshakes.  Each
+ * client then opens one RTCDataChannel per unreliable channel, labelled with
+ * its {@link Channel} value.  Each data channel message is one packet;
+ * `UnreliableOrdered` packets carry a sequence number and late ones are
+ * dropped.  Each signaling client joins a session
  * identified by a {@link ClientId}, shared with the TCP transport when the
  * client presents its session token.  On open, the server sends a `welcome`
  * signaling message carrying the id and token.  The UDP transport is part of
  * the session for as long as its signaling socket is open.
- * Use `getConnectedClients` to enumerate active clients,
- * `sendToClient` / `sendToEverybody` to push data, and
- * `getReceivedPackets` to consume incoming packets per frame.
  *
  * Runs on Bun's native WebSocket server (`Bun.serve`) and therefore requires
  * the Bun runtime.
  *
- * Typical usage is through `NetworkServerLibrary` which instantiates and
- * starts this class automatically during `__init`.
+ * Internal: games use it through `UnreliableOrderedServer` and
+ * `UnreliableUnorderedServer`, which `NetworkServerLibrary` sets up during
+ * `__init`.
  */
 export class UDPServer {
-  private _clients = new Map<
-    ClientId,
-    { channel: RTCDataChannel; data: Uint8Array; chunkedData: Uint8Array[] }
-  >();
-  private readonly _magicData = new Uint8Array();
+  private _clients = new Map<ClientId, Map<UnreliableChannel, DataChannelState>>();
+  private readonly _peerConnections = new Set<RTCPeerConnection>();
   private _server: Server<SignalingSocketData> | undefined;
 
   constructor(
     private _port: number,
     private _host: string,
-    magicValue: string,
     private _cert?: string,
     private _key?: string,
     private _ice: UDPServerIceConfig = {},
     private readonly _registry: ClientRegistry = new ClientRegistry(),
   ) {
-    this._magicData = new TextEncoder().encode(magicValue);
     if (!this._cert || !this._key) {
       console.warn(
         "No TLS cert/key provided for UDP server, WebSocket connections will be unencrypted",
@@ -144,6 +152,7 @@ export class UDPServer {
 
           const peerConnection = this.setupRtcSendIceCandidates(webSocket);
           webSocket.data.peerConnection = peerConnection;
+          this._peerConnections.add(peerConnection);
           this.receiveClientDataChannel(peerConnection, id, webSocket.data.connection.address);
         },
         message: async (webSocket, message) => {
@@ -167,7 +176,11 @@ export class UDPServer {
           }
         },
         close: (webSocket) => {
-          webSocket.data.peerConnection?.close();
+          const peerConnection = webSocket.data.peerConnection;
+          if (peerConnection) {
+            peerConnection.close();
+            this._peerConnections.delete(peerConnection);
+          }
 
           const id = webSocket.data.id;
           if (id === undefined) return;
@@ -191,16 +204,23 @@ export class UDPServer {
   public close() {
     this._server?.stop(true);
     this._server = undefined;
+    for (const peerConnection of this._peerConnections) {
+      peerConnection.close();
+    }
+    this._peerConnections.clear();
     this._clients.clear();
   }
 
   /**
-   * Return a snapshot array of client IDs with active data channels.
+   * Return a snapshot array of client IDs with an active data channel.
    *
+   * @param channel - Only list clients with this channel; any channel when omitted.
    * @returns ClientId[]
    */
-  public getConnectedClients(): ClientId[] {
-    return [...this._clients.keys()];
+  public getConnectedClients(channel?: UnreliableChannel): ClientId[] {
+    return [...this._clients]
+      .filter(([, channels]) => (channel === undefined ? channels.size > 0 : channels.has(channel)))
+      .map(([id]) => id);
   }
 
   /**
@@ -215,58 +235,56 @@ export class UDPServer {
   }
 
   /**
-   * Broadcast a packet to all connected clients over the unreliable data channels.
-   * The server will frame the provided data with the configured magic terminator.
+   * Broadcast a packet to every client with an open data channel for `channel`.
    *
+   * @param channel - Unreliable channel to send on.
    * @param data - Raw packet bytes (Uint8Array) to send to every client
    * @returns void
    */
-  public sendToEverybody(data: Uint8Array) {
-    const magicPacket = buildMagicPacket(data, this._magicData);
-    this._clients.forEach((client) => {
-      client.channel.send(magicPacket);
+  public sendToEverybody(channel: UnreliableChannel, data: Uint8Array) {
+    this._clients.forEach((channels) => {
+      const state = channels.get(channel);
+      if (state) this.send(state, data);
     });
   }
 
   /**
-   * Send a packet to a single client via the unreliable data channel.
-   * The packet will be framed with the server's configured magic terminator
-   * bytes before being sent.
+   * Send a packet to a single client on an unreliable channel.
    *
+   * @param channel - Unreliable channel to send on.
    * @param clientId - Client identifier, as listed by `getConnectedClients`
    * @param data - Raw packet bytes (Uint8Array) to send
    * @returns void
    */
-  public sendToClient(clientId: ClientId, data: Uint8Array) {
-    const client = this._clients.get(clientId);
-    if (!client) {
-      console.error(`Unknown client: ${clientId}`);
+  public sendToClient(channel: UnreliableChannel, clientId: ClientId, data: Uint8Array) {
+    const state = this._clients.get(clientId)?.get(channel);
+    if (!state) {
+      console.error(`Unknown client on ${channel}: ${clientId}`);
       return;
     }
-    client.channel.send(buildMagicPacket(data, this._magicData));
+    this.send(state, data);
   }
 
   /**
-   * Reassemble buffered chunks and return a map of clientId => complete packets.
-   * Partial packets are retained internally for the next call so callers may
-   * repeatedly poll this method to consume newly arrived data.
+   * Return the packets each client sent on an unreliable channel since the last call.
    *
+   * @param channel - Unreliable channel to read.
    * @returns Map<ClientId, Uint8Array[]>
    */
-  public getReceivedPackets(): Map<ClientId, Uint8Array[]> {
+  public getReceivedPackets(channel: UnreliableChannel): Map<ClientId, Uint8Array[]> {
     const packets = new Map<ClientId, Uint8Array[]>();
 
-    this._clients.forEach((client, clientId) => {
-      const {
-        packets: clientPackets,
-        data,
-        chunkedData,
-      } = parsePacketsFromChunks(client.data, client.chunkedData, this._magicData);
-      client.data = data;
-      client.chunkedData = chunkedData;
-      packets.set(clientId, clientPackets);
+    this._clients.forEach((channels, clientId) => {
+      const state = channels.get(channel);
+      if (!state) return;
+      packets.set(clientId, state.packets);
+      state.packets = [];
     });
     return packets;
+  }
+
+  private send(state: DataChannelState, data: Uint8Array) {
+    state.channel.send(state.sequencer ? state.sequencer.wrap(data) : data);
   }
 
   private async receiveClientOffer(
@@ -348,30 +366,51 @@ export class UDPServer {
   ) {
     peerConnection.ondatachannel = (event) => {
       const channel = event.channel;
-      const client = { channel, data: new Uint8Array(), chunkedData: [] as Uint8Array[] };
-      this._clients.set(id, client);
+      const kind = unreliableChannelFromLabel(channel.label);
+      if (kind === undefined) {
+        console.error(`UDP data channel with unknown label "${channel.label}" from user: ${id}`);
+        channel.close();
+        return;
+      }
 
-      /** Drop the entry unless a newer channel already replaced it. */
-      const removeClient = () => {
-        if (this._clients.get(id) === client) this._clients.delete(id);
+      const state: DataChannelState = {
+        channel,
+        packets: [],
+        ...(kind === Channel.UnreliableOrdered ? { sequencer: new PacketSequencer() } : {}),
+      };
+      let channels = this._clients.get(id);
+      if (!channels) {
+        channels = new Map();
+        this._clients.set(id, channels);
+      }
+      channels.set(kind, state);
+
+      /** Drop the entry unless a newer data channel already replaced it. */
+      const removeChannel = () => {
+        const current = this._clients.get(id);
+        if (current?.get(kind) !== state) return;
+        current.delete(kind);
+        if (current.size === 0) this._clients.delete(id);
       };
 
       channel.onopen = () => {
-        console.log("UDP openned for user: " + id + ", ip: " + clientIp);
+        console.log(`UDP ${kind} openned for user: ${id}, ip: ${clientIp}`);
       };
 
       channel.onmessage = (message) => {
-        client.chunkedData.push(rawDataToUint8Array(message.data as ArrayBuffer));
+        const packet = rawDataToUint8Array(message.data as ArrayBuffer);
+        const payload = state.sequencer ? state.sequencer.unwrap(packet) : packet;
+        if (payload) state.packets.push(payload);
       };
 
       channel.onclose = () => {
-        console.log("UDP closed for user: " + id + ", ip: " + clientIp);
-        removeClient();
+        console.log(`UDP ${kind} closed for user: ${id}, ip: ${clientIp}`);
+        removeChannel();
       };
 
       channel.onerror = (event) => {
-        console.error(`UDP error for user: ${id}, ip: ${clientIp}`, { cause: event });
-        removeClient();
+        console.error(`UDP ${kind} error for user: ${id}, ip: ${clientIp}`, { cause: event });
+        removeChannel();
       };
     };
   }

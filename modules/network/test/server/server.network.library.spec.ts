@@ -41,7 +41,7 @@ describe("NetworkServerLibrary", () => {
   describe("runtime", () => {
     it("should refuse to start outside the Bun runtime with a clear message", async () => {
       vi.unstubAllGlobals();
-      const ctx = makeInitContext({ LISTENING_TCP_PORT: "9000", MAGIC_VALUE: "END" });
+      const ctx = makeInitContext({ LISTENING_TCP_PORT: "9000" });
 
       await expect(new NetworkServerLibrary().__init(ctx)).rejects.toThrow(
         "the Bun runtime is required",
@@ -51,7 +51,7 @@ describe("NetworkServerLibrary", () => {
 
   describe("config validation", () => {
     it("should throw when neither TCP nor UDP port is provided", async () => {
-      const ctx = makeInitContext({ MAGIC_VALUE: "END" });
+      const ctx = makeInitContext({});
       await expect(new NetworkServerLibrary().__init(ctx)).rejects.toThrow();
     });
 
@@ -63,34 +63,37 @@ describe("NetworkServerLibrary", () => {
 
   describe("initialization", () => {
     it("should initialize a TCP server when only LISTENING_TCP_PORT is provided", async () => {
-      const ctx = makeInitContext({ LISTENING_TCP_PORT: "9000", MAGIC_VALUE: "END" });
+      const ctx = makeInitContext({ LISTENING_TCP_PORT: "9000" });
       const lib = new NetworkServerLibrary();
       await lib.__init(ctx);
-      expect(lib.tcp).toBeDefined();
-      expect(lib.udp).toBeUndefined();
+      expect(lib.reliableOrdered).toBeDefined();
+      expect(lib.reliableUnordered).toBeDefined();
+      expect(lib.unreliableOrdered).toBeUndefined();
+      expect(lib.unreliableUnordered).toBeUndefined();
     });
 
     it("should initialize a UDP server when only LISTENING_UDP_PORT is provided", async () => {
-      const ctx = makeInitContext({ LISTENING_UDP_PORT: "9001", MAGIC_VALUE: "END" });
+      const ctx = makeInitContext({ LISTENING_UDP_PORT: "9001" });
       const lib = new NetworkServerLibrary();
       await lib.__init(ctx);
-      expect(lib.udp).toBeDefined();
-      expect(lib.tcp).toBeUndefined();
+      expect(lib.unreliableOrdered).toBeDefined();
+      expect(lib.unreliableUnordered).toBeDefined();
+      expect(lib.reliableOrdered).toBeUndefined();
+      expect(lib.reliableUnordered).toBeUndefined();
     });
 
     it("should initialize both TCP and UDP servers when both ports are provided", async () => {
       const ctx = makeInitContext({
         LISTENING_TCP_PORT: "9000",
         LISTENING_UDP_PORT: "9001",
-        MAGIC_VALUE: "END",
       });
       const lib = new NetworkServerLibrary();
       await lib.__init(ctx);
-      expect(lib.tcp).toBeDefined();
-      expect(lib.udp).toBeDefined();
+      expect(lib.reliableOrdered).toBeDefined();
+      expect(lib.unreliableUnordered).toBeDefined();
     });
 
-    it("should default LISTENING_INTERFACE to 0.0.0.0 and MAGIC_VALUE when not provided", async () => {
+    it("should default LISTENING_INTERFACE to 0.0.0.0 when not provided", async () => {
       const ctx = makeInitContext({ LISTENING_TCP_PORT: "9000" });
       const lib = new NetworkServerLibrary();
       await expect(lib.__init(ctx)).resolves.toBeUndefined();
@@ -98,12 +101,16 @@ describe("NetworkServerLibrary", () => {
   });
 
   describe("expose", () => {
-    it("returns the tcp/udp servers", async () => {
+    it("returns the channel servers", async () => {
       const ctx = makeInitContext({ LISTENING_TCP_PORT: "9000" });
       const lib = new NetworkServerLibrary();
       await lib.__init(ctx);
-      expect(lib.expose().tcp).toBe(lib.tcp);
-      expect(() => lib.expose().udp).toThrow("UDP isn't defined");
+      expect(lib.expose().reliableOrdered).toBe(lib.reliableOrdered);
+      expect(lib.expose().reliableUnordered).toBe(lib.reliableUnordered);
+      expect(() => lib.expose().unreliableOrdered).toThrow(
+        "The unreliableOrdered channel isn't defined: set LISTENING_UDP_PORT",
+      );
+      expect(() => lib.expose().unreliableUnordered).toThrow("LISTENING_UDP_PORT");
     });
 
     it("returns the client sessions", () => {
@@ -160,18 +167,19 @@ describe("NetworkServerLibrary", () => {
       const ctx = makeInitContext({
         LISTENING_TCP_PORT: "9000",
         LISTENING_UDP_PORT: "9001",
-        MAGIC_VALUE: "END",
       });
       const lib = new NetworkServerLibrary();
       await lib.__init(ctx);
-      expect(lib.tcp).toBeDefined();
-      expect(lib.udp).toBeDefined();
+      expect(lib.reliableOrdered).toBeDefined();
+      expect(lib.unreliableOrdered).toBeDefined();
 
       await lib.__clear({} as never);
 
       expect(stop).toHaveBeenCalledTimes(2);
-      expect(lib.tcp).toBeUndefined();
-      expect(lib.udp).toBeUndefined();
+      expect(lib.reliableOrdered).toBeUndefined();
+      expect(lib.reliableUnordered).toBeUndefined();
+      expect(lib.unreliableOrdered).toBeUndefined();
+      expect(lib.unreliableUnordered).toBeUndefined();
     });
   });
 });

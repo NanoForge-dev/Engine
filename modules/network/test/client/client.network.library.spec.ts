@@ -71,7 +71,7 @@ describe("NetworkClientLibrary", () => {
 
   describe("config validation", () => {
     it("should throw when neither TCP nor UDP port is provided", async () => {
-      const ctx = makeInitContext({ SERVER_ADDRESS: "127.0.0.1", MAGIC_VALUE: "END" });
+      const ctx = makeInitContext({ SERVER_ADDRESS: "127.0.0.1" });
       await expect(new NetworkClientLibrary().__init(ctx)).rejects.toThrow();
     });
   });
@@ -81,12 +81,13 @@ describe("NetworkClientLibrary", () => {
       const ctx = makeInitContext({
         SERVER_TCP_PORT: "8080",
         SERVER_ADDRESS: "127.0.0.1",
-        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      expect(lib.tcp).toBeDefined();
-      expect(lib.udp).toBeUndefined();
+      expect(lib.reliableOrdered).toBeDefined();
+      expect(lib.reliableUnordered).toBeDefined();
+      expect(lib.unreliableOrdered).toBeUndefined();
+      expect(lib.unreliableUnordered).toBeUndefined();
     });
 
     it("should hand ICE_SERVERS from the environment to the peer connection", async () => {
@@ -105,12 +106,13 @@ describe("NetworkClientLibrary", () => {
       const ctx = makeInitContext({
         SERVER_UDP_PORT: "8081",
         SERVER_ADDRESS: "127.0.0.1",
-        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      expect(lib.udp).toBeDefined();
-      expect(lib.tcp).toBeUndefined();
+      expect(lib.unreliableOrdered).toBeDefined();
+      expect(lib.unreliableUnordered).toBeDefined();
+      expect(lib.reliableOrdered).toBeUndefined();
+      expect(lib.reliableUnordered).toBeUndefined();
     });
 
     it("should initialize both TCP and UDP clients when both ports are provided", async () => {
@@ -118,12 +120,11 @@ describe("NetworkClientLibrary", () => {
         SERVER_TCP_PORT: "8080",
         SERVER_UDP_PORT: "8081",
         SERVER_ADDRESS: "127.0.0.1",
-        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      expect(lib.tcp).toBeDefined();
-      expect(lib.udp).toBeDefined();
+      expect(lib.reliableOrdered).toBeDefined();
+      expect(lib.unreliableUnordered).toBeDefined();
     });
 
     it("should link UDP to the session received over TCP", async () => {
@@ -157,24 +158,54 @@ describe("NetworkClientLibrary", () => {
       expect(lib.clientId).toBe("client-0");
     });
 
-    it("should default MAGIC_VALUE and WSS when not provided", async () => {
+    it("should default WSS when not provided", async () => {
       const ctx = makeInitContext({ SERVER_TCP_PORT: "8080", SERVER_ADDRESS: "127.0.0.1" });
       const lib = new NetworkClientLibrary();
       await expect(lib.__init(ctx)).resolves.toBeUndefined();
     });
   });
 
+  describe("channels", () => {
+    it("should send each reliable channel over the same TCP socket", async () => {
+      const ctx = makeInitContext({ SERVER_TCP_PORT: "8080", SERVER_ADDRESS: "127.0.0.1" });
+      const lib = new NetworkClientLibrary();
+      await lib.__init(ctx);
+
+      lib.reliableOrdered!.sendData(new Uint8Array([1]));
+      lib.reliableUnordered!.sendData(new Uint8Array([2]));
+
+      const socket = vi.mocked(WebSocket).mock.instances[0] as any;
+      expect(socket.send.mock.calls).toStrictEqual([
+        [new Uint8Array([0, 1])],
+        [new Uint8Array([1, 2])],
+      ]);
+    });
+
+    it("should open one data channel per unreliable channel", async () => {
+      const ctx = makeInitContext({ SERVER_UDP_PORT: "8081", SERVER_ADDRESS: "127.0.0.1" });
+      await new NetworkClientLibrary().__init(ctx);
+
+      const peerConnection = vi.mocked(RTCPeerConnection).mock.instances[0] as any;
+      expect(
+        peerConnection.createDataChannel.mock.calls.map(([label]: [string]) => label),
+      ).toStrictEqual(["unreliable-ordered", "unreliable-unordered"]);
+    });
+  });
+
   describe("expose", () => {
-    it("returns the tcp/udp clients", async () => {
+    it("returns the channel clients", async () => {
       const ctx = makeInitContext({
         SERVER_TCP_PORT: "8080",
         SERVER_ADDRESS: "127.0.0.1",
-        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      expect(lib.expose().tcp).toBe(lib.tcp);
-      expect(() => lib.expose().udp).toThrow("UDP isn't defined");
+      expect(lib.expose().reliableOrdered).toBe(lib.reliableOrdered);
+      expect(lib.expose().reliableUnordered).toBe(lib.reliableUnordered);
+      expect(() => lib.expose().unreliableOrdered).toThrow(
+        "The unreliableOrdered channel isn't defined: set SERVER_UDP_PORT",
+      );
+      expect(() => lib.expose().unreliableUnordered).toThrow("SERVER_UDP_PORT");
       expect(lib.expose().clientId).toBe("client-0");
     });
   });

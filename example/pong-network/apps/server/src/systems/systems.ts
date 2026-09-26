@@ -1,6 +1,8 @@
 import { type Context } from "@nanoforge-dev/common";
 import { type Registry } from "@nanoforge-dev/ecs/server";
 import {
+  type Channel,
+  type ChannelServer,
   type ClientId,
   type ClientInfo,
   type NetworkServerContextApi,
@@ -23,8 +25,14 @@ export function move(registry: Registry, ctx: Context) {
   });
 }
 
-function sendMoveAll(id: number, vel: Velocity, pos: Position, network: NetworkServerContextApi) {
-  network.tcp.sendToEverybody(
+/**
+ * Broadcast an entity's position and velocity.
+ *
+ * @param channel - Initial sync goes on `reliableOrdered`, paddle updates on
+ * `unreliableOrdered` and ball bounces on `unreliableUnordered`.
+ */
+function sendMoveAll(id: number, vel: Velocity, pos: Position, channel: ChannelServer<Channel>) {
+  channel.sendToEverybody(
     new TextEncoder().encode(
       JSON.stringify({
         type: "move",
@@ -43,21 +51,21 @@ export function onClientDisconnect(info: ClientInfo) {
 }
 
 function connectNewClient(newCli: ClientId, network: NetworkServerContextApi, zip: any) {
-  network.tcp.sendToClient(
+  network.reliableOrdered.sendToClient(
     newCli,
     new TextEncoder().encode(JSON.stringify({ type: "assignId", assigned: "ball", id: 0 })),
   );
-  network.tcp.sendToClient(
+  network.reliableOrdered.sendToClient(
     newCli,
     new TextEncoder().encode(JSON.stringify({ type: "assignId", assigned: "paddle1", id: 1 })),
   );
-  network.tcp.sendToClient(
+  network.reliableOrdered.sendToClient(
     newCli,
     new TextEncoder().encode(JSON.stringify({ type: "assignId", assigned: "paddle2", id: 2 })),
   );
-  sendMoveAll(0, zip[0].Velocity, zip[0].Position, network);
-  sendMoveAll(1, zip[1].Velocity, zip[1].Position, network);
-  sendMoveAll(2, zip[2].Velocity, zip[2].Position, network);
+  sendMoveAll(0, zip[0].Velocity, zip[0].Position, network.reliableOrdered);
+  sendMoveAll(1, zip[1].Velocity, zip[1].Position, network.reliableOrdered);
+  sendMoveAll(2, zip[2].Velocity, zip[2].Position, network.reliableOrdered);
 }
 
 function handleClientInput(
@@ -94,14 +102,14 @@ function handleClientInput(
   if (key === "stop") {
     paddle.Velocity.y = 0;
   }
-  sendMoveAll(id, paddle.Velocity, paddle.Position, network);
+  sendMoveAll(id, paddle.Velocity, paddle.Position, network.unreliableOrdered);
 }
 
 export function packetHandler(registry: Registry, ctx: Context) {
   const zip = registry.getZipper([Position, Velocity]);
   const network = ctx.network;
 
-  const clientPackets: Map<ClientId, Uint8Array[]> = network.tcp.getReceivedPackets();
+  const clientPackets: Map<ClientId, Uint8Array[]> = network.reliableOrdered.getReceivedPackets();
   clientPackets.forEach((packets, client) => {
     packets.forEach((packet) => {
       const data = JSON.parse(new TextDecoder().decode(packet));
@@ -126,12 +134,12 @@ function checkOutOfTerrain(id: number, paddle: any, network: NetworkServerContex
   if (paddle.Position.y < 0) {
     paddle.Position.y = 0;
     paddle.Velocity.y = 0;
-    sendMoveAll(id, paddle.Velocity, paddle.Position, network);
+    sendMoveAll(id, paddle.Velocity, paddle.Position, network.unreliableOrdered);
   }
   if (paddle.Position.y > 780) {
     paddle.Position.y = 780;
     paddle.Velocity.y = 0;
-    sendMoveAll(id, paddle.Velocity, paddle.Position, network);
+    sendMoveAll(id, paddle.Velocity, paddle.Position, network.unreliableOrdered);
   }
 }
 
@@ -147,7 +155,7 @@ export const bounce = (registry: Registry, ctx: Context) => {
   if (roundStart >= 3000) {
     roundStart = -1;
     zip[0].Velocity.x = 1;
-    sendMoveAll(0, zip[0].Velocity, zip[0].Position, network);
+    sendMoveAll(0, zip[0].Velocity, zip[0].Position, network.unreliableUnordered);
     return;
   }
   let bounced = false;
@@ -188,6 +196,6 @@ export const bounce = (registry: Registry, ctx: Context) => {
     bounced = true;
   }
   if (bounced) {
-    sendMoveAll(0, zip[0].Velocity, zip[0].Position, network);
+    sendMoveAll(0, zip[0].Velocity, zip[0].Position, network.unreliableUnordered);
   }
 };

@@ -1,4 +1,4 @@
-import { Default, Expose, IsArray, IsByteLength, Transform } from "@nanoforge-dev/env";
+import { Default, Expose, IsArray, Transform } from "@nanoforge-dev/env";
 
 import { DEFAULT_NANOFORGE_ICE_SERVERS } from "../default";
 
@@ -33,21 +33,10 @@ const transformIceServers = ({ value }: { value: unknown }): unknown => {
  * libraries.
  *
  * @remarks
- * Settings both sides need, either to agree with each other (packet framing)
- * or to build their own peer connection (ICE servers), are inherited by
- * `ClientConfigNetwork` and `ServerConfigNetwork`.
+ * Settings both sides need to build their own peer connection (ICE servers)
+ * are inherited by `ClientConfigNetwork` and `ServerConfigNetwork`.
  */
 export class NetworkConfig {
-  /**
-   * Delimiter bytes appended to each packet for framing.
-   *
-   * @default "PACKET_END"
-   */
-  @Expose()
-  @Default("PACKET_END")
-  @IsByteLength(2, 64)
-  MAGIC_VALUE!: string;
-
   /**
    * STUN and TURN servers used while gathering ICE candidates.
    *

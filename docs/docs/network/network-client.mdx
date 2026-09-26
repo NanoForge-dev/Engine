@@ -10,25 +10,26 @@ This document describes how the `network-client` package connects to a `network-
 
 ## Overview
 
-A client connects to a single server instance. The package uses one TCP/WebSocket control channel and can also negotiate a single WebRTC data channel for unreliable traffic.
+A client connects to a single server instance and sends every packet on one of
+four [channels](packet-framing), exposed on `ctx.network`:
 
-Client responsibilities in a game are typically:
-
-- Initiate a TCP connection and send control commands such as join, play, and input.
-- Optionally negotiate a WebRTC data channel for receiving server snapshots or sending low-latency updates.
+- `reliableOrdered` and `reliableUnordered`, carried by a TCP WebSocket, for
+  control commands such as join, play, and input.
+- `unreliableOrdered` and `unreliableUnordered`, carried by WebRTC data
+  channels, for server snapshots or low-latency updates.
 
 ## Example
 
-It works the same with UDP:
+It works the same on every channel:
 
 ```javascript
 // Wait for connection to be established
 async function waitForConnection() {
-  if (network.tcp?.isConnected()) return;
+  if (network.reliableOrdered.isConnected()) return;
 
   return new Promise((resolve) => {
     const check = () => {
-      if (network.tcp.isConnected()) {
+      if (network.reliableOrdered.isConnected()) {
         resolve();
       } else {
         setTimeout(check, 50);
@@ -42,10 +43,10 @@ async function waitForConnection() {
 await waitForConnection();
 
 // Send a JSON-encoded packet
-network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ hello: "world" })));
+network.reliableOrdered.sendData(new TextEncoder().encode(JSON.stringify({ hello: "world" })));
 
-// Receive raw server packets
-const latestPackets = getReceivedPackets();
+// Receive raw server packets sent on this channel
+const latestPackets = network.reliableOrdered.getReceivedPackets();
 
 // Decode packets if encoded as JSON
 const decodedPackets = latestPackets.map((packet) => {
@@ -56,4 +57,4 @@ const decodedPackets = latestPackets.map((packet) => {
 ## Notes
 
 - See [Network Client API](network-client-api) for the full list of available functions.
-- For packet framing and terminator semantics, see [Packet Framing](packet-framing).
+- For the channels and how packets are framed on each, see [Packet Channels](packet-framing).

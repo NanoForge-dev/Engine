@@ -18,20 +18,6 @@ const sides: Side[] = [
 ];
 
 describe.each(sides)("NetworkConfig inherited by the $name config", ({ Config, env }) => {
-  it("should default MAGIC_VALUE to PACKET_END", async () => {
-    const config = await registerEnv(Config, { ...env });
-    expect(config.MAGIC_VALUE).toBe("PACKET_END");
-  });
-
-  it("should keep a provided MAGIC_VALUE", async () => {
-    const config = await registerEnv(Config, { ...env, MAGIC_VALUE: "END" });
-    expect(config.MAGIC_VALUE).toBe("END");
-  });
-
-  it("should reject a MAGIC_VALUE shorter than two bytes", async () => {
-    await expect(registerEnv(Config, { ...env, MAGIC_VALUE: "E" })).rejects.toThrow();
-  });
-
   describe("ICE_SERVERS", () => {
     it("should default to an empty list when unset", async () => {
       const config = await registerEnv(Config, { ...env });

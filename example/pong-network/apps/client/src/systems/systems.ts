@@ -29,17 +29,19 @@ export const controlPlayer = (registry: Registry, ctx: Context) => {
     const downPressed = input.isKeyPressed(Controller.down);
     if (upPressed == downPressed) {
       if (Controller.lastPressedUp || Controller.lastPressedDown) {
-        network.tcp.sendData(
+        network.reliableOrdered.sendData(
           new TextEncoder().encode(JSON.stringify({ type: "input", key: "stop" })),
         );
         Controller.lastPressedDown = false;
         Controller.lastPressedUp = false;
       }
     } else if (upPressed && !Controller.lastPressedUp) {
-      network.tcp.sendData(new TextEncoder().encode(JSON.stringify({ type: "input", key: "up" })));
+      network.reliableOrdered.sendData(
+        new TextEncoder().encode(JSON.stringify({ type: "input", key: "up" })),
+      );
       Controller.lastPressedUp = true;
     } else if (downPressed && !Controller.lastPressedDown) {
-      network.tcp?.sendData(
+      network.reliableOrdered.sendData(
         new TextEncoder().encode(JSON.stringify({ type: "input", key: "down" })),
       );
       Controller.lastPressedDown = true;
@@ -61,7 +63,13 @@ export function draw(registry: Registry) {
 
 export function packetHandler(registry: Registry, ctx: Context) {
   const network = ctx.network;
-  const jsonPackets = network.tcp.getReceivedPackets().map((packet) => {
+  // Reliable first, so an entity's `assignId` is applied before its moves.
+  const packets = [
+    ...network.reliableOrdered.getReceivedPackets(),
+    ...network.unreliableOrdered.getReceivedPackets(),
+    ...network.unreliableUnordered.getReceivedPackets(),
+  ];
+  const jsonPackets = packets.map((packet) => {
     return JSON.parse(new TextDecoder().decode(packet));
   });
 

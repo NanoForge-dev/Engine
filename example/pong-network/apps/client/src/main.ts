@@ -87,12 +87,18 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   registry.addSystem(controlPlayer);
   registry.addSystem(draw);
 
+  /** Wait for every channel the game uses, so no early move is missed. */
+  const isConnected = () =>
+    (network.reliableOrdered?.isConnected() ?? false) &&
+    (network.unreliableOrdered?.isConnected() ?? false) &&
+    (network.unreliableUnordered?.isConnected() ?? false);
+
   async function waitForConnection(): Promise<void> {
-    if (network.tcp?.isConnected()) return;
+    if (isConnected()) return;
 
     return new Promise((resolve) => {
       const check = () => {
-        if (network.tcp?.isConnected()) {
+        if (isConnected()) {
           resolve();
         } else {
           setTimeout(check, 50);
@@ -103,7 +109,7 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   }
 
   await waitForConnection();
-  network.tcp?.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
+  network.reliableOrdered?.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
 
   await app.run();
 };

@@ -1,34 +1,45 @@
 ---
-title: "Packet Framing"
+title: "Packet Channels"
 icon: "book"
-description: "How packets are framed and reassembled"
+description: "The four delivery channels and how packets are framed on each"
 ---
 
-# Packet Framing
+# Packet Channels
 
-This note explains how packets are framed and reassembled in the network packages. The framing strategy is simple and robust against transport fragmentation or aggregation.
+Every packet is sent on one of four channels. Pick the channel by what the
+packet needs: whether it may be lost, and whether an older packet is still
+useful once a newer one has arrived.
 
-## Concept
+| Channel               | Lost?    | Order                    | Carried by          | Typical use                    |
+| --------------------- | -------- | ------------------------ | ------------------- | ------------------------------ |
+| `reliableOrdered`     | Never    | Send order               | TCP WebSocket       | Join, chat, game events        |
+| `reliableUnordered`   | Never    | No promise               | TCP WebSocket       | Independent one-off messages   |
+| `unreliableOrdered`   | Possibly | Late packets are dropped | WebRTC data channel | Positions, snapshots           |
+| `unreliableUnordered` | Possibly | Any order                | WebRTC data channel | Fire-and-forget effects, pings |
 
-- Each logical packet is a payload of bytes that the application wants to send, whether JSON or binary.
-- Before sending, the library appends a configurable terminator string, or magic value, to the end of the payload. The default value in the project config is `PACKET_END`.
-- The terminator is applied as bytes using UTF-8 encoding, so it becomes a unique byte suffix that marks the end of a logical packet.
+The reliable channels need a TCP port (`SERVER_TCP_PORT` / `LISTENING_TCP_PORT`),
+the unreliable ones a UDP port (`SERVER_UDP_PORT` / `LISTENING_UDP_PORT`).
+Using a channel whose port is not configured throws.
 
-## Why Use an End Terminator
+Over TCP, `reliableUnordered` is delivered in order in practice: it only
+promises that nothing is lost.
 
-- Transports like WebSocket and RTC DataChannel may split or combine application messages into arbitrary chunks. A terminator lets a receiver reliably detect the end of each logical packet regardless of how the transport fragments or aggregates bytes.
-- A short, human-readable terminator makes debugging easier.
-- The terminator is configurable so you can choose a value that does not collide with your payload contents, which matters especially for raw or binary payloads.
+## Framing
 
-## Sender Logic
+Both transports deliver whole messages, so one message is one packet: there is
+no delimiter and payloads may contain any bytes.
 
-1. Serialize the application message into bytes, for example JSON to UTF-8 bytes or a binary codec output.
-2. Append the configured terminator bytes to the end of the payload.
-3. Send the resulting buffer on the transport, either WebSocket or DataChannel.
+- **TCP**: each binary WebSocket frame starts with one tag byte, `0` for
+  `reliableOrdered` and `1` for `reliableUnordered`, followed by the payload.
+  Text frames are reserved for control messages such as the server `welcome`.
+- **WebRTC**: the client opens one data channel per unreliable channel, labelled
+  `unreliable-ordered` and `unreliable-unordered`. Both use `ordered: false` and
+  `maxRetransmits: 0`.
 
-## Receiver Logic
+## Dropping late packets
 
-1. Accumulate incoming chunks of bytes into a per-connection buffer.
-2. Repeatedly search the accumulated buffer for the terminator sequence.
-3. For each occurrence, extract bytes from the start of the buffer up to, but not including, the terminator. That is a complete logical packet.
-4. Remove the extracted packet and trailing terminator from the buffer, then continue searching. Keep any leftover bytes, which represent a partial packet, for the next incoming chunk.
+`unreliableOrdered` packets start with a big-endian `uint32` sequence number,
+counted per peer and per direction. The receiver delivers a packet only if it is
+newer than the last one it delivered, and drops it otherwise. Nothing ever waits
+for a lost packet: a gap is skipped as soon as a newer packet arrives. Numbers
+are compared as serial numbers, so the counter can wrap around.

@@ -1,24 +1,35 @@
 import { type Context, type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
 import { registerEnv } from "@nanoforge-dev/env";
 
+import {
+  ReliableOrderedServer,
+  ReliableUnorderedServer,
+  UnreliableOrderedServer,
+  UnreliableUnorderedServer,
+} from "./channels.server.network";
 import { ClientRegistry, type ClientsApi } from "./client-registry";
 import { ServerConfigNetwork } from "./config.server.network";
 import type { NetworkServerContextApi } from "./network-server-context.type";
 import { TCPServer } from "./tcp.server.network";
 import { UDPServer } from "./udp.server.network";
 
+const required = <T>(channel: T | undefined, name: string, port: string): T => {
+  if (!channel) throw new Error(`The ${name} channel isn't defined: set ${port}`);
+  return channel;
+};
+
 /**
  * Built-in network library for server-side applications.
  *
  * @remarks
  * Reads network configuration from the environment via `ServerConfigNetwork`
- * and starts TCP (WebSocket) and/or UDP (WebRTC) servers.
+ * and starts TCP (WebSocket) and/or UDP (WebRTC) servers.  TCP carries the
+ * reliable channels and UDP the unreliable ones.
  *
  * Configuration (via environment variables):
  * - `LISTENING_INTERFACE` — bind address (default: `"0.0.0.0"`).
  * - `LISTENING_TCP_PORT` — WebSocket listen port for TCP (optional).
  * - `LISTENING_UDP_PORT` — signaling listen port for UDP (optional).
- * - `MAGIC_VALUE` — packet framing delimiter (default: `"PACKET_END"`).
  * - `WSS_CERT` / `WSS_KEY` — paths to TLS certificate and key files for WSS (optional).
  * - `ICE_SERVERS` — STUN/TURN servers for the UDP transport, comma-separated or a JSON array (default: `[]`).
  * - `ICE_PORT` — fixed, multiplexed UDP port for the UDP transport (optional).
@@ -28,9 +39,16 @@ export class NetworkServerLibrary extends Library {
   readonly key = defineLibraryKey("network");
 
   /** Only set when `LISTENING_TCP_PORT` was configured. */
-  public tcp?: TCPServer;
+  public reliableOrdered?: ReliableOrderedServer;
+  /** Only set when `LISTENING_TCP_PORT` was configured. */
+  public reliableUnordered?: ReliableUnorderedServer;
   /** Only set when `LISTENING_UDP_PORT` was configured. */
-  public udp?: UDPServer;
+  public unreliableOrdered?: UnreliableOrderedServer;
+  /** Only set when `LISTENING_UDP_PORT` was configured. */
+  public unreliableUnordered?: UnreliableUnorderedServer;
+
+  private _tcp?: TCPServer;
+  private _udp?: UDPServer;
 
   private readonly _registry = new ClientRegistry();
 
@@ -61,22 +79,22 @@ export class NetworkServerLibrary extends Library {
     }
 
     if (config.LISTENING_TCP_PORT !== undefined) {
-      this.tcp = new TCPServer(
+      this._tcp = new TCPServer(
         +config.LISTENING_TCP_PORT,
         config.LISTENING_INTERFACE,
-        config.MAGIC_VALUE,
         config.WSS_CERT,
         config.WSS_KEY,
         this._registry,
       );
-      this.tcp.listen();
+      this.reliableOrdered = new ReliableOrderedServer(this._tcp);
+      this.reliableUnordered = new ReliableUnorderedServer(this._tcp);
+      this._tcp.listen();
     }
 
     if (config.LISTENING_UDP_PORT !== undefined) {
-      this.udp = new UDPServer(
+      this._udp = new UDPServer(
         +config.LISTENING_UDP_PORT,
         config.LISTENING_INTERFACE,
-        config.MAGIC_VALUE,
         config.WSS_CERT,
         config.WSS_KEY,
         {
@@ -86,30 +104,40 @@ export class NetworkServerLibrary extends Library {
         },
         this._registry,
       );
-      this.udp.listen();
+      this.unreliableOrdered = new UnreliableOrderedServer(this._udp);
+      this.unreliableUnordered = new UnreliableUnorderedServer(this._udp);
+      this._udp.listen();
     }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override async __clear(_ctx: Context): Promise<void> {
-    this.tcp?.close();
-    this.udp?.close();
+    this._tcp?.close();
+    this._udp?.close();
     this._registry.clear();
-    delete this.tcp;
-    delete this.udp;
+    delete this._tcp;
+    delete this._udp;
+    delete this.reliableOrdered;
+    delete this.reliableUnordered;
+    delete this.unreliableOrdered;
+    delete this.unreliableUnordered;
   }
 
   public override expose(): NetworkServerContextApi {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const library = this;
     return {
-      get tcp() {
-        if (!library.tcp) throw new Error("TCP isn't defined");
-        return library.tcp;
+      get reliableOrdered() {
+        return required(library.reliableOrdered, "reliableOrdered", "LISTENING_TCP_PORT");
       },
-      get udp() {
-        if (!library.udp) throw new Error("UDP isn't defined");
-        return library.udp;
+      get reliableUnordered() {
+        return required(library.reliableUnordered, "reliableUnordered", "LISTENING_TCP_PORT");
+      },
+      get unreliableOrdered() {
+        return required(library.unreliableOrdered, "unreliableOrdered", "LISTENING_UDP_PORT");
+      },
+      get unreliableUnordered() {
+        return required(library.unreliableUnordered, "unreliableUnordered", "LISTENING_UDP_PORT");
       },
       get clients() {
         return library.clients;
