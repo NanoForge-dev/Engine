@@ -17,7 +17,10 @@ import { controlPlayer, draw, move, packetHandler } from "./systems/systems";
 export const layer = new Layer();
 
 export const main = async (options: ClientRunOptions): Promise<void> => {
-  const app = NanoforgeFactory.createClient({ tickRate: 60 });
+  const app = NanoforgeFactory.createClient({
+    tickRate: 60,
+    viewport: { width: 1920, height: 1080, fit: "contain" },
+  });
   const graphics = new Graphics2DLibrary();
   const ecs = new EcsLibrary();
   const network = new NetworkClientLibrary();

@@ -1,9 +1,16 @@
-import { type Context, type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
+import {
+  type Context,
+  type InitContext,
+  Library,
+  type ViewportState,
+  defineLibraryKey,
+} from "@nanoforge-dev/common";
 // Side-effect-only: loads Context.editor/Context.ecs augmentations for the
 // optional editor-drag integration below. graphics-2d is client-only, so
 // it only ever coexists with @nanoforge-dev/ecs/client (never /server) in practice.
 import type { Registry } from "@nanoforge-dev/ecs/client";
 import type {} from "@nanoforge-dev/editor-lib";
+import Konva from "konva";
 
 import * as Graphics from "./exports/konva";
 import type { GraphicsContextApi } from "./graphics-context.type";
@@ -14,9 +21,12 @@ type DragSystemEditor = NonNullable<Context["editor"]>;
  * Built-in 2D graphics library powered by [Konva](https://konvajs.org/).
  *
  * @remarks
- * Creates a full-container Konva `Stage` and a default `Layer` during
- * `__init`. Game code interacts with `Context.graphics.stage`/`.baseLayer`
- * directly to add shapes, images, and animations. Client-only — `__init`
+ * Creates a Konva `Stage` and a default `Layer` during `__init`. Game code
+ * interacts with `Context.graphics.stage`/`.baseLayer` directly to add
+ * shapes, images, and animations, in game coordinates (the design resolution
+ * of `Context.viewport`). The stage follows every viewport change (window
+ * resize, fullscreen, monitor switch, fit mode change): it is resized,
+ * scaled, offset and letterboxed/cropped according to the viewport's fit. Client-only — `__init`
  * throws if `InitContext.container` is missing.
  */
 export class Graphics2DLibrary extends Library {
@@ -25,6 +35,7 @@ export class Graphics2DLibrary extends Library {
   private _stage?: Graphics.Stage;
   private _baseLayer?: Graphics.Layer;
   private _editorDragWired = false;
+  private _unsubscribeViewport?: () => void;
 
   public override async __init(ctx: InitContext): Promise<void> {
     if (!ctx.container) {
@@ -39,9 +50,16 @@ export class Graphics2DLibrary extends Library {
     });
     this._baseLayer = new Graphics.Layer();
     this._stage.add(this._baseLayer);
+
+    if (ctx.viewport) {
+      this._applyViewport(ctx.viewport.state);
+      this._unsubscribeViewport = ctx.viewport.onChange((state) => this._applyViewport(state));
+    }
   }
 
   public override async __clear(): Promise<void> {
+    this._unsubscribeViewport?.();
+    this._unsubscribeViewport = undefined;
     this._stage?.destroy();
     delete (window as unknown as { Konva?: unknown }).Konva;
   }
@@ -86,6 +104,28 @@ export class Graphics2DLibrary extends Library {
     };
   }
 
+  /**
+   * Sizes the canvas to the visible game area, scales/offsets the stage so
+   * game coordinates map to the design resolution, and letterboxes it inside
+   * the container.
+   */
+  private _applyViewport(state: ViewportState): void {
+    const stage = this._stage;
+    if (!stage) return;
+
+    if (Konva.pixelRatio !== state.pixelRatio) {
+      Konva.pixelRatio = state.pixelRatio;
+      for (const layer of stage.getLayers()) layer.getCanvas().setPixelRatio(state.pixelRatio);
+    }
+
+    stage.size({ width: state.visibleWidth, height: state.visibleHeight });
+    stage.scale({ x: state.scaleX, y: state.scaleY });
+    stage.position({ x: state.originX, y: state.originY });
+    stage.content.style.left = `${state.contentLeft}px`;
+    stage.content.style.top = `${state.contentTop}px`;
+    stage.batchDraw();
+  }
+
   private _dragSystem(editor: DragSystemEditor): (registry: Registry) => void {
     const wiredComponents = new Map<string, Set<string>>();
 
@@ -108,7 +148,7 @@ export class Graphics2DLibrary extends Library {
 
           comp.shape.draggable(true);
           comp.shape.on("dragend", ({ target }: any) => {
-            editor.emit("move-component", entityId, comp.name, target._lastPos);
+            editor.emit("move-component", entityId, comp.name, target.position());
           });
           wired.add(comp.name);
         }

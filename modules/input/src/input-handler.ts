@@ -1,3 +1,5 @@
+import type { ViewportContext } from "@nanoforge-dev/common";
+
 import { InputEnum } from "./input.enum";
 import {
   BUTTONS_MASKS,
@@ -8,8 +10,8 @@ import {
 } from "./mouse.types";
 
 export class InputHandler {
-  private readonly offset: { x: number; y: number };
   private readonly container: HTMLDivElement;
+  private readonly viewport?: ViewportContext;
   public inputs: Record<string, boolean> = {};
   public mouse: MouseState = {
     x: 0,
@@ -35,11 +37,10 @@ export class InputHandler {
     deltaY: 0,
   };
 
-  constructor(container: HTMLDivElement) {
+  constructor(container: HTMLDivElement, viewport?: ViewportContext) {
     this.container = container;
+    this.viewport = viewport;
     this.resetInputs();
-
-    this.offset = container.getBoundingClientRect();
 
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
@@ -105,14 +106,14 @@ export class InputHandler {
     if (button === undefined) return;
 
     this.inputs[button] = true;
-    this.updatePointer(e);
+    const { x, y } = this.updatePointer(e);
 
     this.drag.active = true;
     this.drag.button = button;
-    this.drag.startX = e.clientX - this.offset.x;
-    this.drag.startY = e.clientY - this.offset.y;
-    this.drag.x = e.clientX - this.offset.x;
-    this.drag.y = e.clientY - this.offset.y;
+    this.drag.startX = x;
+    this.drag.startY = y;
+    this.drag.x = x;
+    this.drag.y = y;
     this.drag.deltaX = 0;
     this.drag.deltaY = 0;
   };
@@ -134,14 +135,14 @@ export class InputHandler {
   };
 
   private readonly onMouseMove = (e: MouseEvent): void => {
-    this.updatePointer(e);
+    const { x, y } = this.updatePointer(e);
     this.updateInputsMouseButtons(e.buttons);
 
     if (this.drag.active) {
-      this.drag.x = e.clientX - this.offset.x;
-      this.drag.y = e.clientY - this.offset.y;
-      this.drag.deltaX = e.clientX - this.drag.startX - this.offset.x;
-      this.drag.deltaY = e.clientY - this.drag.startY - this.offset.y;
+      this.drag.x = x;
+      this.drag.y = y;
+      this.drag.deltaX = x - this.drag.startX;
+      this.drag.deltaY = y - this.drag.startY;
     }
   };
 
@@ -167,13 +168,26 @@ export class InputHandler {
     if (document.hidden) this.resetInputs();
   };
 
-  private updatePointer(e: MouseEvent): void {
+  /**
+   * Maps an event position to game coordinates through the engine viewport,
+   * or to container-relative CSS px when no viewport is available. The
+   * container rect is read per event so resizes/scrolls never go stale.
+   */
+  private toLocal(e: MouseEvent): { x: number; y: number } {
+    if (this.viewport) return this.viewport.screenToGame(e.clientX, e.clientY);
+    const rect = this.container.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  private updatePointer(e: MouseEvent): { x: number; y: number } {
+    const point = this.toLocal(e);
     this.mouse.prevX = this.mouse.x;
     this.mouse.prevY = this.mouse.y;
-    this.mouse.x = e.clientX - this.offset.x;
-    this.mouse.y = e.clientY - this.offset.y;
+    this.mouse.x = point.x;
+    this.mouse.y = point.y;
     this.mouse.deltaX = this.mouse.x - this.mouse.prevX;
     this.mouse.deltaY = this.mouse.y - this.mouse.prevY;
+    return point;
   }
 
   private updateInputsMouseButtons(buttons: number): void {
