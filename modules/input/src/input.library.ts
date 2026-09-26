@@ -12,7 +12,9 @@ import type { DragState, MouseState, WheelState } from "./mouse.types";
  * Listens to browser `keydown`/`keyup` (on `window`) and `mousedown`/
  * `mouseup`/`mousemove`/`wheel`/`mouseenter`/`mouseleave`/`blur`/
  * `visibilitychange` (on the client container) and exposes a per-frame
- * snapshot of the current input state on `Context.input`. Client-only —
+ * snapshot of the current input state on `Context.input`. Mouse and drag
+ * positions are in game coordinates (mapped through `Context.viewport`, so
+ * they follow the design resolution, fit mode and window resizes). Client-only —
  * `__init` throws if `InitContext.container` is missing.
  */
 export class InputLibrary extends Library {
@@ -30,7 +32,7 @@ export class InputLibrary extends Library {
         "InputLibrary must be registered on the client (InitContext must contain a container element).",
       );
     }
-    this._inputHandler = new InputHandler(ctx.container);
+    this._inputHandler = new InputHandler(ctx.container, ctx.viewport);
   }
 
   public override async __run(): Promise<void> {

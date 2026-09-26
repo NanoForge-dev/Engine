@@ -5,12 +5,14 @@ import { InputEnum } from "./input.enum";
  *
  * @remarks
  * Returned by `InputLibrary.getMouseState`.  `deltaX` / `deltaY` are
- * reset to `0` at the beginning of each frame.
+ * reset to `0` at the beginning of each frame. Positions are in game
+ * coordinates (the viewport's design resolution); without a viewport they
+ * are CSS pixels relative to the container.
  */
 export type MouseState = {
-  /** Current horizontal cursor position in CSS pixels. */
+  /** Current horizontal cursor position, in game coordinates. */
   x: number;
-  /** Current vertical cursor position in CSS pixels. */
+  /** Current vertical cursor position, in game coordinates. */
   y: number;
   /** Horizontal cursor position from the previous frame. */
   prevX: number;
@@ -29,7 +31,7 @@ export type MouseState = {
  *
  * @remarks
  * Returned by `InputLibrary.getDragState`.  A drag becomes active on
- * `mousedown` and inactive on `mouseup`.
+ * `mousedown` and inactive on `mouseup`. Positions are in game coordinates.
  */
 export type DragState = {
   /** `true` when a drag is in progress. */

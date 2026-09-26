@@ -6,7 +6,11 @@ describe("NanoforgeFactory", () => {
   it("creates a client that can be initialized", async () => {
     const client = NanoforgeFactory.createClient();
     await expect(
-      client.init({ files: new Map(), env: {}, container: {} as unknown as HTMLDivElement }),
+      client.init({
+        files: new Map(),
+        env: {},
+        container: { style: {}, clientWidth: 0, clientHeight: 0 } as unknown as HTMLDivElement,
+      }),
     ).resolves.toBeUndefined();
   });
 
