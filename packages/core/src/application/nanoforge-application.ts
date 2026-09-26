@@ -10,6 +10,7 @@ import {
 
 import { InternalAppState } from "../internal/internal-app-state";
 import { InternalVarsState } from "../internal/internal-vars-state";
+import type { InternalViewportState } from "../internal/internal-viewport-state";
 import { LibraryRegistry } from "../library-registry/library-registry";
 import { type ApplicationOptions, DEFAULT_APPLICATION_OPTIONS } from "./application-options.type";
 
@@ -37,6 +38,9 @@ export abstract class NanoforgeApplication {
   private readonly options: ApplicationOptions;
 
   private context?: Context;
+
+  /** Client-only viewport, created by `NanoforgeClient.init` before `initialize`. */
+  protected viewport?: InternalViewportState;
 
   /**
    * @param options - Optional application-level settings such as tickRate.
@@ -80,6 +84,7 @@ export abstract class NanoforgeApplication {
     const loop = async (): Promise<void> => {
       if (!context.app.isRunning) {
         for (const library of orderedForRun) await library.__clear(context);
+        this.viewport?.dispose();
         return;
       }
 
@@ -103,7 +108,12 @@ export abstract class NanoforgeApplication {
   }
 
   protected async initialize(options: RunOptions | ClientRunOptions): Promise<void> {
-    const initContext: InitContext = { ...options, vars: this.varsState.asVarsContext() };
+    const viewport = this.viewport?.asViewportContext();
+    const initContext: InitContext = {
+      ...options,
+      vars: this.varsState.asVarsContext(),
+      ...(viewport ? { viewport } : {}),
+    };
 
     for (const library of this.registry.getOrderedForInit()) {
       await library.__init(initContext);
@@ -112,6 +122,7 @@ export abstract class NanoforgeApplication {
     this.context = this.registry.buildContext(
       this.appState.asAppContext(),
       this.varsState.asVarsContext(),
+      viewport,
     );
   }
 }

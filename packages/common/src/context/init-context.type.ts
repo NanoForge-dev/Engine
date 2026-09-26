@@ -1,4 +1,5 @@
 import { type EventEmitter } from "../editor";
+import type { ViewportContext } from "../viewport/viewport.type";
 import type { VarsContext } from "./context.type";
 
 /**
@@ -50,5 +51,7 @@ export interface InitContext {
   env: Record<string, string | undefined>;
   files: Map<string, string>;
   container?: HTMLDivElement;
+  /** Screen/game viewport. Client-only; `undefined` on the server. */
+  viewport?: ViewportContext;
   editor?: RunOptions["editor"];
 }
