@@ -1,9 +1,7 @@
-import {
-  type IGraphicsLibrary,
-  type IInputLibrary,
-  type ISoundLibrary,
-} from "@nanoforge-dev/common";
+import type { ClientRunOptions } from "@nanoforge-dev/common";
 
+import { InternalViewportState } from "../internal/internal-viewport-state";
+import type { ClientApplicationOptions } from "./application-options.type";
 import { NanoforgeApplication } from "./nanoforge-application";
 
 /**
@@ -11,45 +9,47 @@ import { NanoforgeApplication } from "./nanoforge-application";
  *
  * @remarks
  * Extends `NanoforgeApplication` with client-specific library slots for
- * graphics, input, and sound.  Create an instance via
- * `NanoforgeFactory.createClient`.
+ * graphics, input, and sound, and owns the `viewport` (design resolution,
+ * fit mode and window-resize tracking) exposed on `Context.viewport`.
+ * Create an instance via `NanoforgeFactory.createClient`.
  *
  * @example
  * ```ts
- * const client = NanoforgeFactory.createClient();
- * client.useAssetManager(new AssetManagerLibrary());
- * client.useGraphics(new Graphics2DLibrary());
- * client.useInput(new InputLibrary());
- * client.useSound(new SoundLibrary());
+ * const client = NanoforgeFactory.createClient({
+ *   viewport: { width: 1920, height: 1080, fit: "contain" },
+ * });
+ * client.use(new Graphics2DLibrary());
+ * client.use(new InputLibrary());
+ * client.use(new SoundLibrary());
  * await client.init(`container, files, env `);
  * client.run();
  * ```
  */
 export class NanoforgeClient extends NanoforgeApplication {
+  private readonly viewportOptions: ClientApplicationOptions["viewport"];
+
   /**
-   * Register the graphics library used to render the game.
-   *
-   * @param library - Graphics library instance (e.g. Graphics2DLibrary).
+   * @param options - Optional application settings such as tickRate and viewport.
    */
-  public useGraphics(library: IGraphicsLibrary) {
-    this.applicationConfig.useGraphicsLibrary(library);
+  constructor(options?: Partial<ClientApplicationOptions>) {
+    const { viewport, ...applicationOptions } = options ?? {};
+    super(applicationOptions);
+    this.viewportOptions = viewport;
   }
 
   /**
-   * Register the input library used to read keyboard and mouse state.
+   * Initialise all registered libraries in dependency order and prepare the
+   * engine for the game loop.
    *
-   * @param library - Input library instance (e.g. InputLibrary).
-   */
-  public useInput(library: IInputLibrary) {
-    this.applicationConfig.useInputLibrary(library);
-  }
-
-  /**
-   * Register the sound-effect library.
+   * @remarks
+   * Must be called before `run`.  Resolves once every library's `__init`
+   * hook has completed.
    *
-   * @param library - Sound library instance (e.g. SoundLibrary).
+   * @param options - Run options providing the canvas container, files map, and
+   *   environment variables.
    */
-  public useSound(library: ISoundLibrary) {
-    this.applicationConfig.useSoundLibrary(library);
+  public async init(options: ClientRunOptions): Promise<void> {
+    this.viewport = new InternalViewportState(options.container, this.viewportOptions);
+    await this.initialize(options);
   }
 }

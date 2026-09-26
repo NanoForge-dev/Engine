@@ -19,7 +19,7 @@
 
 ## Installation
 
-**Node.js 25 or newer is required.**
+**Node.js 26 or newer is required.**
 
 ```sh
 npm install @nanoforge-dev/core

@@ -1,23 +1,19 @@
 import { NfException } from "../abstracts/exception.abstract";
 
 /**
- * Thrown when a method is called on a library or engine component before it
- * has been initialised via `__init`.
+ * Thrown when a library is used before its `__init` lifecycle hook has
+ * resolved.
  *
  * @remarks
- * This exception is raised automatically by the helper method
- * `Library.throwNotInitializedError()`.  Ensure that
- * `NanoforgeApplication.init` has resolved before interacting with any
- * library.
+ * Raised automatically by `Library.throwNotInitializedError()`.
  */
 export class NfNotInitializedException extends NfException {
-  /** Always `404`. */
   get code(): number {
     return 404;
   }
 
   /**
-   * @param item - Name of the uninitialised component (e.g. the library's __name).
+   * @param item - Key of the uninitialised library.
    * @param type - Optional category label (e.g. "Library").
    */
   constructor(item: string, type?: string) {
