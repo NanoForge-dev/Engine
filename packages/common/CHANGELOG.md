@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+# [2.0.0](https://github.com/NanoForge-dev/Engine/compare/1.4.2...2.0.0) - (2026-09-27)
+
+## Features
+
+- Add dynamic resize (#441) ([9464df3](https://github.com/NanoForge-dev/Engine/commit/9464df330d97d3f1a10e272e7e1126dd3ab9af64)) by @Exeloo
+- Add nanoforge package (#431) ([6801e56](https://github.com/NanoForge-dev/Engine/commit/6801e5634a7d24bf93c92814631bb426d6d64755)) by @Exeloo
+- Add server run options type (#433) ([8700ece](https://github.com/NanoForge-dev/Engine/commit/8700ece5cba4c5f1e093d4bc246785810f92a8fe)) by @Exeloo
+- Add new common (#423) ([f58b8e2](https://github.com/NanoForge-dev/Engine/commit/f58b8e2fa2801898233a0e2b75f7625c5f7cb851)) by @Exeloo
+
+## Refactor
+
+- Change ecs to only one module (#417) ([c7998c3](https://github.com/NanoForge-dev/Engine/commit/c7998c3b3f1b0dfbdc4a4bdf8c24c3ccf2ec4931)) by @Exeloo
+
 # [1.4.2](https://github.com/NanoForge-dev/Engine/compare/1.4.1...1.4.2) - (2026-07-06)
 
 # [1.4.1](https://github.com/NanoForge-dev/Engine/compare/1.4.0...1.4.1) - (2026-07-06)
