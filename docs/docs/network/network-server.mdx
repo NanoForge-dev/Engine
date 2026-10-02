@@ -12,8 +12,13 @@ This document explains the `network-server` package implementation and the APIs 
 
 The server listens on configured ports and accepts client connections. A single server process can accept many clients, and typical responsibilities in a game are:
 
-- Accept reliable control messages from clients over the TCP/WebSocket channel.
-- Optionally establish `RTCPeerConnection`s via WebSocket signaling to receive unreliable, unordered data channels for low-latency state updates.
+- Accept reliable control messages from clients on `Channel.ReliableOrdered`
+  and `Channel.ReliableUnordered`, carried by a TCP WebSocket.
+- Optionally establish `RTCPeerConnection`s via WebSocket signaling for
+  `Channel.UnreliableOrdered` and `Channel.UnreliableUnordered`, carried by WebRTC data
+  channels, for low-latency state updates.
+
+See [Packet Channels](packet-framing) for what each channel guarantees.
 
 ## Client identification
 
@@ -41,7 +46,7 @@ network.clients.onDisconnect((info) => {
 });
 
 // Anytime: what is known about a client
-const info = network.tcp.getClientInfo(clientId);
+const info = network.clients.get(clientId);
 ```
 
 `onConnect` fires as soon as the first transport is up, so when both transports
@@ -49,17 +54,22 @@ are used, UDP may not be linked yet.
 
 ## Example
 
-It works the same with UDP:
-
 ```javascript
-// Send everybody a JSON-encoded packet
-network.tcp.sendToEverybody(new TextEncoder().encode(JSON.stringify({ type: "are you here" })));
+import { Channel } from "@nanoforge-dev/network/server";
 
-// Check connected clients
-const connectedClients = network.tcp.getConnectedClients();
+// Send everybody a JSON-encoded packet, on Channel.ReliableOrdered
+network.sendToAll(new TextEncoder().encode(JSON.stringify({ type: "are you here" })));
 
-// Receive all packets
-const allPackets = network.tcp.getReceivedPackets();
+// Or pick another channel
+network.sendToAll(new TextEncoder().encode(JSON.stringify({ x: 1 })), {
+  channel: Channel.UnreliableUnordered,
+});
+
+// Check connected clients (ClientId strings)
+const connectedClients = network.getConnectedClients();
+
+// Receive the packets of every channel
+const allPackets = network.getReceivedPackets();
 
 // Get first client packets
 const firstClientPackets = allPackets.get(connectedClients[0]);
@@ -73,4 +83,4 @@ const decodedPackets = firstClientPackets.map((packet) => {
 ## Notes
 
 - See [Network Server API](network-server-api) for the full list of available functions.
-- For packet framing and terminator semantics, see [Packet Framing](packet-framing).
+- For the channels and how packets are framed on each, see [Packet Channels](packet-framing).

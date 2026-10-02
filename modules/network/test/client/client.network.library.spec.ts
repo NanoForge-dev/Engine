@@ -1,7 +1,7 @@
 import type { InitContext } from "@nanoforge-dev/common";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { NetworkClientLibrary } from "../../src/client";
+import { Channel, NetworkClientLibrary } from "../../src/client";
 
 const makeInitContext = (env: Record<string, string>): InitContext => ({
   vars: { get: () => undefined, set: () => {} },
@@ -11,12 +11,28 @@ const makeInitContext = (env: Record<string, string>): InitContext => ({
 
 const welcome = { type: "welcome", id: "client-0", token: "t0k3n" };
 
+const tcpOnly = { SERVER_TCP_PORT: "8080", SERVER_ADDRESS: "127.0.0.1" };
+const udpOnly = { SERVER_UDP_PORT: "8081", SERVER_ADDRESS: "127.0.0.1" };
+const both = { SERVER_TCP_PORT: "8080", SERVER_UDP_PORT: "8081", SERVER_ADDRESS: "127.0.0.1" };
+
+/** The mocked TCP socket, the first WebSocket opened when TCP is configured. */
+const tcpSocket = () => vi.mocked(WebSocket).mock.instances[0] as any;
+
+/** The mocked data channel labelled `label`. */
+const dataChannel = (label: string) =>
+  (vi.mocked(RTCPeerConnection).mock.instances[0] as any).createDataChannel.mock.results.find(
+    ({ value }: { value: { label: string } }) => value.label === label,
+  )?.value;
+
 describe("NetworkClientLibrary", () => {
   /** How the server answers each socket opened by the test, in order. Defaults to a welcome. */
   let answers: ("welcome" | "close")[];
+  /** `readyState` of the data channels the client creates. */
+  let dataChannelState: string;
 
   beforeEach(() => {
     answers = [];
+    dataChannelState = "open";
     vi.stubGlobal(
       "WebSocket",
       Object.assign(
@@ -30,8 +46,9 @@ describe("NetworkClientLibrary", () => {
           this.onclose = null;
           const answer = answers.shift() ?? "welcome";
           setTimeout(() => {
-            if (answer === "close") this.onclose?.();
-            else this.onmessage?.({ data: JSON.stringify(welcome) });
+            if (answer === "close") return this.onclose?.();
+            this.readyState = 1;
+            this.onmessage?.({ data: JSON.stringify(welcome) });
           });
         }),
         { OPEN: 1 },
@@ -42,9 +59,10 @@ describe("NetworkClientLibrary", () => {
       "RTCPeerConnection",
       vi.fn(function (this: any) {
         this.onicecandidate = null;
-        this.createDataChannel = vi.fn(function (this: any) {
+        this.createDataChannel = vi.fn(function (this: any, label: string) {
           return {
-            readyState: "closed",
+            label,
+            readyState: dataChannelState,
             send: vi.fn(),
             onopen: null,
             onmessage: null,
@@ -71,7 +89,7 @@ describe("NetworkClientLibrary", () => {
 
   describe("config validation", () => {
     it("should throw when neither TCP nor UDP port is provided", async () => {
-      const ctx = makeInitContext({ SERVER_ADDRESS: "127.0.0.1", MAGIC_VALUE: "END" });
+      const ctx = makeInitContext({ SERVER_ADDRESS: "127.0.0.1" });
       await expect(new NetworkClientLibrary().__init(ctx)).rejects.toThrow();
     });
   });
@@ -81,12 +99,14 @@ describe("NetworkClientLibrary", () => {
       const ctx = makeInitContext({
         SERVER_TCP_PORT: "8080",
         SERVER_ADDRESS: "127.0.0.1",
-        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      expect(lib.tcp).toBeDefined();
-      expect(lib.udp).toBeUndefined();
+      await lib.connect();
+      expect(() => lib.sendData(new Uint8Array([1]))).not.toThrow();
+      expect(() =>
+        lib.sendData(new Uint8Array([1]), { channel: Channel.UnreliableOrdered }),
+      ).toThrow("Channel unreliable-ordered needs SERVER_UDP_PORT to be set");
     });
 
     it("should hand ICE_SERVERS from the environment to the peer connection", async () => {
@@ -95,7 +115,9 @@ describe("NetworkClientLibrary", () => {
         SERVER_ADDRESS: "127.0.0.1",
         ICE_SERVERS: "stun:stun.example.com:3478",
       });
-      await new NetworkClientLibrary().__init(ctx);
+      const lib = new NetworkClientLibrary();
+      await lib.__init(ctx);
+      await lib.connect();
       expect(RTCPeerConnection).toHaveBeenCalledWith({
         iceServers: [{ urls: "stun:stun.example.com:3478" }],
       });
@@ -105,12 +127,16 @@ describe("NetworkClientLibrary", () => {
       const ctx = makeInitContext({
         SERVER_UDP_PORT: "8081",
         SERVER_ADDRESS: "127.0.0.1",
-        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      expect(lib.udp).toBeDefined();
-      expect(lib.tcp).toBeUndefined();
+      await lib.connect();
+      expect(() =>
+        lib.sendData(new Uint8Array([1]), { channel: Channel.UnreliableUnordered }),
+      ).not.toThrow();
+      expect(() => lib.sendData(new Uint8Array([1]))).toThrow(
+        "Channel reliable-ordered needs SERVER_TCP_PORT to be set",
+      );
     });
 
     it("should initialize both TCP and UDP clients when both ports are provided", async () => {
@@ -118,12 +144,14 @@ describe("NetworkClientLibrary", () => {
         SERVER_TCP_PORT: "8080",
         SERVER_UDP_PORT: "8081",
         SERVER_ADDRESS: "127.0.0.1",
-        MAGIC_VALUE: "END",
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      expect(lib.tcp).toBeDefined();
-      expect(lib.udp).toBeDefined();
+      await lib.connect();
+      expect(() => lib.sendData(new Uint8Array([1]))).not.toThrow();
+      expect(() =>
+        lib.sendData(new Uint8Array([1]), { channel: Channel.UnreliableUnordered }),
+      ).not.toThrow();
     });
 
     it("should link UDP to the session received over TCP", async () => {
@@ -134,6 +162,7 @@ describe("NetworkClientLibrary", () => {
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
+      await lib.connect();
 
       expect(vi.mocked(WebSocket).mock.calls.map(([url]) => url)).toStrictEqual([
         "ws://127.0.0.1:8080",
@@ -142,8 +171,7 @@ describe("NetworkClientLibrary", () => {
       expect(lib.clientId).toBe("client-0");
     });
 
-    it("should still connect UDP, without a token, when TCP fails", async () => {
-      vi.spyOn(console, "error").mockImplementation(() => {});
+    it("should still connect UDP, without a token, when TCP fails, then reject", async () => {
       answers = ["close"];
       const ctx = makeInitContext({
         SERVER_TCP_PORT: "8080",
@@ -151,31 +179,183 @@ describe("NetworkClientLibrary", () => {
         SERVER_ADDRESS: "127.0.0.1",
       });
       const lib = new NetworkClientLibrary();
+      await lib.__init(ctx);
 
-      await expect(lib.__init(ctx)).resolves.toBeUndefined();
+      await expect(lib.connect()).rejects.toThrow(
+        "NetworkClientLibrary: could not connect to the server",
+      );
       expect(vi.mocked(WebSocket).mock.calls[1]?.[0]).toBe("ws://127.0.0.1:8081");
       expect(lib.clientId).toBe("client-0");
     });
 
-    it("should default MAGIC_VALUE and WSS when not provided", async () => {
+    it("should default WSS when not provided", async () => {
       const ctx = makeInitContext({ SERVER_TCP_PORT: "8080", SERVER_ADDRESS: "127.0.0.1" });
       const lib = new NetworkClientLibrary();
       await expect(lib.__init(ctx)).resolves.toBeUndefined();
     });
   });
 
-  describe("expose", () => {
-    it("returns the tcp/udp clients", async () => {
-      const ctx = makeInitContext({
-        SERVER_TCP_PORT: "8080",
-        SERVER_ADDRESS: "127.0.0.1",
-        MAGIC_VALUE: "END",
-      });
+  describe("connect", () => {
+    it("should not open any connection during __init", async () => {
+      await new NetworkClientLibrary().__init(makeInitContext(both));
+      expect(WebSocket).not.toHaveBeenCalled();
+    });
+
+    it("should only open the transports the channels need", async () => {
       const lib = new NetworkClientLibrary();
-      await lib.__init(ctx);
-      expect(lib.expose().tcp).toBe(lib.tcp);
-      expect(() => lib.expose().udp).toThrow("UDP isn't defined");
-      expect(lib.expose().clientId).toBe("client-0");
+      await lib.__init(makeInitContext(both));
+      await lib.connect({ channels: [Channel.UnreliableUnordered] });
+
+      expect(vi.mocked(WebSocket).mock.calls.map(([url]) => url)).toStrictEqual([
+        "ws://127.0.0.1:8081",
+      ]);
+    });
+
+    it("should wait until every channel is open", async () => {
+      dataChannelState = "connecting";
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(udpOnly));
+
+      let connected = false;
+      const connecting = lib
+        .connect({ channels: [Channel.UnreliableOrdered] })
+        .then(() => (connected = true));
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      expect(connected).toBe(false);
+
+      dataChannel("unreliable-ordered").readyState = "open";
+      await connecting;
+      expect(connected).toBe(true);
+    });
+
+    it("should reject when the channels are not open in time", async () => {
+      dataChannelState = "connecting";
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(udpOnly));
+
+      await expect(lib.connect({ timeout: 100 })).rejects.toThrow(
+        "channels unreliable-ordered, unreliable-unordered not open after 100ms",
+      );
+    });
+
+    it("should not reconnect a transport that is already open", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      await lib.connect();
+      await lib.connect({ channels: [Channel.ReliableUnordered] });
+
+      expect(WebSocket).toHaveBeenCalledTimes(1);
+    });
+
+    it("should reject a channel whose port is not configured", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+
+      await expect(lib.connect({ channels: [Channel.UnreliableOrdered] })).rejects.toThrow(
+        "Channel unreliable-ordered needs SERVER_UDP_PORT to be set",
+      );
+    });
+
+    it("should reject when called before __init", async () => {
+      await expect(new NetworkClientLibrary().connect()).rejects.toThrow("before __init");
+    });
+  });
+
+  describe("channels", () => {
+    it("should send on ReliableOrdered when no channel is given", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      await lib.connect();
+
+      lib.sendData(new Uint8Array([1]));
+      expect(tcpSocket().send).toHaveBeenCalledWith(new Uint8Array([0, 1]));
+    });
+
+    it("should send each reliable channel over the same TCP socket", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      await lib.connect();
+
+      lib.sendData(new Uint8Array([1]), { channel: Channel.ReliableOrdered });
+      lib.sendData(new Uint8Array([2]), { channel: Channel.ReliableUnordered });
+
+      expect(tcpSocket().send.mock.calls).toStrictEqual([
+        [new Uint8Array([0, 1])],
+        [new Uint8Array([1, 2])],
+      ]);
+    });
+
+    it("should open one data channel per unreliable channel", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(udpOnly));
+      await lib.connect();
+
+      const peerConnection = vi.mocked(RTCPeerConnection).mock.instances[0] as any;
+      expect(
+        peerConnection.createDataChannel.mock.calls.map(([label]: [string]) => label),
+      ).toStrictEqual(["unreliable-ordered", "unreliable-unordered"]);
+    });
+
+    it("should send unreliable channels on their own data channel", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(udpOnly));
+      await lib.connect();
+
+      lib.sendData(new Uint8Array([3]), { channel: Channel.UnreliableUnordered });
+      expect(dataChannel("unreliable-unordered").send).toHaveBeenCalledWith(new Uint8Array([3]));
+      expect(dataChannel("unreliable-ordered").send).not.toHaveBeenCalled();
+    });
+
+    it("should read one channel, or every channel with reliable ones first", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(both));
+      await lib.connect();
+
+      dataChannel("unreliable-unordered").onmessage({ data: new Uint8Array([9]).buffer });
+      tcpSocket().onmessage({ data: new Uint8Array([1, 2]).buffer });
+      tcpSocket().onmessage({ data: new Uint8Array([0, 1]).buffer });
+
+      expect(lib.getReceivedPackets({ channel: Channel.ReliableUnordered })).toStrictEqual([
+        new Uint8Array([2]),
+      ]);
+      expect(lib.getReceivedPackets()).toStrictEqual([new Uint8Array([1]), new Uint8Array([9])]);
+      expect(lib.getReceivedPackets()).toStrictEqual([]);
+    });
+
+    it("should report connected only once every configured channel is", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(both));
+      await lib.connect();
+      tcpSocket().readyState = 1;
+      dataChannel("unreliable-ordered").readyState = "connecting";
+
+      expect(lib.isConnected({ channel: Channel.ReliableOrdered })).toBe(true);
+      expect(lib.isConnected({ channel: Channel.UnreliableOrdered })).toBe(false);
+      expect(lib.isConnected()).toBe(false);
+
+      dataChannel("unreliable-ordered").readyState = "open";
+      expect(lib.isConnected()).toBe(true);
+    });
+
+    it("should report not connected before init", () => {
+      expect(new NetworkClientLibrary().isConnected()).toBe(false);
+    });
+  });
+
+  describe("expose", () => {
+    it("delegates to the library", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      await lib.connect();
+      const api = lib.expose();
+
+      api.sendData(new Uint8Array([5]), { channel: Channel.ReliableUnordered });
+      expect(tcpSocket().send).toHaveBeenCalledWith(new Uint8Array([1, 5]));
+      expect(api.getReceivedPackets()).toStrictEqual([]);
+      expect(() => api.isConnected({ channel: Channel.UnreliableOrdered })).toThrow(
+        "SERVER_UDP_PORT",
+      );
+      expect(api.clientId).toBe("client-0");
     });
   });
 });

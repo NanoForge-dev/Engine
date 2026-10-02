@@ -6,87 +6,75 @@ description: "API reference for the client networking package"
 
 # network-client API
 
-## TCPClient
+`NetworkClientLibrary` is exposed on `ctx.network`. Its methods take an optional
+`{ channel }` to pick one of the four [channels](packet-framing):
+`Channel.ReliableOrdered`, `Channel.ReliableUnordered`,
+`Channel.UnreliableOrdered` or `Channel.UnreliableUnordered`.
 
-### connect()
+Reliable channels need `SERVER_TCP_PORT` and unreliable ones `SERVER_UDP_PORT`.
+Using a channel whose port is not configured throws.
 
-Initiate a WebSocket connection to the server, for example `ws://<ip>:<port>`,
-joining the current session when a token is already known.
+```ts
+import { Channel } from "@nanoforge-dev/network/client";
 
-Resolves once the server's `welcome` is received. Rejects when the socket fails
-or closes before it, or when no welcome arrives within 5 seconds.
+await ctx.network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
+
+ctx.network.sendData(data); // Channel.ReliableOrdered
+ctx.network.sendData(data, { channel: Channel.UnreliableOrdered });
+
+const packets = ctx.network.getReceivedPackets(); // every channel
+```
+
+## connect(options?)
+
+Connect to the server and resolve once the channels are open. Only the
+transports the channels need are opened: TCP for reliable channels, UDP for
+unreliable ones. TCP connects first, then UDP with the TCP session token, so both
+share one client id. Calling it again for channels that are already open resolves
+right away.
+
+Option `channels`: `Channel[]`, the channels to open and wait for. Every
+configured channel by default.
+
+Option `timeout`: `number`, milliseconds before giving up. `10000` by default.
+
+Rejects when a channel's port is not configured, when a transport fails to
+connect, or when the channels are not open before the timeout.
 
 Returns: `Promise<void>`
 
-### getClientId()
-
-Return the client id assigned by the server, once welcomed.
-
-Returns: `string | undefined`
-
-### isConnected()
-
-Return `true` when the underlying WebSocket is open.
-
-Returns: `boolean`
-
-### sendData(data)
+## sendData(data, options?)
 
 Send a payload to the server.
 
 Parameter `data`: `Uint8Array` raw payload bytes.
 
+Option `channel`: `Channel` to send on. `Channel.ReliableOrdered` by default.
+
 Returns: `void`
 
-### getReceivedPackets()
+## getReceivedPackets(options?)
 
-Return an array of complete packets that were reassembled from received chunks.
+Return the packets received since the last call. Call it once per frame.
+
+Option `channel`: `Channel` to read from. Without it, the packets of every
+configured channel are returned, reliable channels first.
 
 Returns: `Uint8Array[]`
 
-## UDPClient
+## isConnected(options?)
 
-### connect()
+Return `true` when packets can be sent and received.
 
-Open a WebSocket for signaling, create an `RTCPeerConnection`, and initiate an SDP offer.
-Presents the TCP session token, when known, so both transports share one client id.
-
-Resolves once the server's `welcome` is received. The data channel may open
-shortly after; check `isConnected()`.
-
-Returns: `Promise<void>`
-
-### getClientId()
-
-Return the client id assigned by the server, once welcomed.
-
-Returns: `string | undefined`
-
-### isConnected()
-
-Return `true` when the `RTCDataChannel` is open.
+Option `channel`: `Channel` to check. Without it, every configured channel must
+be connected.
 
 Returns: `boolean`
 
-### sendData(data)
+## clientId
 
-Send a payload on the data channel.
+Client id assigned by the server, shared by TCP and UDP. `undefined` until
+`connect` has been welcomed by the server. It is only kept in memory: a page
+reload gets a new id.
 
-Parameter `data`: `Uint8Array` raw payload bytes.
-
-Returns: `void`
-
-### getReceivedPackets()
-
-Return an array of complete packets reassembled from received data-channel chunks.
-
-Returns: `Uint8Array[]`
-
-## clientId (`ctx.network.clientId`)
-
-Client id assigned by the server, shared by TCP and UDP. `undefined` until a
-transport has been welcomed. It is only kept in memory: a page reload gets a new
-id.
-
-`NetworkClientLibrary` connects TCP first, then UDP with the TCP session token.
-A transport that fails to connect is logged and does not fail initialization.
+Type: `string | undefined`

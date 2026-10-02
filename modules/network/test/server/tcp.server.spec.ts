@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ClientRegistry } from "../../src/server/client-registry";
 import { TCPServer } from "../../src/server/tcp.server.network";
+import { Channel } from "../../src/shared/channels";
 
 const serve = vi.fn();
 const file = vi.fn((path: string) => ({ path }));
@@ -57,29 +58,34 @@ const getWelcome = (webSocket: { send: ReturnType<typeof vi.fn> }) =>
 describe("TCPServer", () => {
   describe("before listen", () => {
     it("should have no connected clients initially", () => {
-      const server = new TCPServer(9000, "127.0.0.1", "END");
+      const server = new TCPServer(9000, "127.0.0.1");
       expect(server.getConnectedClients()).toStrictEqual([]);
     });
 
     it("should return an empty packets map when no clients are connected", () => {
-      const server = new TCPServer(9000, "127.0.0.1", "END");
-      expect(server.getReceivedPackets()).toStrictEqual(new Map());
+      const server = new TCPServer(9000, "127.0.0.1");
+      expect(server.getReceivedPackets(Channel.ReliableOrdered)).toStrictEqual(new Map());
     });
 
     it("should not throw when sendToClient is called with an unknown clientId", () => {
-      const server = new TCPServer(9000, "127.0.0.1", "END");
-      expect(() => server.sendToClient("unknown", new Uint8Array([1, 2, 3]))).not.toThrow();
+      const server = new TCPServer(9000, "127.0.0.1");
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      expect(() =>
+        server.sendToClient(Channel.ReliableOrdered, "unknown", new Uint8Array([1, 2, 3])),
+      ).not.toThrow();
     });
 
     it("should not throw when sendToEverybody is called with no clients", () => {
-      const server = new TCPServer(9000, "127.0.0.1", "END");
-      expect(() => server.sendToEverybody(new Uint8Array([1, 2, 3]))).not.toThrow();
+      const server = new TCPServer(9000, "127.0.0.1");
+      expect(() =>
+        server.sendToEverybody(Channel.ReliableOrdered, new Uint8Array([1, 2, 3])),
+      ).not.toThrow();
     });
   });
 
   describe("after listen", () => {
     it("should start a Bun server on the configured host and port", () => {
-      const server = new TCPServer(9001, "0.0.0.0", "MAGIC");
+      const server = new TCPServer(9001, "0.0.0.0");
       server.listen();
       expect(serve).toHaveBeenCalledWith(
         expect.objectContaining({ port: 9001, hostname: "0.0.0.0" }),
@@ -87,7 +93,7 @@ describe("TCPServer", () => {
     });
 
     it("should register the websocket lifecycle handlers", () => {
-      const server = new TCPServer(9002, "0.0.0.0", "END");
+      const server = new TCPServer(9002, "0.0.0.0");
       server.listen();
       expect(getServeOptions().websocket).toEqual({
         open: expect.any(Function),
@@ -97,13 +103,13 @@ describe("TCPServer", () => {
     });
 
     it("should serve without TLS when no cert and key are provided", () => {
-      const server = new TCPServer(9007, "0.0.0.0", "END");
+      const server = new TCPServer(9007, "0.0.0.0");
       server.listen();
       expect(getServeOptions().tls).toBeUndefined();
     });
 
     it("should serve over TLS when a cert and key are provided", () => {
-      const server = new TCPServer(9008, "0.0.0.0", "END", "/tmp/cert.pem", "/tmp/key.pem");
+      const server = new TCPServer(9008, "0.0.0.0", "/tmp/cert.pem", "/tmp/key.pem");
       server.listen();
       expect(getServeOptions().tls).toEqual({
         cert: { path: "/tmp/cert.pem" },
@@ -114,7 +120,7 @@ describe("TCPServer", () => {
     });
 
     it("should reject a plain HTTP request that cannot be upgraded", () => {
-      const server = new TCPServer(9009, "0.0.0.0", "END");
+      const server = new TCPServer(9009, "0.0.0.0");
       server.listen();
 
       const response = getServeOptions().fetch(new Request("http://localhost:9009/"), {
@@ -128,7 +134,7 @@ describe("TCPServer", () => {
       const registry = new ClientRegistry();
       const onConnect = vi.fn();
       registry.onConnect(onConnect);
-      const server = new TCPServer(9012, "0.0.0.0", "END", undefined, undefined, registry);
+      const server = new TCPServer(9012, "0.0.0.0", undefined, undefined, registry);
       server.listen();
 
       getServeOptions().fetch(new Request("http://localhost:9012/"), {
@@ -140,7 +146,7 @@ describe("TCPServer", () => {
     });
 
     it("should reject an upgrade presenting an unknown session token", () => {
-      const server = new TCPServer(9013, "0.0.0.0", "END");
+      const server = new TCPServer(9013, "0.0.0.0");
       server.listen();
 
       const { response } = connect("127.0.0.1", { url: "http://localhost:9013/?token=forged" });
@@ -151,14 +157,14 @@ describe("TCPServer", () => {
 
   describe("client lifecycle", () => {
     it("should register a new client on connection", () => {
-      const server = new TCPServer(9003, "0.0.0.0", "END");
+      const server = new TCPServer(9003, "0.0.0.0");
       server.listen();
       connect();
       expect(server.getConnectedClients()).toStrictEqual(["client-0"]);
     });
 
     it("should remove a client on disconnect", () => {
-      const server = new TCPServer(9004, "0.0.0.0", "END");
+      const server = new TCPServer(9004, "0.0.0.0");
       server.listen();
       const { webSocket, options } = connect();
       expect(server.getConnectedClients()).toStrictEqual(["client-0"]);
@@ -168,7 +174,7 @@ describe("TCPServer", () => {
     });
 
     it("should send a welcome text frame with the client id and session token", () => {
-      const server = new TCPServer(9014, "0.0.0.0", "END");
+      const server = new TCPServer(9014, "0.0.0.0");
       server.listen();
       const { webSocket } = connect();
 
@@ -181,7 +187,7 @@ describe("TCPServer", () => {
     });
 
     it("should refuse a second TCP connection for the same session", () => {
-      const server = new TCPServer(9015, "0.0.0.0", "END");
+      const server = new TCPServer(9015, "0.0.0.0");
       server.listen();
       const { webSocket } = connect();
       const { token } = getWelcome(webSocket);
@@ -191,7 +197,7 @@ describe("TCPServer", () => {
     });
 
     it("should expose what is known about a connected client", () => {
-      const server = new TCPServer(9016, "0.0.0.0", "END");
+      const server = new TCPServer(9016, "0.0.0.0");
       server.listen();
       connect("10.0.0.5", {
         url: "http://localhost:9016/?name=alice",
@@ -220,7 +226,7 @@ describe("TCPServer", () => {
       const registry = new ClientRegistry();
       const onDisconnect = vi.fn();
       registry.onDisconnect(onDisconnect);
-      const server = new TCPServer(9017, "0.0.0.0", "END", undefined, undefined, registry);
+      const server = new TCPServer(9017, "0.0.0.0", undefined, undefined, registry);
       server.listen();
       const { webSocket, options } = connect();
 
@@ -230,47 +236,73 @@ describe("TCPServer", () => {
     });
 
     it("should assign distinct ids to connected clients", () => {
-      const server = new TCPServer(9005, "0.0.0.0", "END");
+      const server = new TCPServer(9005, "0.0.0.0");
       server.listen();
       connect("127.0.0.1");
       connect("127.0.0.2");
       expect(server.getConnectedClients()).toStrictEqual(["client-0", "client-1"]);
     });
 
-    it("should parse a received packet from a connected client", () => {
-      const magicBytes = new TextEncoder().encode("END");
-      const payload = new Uint8Array([42, 43]);
-      const chunk = new Uint8Array([...payload, ...magicBytes]);
-
-      const server = new TCPServer(9006, "0.0.0.0", "END");
+    it("should route each received frame to the channel of its tag", () => {
+      const server = new TCPServer(9006, "0.0.0.0");
       server.listen();
       const { webSocket, options } = connect();
 
-      options.websocket.message(webSocket, Buffer.from(chunk));
+      options.websocket.message(webSocket, Buffer.from([0, 42, 43]));
+      options.websocket.message(webSocket, Buffer.from([1, 44]));
 
-      const packets = server.getReceivedPackets();
-      expect(packets.get("client-0")).toHaveLength(1);
-      expect(packets.get("client-0")?.[0]).toStrictEqual(payload);
+      expect(server.getReceivedPackets(Channel.ReliableOrdered).get("client-0")).toStrictEqual([
+        new Uint8Array([42, 43]),
+      ]);
+      expect(server.getReceivedPackets(Channel.ReliableUnordered).get("client-0")).toStrictEqual([
+        new Uint8Array([44]),
+      ]);
+      expect(server.getReceivedPackets(Channel.ReliableOrdered).get("client-0")).toStrictEqual([]);
+    });
+
+    it("should drop a frame with an unknown channel tag", () => {
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      const server = new TCPServer(9018, "0.0.0.0");
+      server.listen();
+      const { webSocket, options } = connect();
+
+      options.websocket.message(webSocket, Buffer.from([7, 1]));
+      expect(server.getReceivedPackets(Channel.ReliableOrdered).get("client-0")).toStrictEqual([]);
+      expect(server.getReceivedPackets(Channel.ReliableUnordered).get("client-0")).toStrictEqual(
+        [],
+      );
     });
 
     it("should ignore a text frame instead of throwing", () => {
-      const server = new TCPServer(9010, "0.0.0.0", "END");
+      const server = new TCPServer(9010, "0.0.0.0");
       server.listen();
       const { webSocket, options } = connect();
 
+      vi.spyOn(console, "error").mockImplementation(() => {});
       expect(() => options.websocket.message(webSocket, "not binary")).not.toThrow();
-      expect(server.getReceivedPackets().get("client-0")).toStrictEqual([]);
+      expect(server.getReceivedPackets(Channel.ReliableOrdered).get("client-0")).toStrictEqual([]);
     });
 
-    it("should send framed packets to a connected client", () => {
-      const server = new TCPServer(9011, "0.0.0.0", "END");
+    it("should prefix packets sent to a client with the channel tag", () => {
+      const server = new TCPServer(9011, "0.0.0.0");
       server.listen();
       const { webSocket } = connect();
 
-      server.sendToClient("client-0", new Uint8Array([1, 2]));
-      expect(webSocket.send).toHaveBeenCalledWith(
-        new Uint8Array([1, 2, ...new TextEncoder().encode("END")]),
-      );
+      server.sendToClient(Channel.ReliableOrdered, "client-0", new Uint8Array([1, 2]));
+      server.sendToClient(Channel.ReliableUnordered, "client-0", new Uint8Array([3]));
+      expect(webSocket.send).toHaveBeenCalledWith(new Uint8Array([0, 1, 2]));
+      expect(webSocket.send).toHaveBeenCalledWith(new Uint8Array([1, 3]));
+    });
+
+    it("should broadcast tagged packets to every client", () => {
+      const server = new TCPServer(9019, "0.0.0.0");
+      server.listen();
+      const first = connect("127.0.0.1").webSocket;
+      const second = connect("127.0.0.2").webSocket;
+
+      server.sendToEverybody(Channel.ReliableUnordered, new Uint8Array([5]));
+      expect(first.send).toHaveBeenCalledWith(new Uint8Array([1, 5]));
+      expect(second.send).toHaveBeenCalledWith(new Uint8Array([1, 5]));
     });
   });
 });

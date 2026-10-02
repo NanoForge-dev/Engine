@@ -11,17 +11,67 @@ description: "API reference for the server networking package"
 `string`: an opaque, random identifier (UUID) of a client session. A client
 connected over both TCP and UDP has the same `ClientId` on both servers.
 
-## TCPServer
+## Methods
 
-### listen()
+`NetworkServerLibrary` is exposed on `ctx.network`. Its methods take an optional
+`{ channel }` to pick one of the four [channels](packet-framing):
+`Channel.ReliableOrdered`, `Channel.ReliableUnordered`,
+`Channel.UnreliableOrdered` or `Channel.UnreliableUnordered`.
 
-Start the WebSocket server and begin accepting clients.
+Reliable channels need `LISTENING_TCP_PORT` and unreliable ones
+`LISTENING_UDP_PORT`. Using a channel whose port is not configured throws.
+
+```ts
+import { Channel } from "@nanoforge-dev/network/server";
+
+ctx.network.sendToAll(data); // Channel.ReliableOrdered
+ctx.network.sendToAll(data, { channel: Channel.UnreliableUnordered });
+
+ctx.network.getReceivedPackets().forEach((packets, clientId) => {
+  // every channel
+});
+```
+
+### sendToAll(data, options?)
+
+Send a payload to every client reachable on the channel.
+
+Parameter `data`: `Uint8Array` raw payload bytes.
+
+Option `channel`: `Channel` to send on. `Channel.ReliableOrdered` by default.
 
 Returns: `void`
 
-### getConnectedClients()
+### sendToClient(clientId, data, options?)
 
-Return a snapshot array of the client IDs currently connected over TCP.
+Send a payload to one client. Logs an error when the client is not reachable on
+the channel.
+
+Parameter `clientId`: `ClientId` client identifier.
+
+Parameter `data`: `Uint8Array` payload bytes.
+
+Option `channel`: `Channel` to send on. `Channel.ReliableOrdered` by default.
+
+Returns: `void`
+
+### getReceivedPackets(options?)
+
+Return the packets each client sent since the last call. Call it once per frame.
+
+Option `channel`: `Channel` to read from. Without it, the packets of every
+configured channel are merged per client, reliable channels first.
+
+Returns: `Map<ClientId, Uint8Array[]>`
+
+### getConnectedClients(options?)
+
+Return a snapshot array of the clients reachable on the channel: clients with an
+open WebSocket for reliable channels, clients with the channel's data channel for
+unreliable ones.
+
+Option `channel`: `Channel` to check. Without it, clients reachable on any
+configured channel.
 
 Returns: `ClientId[]`
 
@@ -32,74 +82,6 @@ Return what is known about a client session. See [ClientInfo](#clientinfo).
 Parameter `clientId`: `ClientId`
 
 Returns: `ClientInfo | undefined` (`undefined` once the client is gone)
-
-### sendToEverybody(data)
-
-Send a payload to every connected client.
-
-Parameter `data`: `Uint8Array` raw payload bytes.
-
-Returns: `void`
-
-### sendToClient(clientId, data)
-
-Send a payload to the client identified by `clientId`.
-
-Parameter `clientId`: `ClientId` client identifier.
-
-Parameter `data`: `Uint8Array` payload bytes.
-
-Returns: `void`
-
-### getReceivedPackets()
-
-Parse and return complete packets received from each client. Each packet is a `Uint8Array` buffer.
-
-Returns: `Map<ClientId, Uint8Array[]>`
-
-## UDPServer
-
-### listen()
-
-Start the signaling WebSocket and accept incoming client offers.
-
-Returns: `void`
-
-### getConnectedClients()
-
-Return a snapshot array of client IDs with active data channels.
-
-Returns: `ClientId[]`
-
-### getClientInfo(clientId)
-
-Same as [`TCPServer.getClientInfo`](#getclientinfo-clientid).
-
-Returns: `ClientInfo | undefined`
-
-### sendToEverybody(data)
-
-Send a payload to every connected data channel.
-
-Parameter `data`: `Uint8Array` raw payload bytes.
-
-Returns: `void`
-
-### sendToClient(clientId, data)
-
-Send a payload to a single client data channel.
-
-Parameter `clientId`: `ClientId`
-
-Parameter `data`: `Uint8Array`
-
-Returns: `void`
-
-### getReceivedPackets()
-
-Parse incoming channel chunks and return a map of complete packets per client.
-
-Returns: `Map<ClientId, Uint8Array[]>`
 
 ## clients (`ctx.network.clients`)
 
@@ -120,9 +102,9 @@ Returns: `ClientInfo[]`
 
 Call `listener(info)` when a new client session starts, i.e. when its first
 transport is up. With TCP and UDP, it fires on TCP open, before UDP is linked:
-`udp.sendToClient(info.id)` may still report an unknown client at that point.
-With UDP only, it fires when the signaling socket opens, before the data channel
-exists, so `udp.sendToClient(info.id)` may also report an unknown client.
+`sendToClient(info.id)` on an unreliable channel may still report an unknown
+client at that point. With UDP only, it fires when the signaling socket opens,
+before the data channels exist, so it may also report an unknown client.
 
 Returns: `() => void` that removes the listener.
 
