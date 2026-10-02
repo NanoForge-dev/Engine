@@ -1,4 +1,3 @@
-import { type EventEmitter } from "../editor";
 import type { ViewportContext } from "../viewport/viewport.type";
 import type { VarsContext } from "./context.type";
 
@@ -10,18 +9,6 @@ export interface RunOptions {
   files: Map<string, string>;
   /** Raw, unvalidated environment variables. */
   env: Record<string, string | undefined>;
-
-  /**
-   * Raw editor bridge, supplied by whoever starts the app under an editor
-   * host. `EditorLibrary` transforms this pair into the single
-   * `Context.editor` facade every library sees.
-   */
-  editor?: {
-    /** Engine → editor channel. */
-    toEditor: EventEmitter;
-    /** Editor → engine channel. */
-    fromEditor: EventEmitter;
-  };
 }
 
 /**
@@ -53,5 +40,4 @@ export interface InitContext {
   container?: HTMLDivElement;
   /** Screen/game viewport. Client-only; `undefined` on the server. */
   viewport?: ViewportContext;
-  editor?: RunOptions["editor"];
 }

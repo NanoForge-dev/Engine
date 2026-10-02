@@ -119,4 +119,36 @@ describe("SoundLibrary", () => {
       vi.unstubAllGlobals();
     });
   });
+
+  describe("editor mute", () => {
+    it("mutes on the editor's command, on top of the game's own state", async () => {
+      const { AudioClass } = makeMockAudio();
+      vi.stubGlobal("Audio", AudioClass);
+      const library = new SoundLibrary();
+      await library.__init();
+      library.mute(); // the game unmutes (sounds start muted)
+      library.load("click", "click.mp3");
+      const listeners = new Map<string, (...args: unknown[]) => void>();
+      const editor = {
+        on: (event: string, listener: (...args: unknown[]) => void) =>
+          listeners.set(event, listener),
+      };
+      await library.__editorInit({ editor } as never);
+      const element = (
+        library as unknown as { _sounds: Map<string, { muted: boolean }> }
+      )._sounds.get("click")!;
+      expect(element.muted).toBe(false);
+
+      listeners.get("mute")!(true);
+      expect(element.muted).toBe(true);
+      library.load("boom", "boom.mp3");
+      expect(
+        (library as unknown as { _sounds: Map<string, { muted: boolean }> })._sounds.get("boom")!
+          .muted,
+      ).toBe(true);
+      listeners.get("mute")!(false);
+      expect(element.muted).toBe(false);
+      vi.unstubAllGlobals();
+    });
+  });
 });

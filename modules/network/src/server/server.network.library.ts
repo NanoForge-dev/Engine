@@ -1,4 +1,5 @@
 import { type Context, type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
+import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/editor-lib";
 import { registerEnv } from "@nanoforge-dev/env";
 
 import {
@@ -9,6 +10,7 @@ import {
   isReliableChannel,
 } from "../shared/channels";
 import { NetworkData, type NetworkPayload, encodeNetworkPayload } from "../shared/network-data";
+import { type Trace, createTrace, traceServer } from "../shared/trace";
 import { type ClientId, type ClientInfo, ClientRegistry, type ClientsApi } from "./client-registry";
 import { ServerConfigNetwork } from "./config.server.network";
 import type { NetworkServerContextApi } from "./network-server-context.type";
@@ -41,7 +43,7 @@ import { UDPServer } from "./udp.server.network";
  * });
  * ```
  */
-export class NetworkServerLibrary extends Library {
+export class NetworkServerLibrary extends Library implements EditorAwareLibrary {
   readonly key = defineLibraryKey("network");
 
   private _tcp?: TCPServer;
@@ -53,6 +55,8 @@ export class NetworkServerLibrary extends Library {
   public get clients(): ClientsApi {
     return this._registry;
   }
+
+  private _trace: Trace | undefined;
 
   public override async __init(ctx: InitContext): Promise<void> {
     if (typeof Bun === "undefined") {
@@ -205,6 +209,23 @@ export class NetworkServerLibrary extends Library {
    */
   public getClientInfo(clientId: ClientId): ClientInfo | undefined {
     return this._registry.get(clientId);
+  }
+
+  /**
+   * Traces packets for the editor (`network-trace`, `network-stats`) while
+   * its `welcome` asks for it.
+   */
+  public async __editorInit(ctx: EditorInitContext): Promise<void> {
+    const trace = createTrace(ctx.editor);
+    if (this._tcp) traceServer(this._tcp, "tcp", trace);
+    if (this._udp) traceServer(this._udp, "udp", trace);
+    this._trace = trace;
+  }
+
+  /** Sends the totals of the packets traced for the editor (also while paused). */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public override async __events(_ctx: Context): Promise<void> {
+    this._trace?.tick();
   }
 
   public override expose(): NetworkServerContextApi {

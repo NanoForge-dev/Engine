@@ -83,8 +83,17 @@
   "dependencies": {
     "@nanoforge-dev/common": "workspace:*"
   },
+  "peerDependencies": {
+    "@nanoforge-dev/editor-lib": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@nanoforge-dev/editor-lib": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@favware/cliff-jumper": "catalog:ci",
+    "@nanoforge-dev/editor-lib": "workspace:*",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",

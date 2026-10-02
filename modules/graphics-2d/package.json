@@ -61,6 +61,14 @@
     "@nanoforge-dev/common": "workspace:*",
     "konva": "catalog:graphics"
   },
+  "peerDependencies": {
+    "@nanoforge-dev/editor-lib": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@nanoforge-dev/editor-lib": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@favware/cliff-jumper": "catalog:ci",
     "@nanoforge-dev/ecs": "workspace:*",

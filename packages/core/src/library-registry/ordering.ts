@@ -42,11 +42,17 @@ export const orderByRunSequence = (libraries: Library[]): Library[] => {
     libraries.map((lib) => [lib.key, new Set<string>()]),
   );
 
+  // "*" stands for every other library.
+  const expand = (library: Library, keys: string[]): string[] =>
+    keys.flatMap((key) =>
+      key === "*" ? libraries.map((lib) => lib.key).filter((k) => k !== library.key) : [key],
+    );
+
   for (const library of libraries) {
-    for (const before of library.relationships.runBefore) {
+    for (const before of expand(library, library.relationships.runBefore)) {
       runDependencies.get(library.key)?.add(before);
     }
-    for (const after of library.relationships.runAfter) {
+    for (const after of expand(library, library.relationships.runAfter)) {
       runDependencies.get(after)?.add(library.key);
     }
   }

@@ -263,8 +263,8 @@ describe("NanoforgeApplication", () => {
     it("resumes on the same tick an event handler calls requestResume(), since __events runs before the pause check", async () => {
       vi.useFakeTimers();
 
-      class EditorStandIn extends Library {
-        readonly key = "editor";
+      class ResumingLibrary extends Library {
+        readonly key = "resumer";
         private _resumeQueued = false;
 
         queueResume(): void {
@@ -280,9 +280,9 @@ describe("NanoforgeApplication", () => {
       }
 
       const server = new NanoforgeServer({ tickRate: 60 });
-      const editor = new EditorStandIn();
+      const resumer = new ResumingLibrary();
       const probe = new RecordingLibrary("probe", []);
-      server.use(editor);
+      server.use(resumer);
       server.use(probe);
       await server.init(makeRunOptions());
 
@@ -292,10 +292,109 @@ describe("NanoforgeApplication", () => {
       await vi.advanceTimersByTimeAsync(200);
       const runsWhilePaused = probe.runCount;
 
-      editor.queueResume();
+      resumer.queueResume();
       await vi.advanceTimersByTimeAsync(50); // next tick: __events drains the resume, __run fires too
 
       expect(probe.runCount).toBeGreaterThan(runsWhilePaused);
+    });
+  });
+
+  describe("step", () => {
+    it("runs exactly one tick per requestStep() while paused", async () => {
+      vi.useFakeTimers();
+      const server = new NanoforgeServer({ tickRate: 100 });
+      const probe = new RecordingLibrary("probe", []);
+      server.use(probe);
+      await server.init(makeRunOptions());
+      await server.run();
+      await vi.advanceTimersByTimeAsync(1);
+      const app = probe.capturedContext!.app;
+      app.requestPause();
+      await vi.advanceTimersByTimeAsync(50);
+      const before = probe.runCount;
+
+      app.requestStep();
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(probe.runCount).toBe(before + 1);
+      expect(app.delta).toBe(10);
+    });
+  });
+
+  describe("library hooks", () => {
+    it("lists the registered library keys on ctx.app.libraries", async () => {
+      vi.useFakeTimers();
+      const server = new NanoforgeServer();
+      const probe = new RecordingLibrary("probe", []);
+      server.use(probe);
+      await server.init(makeRunOptions());
+      await server.run();
+      await vi.advanceTimersByTimeAsync(1);
+
+      expect(probe.capturedContext!.app.libraries).toEqual(["assets", "probe"]);
+    });
+
+    it("callHook() calls the hook on the libraries that have it, in run order", async () => {
+      vi.useFakeTimers();
+      const calls: unknown[][] = [];
+      class Hooked extends RecordingLibrary {
+        async __ready(...args: unknown[]): Promise<void> {
+          await Promise.resolve();
+          calls.push([this.key, ...args]);
+        }
+      }
+      const server = new NanoforgeServer();
+      const last = new Hooked("last", []);
+      const first = new Hooked("first", [], { runAfter: ["*"] });
+      const plain = new RecordingLibrary("plain", []);
+      server.use(last);
+      server.use(plain);
+      server.use(first);
+      await server.init(makeRunOptions());
+      await server.run();
+      await vi.advanceTimersByTimeAsync(1);
+
+      await plain.capturedContext!.app.callHook("__ready", 1, "two");
+
+      expect(calls).toEqual([
+        ["first", 1, "two"],
+        ["last", 1, "two"],
+      ]);
+    });
+  });
+
+  describe("tick observers", () => {
+    it("reports each tick, the hooks when timings are wanted, and the stop after every clear", async () => {
+      vi.useFakeTimers();
+      const server = new NanoforgeServer({ tickRate: 100 });
+      const probe = new RecordingLibrary("probe", []);
+      server.use(probe);
+      await server.init(makeRunOptions());
+      await server.run();
+      await vi.advanceTimersByTimeAsync(1);
+      const app = probe.capturedContext!.app;
+
+      const observer = { timings: false, onHook: vi.fn(), onTick: vi.fn(), onStop: vi.fn() };
+      const clearsAtStop: number[] = [];
+      observer.onStop.mockImplementation(() => clearsAtStop.push(probe.clearCount));
+      const stopObserving = app.observeTicks(observer);
+      const silent = { onTick: vi.fn() };
+      app.observeTicks(silent)();
+
+      await vi.advanceTimersByTimeAsync(10);
+      expect(observer.onTick).toHaveBeenCalledWith(expect.any(Number), expect.any(Number));
+      expect(observer.onHook).not.toHaveBeenCalled();
+      expect(silent.onTick).not.toHaveBeenCalled();
+
+      observer.timings = true;
+      await vi.advanceTimersByTimeAsync(10);
+      expect(observer.onHook).toHaveBeenCalledWith("probe", expect.any(Number));
+
+      app.requestStop();
+      await vi.advanceTimersByTimeAsync(20);
+      expect(clearsAtStop).toEqual([1]);
+
+      stopObserving();
     });
   });
 });

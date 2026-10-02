@@ -72,10 +72,10 @@ describe("Graphics2DLibrary", () => {
       ...Object.fromEntries(Object.entries(shapes).map(([name, shape]) => [name, { name, shape }])),
     });
 
-    it("does nothing when ctx.editor or ctx.ecs is absent", async () => {
+    it("does nothing when ctx.ecs is absent", async () => {
       const library = new Graphics2DLibrary();
       await expect(
-        library.__events({ editor: undefined, ecs: undefined } as any),
+        library.__editorInit({ editor: { emit: vi.fn(), on: vi.fn() }, ecs: undefined } as any),
       ).resolves.toBeUndefined();
     });
 
@@ -94,7 +94,7 @@ describe("Graphics2DLibrary", () => {
         ecs: { registry: { getZipper, addSystem } },
       } as any;
 
-      await library.__events(ctx);
+      await library.__editorInit(ctx);
       expect(addSystem).toHaveBeenCalledOnce();
 
       const system = addSystem.mock.calls[0]![0] as (registry: unknown) => void;
@@ -115,7 +115,7 @@ describe("Graphics2DLibrary", () => {
       expect(shape.on).toHaveBeenCalledOnce();
     });
 
-    it("only wires the drag system once across multiple __events calls", async () => {
+    it("wires nothing on ticks, only in __editorInit", async () => {
       const library = new Graphics2DLibrary();
       const addSystem = vi.fn();
       const ctx = {
@@ -124,9 +124,9 @@ describe("Graphics2DLibrary", () => {
       } as any;
 
       await library.__events(ctx);
-      await library.__events(ctx);
+      await library.__run(ctx);
 
-      expect(addSystem).toHaveBeenCalledOnce();
+      expect(addSystem).not.toHaveBeenCalled();
     });
   });
 });

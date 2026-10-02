@@ -112,16 +112,13 @@ describe("EcsLibrary (client)", () => {
   });
 
   describe("editor hot-reload", () => {
-    it("registers a 'hot-reload' listener on the editor bridge once, during __init, and applies it via addComponent", async () => {
+    it("registers a 'hot-reload' listener on the editor bridge once, in __editorInit, and applies it via addComponent", async () => {
       const on = vi.fn();
       const lib = new EcsLibrary();
-      await lib.__init({
-        ...makeInitContext(),
-        editor: {
-          toEditor: { emit: vi.fn(), on: vi.fn() },
-          fromEditor: { emit: vi.fn(), on },
-        } as any,
-      });
+      await lib.__init(makeInitContext());
+      expect(on).not.toHaveBeenCalled();
+
+      await lib.__editorInit({ ...makeContext(), editor: { emit: vi.fn(), on } } as any);
 
       expect(on).toHaveBeenCalledTimes(1);
       expect(on).toHaveBeenCalledWith("hot-reload", expect.any(Function));

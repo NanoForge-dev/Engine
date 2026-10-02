@@ -1,4 +1,5 @@
 import { Library, NfNotFound, defineLibraryKey } from "@nanoforge-dev/common";
+import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/editor-lib";
 
 import type { SoundContextApi } from "./sound-context.type";
 
@@ -10,15 +11,25 @@ import type { SoundContextApi } from "./sound-context.type";
  * with `load` and trigger playback with `play`. Unlike `MusicLibrary`,
  * multiple sounds may overlap — there's no single-track exclusivity.
  */
-export class SoundLibrary extends Library {
+export class SoundLibrary extends Library implements EditorAwareLibrary {
   readonly key = defineLibraryKey("sound");
 
   private _muted = true;
+  /** Muted by the editor (`mute` bridge command), on top of the game's own state. */
+  private _editorMuted = false;
   private _sounds?: Map<string, HTMLAudioElement>;
 
   public override async __init(): Promise<void> {
     this._sounds = new Map();
     this._muted = true;
+  }
+
+  /** Listens to the editor's `mute` command. */
+  public async __editorInit(ctx: EditorInitContext): Promise<void> {
+    ctx.editor.on("mute", (muted) => {
+      this._editorMuted = muted;
+      this._applyMuted();
+    });
   }
 
   public override async __clear(): Promise<void> {
@@ -36,7 +47,7 @@ export class SoundLibrary extends Library {
   public load(key: string, file: string): void {
     if (!this._sounds) this.throwNotInitializedError();
     const element = new Audio(file);
-    element.muted = this._muted;
+    element.muted = this._muted || this._editorMuted;
     this._sounds.set(key, element);
   }
 
@@ -57,7 +68,7 @@ export class SoundLibrary extends Library {
   public mute(): void {
     if (!this._sounds) this.throwNotInitializedError();
     this._muted = !this._muted;
-    for (const element of this._sounds.values()) element.muted = this._muted;
+    this._applyMuted();
   }
 
   public override expose(): SoundContextApi {
@@ -68,5 +79,11 @@ export class SoundLibrary extends Library {
       play: (key) => library.play(key),
       mute: () => library.mute(),
     };
+  }
+
+  private _applyMuted(): void {
+    for (const element of this._sounds?.values() ?? []) {
+      element.muted = this._muted || this._editorMuted;
+    }
   }
 }

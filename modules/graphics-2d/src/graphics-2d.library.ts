@@ -1,21 +1,22 @@
 import {
-  type Context,
   type InitContext,
   Library,
   type ViewportState,
   defineLibraryKey,
 } from "@nanoforge-dev/common";
-// Side-effect-only: loads Context.editor/Context.ecs augmentations for the
-// optional editor-drag integration below. graphics-2d is client-only, so
-// it only ever coexists with @nanoforge-dev/ecs/client (never /server) in practice.
+// Type-only: the optional editor-drag integration below. graphics-2d is
+// client-only, so it only ever coexists with @nanoforge-dev/ecs/client
+// (never /server) in practice.
 import type { Registry } from "@nanoforge-dev/ecs/client";
-import type {} from "@nanoforge-dev/editor-lib";
+import type {
+  EditorAwareLibrary,
+  EditorContextApi,
+  EditorInitContext,
+} from "@nanoforge-dev/editor-lib";
 import Konva from "konva";
 
 import * as Graphics from "./exports/konva";
 import type { GraphicsContextApi } from "./graphics-context.type";
-
-type DragSystemEditor = NonNullable<Context["editor"]>;
 
 /**
  * Built-in 2D graphics library powered by [Konva](https://konvajs.org/).
@@ -29,12 +30,11 @@ type DragSystemEditor = NonNullable<Context["editor"]>;
  * scaled, offset and letterboxed/cropped according to the viewport's fit. Client-only — `__init`
  * throws if `InitContext.container` is missing.
  */
-export class Graphics2DLibrary extends Library {
+export class Graphics2DLibrary extends Library implements EditorAwareLibrary {
   readonly key = defineLibraryKey("graphics");
 
   private _stage?: Graphics.Stage;
   private _baseLayer?: Graphics.Layer;
-  private _editorDragWired = false;
   private _unsubscribeViewport?: () => void;
 
   public override async __init(ctx: InitContext): Promise<void> {
@@ -65,20 +65,13 @@ export class Graphics2DLibrary extends Library {
   }
 
   /**
-   * When both an editor bridge and ecs are registered, makes drawable
+   * When an editor started the app and ecs is registered, makes drawable
    * shapes (`DrawableCircle2D`/`DrawableRect2D`/`DrawableText2D`) draggable
-   * in the viewport and notifies the editor on drag end. No-op otherwise —
-   * plain graphics-2d usage is entirely unaffected.
-   *
-   * @remarks
-   * One-time wiring lives in `__events` (always runs, even while paused),
-   * not `__run` — so it isn't blocked behind an app that starts paused.
+   * in the viewport and notifies the editor on drag end. Plain graphics-2d
+   * usage is entirely unaffected.
    */
-  public override async __events(ctx: Context): Promise<void> {
-    if (!this._editorDragWired && ctx.editor && ctx.ecs) {
-      ctx.ecs.registry.addSystem(this._dragSystem(ctx.editor));
-      this._editorDragWired = true;
-    }
+  public async __editorInit(ctx: EditorInitContext): Promise<void> {
+    if (ctx.ecs) ctx.ecs.registry.addSystem(this._dragSystem(ctx.editor));
   }
 
   public get stage(): Graphics.Stage {
@@ -126,7 +119,7 @@ export class Graphics2DLibrary extends Library {
     stage.batchDraw();
   }
 
-  private _dragSystem(editor: DragSystemEditor): (registry: Registry) => void {
+  private _dragSystem(editor: EditorContextApi): (registry: Registry) => void {
     const wiredComponents = new Map<string, Set<string>>();
 
     return (registry: Registry) => {

@@ -1,6 +1,7 @@
 /**
  * Ordering relationships between a library and other libraries, referenced
- * by their `key`.
+ * by their `key`. In `runBefore` and `runAfter`, `"*"` stands for every
+ * other library.
  */
 export interface LibraryRelationships {
   /** Keys of libraries that must be initialized before this one. */

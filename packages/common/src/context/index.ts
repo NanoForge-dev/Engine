@@ -1,4 +1,4 @@
-export type { AppContext, AssetContext, Context, VarsContext } from "./context.type";
+export type { AppContext, AssetContext, Context, TickObserver, VarsContext } from "./context.type";
 export type {
   ClientRunOptions,
   InitContext,

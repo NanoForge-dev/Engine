@@ -1,70 +1,50 @@
-import {
-  type Context,
-  type EventEmitter,
-  type InitContext,
-  Library,
-  defineLibraryKey,
-} from "@nanoforge-dev/common";
+import { type Context, type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
 
-import { EditorCommand } from "./editor-command.enum";
-import type { EditorContextApi } from "./editor-context.type";
+import { EditorBridge } from "./internal/editor-bridge";
+import { EDITOR_INIT_HOOK, type EditorContextApi } from "./protocol";
 
 /**
- * Base editor bridge library.
+ * Editor bridge library.
  *
  * @remarks
- * Opt-in — register it only when the app is started under an editor host
- * (`app.use(new EditorLibrary())`), not a mandatory built-in like the asset
- * library. Reads the raw `toEditor`/`fromEditor` emitter pair from
- * `RunOptions.editor` (see `@nanoforge-dev/common`'s `RunOptions`
- * augmentation) and transforms them into the single `Context.editor` facade
- * every other library sees.
+ * Register it (`app.use(new EditorLibrary())`) in a game that may be started
+ * by an editor host. When `RunOptions.editor` is given, it handles the base
+ * commands (pause, resume, step, stop), reports the run state, provides
+ * `Context.editor` and the features the editor asks for in its `welcome`
+ * (frame stats, console output). Without `RunOptions.editor` it does nothing.
+ *
+ * Once the editor's `welcome` arrives, it calls `__editorInit(ctx)` on every
+ * registered library that has it (see `EditorAwareLibrary`).
  */
 export class EditorLibrary extends Library {
   readonly key = defineLibraryKey("editor");
 
-  private _toEditor: EventEmitter | undefined;
-  private _fromEditor: EventEmitter | undefined;
-  private _baseCommandsWired = false;
+  // Created with the library, before any `__init`: startup console output is kept.
+  private readonly _bridge = new EditorBridge();
+
+  constructor() {
+    // Every other library runs after this one: commands apply to the tick they arrive in.
+    super({ runAfter: ["*"] });
+  }
 
   public override async __init(ctx: InitContext): Promise<void> {
-    this._toEditor = ctx.editor?.toEditor;
-    this._fromEditor = ctx.editor?.fromEditor;
+    if (ctx.editor) this._bridge.connect(ctx.editor);
+    else this._bridge.dispose();
   }
 
   /**
-   * Drains queued editor → engine commands every tick — via `__events`, not
-   * `__run`, so this keeps happening even while the app is paused. That's
-   * what lets a queued "resume" command actually reach and lift the pause;
-   * if this drained inside `__run` instead, a paused app could never
-   * process the very command that would unpause it.
-   *
-   * Also wires the base `EditorCommand.Pause`/`.Resume`/`.Stop` commands
-   * (once) directly onto `Context.app` — an editor host gets these three
-   * actions for free, with no app-side listener code required.
+   * Drains the editor's commands every tick — in `__events`, so also while
+   * paused (the `resume` command has to get through) — and runs the
+   * libraries' `__editorInit` once the editor's `welcome` arrived.
    */
   public override async __events(ctx: Context): Promise<void> {
-    if (!this._baseCommandsWired && this._fromEditor) {
-      this._fromEditor.on(EditorCommand.Pause, () => ctx.app.requestPause());
-      this._fromEditor.on(EditorCommand.Resume, () => ctx.app.requestResume());
-      this._fromEditor.on(EditorCommand.Stop, () => ctx.app.requestStop());
-      this._baseCommandsWired = true;
-    }
-    this._fromEditor?.runEvents();
+    if (!this._bridge.connected) return;
+    this._bridge.start(ctx.app, ctx.viewport);
+    this._bridge.drain();
+    if (this._bridge.takeWelcomed()) await ctx.app.callHook(EDITOR_INIT_HOOK, ctx);
   }
 
-  public override expose(): EditorContextApi {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const library = this;
-    return {
-      emit: (event, ...args) => {
-        if (!library._toEditor) library.throwNotInitializedError();
-        library._toEditor?.emit(event, ...args);
-      },
-      on: (event, listener) => {
-        if (!library._fromEditor) library.throwNotInitializedError();
-        library._fromEditor?.on(event, listener);
-      },
-    };
+  public override expose(): EditorContextApi | undefined {
+    return this._bridge.connected ? this._bridge.facade() : undefined;
   }
 }
