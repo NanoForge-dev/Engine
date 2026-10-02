@@ -2,6 +2,7 @@ import "./context-augmentation";
 
 export type { NetworkConfig } from "../shared/config.network";
 export { Channel, type ChannelOptions } from "../shared/channels";
+export { NetworkData, type NetworkPayload } from "../shared/network-data";
 export type {
   ClientId,
   ClientInfo,

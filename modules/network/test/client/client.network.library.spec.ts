@@ -1,7 +1,7 @@
 import type { InitContext } from "@nanoforge-dev/common";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Channel, NetworkClientLibrary } from "../../src/client";
+import { Channel, NetworkClientLibrary, NetworkData } from "../../src/client";
 
 const makeInitContext = (env: Record<string, string>): InitContext => ({
   vars: { get: () => undefined, set: () => {} },
@@ -14,6 +14,11 @@ const welcome = { type: "welcome", id: "client-0", token: "t0k3n" };
 const tcpOnly = { SERVER_TCP_PORT: "8080", SERVER_ADDRESS: "127.0.0.1" };
 const udpOnly = { SERVER_UDP_PORT: "8081", SERVER_ADDRESS: "127.0.0.1" };
 const both = { SERVER_TCP_PORT: "8080", SERVER_UDP_PORT: "8081", SERVER_ADDRESS: "127.0.0.1" };
+
+const utf8 = (text: string) => new TextEncoder().encode(text);
+
+/** The payload bytes of each received packet. */
+const bytesOf = (packets: NetworkData[]) => packets.map((packet) => packet.bytes());
 
 /** The mocked TCP socket, the first WebSocket opened when TCP is configured. */
 const tcpSocket = () => vi.mocked(WebSocket).mock.instances[0] as any;
@@ -285,6 +290,20 @@ describe("NetworkClientLibrary", () => {
       ]);
     });
 
+    it("should send strings as UTF-8 and other values as JSON", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(both));
+      await lib.connect();
+
+      lib.sendData({ type: "play" });
+      lib.sendData("hi", { channel: Channel.UnreliableUnordered });
+
+      expect(tcpSocket().send).toHaveBeenCalledWith(
+        new Uint8Array([0, ...utf8('{"type":"play"}')]),
+      );
+      expect(dataChannel("unreliable-unordered").send).toHaveBeenCalledWith(utf8("hi"));
+    });
+
     it("should open one data channel per unreliable channel", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(udpOnly));
@@ -315,11 +334,26 @@ describe("NetworkClientLibrary", () => {
       tcpSocket().onmessage({ data: new Uint8Array([1, 2]).buffer });
       tcpSocket().onmessage({ data: new Uint8Array([0, 1]).buffer });
 
-      expect(lib.getReceivedPackets({ channel: Channel.ReliableUnordered })).toStrictEqual([
-        new Uint8Array([2]),
+      expect(bytesOf(lib.getReceivedPackets({ channel: Channel.ReliableUnordered }))).toStrictEqual(
+        [new Uint8Array([2])],
+      );
+      expect(bytesOf(lib.getReceivedPackets())).toStrictEqual([
+        new Uint8Array([1]),
+        new Uint8Array([9]),
       ]);
-      expect(lib.getReceivedPackets()).toStrictEqual([new Uint8Array([1]), new Uint8Array([9])]);
       expect(lib.getReceivedPackets()).toStrictEqual([]);
+    });
+
+    it("should return packets that read back as JSON", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      await lib.connect();
+
+      tcpSocket().onmessage({ data: new Uint8Array([0, ...utf8('{"type":"move"}')]).buffer });
+
+      const [packet] = lib.getReceivedPackets();
+      expect(packet).toBeInstanceOf(NetworkData);
+      expect(packet?.json()).toStrictEqual({ type: "move" });
     });
 
     it("should report connected only once every configured channel is", async () => {

@@ -29,15 +29,15 @@ export const controlPlayer = (registry: Registry, ctx: Context) => {
     const downPressed = input.isKeyPressed(Controller.down);
     if (upPressed == downPressed) {
       if (Controller.lastPressedUp || Controller.lastPressedDown) {
-        network.sendData(new TextEncoder().encode(JSON.stringify({ type: "input", key: "stop" })));
+        network.sendData({ type: "input", key: "stop" });
         Controller.lastPressedDown = false;
         Controller.lastPressedUp = false;
       }
     } else if (upPressed && !Controller.lastPressedUp) {
-      network.sendData(new TextEncoder().encode(JSON.stringify({ type: "input", key: "up" })));
+      network.sendData({ type: "input", key: "up" });
       Controller.lastPressedUp = true;
     } else if (downPressed && !Controller.lastPressedDown) {
-      network.sendData(new TextEncoder().encode(JSON.stringify({ type: "input", key: "down" })));
+      network.sendData({ type: "input", key: "down" });
       Controller.lastPressedDown = true;
     }
   });
@@ -58,9 +58,7 @@ export function draw(registry: Registry) {
 export function packetHandler(registry: Registry, ctx: Context) {
   const network = ctx.network;
   // Every channel, reliable first, so an entity's `assignId` is applied before its moves.
-  const jsonPackets = network.getReceivedPackets().map((packet) => {
-    return JSON.parse(new TextDecoder().decode(packet));
-  });
+  const jsonPackets = network.getReceivedPackets().map((packet) => packet.json());
 
   if (!jsonPackets || jsonPackets.length === 0) return;
   jsonPackets.forEach((packet) => {

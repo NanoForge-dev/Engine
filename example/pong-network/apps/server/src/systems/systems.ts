@@ -4,6 +4,7 @@ import {
   Channel,
   type ClientId,
   type ClientInfo,
+  type NetworkData,
   type NetworkServerContextApi,
 } from "@nanoforge-dev/network/server";
 
@@ -24,12 +25,6 @@ export function move(registry: Registry, ctx: Context) {
   });
 }
 
-/**
- * Broadcast an entity's position and velocity.
- *
- * @param channel - Initial sync goes on `ReliableOrdered`, paddle updates on
- * `UnreliableOrdered` and ball bounces on `UnreliableUnordered`.
- */
 function sendMoveAll(
   id: number,
   vel: Velocity,
@@ -38,14 +33,12 @@ function sendMoveAll(
   channel: Channel,
 ) {
   network.sendToAll(
-    new TextEncoder().encode(
-      JSON.stringify({
-        type: "move",
-        id: id,
-        position: { x: pos.x, y: pos.y },
-        velocity: { x: vel.x, y: vel.y },
-      }),
-    ),
+    {
+      type: "move",
+      id: id,
+      position: { x: pos.x, y: pos.y },
+      velocity: { x: vel.x, y: vel.y },
+    },
     { channel },
   );
 }
@@ -57,18 +50,9 @@ export function onClientDisconnect(info: ClientInfo) {
 }
 
 function connectNewClient(newCli: ClientId, network: NetworkServerContextApi, zip: any) {
-  network.sendToClient(
-    newCli,
-    new TextEncoder().encode(JSON.stringify({ type: "assignId", assigned: "ball", id: 0 })),
-  );
-  network.sendToClient(
-    newCli,
-    new TextEncoder().encode(JSON.stringify({ type: "assignId", assigned: "paddle1", id: 1 })),
-  );
-  network.sendToClient(
-    newCli,
-    new TextEncoder().encode(JSON.stringify({ type: "assignId", assigned: "paddle2", id: 2 })),
-  );
+  network.sendToClient(newCli, { type: "assignId", assigned: "ball", id: 0 });
+  network.sendToClient(newCli, { type: "assignId", assigned: "paddle1", id: 1 });
+  network.sendToClient(newCli, { type: "assignId", assigned: "paddle2", id: 2 });
   sendMoveAll(0, zip[0].Velocity, zip[0].Position, network, Channel.ReliableOrdered);
   sendMoveAll(1, zip[1].Velocity, zip[1].Position, network, Channel.ReliableOrdered);
   sendMoveAll(2, zip[2].Velocity, zip[2].Position, network, Channel.ReliableOrdered);
@@ -115,10 +99,10 @@ export function packetHandler(registry: Registry, ctx: Context) {
   const zip = registry.getZipper([Position, Velocity]);
   const network = ctx.network;
 
-  const clientPackets: Map<ClientId, Uint8Array[]> = network.getReceivedPackets();
+  const clientPackets: Map<ClientId, NetworkData[]> = network.getReceivedPackets();
   clientPackets.forEach((packets, client) => {
     packets.forEach((packet) => {
-      const data = JSON.parse(new TextDecoder().decode(packet));
+      const data = packet.json();
       if (data.type == "play") {
         if (client == cli1 || client == cli2) return;
         if (cli1 === null) {

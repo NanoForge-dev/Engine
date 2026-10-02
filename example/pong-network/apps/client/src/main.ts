@@ -91,7 +91,7 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   await network.connect({
     channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered, Channel.UnreliableUnordered],
   });
-  network.sendData(new TextEncoder().encode(JSON.stringify({ type: "play" })));
+  network.sendData({ type: "play" });
 
   await app.run();
 };
