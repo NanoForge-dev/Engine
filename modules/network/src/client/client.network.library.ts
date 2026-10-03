@@ -10,6 +10,7 @@ import {
   DEFAULT_CHANNEL,
   isReliableChannel,
 } from "../shared/channels";
+import { NetworkData, type NetworkPayload, encodeNetworkPayload } from "../shared/network-data";
 import type { ClientSession } from "./client-session";
 import { ClientConfigNetwork } from "./config.client.network";
 import type { NetworkClientContextApi } from "./network-client-context.type";
@@ -39,9 +40,9 @@ const CONNECT_POLL_MS = 50;
  * @example
  * ```ts
  * await ctx.network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
- * ctx.network.sendData(data); // Channel.ReliableOrdered
- * ctx.network.sendData(data, { channel: Channel.UnreliableOrdered });
- * const packets = ctx.network.getReceivedPackets(); // every channel
+ * ctx.network.sendData({ type: "join" }); // Channel.ReliableOrdered
+ * ctx.network.sendData({ x: 1, y: 2 }, { channel: Channel.UnreliableOrdered });
+ * const messages = ctx.network.getReceivedPackets().map((packet) => packet.json()); // every channel
  * ```
  */
 export class NetworkClientLibrary extends Library {
@@ -53,7 +54,7 @@ export class NetworkClientLibrary extends Library {
   private readonly _connecting = new Map<TCPClient | UDPClient, Promise<void>>();
   private readonly _session: ClientSession = {};
 
-  /** Client id assigned by the server, `undefined` until a transport is welcomed. */
+  /** Client id assigned by the server, `undefined` until transport is welcomed. */
   public get clientId(): string | undefined {
     return this._session.id;
   }
@@ -142,13 +143,14 @@ export class NetworkClientLibrary extends Library {
   /**
    * Send a payload to the server.
    *
-   * @param data - Raw payload bytes.
+   * @param data - Bytes, a string, or any value `JSON.stringify` can encode.
    * @param options - `channel` to send on, `Channel.ReliableOrdered` by default.
-   * @throws When the channel's port was not configured.
+   * @throws When the channel's port was not configured
    */
-  public sendData(data: Uint8Array, { channel = DEFAULT_CHANNEL }: ChannelOptions = {}): void {
-    if (isReliableChannel(channel)) this.requireTcp(channel).sendData(channel, data);
-    else this.requireUdp(channel).sendData(channel, data);
+  public sendData(data: NetworkPayload, { channel = DEFAULT_CHANNEL }: ChannelOptions = {}): void {
+    const bytes = encodeNetworkPayload(data);
+    if (isReliableChannel(channel)) this.requireTcp(channel).sendData(channel, bytes);
+    else this.requireUdp(channel).sendData(channel, bytes);
   }
 
   /**
@@ -159,15 +161,17 @@ export class NetworkClientLibrary extends Library {
    * configured channel are returned, reliable channels first.
    *
    * @param options - `channel` to read from, every channel by default.
-   * @returns Array of packet buffers.
+   * @returns Array of packets, each read with `bytes()`, `text()`, `json()`…
    * @throws When the channel's port was not configured.
    */
-  public getReceivedPackets({ channel }: ChannelOptions = {}): Uint8Array[] {
+  public getReceivedPackets({ channel }: ChannelOptions = {}): NetworkData[] {
     if (channel === undefined) {
       return this.configuredChannels().flatMap((c) => this.getReceivedPackets({ channel: c }));
     }
-    if (isReliableChannel(channel)) return this.requireTcp(channel).getReceivedPackets(channel);
-    return this.requireUdp(channel).getReceivedPackets(channel);
+    const packets = isReliableChannel(channel)
+      ? this.requireTcp(channel).getReceivedPackets(channel)
+      : this.requireUdp(channel).getReceivedPackets(channel);
+    return packets.map((packet) => new NetworkData(packet));
   }
 
   /**

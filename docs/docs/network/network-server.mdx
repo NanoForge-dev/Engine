@@ -57,13 +57,11 @@ are used, UDP may not be linked yet.
 ```javascript
 import { Channel } from "@nanoforge-dev/network/server";
 
-// Send everybody a JSON-encoded packet, on Channel.ReliableOrdered
-network.sendToAll(new TextEncoder().encode(JSON.stringify({ type: "are you here" })));
+// Send everybody a value as JSON, on Channel.ReliableOrdered
+network.sendToAll({ type: "are you here" });
 
 // Or pick another channel
-network.sendToAll(new TextEncoder().encode(JSON.stringify({ x: 1 })), {
-  channel: Channel.UnreliableUnordered,
-});
+network.sendToAll({ x: 1 }, { channel: Channel.UnreliableUnordered });
 
 // Check connected clients (ClientId strings)
 const connectedClients = network.getConnectedClients();
@@ -74,10 +72,8 @@ const allPackets = network.getReceivedPackets();
 // Get first client packets
 const firstClientPackets = allPackets.get(connectedClients[0]);
 
-// Decode packets if encoded as JSON
-const decodedPackets = firstClientPackets.map((packet) => {
-  return JSON.parse(new TextDecoder().decode(packet));
-});
+// Read each packet the way it was sent: json(), text(), bytes() or arrayBuffer()
+const decodedPackets = firstClientPackets.map((packet) => packet.json());
 ```
 
 ## Notes

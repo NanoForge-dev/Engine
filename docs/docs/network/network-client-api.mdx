@@ -19,10 +19,10 @@ import { Channel } from "@nanoforge-dev/network/client";
 
 await ctx.network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
 
-ctx.network.sendData(data); // Channel.ReliableOrdered
-ctx.network.sendData(data, { channel: Channel.UnreliableOrdered });
+ctx.network.sendData({ type: "join" }); // Channel.ReliableOrdered
+ctx.network.sendData({ x: 1, y: 2 }, { channel: Channel.UnreliableOrdered });
 
-const packets = ctx.network.getReceivedPackets(); // every channel
+const messages = ctx.network.getReceivedPackets().map((packet) => packet.json()); // every channel
 ```
 
 ## connect(options?)
@@ -47,9 +47,13 @@ Returns: `Promise<void>`
 
 Send a payload to the server.
 
-Parameter `data`: `Uint8Array` raw payload bytes.
+Parameter `data`: [`NetworkPayload`](#networkpayload), bytes, a string or any
+JSON value.
 
 Option `channel`: `Channel` to send on. `Channel.ReliableOrdered` by default.
+
+Throws a `TypeError` when `data` cannot be encoded as JSON (`undefined`, a
+function).
 
 Returns: `void`
 
@@ -60,7 +64,7 @@ Return the packets received since the last call. Call it once per frame.
 Option `channel`: `Channel` to read from. Without it, the packets of every
 configured channel are returned, reliable channels first.
 
-Returns: `Uint8Array[]`
+Returns: [`NetworkData[]`](#networkdata)
 
 ## isConnected(options?)
 
@@ -78,3 +82,27 @@ Client id assigned by the server, shared by TCP and UDP. `undefined` until
 reload gets a new id.
 
 Type: `string | undefined`
+
+## NetworkPayload
+
+What `sendData` accepts. Packets carry no format tag: the receiver reads a
+packet the way it was sent.
+
+| Value                                              | Encoded as            | Read back with                |
+| -------------------------------------------------- | --------------------- | ----------------------------- |
+| `Uint8Array`, `ArrayBuffer`, any `ArrayBufferView` | The bytes as they are | `bytes()` or `arrayBuffer()`  |
+| `string`                                           | UTF-8 text            | `text()`                      |
+| `NetworkData`                                      | Its bytes, unchanged  | What the original sender used |
+| Any other value (object, array, number, …)         | `JSON.stringify` text | `json()`                      |
+
+## NetworkData
+
+One received packet. Its methods are synchronous and return a new value on
+every call.
+
+| Method          | Returns                                                                    |
+| --------------- | -------------------------------------------------------------------------- |
+| `bytes()`       | `Uint8Array`: the payload bytes.                                           |
+| `arrayBuffer()` | `ArrayBuffer`: the payload bytes.                                          |
+| `text()`        | `string`: the payload decoded as UTF-8.                                    |
+| `json<T>()`     | `T`: the payload parsed as JSON. Throws a `SyntaxError` if it is not JSON. |

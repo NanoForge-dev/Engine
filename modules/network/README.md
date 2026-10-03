@@ -69,6 +69,23 @@ the last one it delivered. One message is one packet on every channel, so
 payloads may contain any bytes. Over TCP, `ReliableUnordered` is delivered in
 order in practice.
 
+### Payloads
+
+The send methods take bytes, a string or any JSON value, and every received
+packet is a `NetworkData` you read in the format you need. Packets carry no
+format tag: read a packet the way it was sent.
+
+| Sent value                                         | Encoded as            | Read back with                    |
+| -------------------------------------------------- | --------------------- | --------------------------------- |
+| `Uint8Array`, `ArrayBuffer`, any `ArrayBufferView` | The bytes as they are | `bytes()` or `arrayBuffer()`      |
+| `string`                                           | UTF-8 text            | `text()`                          |
+| Any other value (object, array, number, …)         | `JSON.stringify` text | `json()`                          |
+| A received `NetworkData`                           | Its bytes, unchanged  | Whatever the original sender used |
+
+`NetworkData` methods are synchronous and return a new value on every call.
+`json()` throws a `SyntaxError` when the payload is not JSON, and sending a value
+`JSON.stringify` cannot encode (`undefined`, a function) throws a `TypeError`.
+
 ### Running the server behind a NAT
 
 The UDP transport is a WebRTC data channel, so clients connect to the address the
@@ -149,10 +166,10 @@ app.use(new NetworkClientLibrary());
 await ctx.network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
 
 // Every frame:
-ctx.network.sendData(joinPayload); // Channel.ReliableOrdered
-ctx.network.sendData(positionPayload, { channel: Channel.UnreliableOrdered });
+ctx.network.sendData({ type: "join" }); // Channel.ReliableOrdered
+ctx.network.sendData({ x: 1, y: 2 }, { channel: Channel.UnreliableOrdered });
 for (const packet of ctx.network.getReceivedPackets()) {
-  // Handle incoming packets, from every channel.
+  const message = packet.json(); // Incoming packets, from every channel.
 }
 ```
 
@@ -164,10 +181,10 @@ app.use(new NetworkServerLibrary());
 
 // Every frame:
 ctx.network.getReceivedPackets().forEach((packets, clientId) => {
-  // Handle each client's packets, from every channel.
+  const messages = packets.map((packet) => packet.json()); // From every channel.
 });
-ctx.network.sendToAll(snapshotPayload, { channel: Channel.UnreliableOrdered });
-ctx.network.sendToClient(clientId, eventPayload); // Channel.ReliableOrdered
+ctx.network.sendToAll(snapshot, { channel: Channel.UnreliableOrdered });
+ctx.network.sendToClient(clientId, { type: "event" }); // Channel.ReliableOrdered
 ```
 
 `connect` only opens the transports its channels need, and rejects when a

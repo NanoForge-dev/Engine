@@ -32,6 +32,11 @@ promises that nothing is lost.
 Both transports deliver whole messages, so one message is one packet: there is
 no delimiter and payloads may contain any bytes.
 
+The payload carries no format tag. Bytes are sent as they are, a string as its
+UTF-8 text, and any other value as its `JSON.stringify` text. The receiver gets a
+`NetworkData` and reads it the way it was sent, with `bytes()`, `text()` or
+`json()`.
+
 - **TCP**: each binary WebSocket frame starts with one tag byte, `0` for
   `ReliableOrdered` and `1` for `ReliableUnordered`, followed by the payload.
   Text frames are reserved for control messages such as the server `welcome`.

@@ -1,7 +1,7 @@
 import type { InitContext } from "@nanoforge-dev/common";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Channel, NetworkServerLibrary } from "../../src/server";
+import { Channel, NetworkData, NetworkServerLibrary } from "../../src/server";
 
 vi.mock("node-datachannel/polyfill", () => ({
   RTCPeerConnection: vi.fn(function (this: any) {
@@ -54,6 +54,11 @@ const makeDataChannel = (label: string) => ({
   onclose: null as null | (() => void),
   onerror: null as null | ((event: unknown) => void),
 });
+
+const utf8 = (text: string) => new TextEncoder().encode(text);
+
+/** The payload bytes of each received packet. */
+const bytesOf = (packets: NetworkData[] | undefined) => packets?.map((packet) => packet.bytes());
 
 const tcpOnly = { LISTENING_TCP_PORT: "9000" };
 const udpOnly = { LISTENING_UDP_PORT: "9001" };
@@ -168,6 +173,37 @@ describe("NetworkServerLibrary", () => {
       expect(unordered.send).toHaveBeenCalledWith(new Uint8Array([2]));
     });
 
+    it("should send strings as UTF-8 and other values as JSON", async () => {
+      const lib = new NetworkServerLibrary();
+      await lib.__init(makeInitContext(both));
+      const tcp = openSocket(0, "http://localhost:9000/");
+      const udp = openSocket(1, `http://localhost:9001/?token=${tcp.welcome.token}`);
+      const unordered = makeDataChannel("unreliable-unordered");
+      udp.webSocket.data.peerConnection.ondatachannel({ channel: unordered });
+
+      lib.sendToClient(tcp.welcome.id, { type: "assignId", id: 0 });
+      lib.sendToAll("hi", { channel: Channel.UnreliableUnordered });
+
+      expect(tcp.webSocket.send).toHaveBeenCalledWith(
+        new Uint8Array([0, ...utf8('{"type":"assignId","id":0}')]),
+      );
+      expect(unordered.send).toHaveBeenCalledWith(utf8("hi"));
+    });
+
+    it("should relay a received packet as it is", async () => {
+      const lib = new NetworkServerLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      const { webSocket, options, welcome } = openSocket(0, "http://localhost:9000/");
+
+      options.websocket.message(webSocket, Buffer.from([0, ...utf8('{"type":"input"}')]));
+      const [packet] = lib.getReceivedPackets().get(welcome.id) ?? [];
+      expect(packet).toBeInstanceOf(NetworkData);
+      expect(packet?.json()).toStrictEqual({ type: "input" });
+
+      lib.sendToAll(packet!);
+      expect(webSocket.send).toHaveBeenCalledWith(new Uint8Array([0, ...utf8('{"type":"input"}')]));
+    });
+
     it("should read one channel, or merge every channel per client", async () => {
       const lib = new NetworkServerLibrary();
       await lib.__init(makeInitContext(both));
@@ -181,10 +217,10 @@ describe("NetworkServerLibrary", () => {
       tcp.options.websocket.message(tcp.webSocket, Buffer.from([1, 2]));
       tcp.options.websocket.message(tcp.webSocket, Buffer.from([0, 1]));
 
-      expect(lib.getReceivedPackets({ channel: Channel.ReliableUnordered }).get(id)).toStrictEqual([
-        new Uint8Array([2]),
-      ]);
-      expect(lib.getReceivedPackets().get(id)).toStrictEqual([
+      expect(
+        bytesOf(lib.getReceivedPackets({ channel: Channel.ReliableUnordered }).get(id)),
+      ).toStrictEqual([new Uint8Array([2])]);
+      expect(bytesOf(lib.getReceivedPackets().get(id))).toStrictEqual([
         new Uint8Array([1]),
         new Uint8Array([9]),
       ]);

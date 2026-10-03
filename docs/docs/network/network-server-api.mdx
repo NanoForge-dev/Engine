@@ -24,11 +24,11 @@ Reliable channels need `LISTENING_TCP_PORT` and unreliable ones
 ```ts
 import { Channel } from "@nanoforge-dev/network/server";
 
-ctx.network.sendToAll(data); // Channel.ReliableOrdered
-ctx.network.sendToAll(data, { channel: Channel.UnreliableUnordered });
+ctx.network.sendToAll({ type: "start" }); // Channel.ReliableOrdered
+ctx.network.sendToAll({ x: 1, y: 2 }, { channel: Channel.UnreliableUnordered });
 
 ctx.network.getReceivedPackets().forEach((packets, clientId) => {
-  // every channel
+  const messages = packets.map((packet) => packet.json()); // every channel
 });
 ```
 
@@ -36,9 +36,13 @@ ctx.network.getReceivedPackets().forEach((packets, clientId) => {
 
 Send a payload to every client reachable on the channel.
 
-Parameter `data`: `Uint8Array` raw payload bytes.
+Parameter `data`: [`NetworkPayload`](#networkpayload), bytes, a string or any
+JSON value.
 
 Option `channel`: `Channel` to send on. `Channel.ReliableOrdered` by default.
+
+Throws a `TypeError` when `data` cannot be encoded as JSON (`undefined`, a
+function).
 
 Returns: `void`
 
@@ -49,7 +53,8 @@ the channel.
 
 Parameter `clientId`: `ClientId` client identifier.
 
-Parameter `data`: `Uint8Array` payload bytes.
+Parameter `data`: [`NetworkPayload`](#networkpayload), bytes, a string or any
+JSON value.
 
 Option `channel`: `Channel` to send on. `Channel.ReliableOrdered` by default.
 
@@ -62,7 +67,7 @@ Return the packets each client sent since the last call. Call it once per frame.
 Option `channel`: `Channel` to read from. Without it, the packets of every
 configured channel are merged per client, reliable channels first.
 
-Returns: `Map<ClientId, Uint8Array[]>`
+Returns: `Map<ClientId, NetworkData[]>`, see [NetworkData](#networkdata)
 
 ### getConnectedClients(options?)
 
@@ -82,6 +87,32 @@ Return what is known about a client session. See [ClientInfo](#clientinfo).
 Parameter `clientId`: `ClientId`
 
 Returns: `ClientInfo | undefined` (`undefined` once the client is gone)
+
+## NetworkPayload
+
+What `sendToAll` and `sendToClient` accept. Packets carry no format tag: the
+receiver reads a packet the way it was sent.
+
+| Value                                              | Encoded as            | Read back with                |
+| -------------------------------------------------- | --------------------- | ----------------------------- |
+| `Uint8Array`, `ArrayBuffer`, any `ArrayBufferView` | The bytes as they are | `bytes()` or `arrayBuffer()`  |
+| `string`                                           | UTF-8 text            | `text()`                      |
+| `NetworkData`                                      | Its bytes, unchanged  | What the original sender used |
+| Any other value (object, array, number, …)         | `JSON.stringify` text | `json()`                      |
+
+Passing a received `NetworkData` relays a client's packet as it is.
+
+## NetworkData
+
+One received packet. Its methods are synchronous and return a new value on
+every call.
+
+| Method          | Returns                                                                    |
+| --------------- | -------------------------------------------------------------------------- |
+| `bytes()`       | `Uint8Array`: the payload bytes.                                           |
+| `arrayBuffer()` | `ArrayBuffer`: the payload bytes.                                          |
+| `text()`        | `string`: the payload decoded as UTF-8.                                    |
+| `json<T>()`     | `T`: the payload parsed as JSON. Throws a `SyntaxError` if it is not JSON. |
 
 ## clients (`ctx.network.clients`)
 

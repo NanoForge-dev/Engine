@@ -26,24 +26,25 @@ import { Channel } from "@nanoforge-dev/network/client";
 // Open the channels the game uses and wait until they are ready
 await network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
 
-// Send a JSON-encoded packet, on Channel.ReliableOrdered
-network.sendData(new TextEncoder().encode(JSON.stringify({ hello: "world" })));
+// Send a value as JSON, on Channel.ReliableOrdered
+network.sendData({ hello: "world" });
 
 // Or pick another channel
-network.sendData(new TextEncoder().encode(JSON.stringify({ x: 1 })), {
-  channel: Channel.UnreliableOrdered,
-});
+network.sendData({ x: 1 }, { channel: Channel.UnreliableOrdered });
 
-// Receive the raw server packets of every channel
+// Strings are sent as UTF-8 text, bytes as they are
+network.sendData("hello");
+network.sendData(new Uint8Array([1, 2, 3]));
+
+// Receive the server packets of every channel
 const latestPackets = network.getReceivedPackets();
 
-// Decode packets if encoded as JSON
-const decodedPackets = latestPackets.map((packet) => {
-  return JSON.parse(new TextDecoder().decode(packet));
-});
+// Read each packet the way it was sent: json(), text(), bytes() or arrayBuffer()
+const decodedPackets = latestPackets.map((packet) => packet.json());
 ```
 
 ## Notes
 
-- See [Network Client API](network-client-api) for the full list of available functions.
+- See [Network Client API](network-client-api) for the full list of available functions,
+  and for how each kind of payload is encoded.
 - For the channels and how packets are framed on each, see [Packet Channels](packet-framing).

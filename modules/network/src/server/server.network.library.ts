@@ -8,6 +8,7 @@ import {
   DEFAULT_CHANNEL,
   isReliableChannel,
 } from "../shared/channels";
+import { NetworkData, type NetworkPayload, encodeNetworkPayload } from "../shared/network-data";
 import { type ClientId, type ClientInfo, ClientRegistry, type ClientsApi } from "./client-registry";
 import { ServerConfigNetwork } from "./config.server.network";
 import type { NetworkServerContextApi } from "./network-server-context.type";
@@ -33,9 +34,11 @@ import { UDPServer } from "./udp.server.network";
  *
  * @example
  * ```ts
- * ctx.network.sendToAll(data); // Channel.ReliableOrdered
- * ctx.network.sendToAll(data, { channel: Channel.UnreliableUnordered });
- * ctx.network.getReceivedPackets().forEach((packets, clientId) => {}); // every channel
+ * ctx.network.sendToAll({ type: "start" }); // Channel.ReliableOrdered
+ * ctx.network.sendToAll({ x: 1, y: 2 }, { channel: Channel.UnreliableUnordered });
+ * ctx.network.getReceivedPackets().forEach((packets, clientId) => {
+ *   const messages = packets.map((packet) => packet.json()); // every channel
+ * });
  * ```
  */
 export class NetworkServerLibrary extends Library {
@@ -112,30 +115,34 @@ export class NetworkServerLibrary extends Library {
   /**
    * Send a payload to every client reachable on a channel.
    *
-   * @param data - Raw payload bytes.
+   * @param data - Bytes, a string, or any value `JSON.stringify` can encode.
    * @param options - `channel` to send on, `Channel.ReliableOrdered` by default.
-   * @throws When the channel's port was not configured.
+   * @throws When the channel's port was not configured, or `data` cannot be
+   * encoded as JSON.
    */
-  public sendToAll(data: Uint8Array, { channel = DEFAULT_CHANNEL }: ChannelOptions = {}): void {
-    if (isReliableChannel(channel)) this.requireTcp(channel).sendToEverybody(channel, data);
-    else this.requireUdp(channel).sendToEverybody(channel, data);
+  public sendToAll(data: NetworkPayload, { channel = DEFAULT_CHANNEL }: ChannelOptions = {}): void {
+    const bytes = encodeNetworkPayload(data);
+    if (isReliableChannel(channel)) this.requireTcp(channel).sendToEverybody(channel, bytes);
+    else this.requireUdp(channel).sendToEverybody(channel, bytes);
   }
 
   /**
    * Send a payload to one client.
    *
    * @param clientId - Client identifier.
-   * @param data - Raw payload bytes.
+   * @param data - Bytes, a string, or any value `JSON.stringify` can encode.
    * @param options - `channel` to send on, `Channel.ReliableOrdered` by default.
-   * @throws When the channel's port was not configured.
+   * @throws When the channel's port was not configured, or `data` cannot be
+   * encoded as JSON.
    */
   public sendToClient(
     clientId: ClientId,
-    data: Uint8Array,
+    data: NetworkPayload,
     { channel = DEFAULT_CHANNEL }: ChannelOptions = {},
   ): void {
-    if (isReliableChannel(channel)) this.requireTcp(channel).sendToClient(channel, clientId, data);
-    else this.requireUdp(channel).sendToClient(channel, clientId, data);
+    const bytes = encodeNetworkPayload(data);
+    if (isReliableChannel(channel)) this.requireTcp(channel).sendToClient(channel, clientId, bytes);
+    else this.requireUdp(channel).sendToClient(channel, clientId, bytes);
   }
 
   /**
@@ -146,16 +153,21 @@ export class NetworkServerLibrary extends Library {
    * configured channel are merged per client, reliable channels first.
    *
    * @param options - `channel` to read from, every channel by default.
-   * @returns Map of client id to packet buffers.
+   * @returns Map of client id to packets, each read with `bytes()`, `text()`,
+   * `json()`…
    * @throws When the channel's port was not configured.
    */
-  public getReceivedPackets({ channel }: ChannelOptions = {}): Map<ClientId, Uint8Array[]> {
+  public getReceivedPackets({ channel }: ChannelOptions = {}): Map<ClientId, NetworkData[]> {
     if (channel !== undefined) {
-      if (isReliableChannel(channel)) return this.requireTcp(channel).getReceivedPackets(channel);
-      return this.requireUdp(channel).getReceivedPackets(channel);
+      const packets = isReliableChannel(channel)
+        ? this.requireTcp(channel).getReceivedPackets(channel)
+        : this.requireUdp(channel).getReceivedPackets(channel);
+      return new Map(
+        [...packets].map(([clientId, raw]) => [clientId, raw.map((p) => new NetworkData(p))]),
+      );
     }
 
-    const merged = new Map<ClientId, Uint8Array[]>();
+    const merged = new Map<ClientId, NetworkData[]>();
     for (const c of this.configuredChannels()) {
       this.getReceivedPackets({ channel: c }).forEach((packets, clientId) => {
         merged.set(clientId, [...(merged.get(clientId) ?? []), ...packets]);

@@ -1,4 +1,5 @@
 import type { ChannelOptions } from "../shared/channels";
+import type { NetworkData, NetworkPayload } from "../shared/network-data";
 import type { ClientId, ClientInfo, ClientsApi } from "./client-registry";
 
 /**
@@ -13,20 +14,20 @@ export interface NetworkServerContextApi {
   /** Client sessions, shared by TCP and UDP: lookup and connect/disconnect callbacks. */
   readonly clients: ClientsApi;
   /**
-   * Send a payload to every client, on `Channel.ReliableOrdered` unless
-   * another `channel` is given.
+   * Send bytes, a string or a JSON value to every client, on
+   * `Channel.ReliableOrdered` unless another `channel` is given.
    */
-  sendToAll(data: Uint8Array, options?: ChannelOptions): void;
+  sendToAll(data: NetworkPayload, options?: ChannelOptions): void;
   /**
-   * Send a payload to one client, on `Channel.ReliableOrdered` unless another
-   * `channel` is given.
+   * Send bytes, a string or a JSON value to one client, on
+   * `Channel.ReliableOrdered` unless another `channel` is given.
    */
-  sendToClient(clientId: ClientId, data: Uint8Array, options?: ChannelOptions): void;
+  sendToClient(clientId: ClientId, data: NetworkPayload, options?: ChannelOptions): void;
   /**
    * Return the packets each client sent since the last call, from `channel` or
    * from every configured channel.  Call it once per frame.
    */
-  getReceivedPackets(options?: ChannelOptions): Map<ClientId, Uint8Array[]>;
+  getReceivedPackets(options?: ChannelOptions): Map<ClientId, NetworkData[]>;
   /** Return the clients reachable on `channel`, or on any configured channel. */
   getConnectedClients(options?: ChannelOptions): ClientId[];
   /** Return what is known about a client session, `undefined` once it is gone. */

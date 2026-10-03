@@ -1,4 +1,5 @@
 import type { ChannelOptions, ConnectOptions } from "../shared/channels";
+import type { NetworkData, NetworkPayload } from "../shared/network-data";
 
 /**
  * Public surface of `NetworkClientLibrary`, exposed on `Context.network`.
@@ -17,15 +18,15 @@ export interface NetworkClientContextApi {
    */
   connect(options?: ConnectOptions): Promise<void>;
   /**
-   * Send a payload to the server, on `Channel.ReliableOrdered` unless another
-   * `channel` is given.
+   * Send bytes, a string or a JSON value to the server, on
+   * `Channel.ReliableOrdered` unless another `channel` is given.
    */
-  sendData(data: Uint8Array, options?: ChannelOptions): void;
+  sendData(data: NetworkPayload, options?: ChannelOptions): void;
   /**
    * Return the packets received since the last call, from `channel` or from
    * every configured channel.  Call it once per frame.
    */
-  getReceivedPackets(options?: ChannelOptions): Uint8Array[];
+  getReceivedPackets(options?: ChannelOptions): NetworkData[];
   /** Return `true` when `channel`, or every configured channel, is connected. */
   isConnected(options?: ChannelOptions): boolean;
 }
