@@ -4,15 +4,6 @@ import {
   type ViewportState,
   defineLibraryKey,
 } from "@nanoforge-dev/common";
-// Type-only: the optional editor-drag integration below. graphics-2d is
-// client-only, so it only ever coexists with @nanoforge-dev/ecs/client
-// (never /server) in practice.
-import type { Registry } from "@nanoforge-dev/ecs/client";
-import type {
-  EditorAwareLibrary,
-  EditorContextApi,
-  EditorInitContext,
-} from "@nanoforge-dev/editor-lib";
 import Konva from "konva";
 
 import * as Graphics from "./exports/konva";
@@ -30,7 +21,7 @@ import type { GraphicsContextApi } from "./graphics-context.type";
  * scaled, offset and letterboxed/cropped according to the viewport's fit. Client-only — `__init`
  * throws if `InitContext.container` is missing.
  */
-export class Graphics2DLibrary extends Library implements EditorAwareLibrary {
+export class Graphics2DLibrary extends Library {
   readonly key = defineLibraryKey("graphics");
 
   private _stage?: Graphics.Stage;
@@ -62,16 +53,6 @@ export class Graphics2DLibrary extends Library implements EditorAwareLibrary {
     this._unsubscribeViewport = undefined;
     this._stage?.destroy();
     delete (window as unknown as { Konva?: unknown }).Konva;
-  }
-
-  /**
-   * When an editor started the app and ecs is registered, makes drawable
-   * shapes (`DrawableCircle2D`/`DrawableRect2D`/`DrawableText2D`) draggable
-   * in the viewport and notifies the editor on drag end. Plain graphics-2d
-   * usage is entirely unaffected.
-   */
-  public async __editorInit(ctx: EditorInitContext): Promise<void> {
-    if (ctx.ecs) ctx.ecs.registry.addSystem(this._dragSystem(ctx.editor));
   }
 
   public get stage(): Graphics.Stage {
@@ -117,35 +98,5 @@ export class Graphics2DLibrary extends Library implements EditorAwareLibrary {
     stage.content.style.left = `${state.contentLeft}px`;
     stage.content.style.top = `${state.contentTop}px`;
     stage.batchDraw();
-  }
-
-  private _dragSystem(editor: EditorContextApi): (registry: Registry) => void {
-    const wiredComponents = new Map<string, Set<string>>();
-
-    return (registry: Registry) => {
-      const entities = [
-        ...registry.getZipper([{ name: "__RESERVED_entityId" }, { name: "DrawableCircle2D" }]),
-        ...registry.getZipper([{ name: "__RESERVED_entityId" }, { name: "DrawableRect2D" }]),
-        ...registry.getZipper([{ name: "__RESERVED_entityId" }, { name: "DrawableText2D" }]),
-      ];
-
-      for (const entry of entities as any[]) {
-        const { __RESERVED_entityId, DrawableCircle2D, DrawableRect2D, DrawableText2D } = entry;
-        const entityId = __RESERVED_entityId.entityId;
-
-        if (!wiredComponents.has(entityId)) wiredComponents.set(entityId, new Set());
-        const wired = wiredComponents.get(entityId) as Set<string>;
-
-        for (const comp of [DrawableCircle2D, DrawableRect2D, DrawableText2D]) {
-          if (!comp || wired.has(comp.name)) continue;
-
-          comp.shape.draggable(true);
-          comp.shape.on("dragend", ({ target }: any) => {
-            editor.emit("move-component", entityId, comp.name, target.position());
-          });
-          wired.add(comp.name);
-        }
-      }
-    };
   }
 }

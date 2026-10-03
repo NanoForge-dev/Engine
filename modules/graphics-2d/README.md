@@ -49,8 +49,6 @@ public override async __run(ctx: Context): Promise<void> {
 }
 ```
 
-When registered alongside `@nanoforge-dev/ecs`'s `EcsLibrary` and `@nanoforge-dev/editor`'s `EditorLibrary`, `Graphics2DLibrary` automatically makes any entity carrying a `DrawableCircle2D`/`DrawableRect2D`/`DrawableText2D` component draggable in the viewport and notifies the editor on drag end — no extra wiring required.
-
 ## Links
 
 - [GitHub][source]
