@@ -6,6 +6,7 @@ import {
   type Library,
   NfNotInitializedException,
   type RunOptions,
+  type TickObserver,
 } from "@nanoforge-dev/common";
 
 import { InternalAppState } from "../internal/internal-app-state";
@@ -81,24 +82,40 @@ export abstract class NanoforgeApplication {
     const tickLengthMs = 1000 / this.options.tickRate;
     let previousTick = Date.now();
 
+    const observers = this.appState.observers;
+    let timed: TickObserver[] = [];
+    const runHook = async (library: Library, hook: "__events" | "__run"): Promise<void> => {
+      if (timed.length === 0) return library[hook](context);
+      const start = performance.now();
+      await library[hook](context);
+      const ms = performance.now() - start;
+      for (const observer of timed) observer.onHook?.(library.key, ms);
+    };
+
     const loop = async (): Promise<void> => {
       if (!context.app.isRunning) {
         for (const library of orderedForRun) await library.__clear(context);
         this.viewport?.dispose();
+        for (const observer of observers) observer.onStop?.();
         return;
       }
 
       const tickStart = Date.now();
+      const tickTimer = performance.now();
+      timed = [...observers].filter((observer) => observer.timings);
 
-      for (const library of orderedForRun) await library.__events(context);
+      for (const library of orderedForRun) await runHook(library, "__events");
 
-      if (context.app.isPaused) {
+      const step = this.appState.takeStep();
+      if (context.app.isPaused && !step) {
         previousTick = tickStart;
       } else {
-        this.appState.setDelta(tickStart - previousTick);
-        for (const library of orderedForRun) await library.__run(context);
+        this.appState.setDelta(step ? tickLengthMs : tickStart - previousTick);
+        for (const library of orderedForRun) await runHook(library, "__run");
         previousTick = tickStart;
       }
+      const tickMs = performance.now() - tickTimer;
+      for (const observer of observers) observer.onTick?.(tickMs, Date.now());
 
       setTimeout(loop, tickLengthMs + tickStart - Date.now());
     };
@@ -114,6 +131,11 @@ export abstract class NanoforgeApplication {
       vars: this.varsState.asVarsContext(),
       ...(viewport ? { viewport } : {}),
     };
+
+    this.appState.setLibraries(
+      this.registry.getAll().map((library) => library.key),
+      this.registry.getOrderedForRun(),
+    );
 
     for (const library of this.registry.getOrderedForInit()) {
       await library.__init(initContext);

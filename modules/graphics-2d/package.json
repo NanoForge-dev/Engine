@@ -63,8 +63,6 @@
   },
   "devDependencies": {
     "@favware/cliff-jumper": "catalog:ci",
-    "@nanoforge-dev/ecs": "workspace:*",
-    "@nanoforge-dev/editor-lib": "workspace:*",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",

@@ -67,6 +67,20 @@ describe("orderByRunSequence", () => {
     expect(result.indexOf("B")).toBeLessThan(result.indexOf("A"));
   });
 
+  it("runs a library with runAfter '*' before every other one", () => {
+    const a = new StubLibrary("A");
+    const b = new StubLibrary("B", { runAfter: ["*"] });
+    const c = new StubLibrary("C", { runAfter: ["A"] });
+    expect(orderByRunSequence([a, b, c]).map((l) => l.key)).toEqual(["B", "C", "A"]);
+  });
+
+  it("runs a library with runBefore '*' after every other one", () => {
+    const a = new StubLibrary("A", { runBefore: ["*"] });
+    const b = new StubLibrary("B");
+    const c = new StubLibrary("C");
+    expect(orderByRunSequence([a, b, c]).map((l) => l.key)).toEqual(["B", "C", "A"]);
+  });
+
   it("throws on circular run ordering", () => {
     const a = new StubLibrary("A", { runBefore: ["B"] });
     const b = new StubLibrary("B", { runBefore: ["A"] });

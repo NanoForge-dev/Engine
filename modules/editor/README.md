@@ -15,7 +15,9 @@
 
 ## About
 
-`@nanoforge-dev/editor-lib` is the built-in bridge library between a running NanoForge application and an external editor host. It turns the raw `toEditor`/`fromEditor` event-emitter pair supplied via `RunOptions.editor` into the single, asymmetric `Context.editor` facade every other library sees.
+`@nanoforge-dev/editor-lib` is the bridge between a running NanoForge application and an external editor host. `EditorLibrary` turns the raw `toEditor`/`fromEditor` event-emitter pair supplied via `RunOptions.editor` into the `Context.editor` facade every other library sees, and handles the pause/resume/step/stop commands, run state reports, frame stats and log forwarding: see the [editor protocol](https://github.com/NanoForge-dev/Engine/blob/main/docs/docs/editor/protocol.mdx).
+
+It also provides `QueuedEventEmitter`, the event emitter an editor host gives a game in `RunOptions.editor`.
 
 ## Installation
 
@@ -28,27 +30,9 @@ pnpm add @nanoforge-dev/editor-lib
 bun add @nanoforge-dev/editor-lib
 ```
 
-## Warning
-
-This library is opt-in — only register it when the app is started under an editor host (`app.use(new EditorLibrary())`). Without it, `Context.editor` is simply absent, and other libraries that check for it (like `@nanoforge-dev/ecs`'s hot-reload wiring) no-op cleanly.
-
 ## Example usage
 
-Construct one `QueuedEventEmitter` per direction and hand both to `RunOptions.editor` when starting the app:
-
-```ts
-import { QueuedEventEmitter } from "@nanoforge-dev/editor-lib";
-
-const toEditor = new QueuedEventEmitter(); // engine -> editor
-const fromEditor = new QueuedEventEmitter(); // editor -> engine
-
-await app.init({
-  ...options,
-  editor: { toEditor, fromEditor },
-});
-```
-
-Register `EditorLibrary` alongside your other libraries:
+Register `EditorLibrary` alongside your other libraries. It does nothing when no editor started the app:
 
 ```ts
 import { EditorLibrary } from "@nanoforge-dev/editor-lib";
@@ -56,7 +40,19 @@ import { EditorLibrary } from "@nanoforge-dev/editor-lib";
 app.use(new EditorLibrary());
 ```
 
-Any registered library can then talk to the editor through `Context.editor`:
+The editor host constructs one `QueuedEventEmitter` per direction and hands both to `RunOptions.editor`:
+
+```ts
+import { QueuedEventEmitter } from "@nanoforge-dev/editor-lib";
+
+const toEditor = new QueuedEventEmitter(); // engine -> editor
+const fromEditor = new QueuedEventEmitter(); // editor -> engine
+
+await app.init({ ...options, editor: { toEditor, fromEditor } });
+fromEditor.emit("pause");
+```
+
+Libraries talk to the editor through `Context.editor`, `undefined` when no editor started the game:
 
 ```ts
 public override async __run(ctx: Context): Promise<void> {
@@ -64,21 +60,17 @@ public override async __run(ctx: Context): Promise<void> {
 }
 ```
 
-The editor host itself drives the other two operations directly on the raw emitters it created — sending commands via `fromEditor.emit(...)` and listening for outgoing notifications via `toEditor.on(...)` — which is why `Context.editor` only exposes `emit`/`on` for the reverse direction, not all four.
-
-## Base commands
-
-`EditorLibrary` handles three reserved editor → engine commands itself, with no app-side wiring required — they're forwarded straight to `Context.app`'s pause/resume/stop actions:
+One-time editor wiring goes in `__editorInit`, which `EditorLibrary` calls once on every library that has it, when the editor's `welcome` arrives:
 
 ```ts
-import { EditorCommand } from "@nanoforge-dev/editor-lib";
+import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/editor-lib";
 
-fromEditor.emit(EditorCommand.Pause); // ctx.app.requestPause()
-fromEditor.emit(EditorCommand.Resume); // ctx.app.requestResume()
-fromEditor.emit(EditorCommand.Stop); // ctx.app.requestStop()
+class MyLibrary extends Library implements EditorAwareLibrary {
+  public async __editorInit(ctx: EditorInitContext): Promise<void> {
+    ctx.editor.on("hot-reload", (entity, component) => this.apply(entity, component));
+  }
+}
 ```
-
-Because `EditorLibrary` drains `fromEditor` from `__events` (which keeps running even while paused), a queued `EditorCommand.Resume` always reaches the engine and lifts the pause — it isn't blocked behind the very pause it's meant to undo.
 
 ## Links
 

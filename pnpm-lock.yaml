@@ -488,6 +488,9 @@ importers:
       '@favware/cliff-jumper':
         specifier: catalog:ci
         version: 6.1.0
+      '@nanoforge-dev/editor-lib':
+        specifier: workspace:*
+        version: link:../editor
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:*
         version: link:../../utils/eslint-config
@@ -568,12 +571,6 @@ importers:
       '@favware/cliff-jumper':
         specifier: catalog:ci
         version: 6.1.0
-      '@nanoforge-dev/ecs':
-        specifier: workspace:*
-        version: link:../ecs
-      '@nanoforge-dev/editor-lib':
-        specifier: workspace:*
-        version: link:../editor
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:*
         version: link:../../utils/eslint-config
@@ -648,6 +645,9 @@ importers:
       '@favware/cliff-jumper':
         specifier: catalog:ci
         version: 6.1.0
+      '@nanoforge-dev/editor-lib':
+        specifier: workspace:*
+        version: link:../editor
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:*
         version: link:../../utils/eslint-config
@@ -691,6 +691,9 @@ importers:
       '@favware/cliff-jumper':
         specifier: catalog:ci
         version: 6.1.0
+      '@nanoforge-dev/editor-lib':
+        specifier: workspace:*
+        version: link:../editor
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:*
         version: link:../../utils/eslint-config
@@ -731,6 +734,9 @@ importers:
       '@favware/cliff-jumper':
         specifier: catalog:ci
         version: 6.1.0
+      '@nanoforge-dev/editor-lib':
+        specifier: workspace:*
+        version: link:../editor
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:*
         version: link:../../utils/eslint-config

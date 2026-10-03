@@ -19,12 +19,47 @@ export interface AppContext {
   readonly delta: number;
   /** Configured ticks-per-second for the run loop. */
   readonly tickRate: number;
+  /** Keys of the registered libraries. */
+  readonly libraries: readonly string[];
   /** Requests that the tick loop stop after the current tick. */
   requestStop(): void;
   /** Pauses the tick loop: every library's `__run` is skipped until resumed. */
   requestPause(): void;
   /** Resumes a paused tick loop. */
   requestResume(): void;
+  /** Runs exactly one tick (`__run` of every library) while paused. */
+  requestStep(): void;
+  /**
+   * Calls an optional hook on every library that has it, in run order, one
+   * after the other.
+   *
+   * @remarks
+   * Lets a library define a lifecycle step of its own for the others (a
+   * method named like the built-in hooks, e.g. `__myLibraryReady`) without
+   * the engine knowing about it.
+   *
+   * @param name - Name of the method to call.
+   * @param args - Arguments handed to it.
+   */
+  callHook(name: string, ...args: unknown[]): Promise<void>;
+  /**
+   * Observes the tick loop.
+   *
+   * @returns A function that stops observing.
+   */
+  observeTicks(observer: TickObserver): () => void;
+}
+
+/** Observer of the tick loop (see `AppContext.observeTicks`). */
+export interface TickObserver {
+  /** Whether `onHook` is wanted (read each tick): hooks are only timed when it is. */
+  readonly timings?: boolean;
+  /** Time a library spent in a hook (`__events` or `__run`) of the current tick, in ms. */
+  onHook?(key: string, ms: number): void;
+  /** End of a tick, paused ones too: its duration in ms and the current time. */
+  onTick?(ms: number, now: number): void;
+  /** The loop stopped: every library was cleared. */
+  onStop?(): void;
 }
 
 /**

@@ -1,4 +1,5 @@
-import { type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
+import { type Context, type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
+import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/editor-lib";
 import { registerEnv } from "@nanoforge-dev/env";
 
 import {
@@ -11,6 +12,7 @@ import {
   isReliableChannel,
 } from "../shared/channels";
 import { NetworkData, type NetworkPayload, encodeNetworkPayload } from "../shared/network-data";
+import { type Trace, createTrace, traceClient } from "../shared/trace";
 import type { ClientSession } from "./client-session";
 import { ClientConfigNetwork } from "./config.client.network";
 import type { NetworkClientContextApi } from "./network-client-context.type";
@@ -45,7 +47,7 @@ const CONNECT_POLL_MS = 50;
  * const messages = ctx.network.getReceivedPackets().map((packet) => packet.json()); // every channel
  * ```
  */
-export class NetworkClientLibrary extends Library {
+export class NetworkClientLibrary extends Library implements EditorAwareLibrary {
   readonly key = defineLibraryKey("network");
 
   private _tcp?: TCPClient;
@@ -58,6 +60,8 @@ export class NetworkClientLibrary extends Library {
   public get clientId(): string | undefined {
     return this._session.id;
   }
+
+  private _trace: Trace | undefined;
 
   public override async __init(ctx: InitContext): Promise<void> {
     const config = await registerEnv(ClientConfigNetwork, ctx.env);
@@ -187,6 +191,23 @@ export class NetworkClientLibrary extends Library {
     }
     if (isReliableChannel(channel)) return this.requireTcp(channel).isConnected();
     return this.requireUdp(channel).isConnected(channel);
+  }
+
+  /**
+   * Traces packets for the editor (`network-trace`, `network-stats`) while
+   * its `welcome` asks for it.
+   */
+  public async __editorInit(ctx: EditorInitContext): Promise<void> {
+    const trace = createTrace(ctx.editor);
+    if (this._tcp) traceClient(this._tcp, "tcp", trace);
+    if (this._udp) traceClient(this._udp, "udp", trace);
+    this._trace = trace;
+  }
+
+  /** Sends the totals of the packets traced for the editor (also while paused). */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public override async __events(_ctx: Context): Promise<void> {
+    this._trace?.tick();
   }
 
   public override expose(): NetworkClientContextApi {

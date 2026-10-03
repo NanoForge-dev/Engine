@@ -1,4 +1,5 @@
 import { Library, NfNotFound, defineLibraryKey } from "@nanoforge-dev/common";
+import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/editor-lib";
 
 import type { MusicContextApi } from "./music-context.type";
 
@@ -10,10 +11,12 @@ import type { MusicContextApi } from "./music-context.type";
  * only one track plays at a time — unlike `SoundLibrary`, starting a new
  * track pauses whichever one was playing.
  */
-export class MusicLibrary extends Library {
+export class MusicLibrary extends Library implements EditorAwareLibrary {
   readonly key = defineLibraryKey("music");
 
   private _muted = true;
+  /** Muted by the editor (`mute` bridge command), on top of the game's own state. */
+  private _editorMuted = false;
   private _tracks?: Map<string, HTMLAudioElement>;
   private _current: HTMLAudioElement | null = null;
 
@@ -21,6 +24,14 @@ export class MusicLibrary extends Library {
     this._tracks = new Map();
     this._muted = true;
     this._current = null;
+  }
+
+  /** Listens to the editor's `mute` command. */
+  public async __editorInit(ctx: EditorInitContext): Promise<void> {
+    ctx.editor.on("mute", (muted) => {
+      this._editorMuted = muted;
+      this._applyMuted();
+    });
   }
 
   public override async __clear(): Promise<void> {
@@ -40,7 +51,7 @@ export class MusicLibrary extends Library {
   public load(key: string, file: string): void {
     if (!this._tracks) this.throwNotInitializedError();
     const element = new Audio(file);
-    element.muted = this._muted;
+    element.muted = this._muted || this._editorMuted;
     this._tracks.set(key, element);
   }
 
@@ -66,7 +77,7 @@ export class MusicLibrary extends Library {
   public mute(): void {
     if (!this._tracks) this.throwNotInitializedError();
     this._muted = !this._muted;
-    for (const element of this._tracks.values()) element.muted = this._muted;
+    this._applyMuted();
   }
 
   public override expose(): MusicContextApi {
@@ -77,5 +88,11 @@ export class MusicLibrary extends Library {
       play: (key) => library.play(key),
       mute: () => library.mute(),
     };
+  }
+
+  private _applyMuted(): void {
+    for (const element of this._tracks?.values() ?? []) {
+      element.muted = this._muted || this._editorMuted;
+    }
   }
 }

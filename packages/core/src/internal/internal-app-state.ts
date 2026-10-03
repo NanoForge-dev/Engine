@@ -1,4 +1,4 @@
-import type { AppContext } from "@nanoforge-dev/common";
+import type { AppContext, Library, TickObserver } from "@nanoforge-dev/common";
 
 /**
  * The only place `app`'s state can be mutated.
@@ -13,6 +13,10 @@ export class InternalAppState {
   private _isRunning = false;
   private _isPaused = false;
   private _delta = 0;
+  private _stepRequested = false;
+  private _keys: readonly string[] = [];
+  private _libraries: readonly Library[] = [];
+  private readonly _observers = new Set<TickObserver>();
 
   constructor(tickRate: number) {
     this._tickRate = tickRate;
@@ -36,6 +40,26 @@ export class InternalAppState {
 
   setDelta(value: number): void {
     this._delta = value;
+  }
+
+  /**
+   * @param keys - Keys of the registered libraries.
+   * @param ordered - The libraries in run order, for `callHook`.
+   */
+  setLibraries(keys: readonly string[], ordered: readonly Library[]): void {
+    this._keys = keys;
+    this._libraries = ordered;
+  }
+
+  /** Whether one tick was requested while paused (consumed). */
+  takeStep(): boolean {
+    const step = this._stepRequested;
+    this._stepRequested = false;
+    return step;
+  }
+
+  get observers(): ReadonlySet<TickObserver> {
+    return this._observers;
   }
 
   asAppContext(): AppContext {
@@ -62,6 +86,22 @@ export class InternalAppState {
       },
       requestResume: () => {
         state.setIsPaused(false);
+      },
+      requestStep: () => {
+        state._stepRequested = true;
+      },
+      get libraries() {
+        return state._keys;
+      },
+      callHook: async (name, ...args) => {
+        for (const library of state._libraries) {
+          const hook = (library as unknown as Record<string, unknown>)[name];
+          if (typeof hook === "function") await hook.apply(library, args);
+        }
+      },
+      observeTicks: (observer) => {
+        state._observers.add(observer);
+        return () => void state._observers.delete(observer);
       },
     };
   }

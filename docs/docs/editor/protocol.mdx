@@ -1,0 +1,110 @@
+---
+title: "Editor protocol"
+icon: "book"
+description: "How a running game and the NanoForge editor talk to each other"
+---
+
+# Editor protocol
+
+When the editor starts a game, it passes two event emitters in `RunOptions.editor`:
+
+- `fromEditor`: editor → engine commands. `EditorLibrary` drains it at the start of every tick, including paused ticks.
+- `toEditor`: engine → editor events.
+
+The game registers `EditorLibrary` from `@nanoforge-dev/editor-lib`, which handles the protocol. The engine itself (`@nanoforge-dev/core`, `@nanoforge-dev/common`) knows nothing about the editor.
+
+```ts
+import { EditorLibrary } from "@nanoforge-dev/editor-lib";
+
+app.use(new EditorLibrary());
+```
+
+Without `RunOptions.editor` the library does nothing, so a game can always register it. Libraries reach the editor through `Context.editor`, which is `undefined` when no editor started the game or `EditorLibrary` is not registered.
+
+The protocol version is `EDITOR_PROTOCOL_VERSION` (`@nanoforge-dev/editor-lib`), currently **1**. The command and event payloads are typed by `EditorCommandMap` and `EditorEventMap`. Libraries add their own entries by module augmentation.
+
+## Handshake
+
+1. On its first tick, once every library is initialized, the engine emits `hello`: `{ protocolVersion, libraries }`, where `libraries` lists the keys of the registered libraries.
+2. The editor answers with the `welcome` command: `{ protocolVersion, features }`, where `features` lists the optional features it wants (below).
+3. `EditorLibrary` calls `__editorInit(ctx)` once on every library that has it (below). Libraries read the answer from `ctx.editor.welcome`.
+
+Commands drained on the same tick as the first `welcome`, before or after it, are not seen by the listeners added in `__editorInit`: they are dispatched before the hook runs. The editor sends the commands meant for libraries (`mute`, `ecs-*`…) at least one tick after its `welcome`.
+
+If the two protocol versions differ, the editor tells the user to update the engine or the editor.
+
+## Editor wiring in a library: `__editorInit`
+
+A library that has editor-only wiring implements `EditorAwareLibrary`. `__editorInit` is called once, in run order, on the tick the editor's `welcome` arrives, before the libraries' `__events` of that tick. It is never called when no editor started the game. A later `welcome` only replaces `ctx.editor.welcome`.
+
+```ts
+import { Library } from "@nanoforge-dev/common";
+import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/editor-lib";
+
+class SoundLibrary extends Library implements EditorAwareLibrary {
+  async __editorInit(ctx: EditorInitContext) {
+    ctx.editor.on("mute", (muted) => this.setMuted(muted));
+  }
+}
+```
+
+The hook is not part of the engine: `EditorLibrary` calls it with `ctx.app.callHook("__editorInit", ctx)`, which any library can use to define a lifecycle step of its own.
+
+## Run control
+
+| Command  | Effect                                        |
+| -------- | --------------------------------------------- |
+| `pause`  | `ctx.app.requestPause()`                      |
+| `resume` | `ctx.app.requestResume()`                     |
+| `step`   | runs exactly one tick while paused            |
+| `stop`   | `ctx.app.requestStop()`: clears every library |
+
+A command applies on the tick it is drained in. After a `stop`, that tick still completes before the libraries are cleared.
+
+The engine reports each change of its run state with the `state` event: `"running"`, `"paused"` or `"stopped"`. It sends `stopped` only after every library's `__clear` has run and the viewport has been disposed, so the editor can safely remove the game container or end the process.
+
+## Optional features
+
+Each feature is enabled only if the editor asks for it in `welcome.features`.
+
+| Feature                                        | Event           | Payload                                                                                             |
+| ---------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------- |
+| `frameStats: { intervalMs }`                   | `frame-stats`   | `{ windowMs, ticks, tps, tick: { avg, max }, libraries: { [key]: { avg, max } } }`, durations in ms |
+| `logs: true`                                   | `log`           | `{ level, message }` for each console call made by the game's code                                  |
+| `logs: { values: true }`                       | `log`           | also `values` (the logged values, as trees) and `caller` (`<bundle file>:<line>:<column>`)          |
+| `networkTrace: { sampleRate?, maxPerSecond? }` | `network-trace` | `{ direction, transport, clientId?, size, head, time }` (network libraries)                         |
+| `viewport: true`                               | `viewport`      | the game's `ViewportState`, at once and on every change (clients)                                   |
+
+Log forwarding only forwards console calls whose stack contains a frame of the game bundle. Output from before the `welcome` (library `__init`, the start of `main`) is kept, up to 200 lines, and sent as soon as the editor asks for logs. It is dropped if the editor doesn't ask for them. A client runs inside the editor page, and this keeps the editor's own console output out of the game logs.
+
+### Logged values belong to the host
+
+The trees in `values` (`EditorLogValue`) are made by the host, not by the engine: the host passes its serializer in `RunOptions.editor.serializeLogValue`, and the bridge calls it on each argument when the line is logged, so later changes to a logged object don't show. A host runs the games it wants values of in its own page (the editor runs clients this way), so the function can be passed as is.
+
+- A host that gives no serializer gets text only, even if it asks for values.
+- An engine older than this field ignores it, and keeps sending text only.
+- Lines logged between the creation of `EditorLibrary` and its `__init` are snapshotted when the channels arrive.
+
+### Viewport
+
+A point `(x, y)` of the game is drawn at `(contentLeft + originX + x * scaleX, contentTop + originY + y * scaleY)` CSS px of the game's container. The editor uses it to draw over the running game (selecting and moving entities in its Game screen).
+
+## Hosting a game
+
+```ts
+import { QueuedEventEmitter } from "@nanoforge-dev/editor-lib";
+
+const fromEditor = new QueuedEventEmitter(); // drained by the engine
+const toEditor = {
+  on() {},
+  off() {},
+  runEvents() {},
+  // Deliver outside the engine tick.
+  emit: (event: string, ...args: unknown[]) => queueMicrotask(() => handle(event, args)),
+};
+
+await main({ ...options, editor: { toEditor, fromEditor, serializeLogValue } });
+fromEditor.emit("welcome", { protocolVersion: 1, features: { frameStats: { intervalMs: 500 } } });
+```
+
+The game started by `main` must have registered `EditorLibrary`, or `RunOptions.editor` is ignored.

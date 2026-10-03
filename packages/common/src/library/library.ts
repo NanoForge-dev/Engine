@@ -59,8 +59,8 @@ export abstract class Library {
   /**
    * Called every tick, in run order, whether or not the tick loop is
    * paused — unlike `__run`. Use this for event/message draining that must
-   * not be affected by pause (e.g. an editor bridge listening for the
-   * "resume" command itself), not for gameplay simulation.
+   * not be affected by pause (e.g. listening for the command that resumes
+   * the loop), not for gameplay simulation.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async __events(_ctx: Context): Promise<void> {}
