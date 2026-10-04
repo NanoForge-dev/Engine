@@ -21,6 +21,7 @@ body:
         - input
         - music
         - network
+        - scene
         - sound
         - eslint-config
         - prettier-config

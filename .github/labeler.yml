@@ -42,6 +42,12 @@ modules:network:
           - modules/network/*
           - modules/network/**/*
 
+modules:scene:
+  - changed-files:
+      - any-glob-to-any-file:
+          - modules/scene/*
+          - modules/scene/**/*
+
 modules:sound:
   - changed-files:
       - any-glob-to-any-file:

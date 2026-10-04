@@ -18,6 +18,7 @@ on:
           - "@nanoforge-dev/input"
           - "@nanoforge-dev/music"
           - "@nanoforge-dev/network"
+          - "@nanoforge-dev/scene"
           - "@nanoforge-dev/sound"
           - "@nanoforge-dev/utils-eslint-config"
           - "@nanoforge-dev/utils-prettier-config"
