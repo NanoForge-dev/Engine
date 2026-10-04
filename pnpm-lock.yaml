@@ -491,6 +491,9 @@ importers:
       '@nanoforge-dev/editor-lib':
         specifier: workspace:*
         version: link:../editor
+      '@nanoforge-dev/scene':
+        specifier: workspace:*
+        version: link:../scene
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:*
         version: link:../../utils/eslint-config
@@ -706,6 +709,49 @@ importers:
       '@types/bun':
         specifier: catalog:core
         version: 1.4.2
+      eslint:
+        specifier: catalog:lint
+        version: 10.9.1(jiti@2.6.1)(supports-color@10.2.2)
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
+      tsdown:
+        specifier: catalog:build
+        version: 0.22.14(typescript@6.0.3)(unrun@0.3.1(synckit@0.11.13))
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.1(synckit@0.11.13)
+      vitest:
+        specifier: catalog:test
+        version: 4.1.11(@types/node@26.4.0)(@vitest/coverage-v8@4.1.11)(vite@8.2.2(@types/node@26.4.0)(jiti@2.6.1)(yaml@2.9.0))
+
+  modules/scene:
+    dependencies:
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+    devDependencies:
+      '@favware/cliff-jumper':
+        specifier: catalog:ci
+        version: 6.1.0
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nanoforge-dev/editor-lib':
+        specifier: workspace:*
+        version: link:../editor
+      '@nanoforge-dev/utils-eslint-config':
+        specifier: workspace:*
+        version: link:../../utils/eslint-config
+      '@nanoforge-dev/utils-prettier-config':
+        specifier: workspace:*
+        version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
       eslint:
         specifier: catalog:lint
         version: 10.9.1(jiti@2.6.1)(supports-color@10.2.2)

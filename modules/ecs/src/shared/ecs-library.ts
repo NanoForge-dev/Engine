@@ -10,6 +10,7 @@ import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/edito
 import type { Entity, MainModule, Registry } from "../../lib/web/libecs";
 import type { EcsContextApi } from "./ecs-context.type";
 import { EditorWorldTracker } from "./editor-world";
+import { trackSystems } from "./registry-hooks";
 
 /** Loads the compiled WASM module — supplied by the client/server entry point. */
 export type LoadEcsModule = (options: { locateFile: () => string }) => Promise<MainModule>;
@@ -51,6 +52,8 @@ export abstract class EcsLibrary extends Library implements EditorAwareLibrary {
     this._registry = new this._module.Registry();
     // From the start, before the editor's welcome: entities spawned at startup are recorded.
     if (ctx.editor) this._editorWorld = new EditorWorldTracker(this._registry);
+    // Outside the editor's instrumentation: scenes remove their systems by function.
+    trackSystems(this._registry);
   }
 
   /** Listens to the editor's commands (`hot-reload`, live mode). */

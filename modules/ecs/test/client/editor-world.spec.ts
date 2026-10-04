@@ -120,6 +120,25 @@ describe("EditorWorldTracker (live mode)", () => {
     await ecs.__events(ctx);
     expect(lastWorld().systems[0]!.enabled).toBe(false);
   });
+
+  it("follows the systems removed by index", async () => {
+    let ranDraw = 0;
+    ecs.registry.addSystem(function bounce() {});
+    ecs.registry.addSystem(function draw() {
+      ranDraw++;
+    });
+    ecs.registry.removeSystem(1);
+    await ecs.__events(ctx);
+    expect(lastWorld().systems.map(({ name }) => name)).toEqual(["move", "draw"]);
+
+    editor.send("ecs-set-system-enabled", 1, false);
+    await ecs.__run(ctx);
+    expect(ranDraw).toBe(0);
+    ecs.registry.removeSystem(1);
+    ecs.registry.removeSystem(5);
+    await ecs.__events(ctx);
+    expect(lastWorld().systems.map(({ name }) => name)).toEqual(["move"]);
+  });
 });
 
 describe("system timings", () => {
