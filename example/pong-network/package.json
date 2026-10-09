@@ -17,6 +17,7 @@
     "@nanoforge-dev/config": "catalog:config",
     "@nanoforge-dev/core": "workspace:*",
     "@nanoforge-dev/env": "workspace:*",
+    "@nanoforge-dev/network": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",
     "lint-staged": "catalog:ci",
     "prettier": "catalog:lint",

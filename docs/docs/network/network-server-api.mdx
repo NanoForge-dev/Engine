@@ -62,7 +62,9 @@ Returns: `void`
 
 ### getReceivedPackets(options?)
 
-Return the packets each client sent since the last call. Call it once per frame.
+Return the packets each client sent since the last call. Call it once per
+frame: packets left unread for a whole tick are dropped. Typed packets never
+show up here.
 
 Option `channel`: `Channel` to read from. Without it, the packets of every
 configured channel are merged per client, reliable channels first.
@@ -88,10 +90,46 @@ Parameter `clientId`: `ClientId`
 
 Returns: `ClientInfo | undefined` (`undefined` once the client is gone)
 
+## packets (`ctx.network.packets`)
+
+Typed packets, declared with `definePacket` (see the
+[network-client API](network-client-api)). Packets of a type
+are routed to its listeners and to `read`, never to `getReceivedPackets`.
+
+### on(packet, listener)
+
+Call `listener(data, { clientId, channel, ctx })` for every packet of this type,
+each tick before the ECS systems (not while paused). Packets are dispatched in
+the order they arrived, reliable channels first. A listener that throws, or
+returns a rejected promise, is logged and does not stop the others.
+
+Returns: `() => void`, a function that removes the listener.
+
+### read(packet)
+
+Return the packets of this type received this tick, as
+`{ data, clientId, channel }[]`. Meant for ECS systems, which run after the
+packets are dispatched.
+
+Returns: `{ data: T; clientId: ClientId; channel: Channel }[]`
+
+### sendToAll(packet, data, options?)
+
+Send a packet to every client reachable on the channel. `data` must match the
+definition's payload type and is encoded as JSON.
+
+Option `channel`: `Channel` to send on. The definition's channel by default.
+
+Throws a `TypeError` when `data` cannot be encoded as JSON.
+
+### sendToClient(clientId, packet, data, options?)
+
+Send a packet to one client, like `sendToAll`.
+
 ## NetworkPayload
 
-What `sendToAll` and `sendToClient` accept. Packets carry no format tag: the
-receiver reads a packet the way it was sent.
+What `sendToAll` and `sendToClient` accept. Their payload carries no format
+tag: the receiver reads a packet the way it was sent.
 
 | Value                                              | Encoded as            | Read back with                |
 | -------------------------------------------------- | --------------------- | ----------------------------- |

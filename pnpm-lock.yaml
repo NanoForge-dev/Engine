@@ -373,6 +373,9 @@ importers:
       '@nanoforge-dev/env':
         specifier: workspace:*
         version: link:../../packages/env
+      '@nanoforge-dev/network':
+        specifier: workspace:*
+        version: link:../../modules/network
       '@trivago/prettier-plugin-sort-imports':
         specifier: catalog:lint
         version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
