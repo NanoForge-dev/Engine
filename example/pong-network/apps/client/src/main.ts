@@ -95,11 +95,10 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   registry.addSystem(controlPlayer);
   registry.addSystem(draw);
 
-  // Wait for every channel the game uses, so no early move is missed.
   await network.connect({
     channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered, Channel.UnreliableUnordered],
   });
-  network.packets.send(Play, null);
+  network.packets.send(Play);
 
   await app.run();
 };

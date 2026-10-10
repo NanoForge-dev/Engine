@@ -90,10 +90,11 @@ Meant for ECS systems, which run after the packets are dispatched.
 
 Returns: `{ data: T; channel: Channel }[]`
 
-### packets.send(packet, data, options?)
+### packets.send(packet, data?, options?)
 
 Send a packet to the server. `data` must match the definition's payload type and
-is encoded as JSON.
+is encoded as JSON. Leave it out for a packet without payload, declared without
+a type: `send(Play)`.
 
 Option `channel`: `Channel` to send on. The definition's channel by default.
 
@@ -118,7 +119,8 @@ before listeners and `read`. Packets that fail it are dropped with a warning.
 Throws when the name is empty or too long, and later, in `packets.on` or `read`,
 when another definition of the same name has another channel or `validate`.
 
-Returns: `PacketDefinition<T>`
+Returns: `PacketDefinition<T>`. Without a type, `T` is `void`: the packet
+carries no payload.
 
 ```ts
 export const Move = definePacket<{ id: number; x: number; y: number }>("move", {

@@ -4,6 +4,7 @@ export type { NetworkConfig } from "../shared/config.network";
 export { Channel, type ChannelOptions, type ConnectOptions } from "../shared/channels";
 export { NetworkData, type NetworkPayload } from "../shared/network-data";
 export {
+  type PacketArgs,
   type PacketDefinition,
   type PacketListener,
   type PacketOptions,

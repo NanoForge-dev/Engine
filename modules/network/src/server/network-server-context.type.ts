@@ -1,6 +1,6 @@
 import type { Channel, ChannelOptions } from "../shared/channels";
 import type { NetworkData, NetworkPayload } from "../shared/network-data";
-import type { PacketDefinition, PacketListener } from "../shared/packet";
+import type { PacketArgs, PacketDefinition, PacketListener } from "../shared/packet";
 import type { ClientId, ClientInfo, ClientsApi } from "./client-registry";
 
 /** Where a packet received by the server comes from. */
@@ -38,12 +38,13 @@ export interface ServerPacketsApi {
   read<T>(packet: PacketDefinition<T>): (ServerPacketInfo & { data: T })[];
   /**
    * Send a packet to every client reachable on the definition's channel,
-   * unless another `channel` is given.
+   * unless another `channel` is given.  `data` is left out for a packet without
+   * payload: `sendToAll(Start)`.
    *
    * @throws When the channel's port was not configured, or `data` cannot be
    * encoded as JSON.
    */
-  sendToAll<T>(packet: PacketDefinition<T>, data: NoInfer<T>, options?: ChannelOptions): void;
+  sendToAll<T>(packet: PacketDefinition<T>, ...args: PacketArgs<NoInfer<T>>): void;
   /**
    * Send a packet to one client, on the definition's channel unless another
    * `channel` is given.
@@ -54,8 +55,7 @@ export interface ServerPacketsApi {
   sendToClient<T>(
     clientId: ClientId,
     packet: PacketDefinition<T>,
-    data: NoInfer<T>,
-    options?: ChannelOptions,
+    ...args: PacketArgs<NoInfer<T>>
   ): void;
 }
 

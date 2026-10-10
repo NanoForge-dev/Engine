@@ -72,10 +72,14 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
   private readonly _packets: ServerPacketsApi = {
     on: (packet, listener) => this._dispatcher.on(packet, listener),
     read: (packet) => this._dispatcher.read(packet),
-    sendToAll: (packet, data, { channel = packet.channel } = {}) =>
-      this.sendBytesToAll(channel, encodeTypedPacket(packet, data)),
-    sendToClient: (clientId, packet, data, { channel = packet.channel } = {}) =>
-      this.sendBytesToClient(clientId, channel, encodeTypedPacket(packet, data)),
+    sendToAll: (packet, ...[data, options]) =>
+      this.sendBytesToAll(options?.channel ?? packet.channel, encodeTypedPacket(packet, data)),
+    sendToClient: (clientId, packet, ...[data, options]) =>
+      this.sendBytesToClient(
+        clientId,
+        options?.channel ?? packet.channel,
+        encodeTypedPacket(packet, data),
+      ),
   };
 
   /** Client sessions shared by the TCP and UDP servers. */

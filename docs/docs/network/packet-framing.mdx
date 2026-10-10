@@ -38,7 +38,8 @@ name in UTF-8, then the payload.
 
 - **Typed packets** (`ctx.network.packets.send`, see
   [Typed packets](network-client#typed-packets)) carry the name given to
-  `definePacket`, and their payload is the `JSON.stringify` text of the data.
+  `definePacket`, and their payload is the `JSON.stringify` text of the data,
+  or nothing for a packet without payload.
   The receiver routes them to the listeners and `read` of that type.
 - **`sendData` packets** have a length of `0`, so no name. Their payload carries
   no format tag: bytes are sent as they are, a string as its UTF-8 text, and any

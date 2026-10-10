@@ -69,8 +69,15 @@ describe("packet header", () => {
     expect(decodePacket(new Uint8Array([4, 1, 2]))).toBeNull();
   });
 
+  it("should send a packet without payload as its name only", () => {
+    const packet = encodeTypedPacket(Play, undefined);
+
+    expect(packet).toStrictEqual(new Uint8Array([4, ...utf8("play")]));
+    expect(decodePacket(packet)).toStrictEqual({ name: "play", data: new Uint8Array() });
+  });
+
   it("should refuse a payload JSON cannot encode", () => {
-    expect(() => encodeTypedPacket(Play as never, undefined as never)).toThrow(TypeError);
+    expect(() => encodeTypedPacket(Play, () => {})).toThrow(TypeError);
   });
 
   it("should sort raw and typed packets, dropping broken ones", () => {
@@ -78,13 +85,17 @@ describe("packet header", () => {
     const typed: TypedPacket<Info>[] = [];
 
     sortPackets(
-      [encodePacket(null, new Uint8Array([1])), new Uint8Array(), encodeTypedPacket(Play, null)],
+      [
+        encodePacket(null, new Uint8Array([1])),
+        new Uint8Array(),
+        encodeTypedPacket(Play, undefined),
+      ],
       info,
       raw,
       typed,
     );
     expect(raw).toStrictEqual([new NetworkData(new Uint8Array([1]))]);
-    expect(typed).toStrictEqual([{ name: "play", data: utf8("null"), info }]);
+    expect(typed).toStrictEqual([{ name: "play", data: new Uint8Array(), info }]);
   });
 });
 
@@ -114,6 +125,15 @@ describe("PacketDispatcher", () => {
       ["a", { x: 2 }, { ...info, ctx }],
       ["b", { x: 2 }],
     ]);
+  });
+
+  it("should hand undefined for a packet without payload", () => {
+    const dispatcher = new PacketDispatcher<Info>();
+    const listener = vi.fn();
+    dispatcher.on(Play, listener);
+
+    dispatcher.dispatch([{ name: "play", data: new Uint8Array(), info }], ctx);
+    expect(listener).toHaveBeenCalledWith(undefined, { ...info, ctx });
   });
 
   it("should stop calling a removed listener", () => {

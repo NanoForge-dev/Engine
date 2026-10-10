@@ -113,16 +113,17 @@ packets are dispatched.
 
 Returns: `{ data: T; clientId: ClientId; channel: Channel }[]`
 
-### sendToAll(packet, data, options?)
+### sendToAll(packet, data?, options?)
 
 Send a packet to every client reachable on the channel. `data` must match the
-definition's payload type and is encoded as JSON.
+definition's payload type and is encoded as JSON. Leave it out for a packet
+without payload: `sendToAll(Start)`.
 
 Option `channel`: `Channel` to send on. The definition's channel by default.
 
 Throws a `TypeError` when `data` cannot be encoded as JSON.
 
-### sendToClient(clientId, packet, data, options?)
+### sendToClient(clientId, packet, data?, options?)
 
 Send a packet to one client, like `sendToAll`.
 

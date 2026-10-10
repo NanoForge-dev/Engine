@@ -52,7 +52,7 @@ both the client and the server import, and let the library route packets to it.
 // shared/protocol.ts
 import { Channel, definePacket } from "@nanoforge-dev/network";
 
-export const Play = definePacket("play"); // payload: null
+export const Play = definePacket("play"); // no payload
 export const Input = definePacket<{ key: "up" | "down" }>("input");
 export const Move = definePacket<{ id: number; x: number; y: number }>("move", {
   channel: Channel.UnreliableOrdered, // default channel of this type
@@ -72,7 +72,7 @@ export const applyMoves = (registry, ctx) => {
 
 // send: the payload is checked against the definition
 ctx.network.packets.send(Input, { key: "up" }); // Channel.ReliableOrdered
-ctx.network.packets.send(Play, null);
+ctx.network.packets.send(Play); // no payload to give
 ```
 
 - Listeners are called every tick before the ECS systems, in the order the

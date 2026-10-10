@@ -79,8 +79,8 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
   private readonly _packets: ClientPacketsApi = {
     on: (packet, listener) => this._dispatcher.on(packet, listener),
     read: (packet) => this._dispatcher.read(packet),
-    send: (packet, data, { channel = packet.channel } = {}) =>
-      this.sendBytes(channel, encodeTypedPacket(packet, data)),
+    send: (packet, ...[data, options]) =>
+      this.sendBytes(options?.channel ?? packet.channel, encodeTypedPacket(packet, data)),
   };
 
   /** Client id assigned by the server, `undefined` until transport is welcomed. */

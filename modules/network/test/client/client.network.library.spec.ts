@@ -399,13 +399,13 @@ describe("NetworkClientLibrary", () => {
       lib.packets.on(Play, (play, info) => calls.push([play, info]));
 
       receive(encodeTypedPacket(Move, { x: 1 }), Channel.UnreliableUnordered);
-      receive(encodeTypedPacket(Play, null), Channel.ReliableOrdered);
+      receive(encodeTypedPacket(Play, undefined), Channel.ReliableOrdered);
       tcpSocket().onmessage({ data: new Uint8Array([0, 0, 7]).buffer });
       expect(calls).toStrictEqual([]);
 
       await lib.__run(ctx);
       expect(calls).toStrictEqual([
-        [null, { channel: Channel.ReliableOrdered, ctx }],
+        [undefined, { channel: Channel.ReliableOrdered, ctx }],
         [{ x: 1 }, { channel: Channel.UnreliableUnordered, ctx }],
       ]);
       expect(lib.packets.read(Move)).toStrictEqual([
@@ -421,7 +421,7 @@ describe("NetworkClientLibrary", () => {
       const listener = vi.fn();
       lib.packets.on(Play, listener);
 
-      receive(encodeTypedPacket(Play, null), Channel.ReliableOrdered);
+      receive(encodeTypedPacket(Play, undefined), Channel.ReliableOrdered);
       expect(lib.getReceivedPackets()).toStrictEqual([]);
       await lib.__run(ctx);
       expect(listener).toHaveBeenCalledOnce();
@@ -447,12 +447,12 @@ describe("NetworkClientLibrary", () => {
       await lib.__init(makeInitContext(tcpOnly));
       await lib.connect();
       const listener = vi.fn(() => {
-        receive(encodeTypedPacket(Play, null), Channel.ReliableOrdered);
+        receive(encodeTypedPacket(Play, undefined), Channel.ReliableOrdered);
         lib.getReceivedPackets();
       });
       lib.packets.on(Play, listener);
 
-      receive(encodeTypedPacket(Play, null), Channel.ReliableOrdered);
+      receive(encodeTypedPacket(Play, undefined), Channel.ReliableOrdered);
       await lib.__run(ctx);
       await lib.__run(ctx);
       expect(listener).toHaveBeenCalledTimes(2);
@@ -464,12 +464,12 @@ describe("NetworkClientLibrary", () => {
       await lib.connect();
 
       lib.packets.send(Move, { x: 1 });
-      lib.packets.send(Play, null, { channel: Channel.ReliableUnordered });
+      lib.packets.send(Play, undefined, { channel: Channel.ReliableUnordered });
       expect(dataChannel("unreliable-unordered").send).toHaveBeenCalledWith(
         encodeTypedPacket(Move, { x: 1 }),
       );
       expect(tcpSocket().send).toHaveBeenCalledWith(
-        new Uint8Array([1, ...encodeTypedPacket(Play, null)]),
+        new Uint8Array([1, ...encodeTypedPacket(Play, undefined)]),
       );
     });
 

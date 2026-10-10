@@ -1,6 +1,6 @@
 import type { Context } from "@nanoforge-dev/common";
 
-import { type Channel, DEFAULT_CHANNEL } from "./channels";
+import { type Channel, type ChannelOptions, DEFAULT_CHANNEL } from "./channels";
 import { NetworkData } from "./network-data";
 
 const encoder = new TextEncoder();
@@ -61,7 +61,7 @@ export interface PacketDefinition<T> {
  * export const Move = definePacket<{ id: number; x: number; y: number }>("move", {
  *   channel: Channel.UnreliableOrdered,
  * });
- * export const Play = definePacket("play"); // payload: null
+ * export const Play = definePacket("play"); // no payload: `send(Play)`
  * ```
  *
  * @param name - Name identifying the type on the wire, unique in the game.
@@ -69,7 +69,7 @@ export interface PacketDefinition<T> {
  * @returns The packet definition, used by `packets.on`, `read` and `send`.
  * @throws When the name is empty or longer than 255 UTF-8 bytes.
  */
-export const definePacket = <T = null>(
+export const definePacket = <T = void>(
   name: string,
   { channel = DEFAULT_CHANNEL, validate }: PacketOptions<T> = {},
 ): PacketDefinition<T> => {
@@ -98,14 +98,27 @@ export const encodePacket = (name: string | null, payload: Uint8Array): Uint8Arr
 };
 
 /**
- * Encode a typed packet: its payload as JSON, prefixed with its type name.
+ * Arguments of the typed send methods after the definition: the payload, which
+ * can be left out when it accepts `undefined` (a packet without payload is
+ * `void`), then the options.
+ *
+ * @typeParam T - Payload type of the packet.
+ */
+export type PacketArgs<T> = undefined extends T
+  ? [data?: T, options?: ChannelOptions]
+  : [data: T, options?: ChannelOptions];
+
+/**
+ * Encode a typed packet: its payload as JSON, or nothing for `undefined`,
+ * prefixed with its type name.
  *
  * @throws `TypeError` When the payload cannot be encoded as JSON.
  */
-export const encodeTypedPacket = <T>(
-  packet: PacketDefinition<T>,
-  data: T,
+export const encodeTypedPacket = (
+  packet: PacketDefinition<unknown>,
+  data: unknown,
 ): Uint8Array<ArrayBuffer> => {
+  if (data === undefined) return encodePacket(packet.name, new Uint8Array());
   const json: string | undefined = JSON.stringify(data);
   if (json === undefined)
     throw new TypeError(`Cannot send a ${typeof data} as packet "${packet.name}"`);
@@ -222,7 +235,7 @@ export class PacketDispatcher<Info> {
     for (const { name, data, info } of packets) {
       let value: unknown;
       try {
-        value = JSON.parse(decoder.decode(data));
+        value = data.length === 0 ? undefined : JSON.parse(decoder.decode(data));
       } catch (error) {
         console.warn(`Network: packet "${name}" is not valid JSON, dropped`, { cause: error });
         continue;
