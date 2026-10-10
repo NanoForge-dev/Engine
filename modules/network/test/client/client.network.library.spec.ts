@@ -83,6 +83,7 @@ describe("NetworkClientLibrary", () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
@@ -108,7 +109,6 @@ describe("NetworkClientLibrary", () => {
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      await lib.connect();
       expect(() => lib.sendData(new Uint8Array([1]))).not.toThrow();
       expect(() =>
         lib.sendData(new Uint8Array([1]), { channel: Channel.UnreliableOrdered }),
@@ -123,7 +123,6 @@ describe("NetworkClientLibrary", () => {
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      await lib.connect();
       expect(RTCPeerConnection).toHaveBeenCalledWith({
         iceServers: [{ urls: "stun:stun.example.com:3478" }],
       });
@@ -136,7 +135,6 @@ describe("NetworkClientLibrary", () => {
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      await lib.connect();
       expect(() =>
         lib.sendData(new Uint8Array([1]), { channel: Channel.UnreliableUnordered }),
       ).not.toThrow();
@@ -153,7 +151,6 @@ describe("NetworkClientLibrary", () => {
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      await lib.connect();
       expect(() => lib.sendData(new Uint8Array([1]))).not.toThrow();
       expect(() =>
         lib.sendData(new Uint8Array([1]), { channel: Channel.UnreliableUnordered }),
@@ -168,7 +165,6 @@ describe("NetworkClientLibrary", () => {
       });
       const lib = new NetworkClientLibrary();
       await lib.__init(ctx);
-      await lib.connect();
 
       expect(vi.mocked(WebSocket).mock.calls.map(([url]) => url)).toStrictEqual([
         "ws://127.0.0.1:8080",
@@ -185,9 +181,8 @@ describe("NetworkClientLibrary", () => {
         SERVER_ADDRESS: "127.0.0.1",
       });
       const lib = new NetworkClientLibrary();
-      await lib.__init(ctx);
 
-      await expect(lib.connect()).rejects.toThrow(
+      await expect(lib.__init(ctx)).rejects.toThrow(
         "NetworkClientLibrary: could not connect to the server",
       );
       expect(vi.mocked(WebSocket).mock.calls[1]?.[0]).toBe("ws://127.0.0.1:8081");
@@ -201,69 +196,52 @@ describe("NetworkClientLibrary", () => {
     });
   });
 
-  describe("connect", () => {
-    it("should not open any connection during __init", async () => {
-      await new NetworkClientLibrary().__init(makeInitContext(both));
-      expect(WebSocket).not.toHaveBeenCalled();
-    });
-
-    it("should only open the transports the channels need", async () => {
-      const lib = new NetworkClientLibrary();
-      await lib.__init(makeInitContext(both));
-      await lib.connect({ channels: [Channel.UnreliableUnordered] });
+  describe("connection", () => {
+    it("should open only the configured transports during __init", async () => {
+      await new NetworkClientLibrary().__init(makeInitContext(udpOnly));
 
       expect(vi.mocked(WebSocket).mock.calls.map(([url]) => url)).toStrictEqual([
         "ws://127.0.0.1:8081",
       ]);
     });
 
+    it("should open all four channels by default when both ports are configured", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(both));
+
+      expect(Object.values(Channel).map((channel) => lib.isConnected({ channel }))).toStrictEqual([
+        true,
+        true,
+        true,
+        true,
+      ]);
+    });
+
     it("should wait until every channel is open", async () => {
       dataChannelState = "connecting";
       const lib = new NetworkClientLibrary();
-      await lib.__init(makeInitContext(udpOnly));
 
-      let connected = false;
-      const connecting = lib
-        .connect({ channels: [Channel.UnreliableOrdered] })
-        .then(() => (connected = true));
+      let initialized = false;
+      const init = lib.__init(makeInitContext(udpOnly)).then(() => (initialized = true));
       await new Promise((resolve) => setTimeout(resolve, 100));
-      expect(connected).toBe(false);
+      expect(initialized).toBe(false);
 
       dataChannel("unreliable-ordered").readyState = "open";
-      await connecting;
-      expect(connected).toBe(true);
+      dataChannel("unreliable-unordered").readyState = "open";
+      await init;
+      expect(initialized).toBe(true);
     });
 
     it("should reject when the channels are not open in time", async () => {
       dataChannelState = "connecting";
-      const lib = new NetworkClientLibrary();
-      await lib.__init(makeInitContext(udpOnly));
+      vi.useFakeTimers();
 
-      await expect(lib.connect({ timeout: 100 })).rejects.toThrow(
-        "channels unreliable-ordered, unreliable-unordered not open after 100ms",
+      const init = new NetworkClientLibrary().__init(makeInitContext(udpOnly));
+      const rejection = expect(init).rejects.toThrow(
+        "channels unreliable-ordered, unreliable-unordered not open after 10000ms",
       );
-    });
-
-    it("should not reconnect a transport that is already open", async () => {
-      const lib = new NetworkClientLibrary();
-      await lib.__init(makeInitContext(tcpOnly));
-      await lib.connect();
-      await lib.connect({ channels: [Channel.ReliableUnordered] });
-
-      expect(WebSocket).toHaveBeenCalledTimes(1);
-    });
-
-    it("should reject a channel whose port is not configured", async () => {
-      const lib = new NetworkClientLibrary();
-      await lib.__init(makeInitContext(tcpOnly));
-
-      await expect(lib.connect({ channels: [Channel.UnreliableOrdered] })).rejects.toThrow(
-        "Channel unreliable-ordered needs SERVER_UDP_PORT to be set",
-      );
-    });
-
-    it("should reject when called before __init", async () => {
-      await expect(new NetworkClientLibrary().connect()).rejects.toThrow("before __init");
+      await vi.advanceTimersByTimeAsync(10_000);
+      await rejection;
     });
   });
 
@@ -271,7 +249,6 @@ describe("NetworkClientLibrary", () => {
     it("should send on ReliableOrdered when no channel is given", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(tcpOnly));
-      await lib.connect();
 
       lib.sendData(new Uint8Array([1]));
       expect(tcpSocket().send).toHaveBeenCalledWith(new Uint8Array([0, 0, 1]));
@@ -280,7 +257,6 @@ describe("NetworkClientLibrary", () => {
     it("should send each reliable channel over the same TCP socket", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(tcpOnly));
-      await lib.connect();
 
       lib.sendData(new Uint8Array([1]), { channel: Channel.ReliableOrdered });
       lib.sendData(new Uint8Array([2]), { channel: Channel.ReliableUnordered });
@@ -294,7 +270,6 @@ describe("NetworkClientLibrary", () => {
     it("should send strings as UTF-8 and other values as JSON", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(both));
-      await lib.connect();
 
       lib.sendData({ type: "play" });
       lib.sendData("hi", { channel: Channel.UnreliableUnordered });
@@ -310,7 +285,6 @@ describe("NetworkClientLibrary", () => {
     it("should open one data channel per unreliable channel", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(udpOnly));
-      await lib.connect();
 
       const peerConnection = vi.mocked(RTCPeerConnection).mock.instances[0] as any;
       expect(
@@ -321,7 +295,6 @@ describe("NetworkClientLibrary", () => {
     it("should send unreliable channels on their own data channel", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(udpOnly));
-      await lib.connect();
 
       lib.sendData(new Uint8Array([3]), { channel: Channel.UnreliableUnordered });
       expect(dataChannel("unreliable-unordered").send).toHaveBeenCalledWith(new Uint8Array([0, 3]));
@@ -331,7 +304,6 @@ describe("NetworkClientLibrary", () => {
     it("should read one channel, or every channel with reliable ones first", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(both));
-      await lib.connect();
 
       dataChannel("unreliable-unordered").onmessage({ data: new Uint8Array([0, 9]).buffer });
       tcpSocket().onmessage({ data: new Uint8Array([1, 0, 2]).buffer });
@@ -350,7 +322,6 @@ describe("NetworkClientLibrary", () => {
     it("should return packets that read back as JSON", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(tcpOnly));
-      await lib.connect();
 
       tcpSocket().onmessage({ data: new Uint8Array([0, 0, ...utf8('{"type":"move"}')]).buffer });
 
@@ -362,7 +333,6 @@ describe("NetworkClientLibrary", () => {
     it("should report connected only once every configured channel is", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(both));
-      await lib.connect();
       tcpSocket().readyState = 1;
       dataChannel("unreliable-ordered").readyState = "connecting";
 
@@ -393,7 +363,6 @@ describe("NetworkClientLibrary", () => {
     it("should dispatch typed packets in __run, reliable ones first", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(both));
-      await lib.connect();
       const calls: unknown[] = [];
       lib.packets.on(Move, (move, info) => calls.push([move, info]));
       lib.packets.on(Play, (play, info) => calls.push([play, info]));
@@ -417,7 +386,6 @@ describe("NetworkClientLibrary", () => {
     it("should keep typed packets out of getReceivedPackets until __run", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(tcpOnly));
-      await lib.connect();
       const listener = vi.fn();
       lib.packets.on(Play, listener);
 
@@ -430,7 +398,6 @@ describe("NetworkClientLibrary", () => {
     it("should drop sendData packets left unread for a whole tick", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(tcpOnly));
-      await lib.connect();
 
       tcpSocket().onmessage({ data: new Uint8Array([0, 0, 1]).buffer });
       await lib.__run(ctx);
@@ -445,7 +412,6 @@ describe("NetworkClientLibrary", () => {
     it("should not lose packets drained by a listener", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(tcpOnly));
-      await lib.connect();
       const listener = vi.fn(() => {
         receive(encodeTypedPacket(Play, undefined), Channel.ReliableOrdered);
         lib.getReceivedPackets();
@@ -461,7 +427,6 @@ describe("NetworkClientLibrary", () => {
     it("should send on the definition's channel unless another is given", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(both));
-      await lib.connect();
 
       lib.packets.send(Move, { x: 1 });
       lib.packets.send(Play, undefined, { channel: Channel.ReliableUnordered });
@@ -482,7 +447,6 @@ describe("NetworkClientLibrary", () => {
     it("delegates to the library", async () => {
       const lib = new NetworkClientLibrary();
       await lib.__init(makeInitContext(tcpOnly));
-      await lib.connect();
       const api = lib.expose();
 
       api.sendData(new Uint8Array([5]), { channel: Channel.ReliableUnordered });

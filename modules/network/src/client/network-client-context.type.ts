@@ -1,4 +1,4 @@
-import type { Channel, ChannelOptions, ConnectOptions } from "../shared/channels";
+import type { Channel, ChannelOptions } from "../shared/channels";
 import type { NetworkData, NetworkPayload } from "../shared/network-data";
 import type { PacketArgs, PacketDefinition, PacketListener } from "../shared/packet";
 
@@ -59,11 +59,6 @@ export interface NetworkClientContextApi {
   readonly packets: ClientPacketsApi;
   /** Client id assigned by the server, shared by TCP and UDP. `undefined` until welcomed. */
   readonly clientId: string | undefined;
-  /**
-   * Connect to the server and resolve once `channels` (every configured
-   * channel by default) are open.  Rejects on failure or after `timeout` ms.
-   */
-  connect(options?: ConnectOptions): Promise<void>;
   /**
    * Send bytes, a string or a JSON value to the server, on
    * `Channel.ReliableOrdered` unless another `channel` is given.

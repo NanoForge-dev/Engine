@@ -14,34 +14,19 @@ description: "API reference for the client networking package"
 Reliable channels need `SERVER_TCP_PORT` and unreliable ones `SERVER_UDP_PORT`.
 Using a channel whose port is not configured throws.
 
+The client connects during `__init`, so its channels are open once the game runs.
+TCP connects first, then UDP with the TCP session token, so both share one client
+id. `__init` rejects when a transport fails, or when its channels are not open
+within 10 seconds.
+
 ```ts
 import { Channel } from "@nanoforge-dev/network/client";
-
-await ctx.network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
 
 ctx.network.sendData({ type: "join" }); // Channel.ReliableOrdered
 ctx.network.sendData({ x: 1, y: 2 }, { channel: Channel.UnreliableOrdered });
 
 const messages = ctx.network.getReceivedPackets().map((packet) => packet.json()); // every channel
 ```
-
-## connect(options?)
-
-Connect to the server and resolve once the channels are open. Only the
-transports the channels need are opened: TCP for reliable channels, UDP for
-unreliable ones. TCP connects first, then UDP with the TCP session token, so both
-share one client id. Calling it again for channels that are already open resolves
-right away.
-
-Option `channels`: `Channel[]`, the channels to open and wait for. Every
-configured channel by default.
-
-Option `timeout`: `number`, milliseconds before giving up. `10000` by default.
-
-Rejects when a channel's port is not configured, when a transport fails to
-connect, or when the channels are not open before the timeout.
-
-Returns: `Promise<void>`
 
 ## sendData(data, options?)
 
@@ -140,7 +125,7 @@ Returns: `boolean`
 ## clientId
 
 Client id assigned by the server, shared by TCP and UDP. `undefined` until
-`connect` has been welcomed by the server. It is only kept in memory: a page
+the server has welcomed the client. It is only kept in memory: a page
 reload gets a new id.
 
 Type: `string | undefined`

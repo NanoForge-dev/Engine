@@ -164,9 +164,6 @@ import { Channel, NetworkClientLibrary } from "@nanoforge-dev/network/client";
 
 app.use(new NetworkClientLibrary());
 
-// Once, at game start: open the channels the game uses and wait for them.
-await ctx.network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
-
 // Every frame:
 ctx.network.sendData({ type: "join" }); // Channel.ReliableOrdered
 ctx.network.sendData({ x: 1, y: 2 }, { channel: Channel.UnreliableOrdered });
@@ -189,9 +186,9 @@ ctx.network.sendToAll(snapshot, { channel: Channel.UnreliableOrdered });
 ctx.network.sendToClient(clientId, { type: "event" }); // Channel.ReliableOrdered
 ```
 
-`connect` only opens the transports its channels need, and rejects when a
-transport fails or the channels are not open within `timeout` milliseconds
-(10 seconds by default). The server starts listening during `__init`.
+The client connects during `__init` and its channels are open before the game
+starts: `__init` rejects when a transport fails or the channels are not open
+within 10 seconds. The server starts listening during `__init`.
 
 ### Typed packets
 
@@ -239,7 +236,7 @@ ctx.network.clients.onDisconnect((info) => console.log(`${info.id} left`));
 const info = ctx.network.getClientInfo(clientId);
 ```
 
-On the client, `ctx.network.clientId` holds the id once `connect` has been welcomed. A page reload
+On the client, `ctx.network.clientId` holds the id once the server has welcomed the client. A page reload
 starts a new session with a new id.
 
 Using a channel whose port wasn't configured on that side throws.

@@ -23,9 +23,6 @@ four [channels](packet-framing), picked with the `channel` option:
 ```javascript
 import { Channel } from "@nanoforge-dev/network/client";
 
-// Open the channels the game uses and wait until they are ready
-await network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
-
 // Send a value as JSON, on Channel.ReliableOrdered
 network.sendData({ hello: "world" });
 

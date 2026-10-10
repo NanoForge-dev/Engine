@@ -52,29 +52,8 @@ export type ChannelOptions = {
   channel?: Channel;
 };
 
-/** How long `connect` waits for its channels by default. */
+/** How long the client waits for its channels to open during `__init`. */
 export const CONNECT_TIMEOUT_MS = 10_000;
-
-/**
- * Options of the client's `connect`.
- *
- * @example
- * ```ts
- * await ctx.network.connect({
- *   channels: [Channel.ReliableOrdered, Channel.UnreliableUnordered],
- * });
- * ```
- */
-export type ConnectOptions = {
-  /** Channels to open and wait for, every configured channel by default. */
-  channels?: Channel[];
-  /**
-   * Give up after this many milliseconds.
-   *
-   * @default 10000
-   */
-  timeout?: number;
-};
 
 /**
  * Tell whether a channel is carried by the TCP WebSocket.
