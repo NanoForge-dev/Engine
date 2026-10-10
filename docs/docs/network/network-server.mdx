@@ -76,6 +76,31 @@ const firstClientPackets = allPackets.get(connectedClients[0]);
 const decodedPackets = firstClientPackets.map((packet) => packet.json());
 ```
 
+## Typed packets
+
+The server uses the same packet types as the client, from the shared protocol
+file (see [Typed packets](network-client#typed-packets)). Its listeners and
+`read` also get the sender.
+
+```ts
+import { Input, Move, Play } from "../../shared/protocol";
+
+// listen once, after app.init()
+network.packets.on(Input, ({ key }, { clientId, ctx }) => {
+  handleInput(clientId, key, ctx);
+});
+
+// or read this tick's packets from an ECS system
+for (const { data, clientId } of ctx.network.packets.read(Input)) handleInput(clientId, data.key);
+
+// send to everybody or to one client, on the definition's channel by default
+ctx.network.packets.sendToAll(Move, { id: 1, x: 2, y: 3 });
+ctx.network.packets.sendToClient(clientId, Move, { id: 1, x: 2, y: 3 });
+```
+
+Payloads come from the clients, so check the ones the game cannot trust with
+the `validate` option of `definePacket`.
+
 ## Notes
 
 - See [Network Server API](network-server-api) for the full list of available functions.

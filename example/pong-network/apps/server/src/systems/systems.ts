@@ -4,10 +4,10 @@ import {
   Channel,
   type ClientId,
   type ClientInfo,
-  type NetworkData,
   type NetworkServerContextApi,
 } from "@nanoforge-dev/network/server";
 
+import { AssignId, Move } from "../../../../shared/protocol";
 import { Position, Velocity } from "../components/components";
 
 let cli1: ClientId | null = null;
@@ -32,13 +32,9 @@ function sendMoveAll(
   network: NetworkServerContextApi,
   channel: Channel,
 ) {
-  network.sendToAll(
-    {
-      type: "move",
-      id: id,
-      position: { x: pos.x, y: pos.y },
-      velocity: { x: vel.x, y: vel.y },
-    },
+  network.packets.sendToAll(
+    Move,
+    { id: id, position: { x: pos.x, y: pos.y }, velocity: { x: vel.x, y: vel.y } },
     { channel },
   );
 }
@@ -50,15 +46,15 @@ export function onClientDisconnect(info: ClientInfo) {
 }
 
 function connectNewClient(newCli: ClientId, network: NetworkServerContextApi, zip: any) {
-  network.sendToClient(newCli, { type: "assignId", assigned: "ball", id: 0 });
-  network.sendToClient(newCli, { type: "assignId", assigned: "paddle1", id: 1 });
-  network.sendToClient(newCli, { type: "assignId", assigned: "paddle2", id: 2 });
+  network.packets.sendToClient(newCli, AssignId, { assigned: "ball", id: 0 });
+  network.packets.sendToClient(newCli, AssignId, { assigned: "paddle1", id: 1 });
+  network.packets.sendToClient(newCli, AssignId, { assigned: "paddle2", id: 2 });
   sendMoveAll(0, zip[0].Velocity, zip[0].Position, network, Channel.ReliableOrdered);
   sendMoveAll(1, zip[1].Velocity, zip[1].Position, network, Channel.ReliableOrdered);
   sendMoveAll(2, zip[2].Velocity, zip[2].Position, network, Channel.ReliableOrdered);
 }
 
-function handleClientInput(
+export function handleClientInput(
   clientId: ClientId,
   key: string,
   network: NetworkServerContextApi,
@@ -95,29 +91,16 @@ function handleClientInput(
   sendMoveAll(id, paddle.Velocity, paddle.Position, network, Channel.UnreliableOrdered);
 }
 
-export function packetHandler(registry: Registry, ctx: Context) {
-  const zip = registry.getZipper([Position, Velocity]);
-  const network = ctx.network;
-
-  const clientPackets: Map<ClientId, NetworkData[]> = network.getReceivedPackets();
-  clientPackets.forEach((packets, client) => {
-    packets.forEach((packet) => {
-      const data = packet.json();
-      if (data.type == "play") {
-        if (client == cli1 || client == cli2) return;
-        if (cli1 === null) {
-          cli1 = client;
-        } else if (cli2 === null) {
-          cli2 = client;
-        } else {
-          return;
-        }
-        connectNewClient(client, network, zip);
-      } else if (data.type == "input") {
-        handleClientInput(client, data.key, network, zip);
-      }
-    });
-  });
+export function handlePlay(client: ClientId, network: NetworkServerContextApi, zip: any) {
+  if (client == cli1 || client == cli2) return;
+  if (cli1 === null) {
+    cli1 = client;
+  } else if (cli2 === null) {
+    cli2 = client;
+  } else {
+    return;
+  }
+  connectNewClient(client, network, zip);
 }
 
 function checkOutOfTerrain(id: number, paddle: any, network: NetworkServerContextApi) {

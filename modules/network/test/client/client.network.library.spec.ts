@@ -1,7 +1,8 @@
-import type { InitContext } from "@nanoforge-dev/common";
+import type { Context, InitContext } from "@nanoforge-dev/common";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Channel, NetworkClientLibrary, NetworkData } from "../../src/client";
+import { Channel, NetworkClientLibrary, NetworkData, definePacket } from "../../src/client";
+import { encodeTypedPacket } from "../../src/shared/packet";
 
 const makeInitContext = (env: Record<string, string>): InitContext => ({
   vars: { get: () => undefined, set: () => {} },
@@ -273,7 +274,7 @@ describe("NetworkClientLibrary", () => {
       await lib.connect();
 
       lib.sendData(new Uint8Array([1]));
-      expect(tcpSocket().send).toHaveBeenCalledWith(new Uint8Array([0, 1]));
+      expect(tcpSocket().send).toHaveBeenCalledWith(new Uint8Array([0, 0, 1]));
     });
 
     it("should send each reliable channel over the same TCP socket", async () => {
@@ -285,8 +286,8 @@ describe("NetworkClientLibrary", () => {
       lib.sendData(new Uint8Array([2]), { channel: Channel.ReliableUnordered });
 
       expect(tcpSocket().send.mock.calls).toStrictEqual([
-        [new Uint8Array([0, 1])],
-        [new Uint8Array([1, 2])],
+        [new Uint8Array([0, 0, 1])],
+        [new Uint8Array([1, 0, 2])],
       ]);
     });
 
@@ -299,9 +300,11 @@ describe("NetworkClientLibrary", () => {
       lib.sendData("hi", { channel: Channel.UnreliableUnordered });
 
       expect(tcpSocket().send).toHaveBeenCalledWith(
-        new Uint8Array([0, ...utf8('{"type":"play"}')]),
+        new Uint8Array([0, 0, ...utf8('{"type":"play"}')]),
       );
-      expect(dataChannel("unreliable-unordered").send).toHaveBeenCalledWith(utf8("hi"));
+      expect(dataChannel("unreliable-unordered").send).toHaveBeenCalledWith(
+        new Uint8Array([0, ...utf8("hi")]),
+      );
     });
 
     it("should open one data channel per unreliable channel", async () => {
@@ -321,7 +324,7 @@ describe("NetworkClientLibrary", () => {
       await lib.connect();
 
       lib.sendData(new Uint8Array([3]), { channel: Channel.UnreliableUnordered });
-      expect(dataChannel("unreliable-unordered").send).toHaveBeenCalledWith(new Uint8Array([3]));
+      expect(dataChannel("unreliable-unordered").send).toHaveBeenCalledWith(new Uint8Array([0, 3]));
       expect(dataChannel("unreliable-ordered").send).not.toHaveBeenCalled();
     });
 
@@ -330,9 +333,9 @@ describe("NetworkClientLibrary", () => {
       await lib.__init(makeInitContext(both));
       await lib.connect();
 
-      dataChannel("unreliable-unordered").onmessage({ data: new Uint8Array([9]).buffer });
-      tcpSocket().onmessage({ data: new Uint8Array([1, 2]).buffer });
-      tcpSocket().onmessage({ data: new Uint8Array([0, 1]).buffer });
+      dataChannel("unreliable-unordered").onmessage({ data: new Uint8Array([0, 9]).buffer });
+      tcpSocket().onmessage({ data: new Uint8Array([1, 0, 2]).buffer });
+      tcpSocket().onmessage({ data: new Uint8Array([0, 0, 1]).buffer });
 
       expect(bytesOf(lib.getReceivedPackets({ channel: Channel.ReliableUnordered }))).toStrictEqual(
         [new Uint8Array([2])],
@@ -349,7 +352,7 @@ describe("NetworkClientLibrary", () => {
       await lib.__init(makeInitContext(tcpOnly));
       await lib.connect();
 
-      tcpSocket().onmessage({ data: new Uint8Array([0, ...utf8('{"type":"move"}')]).buffer });
+      tcpSocket().onmessage({ data: new Uint8Array([0, 0, ...utf8('{"type":"move"}')]).buffer });
 
       const [packet] = lib.getReceivedPackets();
       expect(packet).toBeInstanceOf(NetworkData);
@@ -376,6 +379,105 @@ describe("NetworkClientLibrary", () => {
     });
   });
 
+  describe("packets", () => {
+    const ctx = {} as Context;
+    const Move = definePacket<{ x: number }>("move", { channel: Channel.UnreliableUnordered });
+    const Play = definePacket("play");
+
+    /** Deliver a typed packet as the server would, on a reliable channel or a data channel. */
+    const receive = (packet: Uint8Array, channel: Channel) =>
+      channel === Channel.UnreliableUnordered
+        ? dataChannel(channel).onmessage({ data: packet.slice().buffer })
+        : tcpSocket().onmessage({ data: new Uint8Array([0, ...packet]).buffer });
+
+    it("should dispatch typed packets in __run, reliable ones first", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(both));
+      await lib.connect();
+      const calls: unknown[] = [];
+      lib.packets.on(Move, (move, info) => calls.push([move, info]));
+      lib.packets.on(Play, (play, info) => calls.push([play, info]));
+
+      receive(encodeTypedPacket(Move, { x: 1 }), Channel.UnreliableUnordered);
+      receive(encodeTypedPacket(Play, undefined), Channel.ReliableOrdered);
+      tcpSocket().onmessage({ data: new Uint8Array([0, 0, 7]).buffer });
+      expect(calls).toStrictEqual([]);
+
+      await lib.__run(ctx);
+      expect(calls).toStrictEqual([
+        [undefined, { channel: Channel.ReliableOrdered, ctx }],
+        [{ x: 1 }, { channel: Channel.UnreliableUnordered, ctx }],
+      ]);
+      expect(lib.packets.read(Move)).toStrictEqual([
+        { channel: Channel.UnreliableUnordered, data: { x: 1 } },
+      ]);
+      expect(bytesOf(lib.getReceivedPackets())).toStrictEqual([new Uint8Array([7])]);
+    });
+
+    it("should keep typed packets out of getReceivedPackets until __run", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      await lib.connect();
+      const listener = vi.fn();
+      lib.packets.on(Play, listener);
+
+      receive(encodeTypedPacket(Play, undefined), Channel.ReliableOrdered);
+      expect(lib.getReceivedPackets()).toStrictEqual([]);
+      await lib.__run(ctx);
+      expect(listener).toHaveBeenCalledOnce();
+    });
+
+    it("should drop sendData packets left unread for a whole tick", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      await lib.connect();
+
+      tcpSocket().onmessage({ data: new Uint8Array([0, 0, 1]).buffer });
+      await lib.__run(ctx);
+      expect(bytesOf(lib.getReceivedPackets())).toStrictEqual([new Uint8Array([1])]);
+
+      tcpSocket().onmessage({ data: new Uint8Array([0, 0, 2]).buffer });
+      await lib.__run(ctx);
+      await lib.__run(ctx);
+      expect(lib.getReceivedPackets()).toStrictEqual([]);
+    });
+
+    it("should not lose packets drained by a listener", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      await lib.connect();
+      const listener = vi.fn(() => {
+        receive(encodeTypedPacket(Play, undefined), Channel.ReliableOrdered);
+        lib.getReceivedPackets();
+      });
+      lib.packets.on(Play, listener);
+
+      receive(encodeTypedPacket(Play, undefined), Channel.ReliableOrdered);
+      await lib.__run(ctx);
+      await lib.__run(ctx);
+      expect(listener).toHaveBeenCalledTimes(2);
+    });
+
+    it("should send on the definition's channel unless another is given", async () => {
+      const lib = new NetworkClientLibrary();
+      await lib.__init(makeInitContext(both));
+      await lib.connect();
+
+      lib.packets.send(Move, { x: 1 });
+      lib.packets.send(Play, undefined, { channel: Channel.ReliableUnordered });
+      expect(dataChannel("unreliable-unordered").send).toHaveBeenCalledWith(
+        encodeTypedPacket(Move, { x: 1 }),
+      );
+      expect(tcpSocket().send).toHaveBeenCalledWith(
+        new Uint8Array([1, ...encodeTypedPacket(Play, undefined)]),
+      );
+    });
+
+    it("should run before the ECS", () => {
+      expect(new NetworkClientLibrary().relationships.runAfter).toStrictEqual(["ecs"]);
+    });
+  });
+
   describe("expose", () => {
     it("delegates to the library", async () => {
       const lib = new NetworkClientLibrary();
@@ -384,12 +486,13 @@ describe("NetworkClientLibrary", () => {
       const api = lib.expose();
 
       api.sendData(new Uint8Array([5]), { channel: Channel.ReliableUnordered });
-      expect(tcpSocket().send).toHaveBeenCalledWith(new Uint8Array([1, 5]));
+      expect(tcpSocket().send).toHaveBeenCalledWith(new Uint8Array([1, 0, 5]));
       expect(api.getReceivedPackets()).toStrictEqual([]);
       expect(() => api.isConnected({ channel: Channel.UnreliableOrdered })).toThrow(
         "SERVER_UDP_PORT",
       );
       expect(api.clientId).toBe("client-0");
+      expect(api.packets).toBe(lib.packets);
     });
   });
 });

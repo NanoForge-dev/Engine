@@ -44,9 +44,10 @@ export const DEFAULT_CHANNEL = Channel.ReliableOrdered;
  */
 export type ChannelOptions = {
   /**
-   * Channel to send on or read from.  Sending defaults to
-   * `Channel.ReliableOrdered`; reading and connection checks cover every
-   * configured channel when omitted.
+   * Channel to send on or read from. Sending defaults to the packet
+   * definition's channel for typed packets and to `Channel.ReliableOrdered`
+   * otherwise; reading and connection checks cover every configured channel
+   * when omitted.
    */
   channel?: Channel;
 };

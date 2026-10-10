@@ -9,7 +9,8 @@ description: "The four delivery channels and how packets are framed on each"
 Every packet is sent on one of four channels, picked with the `channel` option
 of the network methods, for example
 `ctx.network.sendData(data, { channel: Channel.UnreliableOrdered })`. Without
-it, packets are sent on `Channel.ReliableOrdered`. Pick the channel by what the
+it, packets are sent on `Channel.ReliableOrdered`, and typed packets on the
+channel of their definition. Pick the channel by what the
 packet needs: whether it may be lost, and whether an older packet is still
 useful once a newer one has arrived.
 
@@ -32,13 +33,27 @@ promises that nothing is lost.
 Both transports deliver whole messages, so one message is one packet: there is
 no delimiter and payloads may contain any bytes.
 
-The payload carries no format tag. Bytes are sent as they are, a string as its
-UTF-8 text, and any other value as its `JSON.stringify` text. The receiver gets a
-`NetworkData` and reads it the way it was sent, with `bytes()`, `text()` or
-`json()`.
+Every packet starts with the name of its packet type: one length byte, then the
+name in UTF-8, then the payload.
+
+- **Typed packets** (`ctx.network.packets.send`, see
+  [Typed packets](network-client#typed-packets)) carry the name given to
+  `definePacket`, and their payload is the `JSON.stringify` text of the data,
+  or nothing for a packet without payload.
+  The receiver routes them to the listeners and `read` of that type.
+- **`sendData` packets** have a length of `0`, so no name. Their payload carries
+  no format tag: bytes are sent as they are, a string as its UTF-8 text, and any
+  other value as its `JSON.stringify` text. The receiver gets a `NetworkData`
+  from `getReceivedPackets` and reads it the way it was sent, with `bytes()`,
+  `text()` or `json()`.
+
+```
+typed    : [4]["move"][{"id":1,"x":2}]
+sendData : [0][payload]
+```
 
 - **TCP**: each binary WebSocket frame starts with one tag byte, `0` for
-  `ReliableOrdered` and `1` for `ReliableUnordered`, followed by the payload.
+  `ReliableOrdered` and `1` for `ReliableUnordered`, followed by the packet.
   Text frames are reserved for control messages such as the server `welcome`.
 - **WebRTC**: the client opens one data channel per unreliable channel, labelled
   `unreliable-ordered` and `unreliable-unordered`. Both use `ordered: false` and
@@ -46,8 +61,12 @@ UTF-8 text, and any other value as its `JSON.stringify` text. The receiver gets 
 
 ## Dropping late packets
 
-`UnreliableOrdered` packets start with a big-endian `uint32` sequence number,
-counted per peer and per direction. The receiver delivers a packet only if it is
+Each `UnreliableOrdered` message starts with a big-endian `uint32` sequence
+number, followed by the packet; the number is counted per peer and per
+direction. The receiver delivers a packet only if it is
 newer than the last one it delivered, and drops it otherwise. Nothing ever waits
 for a lost packet: a gap is skipped as soon as a newer packet arrives. Numbers
 are compared as serial numbers, so the counter can wrap around.
+
+The sequence is shared by every packet type sent on the channel: a late packet
+is dropped even when the newer one was of another type.

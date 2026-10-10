@@ -5,14 +5,16 @@ import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-
 import { InputEnum, InputLibrary } from "@nanoforge-dev/input";
 import { Channel, NetworkClientLibrary } from "@nanoforge-dev/network/client";
 
+import { AssignId, Play } from "../../../shared/protocol";
 import {
   CircleComponent,
   Controller,
+  NetworkId,
   Position,
   RectangleComponent,
   Velocity,
 } from "./components/components";
-import { controlPlayer, draw, move, packetHandler } from "./systems/systems";
+import { applyMoves, controlPlayer, draw, move } from "./systems/systems";
 
 export const layer = new Layer();
 
@@ -82,16 +84,21 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
     new RectangleComponent(new Rect({ fill: "blue", width: 30, height: 300 })),
   );
 
-  registry.addSystem(packetHandler);
+  // Dispatched before the systems, so an entity gets its id before `applyMoves` reads its moves.
+  network.packets.on(AssignId, ({ assigned, id }) => {
+    const index = { ball: 2, paddle1: 4, paddle2: 5 }[assigned];
+    registry.addComponent(registry.entityFromIndex(index), new NetworkId(id));
+  });
+
+  registry.addSystem(applyMoves);
   registry.addSystem(move);
   registry.addSystem(controlPlayer);
   registry.addSystem(draw);
 
-  // Wait for every channel the game uses, so no early move is missed.
   await network.connect({
     channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered, Channel.UnreliableUnordered],
   });
-  network.sendData({ type: "play" });
+  network.packets.send(Play);
 
   await app.run();
 };

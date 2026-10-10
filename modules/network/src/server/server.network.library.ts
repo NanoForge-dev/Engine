@@ -9,11 +9,26 @@ import {
   DEFAULT_CHANNEL,
   isReliableChannel,
 } from "../shared/channels";
-import { NetworkData, type NetworkPayload, encodeNetworkPayload } from "../shared/network-data";
+import {
+  type NetworkData,
+  type NetworkPayload,
+  encodeNetworkPayload,
+} from "../shared/network-data";
+import {
+  PacketDispatcher,
+  type TypedPacket,
+  encodePacket,
+  encodeTypedPacket,
+  sortPackets,
+} from "../shared/packet";
 import { type Trace, createTrace, traceServer } from "../shared/trace";
 import { type ClientId, type ClientInfo, ClientRegistry, type ClientsApi } from "./client-registry";
 import { ServerConfigNetwork } from "./config.server.network";
-import type { NetworkServerContextApi } from "./network-server-context.type";
+import type {
+  NetworkServerContextApi,
+  ServerPacketInfo,
+  ServerPacketsApi,
+} from "./network-server-context.type";
 import { TCPServer } from "./tcp.server.network";
 import { UDPServer } from "./udp.server.network";
 
@@ -38,6 +53,7 @@ import { UDPServer } from "./udp.server.network";
  * ```ts
  * ctx.network.sendToAll({ type: "start" }); // Channel.ReliableOrdered
  * ctx.network.sendToAll({ x: 1, y: 2 }, { channel: Channel.UnreliableUnordered });
+ * ctx.network.packets.sendToAll(Move, move); // typed packet, see `definePacket`
  * ctx.network.getReceivedPackets().forEach((packets, clientId) => {
  *   const messages = packets.map((packet) => packet.json()); // every channel
  * });
@@ -50,6 +66,21 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
   private _udp?: UDPServer;
 
   private readonly _registry = new ClientRegistry();
+  private readonly _dispatcher = new PacketDispatcher<ServerPacketInfo>();
+  private _typed: TypedPacket<ServerPacketInfo>[] = [];
+  private readonly _raw = new Map<Channel, Map<ClientId, NetworkData[]>>();
+  private readonly _packets: ServerPacketsApi = {
+    on: (packet, listener) => this._dispatcher.on(packet, listener),
+    read: (packet) => this._dispatcher.read(packet),
+    sendToAll: (packet, ...[data, options]) =>
+      this.sendBytesToAll(options?.channel ?? packet.channel, encodeTypedPacket(packet, data)),
+    sendToClient: (clientId, packet, ...[data, options]) =>
+      this.sendBytesToClient(
+        clientId,
+        options?.channel ?? packet.channel,
+        encodeTypedPacket(packet, data),
+      ),
+  };
 
   /** Client sessions shared by the TCP and UDP servers. */
   public get clients(): ClientsApi {
@@ -57,6 +88,15 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
   }
 
   private _trace: Trace | undefined;
+
+  constructor() {
+    super({ runAfter: ["ecs"] });
+  }
+
+  /** Typed packets: per-type listeners, `read` and sending. */
+  public get packets(): ServerPacketsApi {
+    return this._packets;
+  }
 
   public override async __init(ctx: InitContext): Promise<void> {
     if (typeof Bun === "undefined") {
@@ -125,9 +165,7 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
    * encoded as JSON.
    */
   public sendToAll(data: NetworkPayload, { channel = DEFAULT_CHANNEL }: ChannelOptions = {}): void {
-    const bytes = encodeNetworkPayload(data);
-    if (isReliableChannel(channel)) this.requireTcp(channel).sendToEverybody(channel, bytes);
-    else this.requireUdp(channel).sendToEverybody(channel, bytes);
+    this.sendBytesToAll(channel, encodePacket(null, encodeNetworkPayload(data)));
   }
 
   /**
@@ -144,17 +182,16 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
     data: NetworkPayload,
     { channel = DEFAULT_CHANNEL }: ChannelOptions = {},
   ): void {
-    const bytes = encodeNetworkPayload(data);
-    if (isReliableChannel(channel)) this.requireTcp(channel).sendToClient(channel, clientId, bytes);
-    else this.requireUdp(channel).sendToClient(channel, clientId, bytes);
+    this.sendBytesToClient(clientId, channel, encodePacket(null, encodeNetworkPayload(data)));
   }
 
   /**
    * Return the packets each client sent since the last call.
    *
    * @remarks
-   * Call this method once per frame.  Without a `channel`, the packets of every
-   * configured channel are merged per client, reliable channels first.
+   * Call this method once per frame: packets left unread for a whole tick are
+   * dropped, and typed packets never show up here.  Without a `channel`, the
+   * packets of every configured channel are merged per client, reliable channels first.
    *
    * @param options - `channel` to read from, every channel by default.
    * @returns Map of client id to packets, each read with `bytes()`, `text()`,
@@ -163,12 +200,11 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
    */
   public getReceivedPackets({ channel }: ChannelOptions = {}): Map<ClientId, NetworkData[]> {
     if (channel !== undefined) {
-      const packets = isReliableChannel(channel)
-        ? this.requireTcp(channel).getReceivedPackets(channel)
-        : this.requireUdp(channel).getReceivedPackets(channel);
-      return new Map(
-        [...packets].map(([clientId, raw]) => [clientId, raw.map((p) => new NetworkData(p))]),
-      );
+      const clients = this.drain(channel);
+      const packets = this._raw.get(channel) ?? new Map<ClientId, NetworkData[]>();
+      this._raw.delete(channel);
+      for (const clientId of clients) if (!packets.has(clientId)) packets.set(clientId, []);
+      return packets;
     }
 
     const merged = new Map<ClientId, NetworkData[]>();
@@ -228,6 +264,15 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
     this._trace?.tick();
   }
 
+  /** Calls the listeners of the typed packets received since the last tick. */
+  public override async __run(ctx: Context): Promise<void> {
+    this._raw.clear();
+    for (const channel of this.configuredChannels()) this.drain(channel);
+    const typed = this._typed;
+    this._typed = [];
+    this._dispatcher.dispatch(typed, ctx);
+  }
+
   public override expose(): NetworkServerContextApi {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const library = this;
@@ -240,6 +285,9 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
       get clients() {
         return library.clients;
       },
+      get packets() {
+        return library.packets;
+      },
     };
   }
 
@@ -247,6 +295,35 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
     return CHANNELS.filter((channel) =>
       isReliableChannel(channel) ? this._tcp !== undefined : this._udp !== undefined,
     );
+  }
+
+  private sendBytesToAll(channel: Channel, bytes: Uint8Array): void {
+    if (isReliableChannel(channel)) this.requireTcp(channel).sendToEverybody(channel, bytes);
+    else this.requireUdp(channel).sendToEverybody(channel, bytes);
+  }
+
+  private sendBytesToClient(clientId: ClientId, channel: Channel, bytes: Uint8Array): void {
+    if (isReliableChannel(channel)) this.requireTcp(channel).sendToClient(channel, clientId, bytes);
+    else this.requireUdp(channel).sendToClient(channel, clientId, bytes);
+  }
+
+  /**
+   * Move what each client sent on `channel` to the typed and raw queues.
+   *
+   * @returns The clients the transport reported, packets or not.
+   */
+  private drain(channel: Channel): ClientId[] {
+    const received = isReliableChannel(channel)
+      ? this.requireTcp(channel).getReceivedPackets(channel)
+      : this.requireUdp(channel).getReceivedPackets(channel);
+    const raw = this._raw.get(channel) ?? new Map<ClientId, NetworkData[]>();
+    received.forEach((packets, clientId) => {
+      const clientRaw = raw.get(clientId) ?? [];
+      sortPackets(packets, { clientId, channel }, clientRaw, this._typed);
+      if (clientRaw.length > 0) raw.set(clientId, clientRaw);
+    });
+    this._raw.set(channel, raw);
+    return [...received.keys()];
   }
 
   private requireTcp(channel: Channel): TCPServer {

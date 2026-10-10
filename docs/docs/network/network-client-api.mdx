@@ -59,12 +59,74 @@ Returns: `void`
 
 ## getReceivedPackets(options?)
 
-Return the packets received since the last call. Call it once per frame.
+Return the packets received since the last call. Call it once per frame:
+packets left unread for a whole tick are dropped. Typed packets never show up
+here.
 
 Option `channel`: `Channel` to read from. Without it, the packets of every
 configured channel are returned, reliable channels first.
 
 Returns: [`NetworkData[]`](#networkdata)
+
+## packets
+
+Typed packets, declared with `definePacket` (see below).
+Packets of a type are routed to its listeners and to `read`, never to
+`getReceivedPackets`.
+
+### packets.on(packet, listener)
+
+Call `listener(data, { channel, ctx })` for every packet of this type, each tick
+before the ECS systems (not while paused). Packets are dispatched in the order
+they arrived, reliable channels first. A listener that throws, or returns a
+rejected promise, is logged and does not stop the others.
+
+Returns: `() => void`, a function that removes the listener.
+
+### packets.read(packet)
+
+Return the packets of this type received this tick, as `{ data, channel }[]`.
+Meant for ECS systems, which run after the packets are dispatched.
+
+Returns: `{ data: T; channel: Channel }[]`
+
+### packets.send(packet, data?, options?)
+
+Send a packet to the server. `data` must match the definition's payload type and
+is encoded as JSON. Leave it out for a packet without payload, declared without
+a type: `send(Play)`.
+
+Option `channel`: `Channel` to send on. The definition's channel by default.
+
+Throws a `TypeError` when `data` cannot be encoded as JSON.
+
+Returns: `void`
+
+## definePacket(name, options?)
+
+Declare a packet type, in a file both apps import. Also exported by
+`@nanoforge-dev/network` itself, for that shared file.
+
+Parameter `name`: `string`, 1 to 255 UTF-8 bytes, unique in the game. It is
+written in front of every packet of this type.
+
+Option `channel`: `Channel` used when `send` gets no `channel`.
+`Channel.ReliableOrdered` by default.
+
+Option `validate`: `(data: unknown) => data is T`, run on every received payload
+before listeners and `read`. Packets that fail it are dropped with a warning.
+
+Throws when the name is empty or too long, and later, in `packets.on` or `read`,
+when another definition of the same name has another channel or `validate`.
+
+Returns: `PacketDefinition<T>`. Without a type, `T` is `void`: the packet
+carries no payload.
+
+```ts
+export const Move = definePacket<{ id: number; x: number; y: number }>("move", {
+  channel: Channel.UnreliableOrdered,
+});
+```
 
 ## isConnected(options?)
 
@@ -85,8 +147,8 @@ Type: `string | undefined`
 
 ## NetworkPayload
 
-What `sendData` accepts. Packets carry no format tag: the receiver reads a
-packet the way it was sent.
+What `sendData` accepts. Its payload carries no format tag: the receiver reads
+a packet the way it was sent.
 
 | Value                                              | Encoded as            | Read back with                |
 | -------------------------------------------------- | --------------------- | ----------------------------- |

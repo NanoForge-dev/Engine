@@ -3,8 +3,9 @@ import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { EcsLibrary } from "@nanoforge-dev/ecs/server";
 import { NetworkServerLibrary } from "@nanoforge-dev/network/server";
 
+import { Input, Play } from "../../../shared/protocol";
 import { Position, Velocity } from "./components/components";
-import { bounce, move, onClientDisconnect, packetHandler } from "./systems/systems";
+import { bounce, handleClientInput, handlePlay, move, onClientDisconnect } from "./systems/systems";
 
 export const main = async (options: RunOptions): Promise<void> => {
   const app = NanoforgeFactory.createServer({ tickRate: 60 });
@@ -32,7 +33,12 @@ export const main = async (options: RunOptions): Promise<void> => {
   registry.addComponent(paddle2, new Position(1850, 390));
   registry.addComponent(paddle2, new Velocity(0, 0));
 
-  registry.addSystem(packetHandler);
+  const zip = () => registry.getZipper([Position, Velocity]);
+  network.packets.on(Play, (_, { clientId, ctx }) => handlePlay(clientId, ctx.network, zip()));
+  network.packets.on(Input, ({ key }, { clientId, ctx }) =>
+    handleClientInput(clientId, key, ctx.network, zip()),
+  );
+
   registry.addSystem(bounce);
   registry.addSystem(move);
 

@@ -43,6 +43,48 @@ const latestPackets = network.getReceivedPackets();
 const decodedPackets = latestPackets.map((packet) => packet.json());
 ```
 
+## Typed packets
+
+Instead of switching on a `type` field, declare each packet type once, in a file
+both the client and the server import, and let the library route packets to it.
+
+```ts
+// shared/protocol.ts
+import { Channel, definePacket } from "@nanoforge-dev/network";
+
+export const Play = definePacket("play"); // no payload
+export const Input = definePacket<{ key: "up" | "down" }>("input");
+export const Move = definePacket<{ id: number; x: number; y: number }>("move", {
+  channel: Channel.UnreliableOrdered, // default channel of this type
+});
+```
+
+```ts
+// client: listen once, after app.init()
+const off = network.packets.on(Move, (move, { channel, ctx }) => {
+  applyMove(ctx.ecs.registry, move); // `move` is typed
+});
+
+// or read this tick's packets from an ECS system
+export const applyMoves = (registry, ctx) => {
+  for (const { data } of ctx.network.packets.read(Move)) applyMove(registry, data);
+};
+
+// send: the payload is checked against the definition
+ctx.network.packets.send(Input, { key: "up" }); // Channel.ReliableOrdered
+ctx.network.packets.send(Play); // no payload to give
+```
+
+- Listeners are called every tick before the ECS systems, in the order the
+  packets arrived, reliable channels first. They are not called while the game
+  is paused: packets wait for the next tick.
+- `read` returns the packets of the current tick; a system that does not read
+  them every tick misses some.
+- Typed packets never appear in `getReceivedPackets`, which only returns the
+  packets sent with `sendData`.
+- A packet type with no listener and no reader is dropped with a warning,
+  printed once per type.
+
 ## Notes
 
 - See [Network Client API](network-client-api) for the full list of available functions,

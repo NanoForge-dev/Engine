@@ -1,7 +1,8 @@
-import type { InitContext } from "@nanoforge-dev/common";
+import type { Context, InitContext } from "@nanoforge-dev/common";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Channel, NetworkData, NetworkServerLibrary } from "../../src/server";
+import { Channel, NetworkData, NetworkServerLibrary, definePacket } from "../../src/server";
+import { encodeTypedPacket } from "../../src/shared/packet";
 
 vi.mock("node-datachannel/polyfill", () => ({
   RTCPeerConnection: vi.fn(function (this: any) {
@@ -151,8 +152,8 @@ describe("NetworkServerLibrary", () => {
       lib.sendToAll(new Uint8Array([1]));
       lib.sendToClient(welcome.id, new Uint8Array([2]));
       expect(webSocket.send.mock.calls).toStrictEqual([
-        [new Uint8Array([0, 1])],
-        [new Uint8Array([0, 2])],
+        [new Uint8Array([0, 0, 1])],
+        [new Uint8Array([0, 0, 2])],
       ]);
     });
 
@@ -169,8 +170,8 @@ describe("NetworkServerLibrary", () => {
       });
       lib.sendToAll(new Uint8Array([2]), { channel: Channel.UnreliableUnordered });
 
-      expect(tcp.webSocket.send).toHaveBeenCalledWith(new Uint8Array([1, 1]));
-      expect(unordered.send).toHaveBeenCalledWith(new Uint8Array([2]));
+      expect(tcp.webSocket.send).toHaveBeenCalledWith(new Uint8Array([1, 0, 1]));
+      expect(unordered.send).toHaveBeenCalledWith(new Uint8Array([0, 2]));
     });
 
     it("should send strings as UTF-8 and other values as JSON", async () => {
@@ -185,9 +186,9 @@ describe("NetworkServerLibrary", () => {
       lib.sendToAll("hi", { channel: Channel.UnreliableUnordered });
 
       expect(tcp.webSocket.send).toHaveBeenCalledWith(
-        new Uint8Array([0, ...utf8('{"type":"assignId","id":0}')]),
+        new Uint8Array([0, 0, ...utf8('{"type":"assignId","id":0}')]),
       );
-      expect(unordered.send).toHaveBeenCalledWith(utf8("hi"));
+      expect(unordered.send).toHaveBeenCalledWith(new Uint8Array([0, ...utf8("hi")]));
     });
 
     it("should relay a received packet as it is", async () => {
@@ -195,13 +196,15 @@ describe("NetworkServerLibrary", () => {
       await lib.__init(makeInitContext(tcpOnly));
       const { webSocket, options, welcome } = openSocket(0, "http://localhost:9000/");
 
-      options.websocket.message(webSocket, Buffer.from([0, ...utf8('{"type":"input"}')]));
+      options.websocket.message(webSocket, Buffer.from([0, 0, ...utf8('{"type":"input"}')]));
       const [packet] = lib.getReceivedPackets().get(welcome.id) ?? [];
       expect(packet).toBeInstanceOf(NetworkData);
       expect(packet?.json()).toStrictEqual({ type: "input" });
 
       lib.sendToAll(packet!);
-      expect(webSocket.send).toHaveBeenCalledWith(new Uint8Array([0, ...utf8('{"type":"input"}')]));
+      expect(webSocket.send).toHaveBeenCalledWith(
+        new Uint8Array([0, 0, ...utf8('{"type":"input"}')]),
+      );
     });
 
     it("should read one channel, or merge every channel per client", async () => {
@@ -213,9 +216,9 @@ describe("NetworkServerLibrary", () => {
       udp.webSocket.data.peerConnection.ondatachannel({ channel: unordered });
       const id = tcp.welcome.id;
 
-      unordered.onmessage?.({ data: new Uint8Array([9]).buffer });
-      tcp.options.websocket.message(tcp.webSocket, Buffer.from([1, 2]));
-      tcp.options.websocket.message(tcp.webSocket, Buffer.from([0, 1]));
+      unordered.onmessage?.({ data: new Uint8Array([0, 9]).buffer });
+      tcp.options.websocket.message(tcp.webSocket, Buffer.from([1, 0, 2]));
+      tcp.options.websocket.message(tcp.webSocket, Buffer.from([0, 0, 1]));
 
       expect(
         bytesOf(lib.getReceivedPackets({ channel: Channel.ReliableUnordered }).get(id)),
@@ -255,6 +258,93 @@ describe("NetworkServerLibrary", () => {
     });
   });
 
+  describe("packets", () => {
+    const ctx = {} as Context;
+    const Input = definePacket<{ key: string }>("input");
+    const Move = definePacket<{ x: number }>("move", { channel: Channel.UnreliableUnordered });
+
+    it("should dispatch typed packets in __run with their sender", async () => {
+      const lib = new NetworkServerLibrary();
+      await lib.__init(makeInitContext(both));
+      const tcp = openSocket(0, "http://localhost:9000/");
+      const udp = openSocket(1, `http://localhost:9001/?token=${tcp.welcome.token}`);
+      const unordered = makeDataChannel("unreliable-unordered");
+      udp.webSocket.data.peerConnection.ondatachannel({ channel: unordered });
+      const clientId = tcp.welcome.id;
+      const calls: unknown[] = [];
+      lib.packets.on(Input, (input, info) => calls.push([input, info]));
+      lib.packets.on(Move, (move, info) => calls.push([move, info]));
+
+      unordered.onmessage?.({ data: encodeTypedPacket(Move, { x: 1 }).buffer });
+      tcp.options.websocket.message(
+        tcp.webSocket,
+        Buffer.from([0, ...encodeTypedPacket(Input, { key: "up" })]),
+      );
+      tcp.options.websocket.message(tcp.webSocket, Buffer.from([0, 0, 7]));
+      expect(calls).toStrictEqual([]);
+
+      await lib.__run(ctx);
+      expect(calls).toStrictEqual([
+        [{ key: "up" }, { clientId, channel: Channel.ReliableOrdered, ctx }],
+        [{ x: 1 }, { clientId, channel: Channel.UnreliableUnordered, ctx }],
+      ]);
+      expect(lib.packets.read(Input)).toStrictEqual([
+        { clientId, channel: Channel.ReliableOrdered, data: { key: "up" } },
+      ]);
+      expect(bytesOf(lib.getReceivedPackets().get(clientId))).toStrictEqual([new Uint8Array([7])]);
+    });
+
+    it("should send on the definition's channel unless another is given", async () => {
+      const lib = new NetworkServerLibrary();
+      await lib.__init(makeInitContext(both));
+      const tcp = openSocket(0, "http://localhost:9000/");
+      const udp = openSocket(1, `http://localhost:9001/?token=${tcp.welcome.token}`);
+      const unordered = makeDataChannel("unreliable-unordered");
+      udp.webSocket.data.peerConnection.ondatachannel({ channel: unordered });
+
+      lib.packets.sendToAll(Move, { x: 1 });
+      lib.packets.sendToClient(
+        tcp.welcome.id,
+        Input,
+        { key: "up" },
+        {
+          channel: Channel.ReliableUnordered,
+        },
+      );
+      expect(unordered.send).toHaveBeenCalledWith(encodeTypedPacket(Move, { x: 1 }));
+      expect(tcp.webSocket.send).toHaveBeenCalledWith(
+        new Uint8Array([1, ...encodeTypedPacket(Input, { key: "up" })]),
+      );
+    });
+
+    it("should drop sendData packets left unread for a whole tick", async () => {
+      const lib = new NetworkServerLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      const { webSocket, options, welcome } = openSocket(0, "http://localhost:9000/");
+
+      options.websocket.message(webSocket, Buffer.from([0, 0, 1]));
+      await lib.__run(ctx);
+      await lib.__run(ctx);
+      expect(lib.getReceivedPackets().get(welcome.id)).toStrictEqual([]);
+    });
+
+    it("should forget clients that left without sending raw packets", async () => {
+      const lib = new NetworkServerLibrary();
+      await lib.__init(makeInitContext(tcpOnly));
+      const { webSocket, options, welcome } = openSocket(0, "http://localhost:9000/");
+
+      await lib.__run(ctx);
+      expect(lib.getReceivedPackets().get(welcome.id)).toStrictEqual([]);
+      await lib.__run(ctx);
+      options.websocket.close(webSocket);
+      expect(lib.getReceivedPackets().has(welcome.id)).toBe(false);
+    });
+
+    it("should run before the ECS", () => {
+      expect(new NetworkServerLibrary().relationships.runAfter).toStrictEqual(["ecs"]);
+    });
+  });
+
   describe("expose", () => {
     it("delegates to the library", async () => {
       const lib = new NetworkServerLibrary();
@@ -265,8 +355,8 @@ describe("NetworkServerLibrary", () => {
       api.sendToAll(new Uint8Array([1]), { channel: Channel.ReliableUnordered });
       api.sendToClient(welcome.id, new Uint8Array([2]));
       expect(webSocket.send.mock.calls).toStrictEqual([
-        [new Uint8Array([1, 1])],
-        [new Uint8Array([0, 2])],
+        [new Uint8Array([1, 0, 1])],
+        [new Uint8Array([0, 0, 2])],
       ]);
       expect(api.getConnectedClients()).toStrictEqual([welcome.id]);
       expect(api.getReceivedPackets().get(welcome.id)).toStrictEqual([]);
@@ -279,6 +369,7 @@ describe("NetworkServerLibrary", () => {
     it("returns the client sessions", () => {
       const lib = new NetworkServerLibrary();
       expect(lib.expose().clients).toBe(lib.clients);
+      expect(lib.expose().packets).toBe(lib.packets);
     });
   });
 

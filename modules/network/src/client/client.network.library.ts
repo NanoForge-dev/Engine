@@ -11,11 +11,26 @@ import {
   DEFAULT_CHANNEL,
   isReliableChannel,
 } from "../shared/channels";
-import { NetworkData, type NetworkPayload, encodeNetworkPayload } from "../shared/network-data";
+import {
+  type NetworkData,
+  type NetworkPayload,
+  encodeNetworkPayload,
+} from "../shared/network-data";
+import {
+  PacketDispatcher,
+  type TypedPacket,
+  encodePacket,
+  encodeTypedPacket,
+  sortPackets,
+} from "../shared/packet";
 import { type Trace, createTrace, traceClient } from "../shared/trace";
 import type { ClientSession } from "./client-session";
 import { ClientConfigNetwork } from "./config.client.network";
-import type { NetworkClientContextApi } from "./network-client-context.type";
+import type {
+  ClientPacketInfo,
+  ClientPacketsApi,
+  NetworkClientContextApi,
+} from "./network-client-context.type";
 import { TCPClient } from "./tcp.client.network";
 import { UDPClient } from "./udp.client.network";
 
@@ -45,6 +60,7 @@ const CONNECT_POLL_MS = 50;
  * ctx.network.sendData({ type: "join" }); // Channel.ReliableOrdered
  * ctx.network.sendData({ x: 1, y: 2 }, { channel: Channel.UnreliableOrdered });
  * const messages = ctx.network.getReceivedPackets().map((packet) => packet.json()); // every channel
+ * ctx.network.packets.send(Input, { key: "up" }); // typed packet, see `definePacket`
  * ```
  */
 export class NetworkClientLibrary extends Library implements EditorAwareLibrary {
@@ -55,6 +71,17 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
   /** Pending or settled connection of each transport, so it is only opened once. */
   private readonly _connecting = new Map<TCPClient | UDPClient, Promise<void>>();
   private readonly _session: ClientSession = {};
+  private readonly _dispatcher = new PacketDispatcher<ClientPacketInfo>();
+  /** Typed packets drained from the transports, dispatched by the next `__run`. */
+  private _typed: TypedPacket<ClientPacketInfo>[] = [];
+  /** `sendData` packets drained from the transports, returned by `getReceivedPackets`. */
+  private readonly _raw = new Map<Channel, NetworkData[]>();
+  private readonly _packets: ClientPacketsApi = {
+    on: (packet, listener) => this._dispatcher.on(packet, listener),
+    read: (packet) => this._dispatcher.read(packet),
+    send: (packet, ...[data, options]) =>
+      this.sendBytes(options?.channel ?? packet.channel, encodeTypedPacket(packet, data)),
+  };
 
   /** Client id assigned by the server, `undefined` until transport is welcomed. */
   public get clientId(): string | undefined {
@@ -62,6 +89,16 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
   }
 
   private _trace: Trace | undefined;
+
+  constructor() {
+    // `runAfter` keys run after this library: packets are dispatched before the ECS systems.
+    super({ runAfter: ["ecs"] });
+  }
+
+  /** Typed packets: per-type listeners, `read` and `send`. */
+  public get packets(): ClientPacketsApi {
+    return this._packets;
+  }
 
   public override async __init(ctx: InitContext): Promise<void> {
     const config = await registerEnv(ClientConfigNetwork, ctx.env);
@@ -152,17 +189,16 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
    * @throws When the channel's port was not configured
    */
   public sendData(data: NetworkPayload, { channel = DEFAULT_CHANNEL }: ChannelOptions = {}): void {
-    const bytes = encodeNetworkPayload(data);
-    if (isReliableChannel(channel)) this.requireTcp(channel).sendData(channel, bytes);
-    else this.requireUdp(channel).sendData(channel, bytes);
+    this.sendBytes(channel, encodePacket(null, encodeNetworkPayload(data)));
   }
 
   /**
    * Return the packets received since the last call.
    *
    * @remarks
-   * Call this method once per frame.  Without a `channel`, the packets of every
-   * configured channel are returned, reliable channels first.
+   * Call this method once per frame: packets left unread for a whole tick are
+   * dropped, and typed packets never show up here.  Without a `channel`, the
+   * packets of every configured channel are returned, reliable channels first.
    *
    * @param options - `channel` to read from, every channel by default.
    * @returns Array of packets, each read with `bytes()`, `text()`, `json()`…
@@ -172,10 +208,10 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
     if (channel === undefined) {
       return this.configuredChannels().flatMap((c) => this.getReceivedPackets({ channel: c }));
     }
-    const packets = isReliableChannel(channel)
-      ? this.requireTcp(channel).getReceivedPackets(channel)
-      : this.requireUdp(channel).getReceivedPackets(channel);
-    return packets.map((packet) => new NetworkData(packet));
+    this.drain(channel);
+    const packets = this._raw.get(channel) ?? [];
+    this._raw.delete(channel);
+    return packets;
   }
 
   /**
@@ -210,6 +246,15 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
     this._trace?.tick();
   }
 
+  /** Calls the listeners of the typed packets received since the last tick. */
+  public override async __run(ctx: Context): Promise<void> {
+    this._raw.clear();
+    for (const channel of this.configuredChannels()) this.drain(channel);
+    const typed = this._typed;
+    this._typed = [];
+    this._dispatcher.dispatch(typed, ctx);
+  }
+
   public override expose(): NetworkClientContextApi {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const library = this;
@@ -218,6 +263,9 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
       sendData: (data, options) => library.sendData(data, options),
       getReceivedPackets: (options) => library.getReceivedPackets(options),
       isConnected: (options) => library.isConnected(options),
+      get packets() {
+        return library.packets;
+      },
       get clientId() {
         return library.clientId;
       },
@@ -228,6 +276,20 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
     return CHANNELS.filter((channel) =>
       isReliableChannel(channel) ? this._tcp !== undefined : this._udp !== undefined,
     );
+  }
+
+  private sendBytes(channel: Channel, bytes: Uint8Array): void {
+    if (isReliableChannel(channel)) this.requireTcp(channel).sendData(channel, bytes);
+    else this.requireUdp(channel).sendData(channel, bytes);
+  }
+
+  private drain(channel: Channel): void {
+    const packets = isReliableChannel(channel)
+      ? this.requireTcp(channel).getReceivedPackets(channel)
+      : this.requireUdp(channel).getReceivedPackets(channel);
+    const raw = this._raw.get(channel) ?? [];
+    sortPackets(packets, { channel }, raw, this._typed);
+    this._raw.set(channel, raw);
   }
 
   private requireTcp(channel: Channel): TCPClient {

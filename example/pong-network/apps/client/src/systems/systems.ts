@@ -1,6 +1,7 @@
 import { type Context } from "@nanoforge-dev/common";
 import { type Registry } from "@nanoforge-dev/ecs/client";
 
+import { Input, Move } from "../../../../shared/protocol";
 import {
   CircleComponent,
   Controller,
@@ -29,15 +30,15 @@ export const controlPlayer = (registry: Registry, ctx: Context) => {
     const downPressed = input.isKeyPressed(Controller.down);
     if (upPressed == downPressed) {
       if (Controller.lastPressedUp || Controller.lastPressedDown) {
-        network.sendData({ type: "input", key: "stop" });
+        network.packets.send(Input, { key: "stop" });
         Controller.lastPressedDown = false;
         Controller.lastPressedUp = false;
       }
     } else if (upPressed && !Controller.lastPressedUp) {
-      network.sendData({ type: "input", key: "up" });
+      network.packets.send(Input, { key: "up" });
       Controller.lastPressedUp = true;
     } else if (downPressed && !Controller.lastPressedDown) {
-      network.sendData({ type: "input", key: "down" });
+      network.packets.send(Input, { key: "down" });
       Controller.lastPressedDown = true;
     }
   });
@@ -55,32 +56,15 @@ export function draw(registry: Registry) {
   });
 }
 
-export function packetHandler(registry: Registry, ctx: Context) {
-  const network = ctx.network;
-  // Every channel, reliable first, so an entity's `assignId` is applied before its moves.
-  const jsonPackets = network.getReceivedPackets().map((packet) => packet.json());
+export function applyMoves(registry: Registry, ctx: Context) {
+  const zipper = registry.getZipper([NetworkId, Position, Velocity]);
 
-  if (!jsonPackets || jsonPackets.length === 0) return;
-  jsonPackets.forEach((packet) => {
-    const type = packet.type;
-    if (type === "move") {
-      const zipper = registry.getZipper([NetworkId, Position, Velocity]);
-      const it = zipper.find((entity) => {
-        return entity.NetworkId.id === packet.id;
-      });
-      if (!it) return;
-      it.Position.x = packet.position.x;
-      it.Position.y = packet.position.y;
-      it.Velocity.x = packet.velocity.x;
-      it.Velocity.y = packet.velocity.y;
-    } else if (type === "assignId") {
-      if (packet.assigned === "ball") {
-        registry.addComponent(registry.entityFromIndex(2), new NetworkId(packet.id));
-      } else if (packet.assigned === "paddle1") {
-        registry.addComponent(registry.entityFromIndex(4), new NetworkId(packet.id));
-      } else if (packet.assigned === "paddle2") {
-        registry.addComponent(registry.entityFromIndex(5), new NetworkId(packet.id));
-      }
-    }
-  });
+  for (const { data } of ctx.network.packets.read(Move)) {
+    const it = zipper.find((entity) => entity.NetworkId.id === data.id);
+    if (!it) continue;
+    it.Position.x = data.position.x;
+    it.Position.y = data.position.y;
+    it.Velocity.x = data.velocity.x;
+    it.Velocity.y = data.velocity.y;
+  }
 }

@@ -52,7 +52,8 @@ port enables the reliable channels, the UDP port the unreliable ones.
 ### Channels
 
 Every method takes an optional `{ channel }`. Sending defaults to
-`Channel.ReliableOrdered`; reading covers every configured channel.
+`Channel.ReliableOrdered`, or to the definition's channel for
+[typed packets](#typed-packets); reading covers every configured channel.
 
 | Channel               | Lost?    | Order                    | Transport |
 | --------------------- | -------- | ------------------------ | --------- |
@@ -64,7 +65,7 @@ Every method takes an optional `{ channel }`. Sending defaults to
 One WebSocket per client carries both reliable channels: each binary frame
 starts with a one-byte channel tag. Each unreliable channel is its own data
 channel (`ordered: false`, `maxRetransmits: 0`); `UnreliableOrdered` packets
-carry a `uint32` sequence number so the receiver drops any packet older than
+are prefixed with a `uint32` sequence number so the receiver drops any packet older than
 the last one it delivered. One message is one packet on every channel, so
 payloads may contain any bytes. Over TCP, `ReliableUnordered` is delivered in
 order in practice.
@@ -72,8 +73,9 @@ order in practice.
 ### Payloads
 
 The send methods take bytes, a string or any JSON value, and every received
-packet is a `NetworkData` you read in the format you need. Packets carry no
-format tag: read a packet the way it was sent.
+packet is a `NetworkData` you read in the format you need. Their payload carries
+no format tag: read a packet the way it was sent. Every packet starts with the
+name of its [typed packet](#typed-packets) type, empty for these ones.
 
 | Sent value                                         | Encoded as            | Read back with                    |
 | -------------------------------------------------- | --------------------- | --------------------------------- |
@@ -190,6 +192,36 @@ ctx.network.sendToClient(clientId, { type: "event" }); // Channel.ReliableOrdere
 `connect` only opens the transports its channels need, and rejects when a
 transport fails or the channels are not open within `timeout` milliseconds
 (10 seconds by default). The server starts listening during `__init`.
+
+### Typed packets
+
+Declare each packet type once, in a file both apps import, then listen for it,
+read it from a system, or send it, with the payload type checked:
+
+```ts
+// shared/protocol.ts
+import { Channel, definePacket } from "@nanoforge-dev/network";
+
+export const Input = definePacket<{ key: "up" | "down" }>("input");
+export const Move = definePacket<{ id: number; x: number; y: number }>("move", {
+  channel: Channel.UnreliableOrdered, // default channel of this type
+});
+```
+
+```ts
+// Client: listeners run every tick before the ECS systems, not while paused.
+network.packets.on(Move, (move, { channel, ctx }) => applyMove(ctx.ecs.registry, move));
+ctx.network.packets.send(Input, { key: "up" });
+
+// Server: listeners and `read` also get the sender.
+network.packets.on(Input, ({ key }, { clientId }) => handleInput(clientId, key));
+for (const { data, clientId } of ctx.network.packets.read(Input)) handleInput(clientId, data.key); // in a system
+ctx.network.packets.sendToAll(Move, { id: 1, x: 2, y: 3 });
+```
+
+`on` returns a function that removes the listener. Typed packets never appear in
+`getReceivedPackets`, and a type nobody listens to or reads is dropped with a
+warning. Use `definePacket`'s `validate` option to check payloads on the server.
 
 ### Client identification
 
