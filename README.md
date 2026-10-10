@@ -49,6 +49,7 @@ nf new
 - `@nanoforge-dev/network-server` ([source][network-server-source]) - A network lib with tcp and udp support for server-side usage
 - `@nanoforge-dev/input` ([source][input-source]) - An input manager for handling keyboard and mouse events
 - `@nanoforge-dev/music` ([source][music-source]) - A music player for your game
+- `@nanoforge-dev/scene` ([source][scene-source]) - A scene manager, with vars shared by scenes and systems
 - `@nanoforge-dev/sound` ([source][sound-source]) - A sound manager for your game
 
 ## Contributing
@@ -75,5 +76,6 @@ If you don't understand something in the documentation, you are experiencing pro
 [music-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/music
 [network-client-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/network-client
 [network-server-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/network-server
+[scene-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/scene
 [sound-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/sound
 [good-first-issue]: https://github.com/NanoForge-dev/Engine/contribute

@@ -66,6 +66,10 @@
   description: "Related to Network library"
   color: "1c3f78"
 
+- name: "modules:scene"
+  description: "Related to Scene library"
+  color: "1c3f78"
+
 - name: "modules:sound"
   description: "Related to Sound library"
   color: "1c3f78"

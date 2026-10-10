@@ -2,6 +2,7 @@ import type { Context } from "@nanoforge-dev/common";
 import type { EditorContextApi } from "@nanoforge-dev/editor-lib";
 
 import type { Component, Entity, Registry, System } from "../../lib/web/libecs";
+import { spawnOrigin } from "./registry-hooks";
 
 /** Where `spawnEntity()` was called: a frame of the game's bundle (no source maps needed). */
 export interface EditorCallSite {
@@ -19,6 +20,8 @@ export interface EditorWorldEntity {
   id: number;
   /** Absent when spawned by the editor. */
   site?: EditorCallSite;
+  /** The id of the scene that spawned it (`EcsScene`), if any. */
+  scene?: string;
   components: { name: string; value: Record<string, EditorValue> }[];
 }
 
@@ -135,6 +138,7 @@ interface TrackedSystem {
 interface TrackedEntity {
   entity: Entity;
   site?: EditorCallSite;
+  scene?: string;
   components: Map<string, Component>;
 }
 
@@ -206,6 +210,7 @@ export class EditorWorldTracker {
       entities: [...this._entities].map(([id, tracked]) => ({
         id,
         ...(tracked.site && { site: tracked.site }),
+        ...(tracked.scene && { scene: tracked.scene }),
         components: [...tracked.components].map(([name, component]) => ({
           name,
           value: toEditorValue(component) as Record<string, EditorValue>,
@@ -253,6 +258,7 @@ export class EditorWorldTracker {
     const add = registry.addComponent.bind(registry);
     const remove = registry.removeComponent.bind(registry);
     const addSystem = registry.addSystem.bind(registry);
+    const removeSystem = registry.removeSystem.bind(registry);
     const clearSystems = registry.clearSystems.bind(registry);
     const systems = this._systems;
     const classes = this._classes;
@@ -261,9 +267,17 @@ export class EditorWorldTracker {
 
     Object.assign(registry, {
       spawnEntity(): Entity {
-        const site = callSiteOf(new Error().stack);
+        // A scene's tracked registry spawns for its `setup`: it gives the line and the scene.
+        const origin = spawnOrigin(registry);
+        const site = origin ? origin.site : callSiteOf(new Error().stack);
+        const scene = origin?.scene;
         const entity = spawn();
-        entities.set(entity.getId(), { entity, ...(site && { site }), components: new Map() });
+        entities.set(entity.getId(), {
+          entity,
+          ...(site && { site }),
+          ...(scene && { scene }),
+          components: new Map(),
+        });
         return entity;
       },
       killEntity(entity: Entity): void {
@@ -308,6 +322,11 @@ export class EditorWorldTracker {
             if (ms > entry.max) entry.max = ms;
           }
         });
+      },
+      removeSystem(index: number): void {
+        // The registry erases its system at this index: the tracked list follows.
+        if (index >= 0 && index < systems.length) systems.splice(index, 1);
+        removeSystem(index);
       },
       clearSystems(): void {
         systems.length = 0;

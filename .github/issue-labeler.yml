@@ -22,6 +22,10 @@ modules:network:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\nnetwork\\n"
 
+modules:scene:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\nscene\\n"
+
 modules:sound:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\nsound\\n"

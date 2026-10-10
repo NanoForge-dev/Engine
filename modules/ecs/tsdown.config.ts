@@ -12,4 +12,9 @@ const createECSPartConfig = (part: "client" | "server"): UserConfig =>
     }),
   });
 
-export default [createTsdownConfig(), createECSPartConfig("client"), createECSPartConfig("server")];
+export default [
+  createTsdownConfig(),
+  createECSPartConfig("client"),
+  createECSPartConfig("server"),
+  createTsdownConfig({ entry: "src/scene/index.ts", outDir: "dist/scene" }),
+];

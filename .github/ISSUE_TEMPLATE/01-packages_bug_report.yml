@@ -23,6 +23,7 @@ body:
         - input
         - music
         - network
+        - scene
         - sound
         - other
     validations:

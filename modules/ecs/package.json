@@ -55,6 +55,16 @@
         "default": "./dist/server/index.js"
       }
     },
+    "./scene": {
+      "require": {
+        "types": "./dist/scene/index.d.cts",
+        "default": "./dist/scene/index.cjs"
+      },
+      "import": {
+        "types": "./dist/scene/index.d.ts",
+        "default": "./dist/scene/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "type": "module",
@@ -84,16 +94,21 @@
     "@nanoforge-dev/common": "workspace:*"
   },
   "peerDependencies": {
-    "@nanoforge-dev/editor-lib": "workspace:*"
+    "@nanoforge-dev/editor-lib": "workspace:*",
+    "@nanoforge-dev/scene": "workspace:*"
   },
   "peerDependenciesMeta": {
     "@nanoforge-dev/editor-lib": {
+      "optional": true
+    },
+    "@nanoforge-dev/scene": {
       "optional": true
     }
   },
   "devDependencies": {
     "@favware/cliff-jumper": "catalog:ci",
     "@nanoforge-dev/editor-lib": "workspace:*",
+    "@nanoforge-dev/scene": "workspace:*",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",

@@ -82,6 +82,26 @@ ctx.ecs.registry.addSystem((registry) => {
 
 When registered alongside `@nanoforge-dev/editor`'s `EditorLibrary`, `EcsLibrary` also listens for a `"hot-reload"` command from the editor and applies incoming components via `registry.addComponent` — useful for live-editing entity state from an external editor host.
 
+### Scenes
+
+`@nanoforge-dev/ecs/scene` has `EcsScene`, a scene of `@nanoforge-dev/scene` whose entities and systems go away when it is unloaded. Write its `setup` like an app's `main`:
+
+```ts
+import { EcsScene } from "@nanoforge-dev/ecs/scene";
+
+export class Level1 extends EcsScene {
+  static override parent = Run;
+
+  override setup(registry: Registry, ctx: Context) {
+    const wall = registry.spawnEntity();
+    registry.addComponent(wall, new Position(40, 90));
+    registry.addSystem(levelFlow);
+  }
+}
+```
+
+The registry `setup` gets is the app's, tracked: at unload, the systems added through it are removed (by function) and the entities spawned through it are killed, after calling the `destroy()` of their components that have one. `teardown(registry, ctx)` runs first, if the scene has one.
+
 ## Links
 
 - [GitHub][source]
