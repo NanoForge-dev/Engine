@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@nanoforge-dev/input",
   "version": "2.0.0",
-  "description": "NanoForge Engine - Input",
+  "description": "NanoForge Engine - Input (keyboard, mouse and controller)",
   "keywords": [
     "nanoforge",
     "game",
@@ -33,6 +33,26 @@
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      }
+    },
+    "./keyboard-mouse": {
+      "require": {
+        "types": "./dist/keyboard-mouse/index.d.cts",
+        "default": "./dist/keyboard-mouse/index.cjs"
+      },
+      "import": {
+        "types": "./dist/keyboard-mouse/index.d.ts",
+        "default": "./dist/keyboard-mouse/index.js"
+      }
+    },
+    "./controller": {
+      "require": {
+        "types": "./dist/controller/index.d.cts",
+        "default": "./dist/controller/index.cjs"
+      },
+      "import": {
+        "types": "./dist/controller/index.d.ts",
+        "default": "./dist/controller/index.js"
       }
     },
     "./package.json": "./package.json"
