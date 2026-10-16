@@ -1,12 +1,13 @@
-import type { SocketAddress } from "bun";
-
 import { SESSION_TOKEN_PARAM } from "../shared/session";
 
 /** Session-wide client identifier, shared by the TCP and UDP transports. */
 export type ClientId = string;
 
-/** Transport a connection was made over. */
-export type Transport = "tcp" | "udp";
+/**
+ * Transport a connection was made over: `"local"` is the host's own player and
+ * `"peer"` a WebRTC link to a peer host (see `NetworkPeerLibrary`).
+ */
+export type Transport = "tcp" | "udp" | "local" | "peer";
 
 /** What the server knows about one transport connection of a client. */
 export type ConnectionInfo = {
@@ -100,7 +101,8 @@ export const getSessionToken = (request: Request): string | null =>
 export const buildConnectionInfo = (
   transport: Transport,
   request: Request,
-  server: { requestIP(request: Request): SocketAddress | null },
+  // Structural `SocketAddress`, so this file builds without Bun's types.
+  server: { requestIP(request: Request): { address: string; port: number; family: string } | null },
 ): ConnectionInfo => {
   const remote = server.requestIP(request);
   const params = [...new URL(request.url).searchParams].filter(
@@ -159,11 +161,24 @@ export class ClientRegistry implements ClientsApi {
    *
    * @param token - Session token presented by the client, or `null` for a new session.
    * @param connection - Connection to attach.
+   * @param register - Called with a new session before the connect listeners, so
+   * the transport can already be sent to from inside them.
    * @returns The session id and token, or `null` when {@link canAttach} refuses it.
    */
   public attach(
+    token: null,
+    connection: ConnectionInfo,
+    register?: (session: { id: ClientId; token: string }) => void,
+  ): { id: ClientId; token: string };
+  public attach(
     token: string | null,
     connection: ConnectionInfo,
+    register?: (session: { id: ClientId; token: string }) => void,
+  ): { id: ClientId; token: string } | null;
+  public attach(
+    token: string | null,
+    connection: ConnectionInfo,
+    register?: (session: { id: ClientId; token: string }) => void,
   ): { id: ClientId; token: string } | null {
     if (!this.canAttach(token, connection.transport)) return null;
 
@@ -184,8 +199,10 @@ export class ClientRegistry implements ClientsApi {
     };
     this._sessions.set(session.info.id, session);
     this._tokens.set(session.token, session.info.id);
+    const created = { id: session.info.id, token: session.token };
+    register?.(created);
     this.notify(this._connectListeners, session.info);
-    return { id: session.info.id, token: session.token };
+    return created;
   }
 
   /**

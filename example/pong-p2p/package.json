@@ -1,0 +1,31 @@
+{
+  "name": "pong-p2p",
+  "version": "0.0.0",
+  "description": "",
+  "author": "",
+  "type": "module",
+  "scripts": {
+    "start": "nf start",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@nanoforge-dev/asset": "workspace:*",
+    "@nanoforge-dev/cli": "^2.3.0",
+    "@nanoforge-dev/common": "workspace:*",
+    "@nanoforge-dev/config": "catalog:config",
+    "@nanoforge-dev/core": "workspace:*",
+    "@nanoforge-dev/env": "workspace:*",
+    "@nanoforge-dev/network": "workspace:*",
+    "@trivago/prettier-plugin-sort-imports": "catalog:lint",
+    "lint-staged": "catalog:ci",
+    "prettier": "catalog:lint",
+    "typescript": "catalog:core"
+  },
+  "private": true,
+  "lint-staged": {
+    "**": [
+      "prettier --ignore-unknown --write"
+    ]
+  }
+}

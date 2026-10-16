@@ -12,4 +12,9 @@ export default [
     outDir: "dist/server",
     tsconfig: "tsconfig.server.json",
   }),
+  createTsdownConfig({
+    entry: "src/peer/index.ts",
+    outDir: "dist/peer",
+    tsconfig: "tsconfig.peer.json",
+  }),
 ];

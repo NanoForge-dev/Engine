@@ -3,32 +3,18 @@ import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/edito
 import { registerEnv } from "@nanoforge-dev/env";
 
 import {
-  CHANNELS,
-  type Channel,
   type ChannelOptions,
-  DEFAULT_CHANNEL,
+  RELIABLE_CHANNELS,
+  UNRELIABLE_CHANNELS,
   isReliableChannel,
 } from "../shared/channels";
-import {
-  type NetworkData,
-  type NetworkPayload,
-  encodeNetworkPayload,
-} from "../shared/network-data";
-import {
-  PacketDispatcher,
-  type TypedPacket,
-  encodePacket,
-  encodeTypedPacket,
-  sortPackets,
-} from "../shared/packet";
+import type { NetworkData, NetworkPayload } from "../shared/network-data";
 import { type Trace, createTrace, traceServer } from "../shared/trace";
 import { type ClientId, type ClientInfo, ClientRegistry, type ClientsApi } from "./client-registry";
 import { ServerConfigNetwork } from "./config.server.network";
-import type {
-  NetworkServerContextApi,
-  ServerPacketInfo,
-  ServerPacketsApi,
-} from "./network-server-context.type";
+import { NetworkServer } from "./network-server";
+import type { NetworkServerContextApi, ServerPacketsApi } from "./network-server-context.type";
+import { SignalingServer } from "./signaling.server.network";
 import { TCPServer } from "./tcp.server.network";
 import { UDPServer } from "./udp.server.network";
 
@@ -48,6 +34,7 @@ import { UDPServer } from "./udp.server.network";
  * - `ICE_SERVERS` — STUN/TURN servers for the UDP transport, comma-separated or a JSON array (default: `[]`).
  * - `ICE_PORT` — fixed, multiplexed UDP port for the UDP transport (optional).
  * - `ADVERTISE_IP` — public address written into host ICE candidates (optional).
+ * - `LISTENING_SIGNALING_PORT` — signaling port pairing `NetworkPeerLibrary` players (optional).
  *
  * @example
  * ```ts
@@ -64,27 +51,18 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
 
   private _tcp?: TCPServer;
   private _udp?: UDPServer;
+  private _signaling?: SignalingServer;
 
   private readonly _registry = new ClientRegistry();
-  private readonly _dispatcher = new PacketDispatcher<ServerPacketInfo>();
-  private _typed: TypedPacket<ServerPacketInfo>[] = [];
-  private readonly _raw = new Map<Channel, Map<ClientId, NetworkData[]>>();
-  private readonly _packets: ServerPacketsApi = {
-    on: (packet, listener) => this._dispatcher.on(packet, listener),
-    read: (packet) => this._dispatcher.read(packet),
-    sendToAll: (packet, ...[data, options]) =>
-      this.sendBytesToAll(options?.channel ?? packet.channel, encodeTypedPacket(packet, data)),
-    sendToClient: (clientId, packet, ...[data, options]) =>
-      this.sendBytesToClient(
-        clientId,
-        options?.channel ?? packet.channel,
-        encodeTypedPacket(packet, data),
-      ),
-  };
+  private readonly _server = new NetworkServer(
+    this._registry,
+    (channel) =>
+      `Channel ${channel} needs ${isReliableChannel(channel) ? "LISTENING_TCP_PORT" : "LISTENING_UDP_PORT"} to be set`,
+  );
 
   /** Client sessions shared by the TCP and UDP servers. */
   public get clients(): ClientsApi {
-    return this._registry;
+    return this._server.clients;
   }
 
   private _trace: Trace | undefined;
@@ -95,7 +73,7 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
 
   /** Typed packets: per-type listeners, `read` and sending. */
   public get packets(): ServerPacketsApi {
-    return this._packets;
+    return this._server.packets;
   }
 
   public override async __init(ctx: InitContext): Promise<void> {
@@ -108,7 +86,11 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
 
     const config = await registerEnv(ServerConfigNetwork, ctx.env);
 
-    if (config.LISTENING_TCP_PORT === undefined && config.LISTENING_UDP_PORT === undefined) {
+    if (
+      config.LISTENING_TCP_PORT === undefined &&
+      config.LISTENING_UDP_PORT === undefined &&
+      config.LISTENING_SIGNALING_PORT === undefined
+    ) {
       throw new Error("NetworkServerLibrary: no listening port specified.");
     }
 
@@ -145,15 +127,30 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
       );
       this._udp.listen();
     }
+
+    if (config.LISTENING_SIGNALING_PORT !== undefined) {
+      this._signaling = new SignalingServer(
+        +config.LISTENING_SIGNALING_PORT,
+        config.LISTENING_INTERFACE,
+        config.WSS_CERT,
+        config.WSS_KEY,
+      );
+      this._signaling.listen();
+    }
+
+    this.routeChannels();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override async __clear(_ctx: Context): Promise<void> {
     this._tcp?.close();
     this._udp?.close();
+    this._signaling?.stop();
     this._registry.clear();
     delete this._tcp;
     delete this._udp;
+    delete this._signaling;
+    this.routeChannels();
   }
 
   /**
@@ -164,8 +161,8 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
    * @throws When the channel's port was not configured, or `data` cannot be
    * encoded as JSON.
    */
-  public sendToAll(data: NetworkPayload, { channel = DEFAULT_CHANNEL }: ChannelOptions = {}): void {
-    this.sendBytesToAll(channel, encodePacket(null, encodeNetworkPayload(data)));
+  public sendToAll(data: NetworkPayload, options?: ChannelOptions): void {
+    this._server.sendToAll(data, options);
   }
 
   /**
@@ -177,12 +174,8 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
    * @throws When the channel's port was not configured, or `data` cannot be
    * encoded as JSON.
    */
-  public sendToClient(
-    clientId: ClientId,
-    data: NetworkPayload,
-    { channel = DEFAULT_CHANNEL }: ChannelOptions = {},
-  ): void {
-    this.sendBytesToClient(clientId, channel, encodePacket(null, encodeNetworkPayload(data)));
+  public sendToClient(clientId: ClientId, data: NetworkPayload, options?: ChannelOptions): void {
+    this._server.sendToClient(clientId, data, options);
   }
 
   /**
@@ -198,22 +191,8 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
    * `json()`…
    * @throws When the channel's port was not configured.
    */
-  public getReceivedPackets({ channel }: ChannelOptions = {}): Map<ClientId, NetworkData[]> {
-    if (channel !== undefined) {
-      const clients = this.drain(channel);
-      const packets = this._raw.get(channel) ?? new Map<ClientId, NetworkData[]>();
-      this._raw.delete(channel);
-      for (const clientId of clients) if (!packets.has(clientId)) packets.set(clientId, []);
-      return packets;
-    }
-
-    const merged = new Map<ClientId, NetworkData[]>();
-    for (const c of this.configuredChannels()) {
-      this.getReceivedPackets({ channel: c }).forEach((packets, clientId) => {
-        merged.set(clientId, [...(merged.get(clientId) ?? []), ...packets]);
-      });
-    }
-    return merged;
+  public getReceivedPackets(options?: ChannelOptions): Map<ClientId, NetworkData[]> {
+    return this._server.getReceivedPackets(options);
   }
 
   /**
@@ -223,17 +202,8 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
    * @returns Snapshot array of client ids.
    * @throws When the channel's port was not configured.
    */
-  public getConnectedClients({ channel }: ChannelOptions = {}): ClientId[] {
-    if (channel !== undefined) {
-      if (isReliableChannel(channel)) return this.requireTcp(channel).getConnectedClients();
-      return this.requireUdp(channel).getConnectedClients(channel);
-    }
-    return [
-      ...new Set([
-        ...(this._tcp?.getConnectedClients() ?? []),
-        ...(this._udp?.getConnectedClients() ?? []),
-      ]),
-    ];
+  public getConnectedClients(options?: ChannelOptions): ClientId[] {
+    return this._server.getConnectedClients(options);
   }
 
   /**
@@ -244,7 +214,7 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
    * @returns The live session info, or `undefined` when the client is gone.
    */
   public getClientInfo(clientId: ClientId): ClientInfo | undefined {
-    return this._registry.get(clientId);
+    return this._server.getClientInfo(clientId);
   }
 
   /**
@@ -266,73 +236,18 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
 
   /** Calls the listeners of the typed packets received since the last tick. */
   public override async __run(ctx: Context): Promise<void> {
-    this._raw.clear();
-    for (const channel of this.configuredChannels()) this.drain(channel);
-    const typed = this._typed;
-    this._typed = [];
-    this._dispatcher.dispatch(typed, ctx);
+    this._server.run(ctx);
   }
 
   public override expose(): NetworkServerContextApi {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const library = this;
-    return {
-      sendToAll: (data, options) => library.sendToAll(data, options),
-      sendToClient: (clientId, data, options) => library.sendToClient(clientId, data, options),
-      getReceivedPackets: (options) => library.getReceivedPackets(options),
-      getConnectedClients: (options) => library.getConnectedClients(options),
-      getClientInfo: (clientId) => library.getClientInfo(clientId),
-      get clients() {
-        return library.clients;
-      },
-      get packets() {
-        return library.packets;
-      },
+    return this._server.expose();
+  }
+
+  /** TCP carries the reliable channels, UDP the unreliable ones. */
+  private routeChannels(): void {
+    this._server.transports = {
+      ...(this._tcp && Object.fromEntries(RELIABLE_CHANNELS.map((c) => [c, this._tcp]))),
+      ...(this._udp && Object.fromEntries(UNRELIABLE_CHANNELS.map((c) => [c, this._udp]))),
     };
-  }
-
-  private configuredChannels(): Channel[] {
-    return CHANNELS.filter((channel) =>
-      isReliableChannel(channel) ? this._tcp !== undefined : this._udp !== undefined,
-    );
-  }
-
-  private sendBytesToAll(channel: Channel, bytes: Uint8Array): void {
-    if (isReliableChannel(channel)) this.requireTcp(channel).sendToEverybody(channel, bytes);
-    else this.requireUdp(channel).sendToEverybody(channel, bytes);
-  }
-
-  private sendBytesToClient(clientId: ClientId, channel: Channel, bytes: Uint8Array): void {
-    if (isReliableChannel(channel)) this.requireTcp(channel).sendToClient(channel, clientId, bytes);
-    else this.requireUdp(channel).sendToClient(channel, clientId, bytes);
-  }
-
-  /**
-   * Move what each client sent on `channel` to the typed and raw queues.
-   *
-   * @returns The clients the transport reported, packets or not.
-   */
-  private drain(channel: Channel): ClientId[] {
-    const received = isReliableChannel(channel)
-      ? this.requireTcp(channel).getReceivedPackets(channel)
-      : this.requireUdp(channel).getReceivedPackets(channel);
-    const raw = this._raw.get(channel) ?? new Map<ClientId, NetworkData[]>();
-    received.forEach((packets, clientId) => {
-      const clientRaw = raw.get(clientId) ?? [];
-      sortPackets(packets, { clientId, channel }, clientRaw, this._typed);
-      if (clientRaw.length > 0) raw.set(clientId, clientRaw);
-    });
-    this._raw.set(channel, raw);
-    return [...received.keys()];
-  }
-
-  private requireTcp(channel: Channel): TCPServer {
-    if (!this._tcp) throw new Error(`Channel ${channel} needs LISTENING_TCP_PORT to be set`);
-    return this._tcp;
-  }
-
-  private requireUdp(channel: Channel): UDPServer {
-    if (!this._udp) throw new Error(`Channel ${channel} needs LISTENING_UDP_PORT to be set`);
-    return this._udp;
   }
 }

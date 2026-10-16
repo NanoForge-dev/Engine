@@ -136,6 +136,19 @@ describe("NetworkServerLibrary", () => {
       ).not.toThrow();
     });
 
+    it("should start only a signaling server when only LISTENING_SIGNALING_PORT is provided", async () => {
+      const stop = vi.fn();
+      serve.mockImplementation(() => ({ stop }));
+      const lib = new NetworkServerLibrary();
+      await lib.__init(makeInitContext({ LISTENING_SIGNALING_PORT: "9002" }));
+
+      expect(serve).toHaveBeenCalledTimes(1);
+      expect(serve.mock.calls[0]?.[0].port).toBe(9002);
+      expect(() => lib.sendToAll(new Uint8Array())).toThrow("LISTENING_TCP_PORT");
+      await lib.__clear({} as never);
+      expect(stop).toHaveBeenCalledWith(true);
+    });
+
     it("should default LISTENING_INTERFACE to 0.0.0.0 when not provided", async () => {
       const ctx = makeInitContext({ LISTENING_TCP_PORT: "9000" });
       const lib = new NetworkServerLibrary();

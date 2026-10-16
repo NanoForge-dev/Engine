@@ -482,6 +482,129 @@ importers:
         specifier: catalog:core
         version: 6.0.3
 
+  example/pong-p2p:
+    devDependencies:
+      '@nanoforge-dev/asset':
+        specifier: workspace:*
+        version: link:../../packages/asset
+      '@nanoforge-dev/cli':
+        specifier: ^2.3.0
+        version: 2.3.0(@types/node@26.4.0)(synckit@0.11.13)
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@nanoforge-dev/config':
+        specifier: catalog:config
+        version: 2.3.0(synckit@0.11.13)
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nanoforge-dev/env':
+        specifier: workspace:*
+        version: link:../../packages/env
+      '@nanoforge-dev/network':
+        specifier: workspace:*
+        version: link:../../modules/network
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      lint-staged:
+        specifier: catalog:ci
+        version: 17.4.1
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  example/pong-p2p/apps/game:
+    devDependencies:
+      '@nanoforge-dev/asset':
+        specifier: workspace:*
+        version: link:../../../../packages/asset
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../../../packages/core
+      '@nanoforge-dev/ecs':
+        specifier: workspace:*
+        version: link:../../../../modules/ecs
+      '@nanoforge-dev/env':
+        specifier: workspace:*
+        version: link:../../../../packages/env
+      '@nanoforge-dev/graphics-2d':
+        specifier: workspace:*
+        version: link:../../../../modules/graphics-2d
+      '@nanoforge-dev/input':
+        specifier: workspace:*
+        version: link:../../../../modules/input
+      '@nanoforge-dev/network':
+        specifier: workspace:*
+        version: link:../../../../modules/network
+      '@nanoforge-dev/utils-eslint-config':
+        specifier: workspace:*
+        version: link:../../../../utils/eslint-config
+      '@nanoforge-dev/utils-prettier-config':
+        specifier: workspace:*
+        version: link:../../../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      eslint:
+        specifier: catalog:lint
+        version: 10.9.1(jiti@2.6.1)(supports-color@10.2.2)
+      lint-staged:
+        specifier: catalog:ci
+        version: 17.4.1
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  example/pong-p2p/apps/signaling:
+    devDependencies:
+      '@nanoforge-dev/asset':
+        specifier: workspace:*
+        version: link:../../../../packages/asset
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../../../packages/core
+      '@nanoforge-dev/env':
+        specifier: workspace:*
+        version: link:../../../../packages/env
+      '@nanoforge-dev/network':
+        specifier: workspace:*
+        version: link:../../../../modules/network
+      '@nanoforge-dev/utils-eslint-config':
+        specifier: workspace:*
+        version: link:../../../../utils/eslint-config
+      '@nanoforge-dev/utils-prettier-config':
+        specifier: workspace:*
+        version: link:../../../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      eslint:
+        specifier: catalog:lint
+        version: 10.9.1(jiti@2.6.1)(supports-color@10.2.2)
+      lint-staged:
+        specifier: catalog:ci
+        version: 17.4.1
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
   modules/ecs:
     dependencies:
       '@nanoforge-dev/common':

@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CHANNELS,
   Channel,
+  DATA_CHANNEL_OPTIONS,
   PacketSequencer,
+  UNRELIABLE_CHANNEL_OPTIONS,
+  channelFromLabel,
   decodeReliableFrame,
   encodeReliableFrame,
   unreliableChannelFromLabel,
@@ -53,6 +57,28 @@ describe("unreliableChannelFromLabel", () => {
   it("should reject reliable or unknown labels", () => {
     expect(unreliableChannelFromLabel("reliable-ordered")).toBeUndefined();
     expect(unreliableChannelFromLabel("game")).toBeUndefined();
+  });
+});
+
+describe("channelFromLabel", () => {
+  it("should map the label of every channel", () => {
+    for (const channel of CHANNELS) expect(channelFromLabel(channel)).toBe(channel);
+  });
+
+  it("should reject unknown labels", () => {
+    expect(channelFromLabel("chat")).toBeUndefined();
+  });
+});
+
+describe("DATA_CHANNEL_OPTIONS", () => {
+  it("should keep the unreliable options of a dedicated server", () => {
+    expect(DATA_CHANNEL_OPTIONS[Channel.UnreliableOrdered]).toBe(UNRELIABLE_CHANNEL_OPTIONS);
+    expect(DATA_CHANNEL_OPTIONS[Channel.UnreliableUnordered]).toBe(UNRELIABLE_CHANNEL_OPTIONS);
+  });
+
+  it("should retransmit the reliable channels", () => {
+    expect(DATA_CHANNEL_OPTIONS[Channel.ReliableOrdered]).toStrictEqual({});
+    expect(DATA_CHANNEL_OPTIONS[Channel.ReliableUnordered]).toStrictEqual({ ordered: false });
   });
 });
 

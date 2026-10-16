@@ -1,0 +1,202 @@
+---
+title: "Peer-to-peer Networking (network/peer)"
+icon: "book"
+description: "Multiplayer without a game server: one player hosts, the others join"
+---
+
+# Peer-to-peer Networking (network/peer)
+
+`@nanoforge-dev/network/peer` runs a multiplayer game without a game server. One
+player **hosts**: their browser runs the game's server, with the same API as
+[`network-server`](./network-server). The other players **join** that host over
+WebRTC, using the same four [channels](./packet-framing) and the same typed
+packets as a dedicated server.
+
+## How it works
+
+```
+             signaling server (handshake only)
+               ╱            ╲
+          host tab ───────── joiner tab      one WebRTC connection per joiner,
+          (server +   ╲      carrying the four channels
+          its player)  ╲──── joiner tab
+```
+
+- A browser tab cannot accept incoming connections, so players first meet on a
+  small **signaling server** that relays the WebRTC handshake. Game traffic never
+  goes through it.
+- Each joiner opens **one** WebRTC connection, to the host. Its four data
+  channels carry `ReliableOrdered`, `ReliableUnordered`, `UnreliableOrdered`
+  and `UnreliableUnordered`.
+- The host's own player reaches its server through an in-memory loopback, so it
+  uses the same client API as everyone else.
+- The game ends when the host leaves. Host migration is not supported.
+
+## Setup
+
+The signaling server is `NetworkServerLibrary` with `LISTENING_SIGNALING_PORT`
+set. It can run alone, or next to the TCP and UDP ports of a dedicated server:
+
+```ts
+// apps/signaling (type "server")
+const app = NanoforgeFactory.createServer({ tickRate: 1 });
+app.use(new NetworkServerLibrary());
+await app.init(options);
+await app.run();
+```
+
+The game is a single client app that uses `NetworkPeerLibrary`:
+
+```dotenv
+NANOFORGE_SERVER_LISTENING_SIGNALING_PORT=4447
+
+NANOFORGE_CLIENT_SERVER_ADDRESS=127.0.0.1
+NANOFORGE_CLIENT_SERVER_SIGNALING_PORT=4447
+# NANOFORGE_CLIENT_WSS=true     # wss:// for the signaling server (WSS_CERT/WSS_KEY on its side)
+
+# STUN for both sides; add a TURN server for players behind strict NATs
+NANOFORGE_ICE_SERVERS=stun:stun.cloudflare.com:3478
+```
+
+## Hosting and joining
+
+Hosting or joining is chosen at runtime, after `app.init()`: every player of a
+deployment gets the same environment. This example joins the room named in the
+URL, or hosts a new room:
+
+```ts
+import { NetworkPeerLibrary } from "@nanoforge-dev/network/peer";
+
+const network = new NetworkPeerLibrary();
+app.use(network);
+await app.init(options);
+
+const room = new URLSearchParams(location.search).get("room");
+if (room) {
+  await network.join(room); // resolves once the four channels to the host are open
+} else {
+  const server = await network.host(); // same API as a dedicated server's ctx.network
+  console.info(`Invite: ${location.origin}${location.pathname}?room=${network.room}`);
+  server.packets.on(Input, ({ key }, { clientId }) => handleInput(clientId, key, server));
+}
+
+network.packets.send(Play); // on the host, this reaches its own server
+await app.run();
+```
+
+| `ctx.network` member     | Host                                   | Joiner      |
+| ------------------------ | -------------------------------------- | ----------- |
+| `packets`, `sendData`, … | To its own server, through loopback    | To the host |
+| `clientId`               | Its player's id on its server          | Its id      |
+| `isHost`                 | `true`                                 | `false`     |
+| `server`                 | The server (`NetworkServerContextApi`) | `undefined` |
+| `room`                   | The code joiners use                   | `undefined` |
+
+`host()` rejects when the signaling server cannot be reached. `join()` rejects
+when the room does not exist, or when no direct connection could be made within
+10 seconds; add a TURN server to `ICE_SERVERS` for those players. Call `leave()`
+to stop, then `host()` or `join()` again.
+
+## Writing the game
+
+The host's server and its player share **one world**: the same ECS registry
+renders the game and holds the authoritative state. That gives three rules:
+
+1. **Register shared systems once.** A `move` system that existed in both the
+   client and the server app must run once, or entities move twice per tick.
+2. **Gate authority on `ctx.network.server`.** It is `undefined` on joiners, so
+   TypeScript makes you check it:
+
+   ```ts
+   export const bounce = (registry: Registry, ctx: Context) => {
+     const server = ctx.network.server;
+     if (!server) return; // only the host simulates the ball
+     // … then exactly as on a dedicated server: server.packets.sendToAll(Move, …)
+   };
+   ```
+
+3. **Systems that apply the host's state read, then skip on the host.**
+   `sendToAll` also reaches the host's player, one tick late, and applying it
+   would rewind the host's world. Read first, so the packet type counts as
+   read and no "no listener or reader" warning is logged:
+
+   ```ts
+   export function applyMoves(registry: Registry, ctx: Context) {
+     const moves = ctx.network.packets.read(Move);
+     if (ctx.network.isHost) return;
+     for (const { data } of moves) {
+       /* apply */
+     }
+   }
+   ```
+
+Server handlers written for a dedicated server, which take a
+`NetworkServerContextApi`, work unchanged on the host. Import their types from
+`@nanoforge-dev/network/peer`, not `/server`, because each entry point declares
+its own `ctx.network`. See `example/pong-p2p` for pong-network merged into one
+peer-to-peer app.
+
+## Players coming and going
+
+- **The host's own player** is already in `server.clients.list()`, with id
+  `network.clientId`, when `host()` resolves: `onConnect` never fires for it.
+  A dedicated-server game that sets players up in `onConnect` also runs that
+  setup once for the host's player:
+
+  ```ts
+  const server = await network.host();
+  server.clients.onConnect(spawnPlayer);
+  spawnPlayer(server.getClientInfo(network.clientId!)!);
+  ```
+
+- **A joiner arrives.** `server.clients.onConnect` fires once all four of its
+  channels are open, so the listener can already send to it.
+- **A joiner leaves.** `server.clients.onDisconnect` fires as soon as the
+  signaling server reports it gone, a data channel closes, or its connection
+  fails.
+- **The host leaves.** The signaling server closes the room, and each joiner's
+  `isConnected()` turns `false` about a second later. Show a "host left"
+  screen from a system:
+
+  ```ts
+  if (!ctx.network.isConnected()) showMenu("Host left");
+  ```
+
+  The host must stay connected to the signaling server: if its signaling
+  connection drops, the server closes the room and its joiners leave. On the
+  host, `network.room` then turns `undefined`.
+
+## Limits
+
+- **Message size.** Keep each packet at or below 64 KiB. WebRTC data channels
+  cap message size, while the dedicated server's WebSocket has no practical cap.
+- **`ReliableUnordered` is really unordered here**, unlike over the dedicated
+  server's TCP WebSocket.
+- **NAT.** A direct connection fails for some player pairs, typically behind
+  strict corporate or mobile NATs. A TURN server in `ICE_SERVERS` relays
+  those players.
+- **Trust.** The host is authoritative and can cheat. Joiners can only act
+  through the packets the host accepts, so use `definePacket`'s `validate`.
+  Anyone with the room code can join, or open many connections to the host:
+  share codes only with the players you invite. Locking a room or kicking a
+  joiner is not available yet.
+- **Background tabs.** Browsers may slow down timers in hidden tabs, and the
+  game loop runs on timers, so a hidden host could slow the game down for
+  every player. Keep the host's tab in the foreground.
+
+## Signaling protocol
+
+JSON text frames, at most 64 KiB each:
+
+| Who    | Sends                                | Server forwards                       |
+| ------ | ------------------------------------ | ------------------------------------- |
+| Host   | connects without a `room`            | `{type:"room", room}` to the host     |
+| Joiner | connects with `?room=CODE`           | HTTP 404 when the room does not exist |
+| Joiner | any frame (its WebRTC offer and ICE) | `{type:"signal", from, data}` to host |
+| Host   | `{type:"signal", to, data}`          | `data` to that joiner of its room     |
+| Joiner | closes                               | `{type:"leave", from}` to the host    |
+| Host   | closes                               | close code `4001` to its joiners      |
+
+The host welcomes a joiner (`{type:"welcome", id, token}`, as the dedicated UDP
+server does) once its data channels are open. The joiner side therefore speaks
+the same protocol as with a dedicated server.
