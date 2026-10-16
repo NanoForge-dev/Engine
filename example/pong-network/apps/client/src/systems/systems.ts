@@ -1,5 +1,6 @@
 import { type Context } from "@nanoforge-dev/common";
 import { type Registry } from "@nanoforge-dev/ecs/client";
+import { ControllerAxis, ControllerButton } from "@nanoforge-dev/input/controller";
 
 import { Input, Move } from "../../../../shared/protocol";
 import {
@@ -24,10 +25,19 @@ export const controlPlayer = (registry: Registry, ctx: Context) => {
   const entities = registry.getZipper([Controller]);
   const input = ctx.input;
   const network = ctx.network;
+  const pad = ctx.controller;
 
   entities.forEach(({ Controller }) => {
-    const upPressed = input.isKeyPressed(Controller.up);
-    const downPressed = input.isKeyPressed(Controller.down);
+    // TEMP controller test: D-pad or left stick drive the paddle too.
+    const stickY = pad.getAxis(ControllerAxis.LeftStickY);
+    const upPressed =
+      !!input.isKeyPressed(Controller.up) ||
+      pad.isButtonPressed(ControllerButton.DPadUp) ||
+      stickY < -0.5;
+    const downPressed =
+      !!input.isKeyPressed(Controller.down) ||
+      pad.isButtonPressed(ControllerButton.DPadDown) ||
+      stickY > 0.5;
     if (upPressed == downPressed) {
       if (Controller.lastPressedUp || Controller.lastPressedDown) {
         network.packets.send(Input, { key: "stop" });

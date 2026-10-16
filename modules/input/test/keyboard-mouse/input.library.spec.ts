@@ -1,7 +1,7 @@
 import type { InitContext } from "@nanoforge-dev/common";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { InputEnum, InputLibrary } from "../src";
+import { InputEnum, InputLibrary } from "../../src/keyboard-mouse";
 
 type MockInputEvent = {
   code?: string;

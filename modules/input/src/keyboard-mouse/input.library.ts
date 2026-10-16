@@ -1,5 +1,6 @@
 import { type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
 
+import { clientOnlyError } from "../shared";
 import type { InputContextApi } from "./input-context.type";
 import { InputHandler } from "./input-handler";
 import type { InputEnum } from "./input.enum";
@@ -28,9 +29,7 @@ export class InputLibrary extends Library {
 
   public override async __init(ctx: InitContext): Promise<void> {
     if (!ctx.container) {
-      throw new Error(
-        "InputLibrary must be registered on the client (InitContext must contain a container element).",
-      );
+      throw clientOnlyError("InputLibrary", "InitContext must contain a container element");
     }
     this._inputHandler = new InputHandler(ctx.container, ctx.viewport);
   }

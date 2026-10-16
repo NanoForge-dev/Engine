@@ -1,6 +1,3 @@
-import "./context-augmentation";
-
-export { InputEnum } from "./input.enum";
-export type { InputContextApi } from "./input-context.type";
-export { InputLibrary } from "./input.library";
-export type { DragState, MouseState, WheelState } from "./mouse.types";
+// Root entry kept for backward compatibility: prefer `@nanoforge-dev/input/keyboard-mouse`.
+export * from "./keyboard-mouse";
+export type { ButtonState } from "./shared";
