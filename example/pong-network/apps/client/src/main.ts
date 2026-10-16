@@ -3,6 +3,7 @@ import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { EcsLibrary } from "@nanoforge-dev/ecs/client";
 import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
 import { InputEnum, InputLibrary } from "@nanoforge-dev/input";
+import { ControllerLibrary } from "@nanoforge-dev/input/controller";
 import { Channel, NetworkClientLibrary } from "@nanoforge-dev/network/client";
 
 import { AssignId, Play } from "../../../shared/protocol";
@@ -27,13 +28,22 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   const ecs = new EcsLibrary();
   const network = new NetworkClientLibrary();
   const input = new InputLibrary();
+  const controller = new ControllerLibrary();
 
   app.use(graphics);
   app.use(ecs);
   app.use(network);
   app.use(input);
+  app.use(controller);
 
   await app.init(options);
+
+  // TEMP controller test: log connections and rumble on connect.
+  controller.onConnect((c) => {
+    console.log("Manette connectée :", c.id, "mapping:", c.mapping);
+    void controller.vibrate({ duration: 300 });
+  });
+  controller.onDisconnect((c) => console.log("Manette déconnectée :", c.id));
 
   const registry = ecs.registry;
 
