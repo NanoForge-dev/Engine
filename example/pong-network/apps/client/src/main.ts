@@ -4,7 +4,7 @@ import { EcsLibrary } from "@nanoforge-dev/ecs/client";
 import { Circle, Graphics2DLibrary, Layer, Rect } from "@nanoforge-dev/graphics-2d";
 import { InputEnum, InputLibrary } from "@nanoforge-dev/input";
 import { ControllerLibrary } from "@nanoforge-dev/input/controller";
-import { Channel, NetworkClientLibrary } from "@nanoforge-dev/network/client";
+import { NetworkClientLibrary } from "@nanoforge-dev/network/client";
 
 import { AssignId, Play } from "../../../shared/protocol";
 import {
@@ -105,9 +105,6 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   registry.addSystem(controlPlayer);
   registry.addSystem(draw);
 
-  await network.connect({
-    channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered, Channel.UnreliableUnordered],
-  });
   network.packets.send(Play);
 
   await app.run();

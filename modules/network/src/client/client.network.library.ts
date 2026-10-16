@@ -7,7 +7,6 @@ import {
   CONNECT_TIMEOUT_MS,
   type Channel,
   type ChannelOptions,
-  type ConnectOptions,
   DEFAULT_CHANNEL,
   isReliableChannel,
 } from "../shared/channels";
@@ -34,7 +33,7 @@ import type {
 import { TCPClient } from "./tcp.client.network";
 import { UDPClient } from "./udp.client.network";
 
-/** Delay between two checks of the channels while `connect` waits. */
+/** Delay between two checks of the channels while `__init` waits for them. */
 const CONNECT_POLL_MS = 50;
 
 /**
@@ -42,10 +41,10 @@ const CONNECT_POLL_MS = 50;
  *
  * @remarks
  * Reads network configuration from the environment via `ClientConfigNetwork`
- * during `__init`.  Call `connect` to open the connections: TCP (WebSocket)
- * carries the reliable channels and UDP (WebRTC data channels) the unreliable
- * ones.  TCP connects first; once welcomed, UDP presents the session token so
- * both transports share one client id.
+ * and opens the connections during `__init`, so the channels are open before
+ * the game runs: TCP (WebSocket) carries the reliable channels and UDP (WebRTC
+ * data channels) the unreliable ones.  TCP connects first; once welcomed, UDP
+ * presents the session token so both transports share one client id.
  *
  * Configuration (via environment variables):
  * - `SERVER_ADDRESS` — hostname or IP of the server (required).
@@ -56,7 +55,6 @@ const CONNECT_POLL_MS = 50;
  *
  * @example
  * ```ts
- * await ctx.network.connect({ channels: [Channel.ReliableOrdered, Channel.UnreliableOrdered] });
  * ctx.network.sendData({ type: "join" }); // Channel.ReliableOrdered
  * ctx.network.sendData({ x: 1, y: 2 }, { channel: Channel.UnreliableOrdered });
  * const messages = ctx.network.getReceivedPackets().map((packet) => packet.json()); // every channel
@@ -68,8 +66,6 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
 
   private _tcp?: TCPClient;
   private _udp?: UDPClient;
-  /** Pending or settled connection of each transport, so it is only opened once. */
-  private readonly _connecting = new Map<TCPClient | UDPClient, Promise<void>>();
   private readonly _session: ClientSession = {};
   private readonly _dispatcher = new PacketDispatcher<ClientPacketInfo>();
   /** Typed packets drained from the transports, dispatched by the next `__run`. */
@@ -125,60 +121,8 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
         this._session,
       );
     }
-  }
 
-  /**
-   * Connect to the server and wait until `channels` are open.
-   *
-   * @remarks
-   * Only opens the transports the channels need: TCP for reliable channels,
-   * UDP for unreliable ones.  Calling it again for already open channels
-   * resolves right away.
-   *
-   * @param options - `channels` to wait for (every configured channel by
-   * default) and a `timeout` in milliseconds (10 seconds by default).
-   * @throws When a channel's port was not configured, a transport fails to
-   * connect, or the channels are not open before the timeout.
-   */
-  public async connect({
-    channels = this.configuredChannels(),
-    timeout = CONNECT_TIMEOUT_MS,
-  }: ConnectOptions = {}): Promise<void> {
-    if (!this._tcp && !this._udp) {
-      throw new Error("NetworkClientLibrary: connect() was called before __init");
-    }
-    const deadline = Date.now() + timeout;
-    const reliable = channels.find(isReliableChannel);
-    const unreliable = channels.find((channel) => !isReliableChannel(channel));
-
-    // TCP first, so UDP joins its session with the token from the TCP welcome.
-    const transports: [string, TCPClient | UDPClient][] = [];
-    if (reliable !== undefined) transports.push(["TCP", this.requireTcp(reliable)]);
-    if (unreliable !== undefined) transports.push(["UDP", this.requireUdp(unreliable)]);
-
-    const failures: unknown[] = [];
-    for (const [name, transport] of transports) {
-      try {
-        await this.connectTransport(name, transport);
-      } catch (error) {
-        failures.push(error);
-      }
-    }
-    if (failures.length > 0) {
-      throw new Error("NetworkClientLibrary: could not connect to the server", {
-        cause: failures.length === 1 ? failures[0] : failures,
-      });
-    }
-
-    while (!channels.every((channel) => this.isConnected({ channel }))) {
-      if (Date.now() >= deadline) {
-        const pending = channels.filter((channel) => !this.isConnected({ channel }));
-        throw new Error(
-          `NetworkClientLibrary: channels ${pending.join(", ")} not open after ${timeout}ms`,
-        );
-      }
-      await new Promise((resolve) => setTimeout(resolve, CONNECT_POLL_MS));
-    }
+    await this.openChannels();
   }
 
   /**
@@ -259,7 +203,6 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const library = this;
     return {
-      connect: (options) => library.connect(options),
       sendData: (data, options) => library.sendData(data, options),
       getReceivedPackets: (options) => library.getReceivedPackets(options),
       isConnected: (options) => library.isConnected(options),
@@ -270,6 +213,50 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
         return library.clientId;
       },
     };
+  }
+
+  /**
+   * Connect every configured transport and wait until its channels are open.
+   *
+   * @remarks
+   * Channels cannot be opened once the game runs, and connection errors are
+   * best caught at start, so this runs during `__init`.
+   *
+   * @throws When a transport fails to connect, or the channels are not open
+   * within `CONNECT_TIMEOUT_MS`.
+   */
+  private async openChannels(): Promise<void> {
+    const deadline = Date.now() + CONNECT_TIMEOUT_MS;
+    const channels = this.configuredChannels();
+
+    // TCP first, so UDP joins its session with the token from the TCP welcome.
+    const transports: [string, TCPClient | UDPClient][] = [];
+    if (this._tcp) transports.push(["TCP", this._tcp]);
+    if (this._udp) transports.push(["UDP", this._udp]);
+
+    const failures: unknown[] = [];
+    for (const [name, transport] of transports) {
+      try {
+        await transport.connect();
+      } catch (error) {
+        failures.push(new Error(`${name} connection failed`, { cause: error }));
+      }
+    }
+    if (failures.length > 0) {
+      throw new Error("NetworkClientLibrary: could not connect to the server", {
+        cause: failures.length === 1 ? failures[0] : failures,
+      });
+    }
+
+    while (!channels.every((channel) => this.isConnected({ channel }))) {
+      if (Date.now() >= deadline) {
+        const pending = channels.filter((channel) => !this.isConnected({ channel }));
+        throw new Error(
+          `NetworkClientLibrary: channels ${pending.join(", ")} not open after ${CONNECT_TIMEOUT_MS}ms`,
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, CONNECT_POLL_MS));
+    }
   }
 
   private configuredChannels(): Channel[] {
@@ -300,18 +287,5 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
   private requireUdp(channel: Channel): UDPClient {
     if (!this._udp) throw new Error(`Channel ${channel} needs SERVER_UDP_PORT to be set`);
     return this._udp;
-  }
-
-  private connectTransport(name: string, transport: TCPClient | UDPClient): Promise<void> {
-    let connecting = this._connecting.get(transport);
-    if (!connecting) {
-      connecting = transport.connect().catch((error: unknown) => {
-        // Forget the failure so a later `connect` can retry.
-        this._connecting.delete(transport);
-        throw new Error(`${name} connection failed`, { cause: error });
-      });
-      this._connecting.set(transport, connecting);
-    }
-    return connecting;
   }
 }
