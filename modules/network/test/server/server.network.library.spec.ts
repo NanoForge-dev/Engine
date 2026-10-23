@@ -145,7 +145,9 @@ describe("NetworkServerLibrary", () => {
       expect(serve).toHaveBeenCalledTimes(1);
       expect(serve.mock.calls[0]?.[0].port).toBe(4445);
       expect(serve.mock.calls[0]?.[0].websocket.maxPayloadLength).toBe(64 * 1024);
-      expect(() => lib.sendToAll(new Uint8Array())).toThrow("LISTENING_TCP_PORT");
+      expect(() => lib.sendToAll("hi", { channel: Channel.UnreliableUnordered })).not.toThrow();
+      expect(lib.getConnectedClients()).toStrictEqual([]);
+      expect(lib.getReceivedPackets()).toStrictEqual(new Map());
       await lib.__clear({} as never);
       expect(stop).toHaveBeenCalledWith(true);
     });

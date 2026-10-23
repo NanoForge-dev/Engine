@@ -56,6 +56,7 @@ NANOFORGE_ICE_SERVERS=stun:stun.cloudflare.com:3478
 - `nf start` sets `NETWORK_MODE=p2p` for both apps. The Bun server process then
   only pairs players for the WebRTC handshake, on `LISTENING_TCP_PORT`. Game
   traffic never goes through it, and one process serves any number of games.
+  The server app still starts there, with no players: its sends do nothing.
 - A page opened **without** `?room=` hosts: its client app starts the server
   app in the same tab and joins it through an in-memory loopback. The server
   app gets the client's environment.

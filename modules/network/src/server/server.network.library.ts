@@ -2,13 +2,27 @@ import type { Context, InitContext } from "@nanoforge-dev/common";
 import type { EditorInitContext } from "@nanoforge-dev/editor-lib";
 import { registerEnv } from "@nanoforge-dev/env";
 
-import { RELIABLE_CHANNELS, UNRELIABLE_CHANNELS, isReliableChannel } from "../shared/channels";
+import {
+  CHANNELS,
+  type Channel,
+  RELIABLE_CHANNELS,
+  UNRELIABLE_CHANNELS,
+  isReliableChannel,
+} from "../shared/channels";
 import { createTrace, traceServer } from "../shared/trace";
+import type { ServerTransport } from "../shared/transport";
 import { ServerConfigNetwork } from "./config.server.network";
 import { NetworkServerLibraryBase } from "./server.network.base";
 import { SignalingServer } from "./signaling.server.network";
 import { TCPServer } from "./tcp.server.network";
 import { UDPServer } from "./udp.server.network";
+
+const NO_CLIENTS: ServerTransport<Channel> = {
+  sendToEverybody: () => {},
+  sendToClient: () => {},
+  getReceivedPackets: () => new Map(),
+  getConnectedClients: () => [],
+};
 
 /**
  * Built-in network library for server-side applications.
@@ -28,7 +42,7 @@ import { UDPServer } from "./udp.server.network";
  * - `ADVERTISE_IP` — public address written into host ICE candidates (optional).
  * - `NETWORK_MODE` — `p2p` (set by `nf` from `network: "p2p"`): the game runs in
  *   the host player's browser, and this server only pairs players, on
- *   `LISTENING_TCP_PORT`.
+ *   `LISTENING_TCP_PORT`: the server app still runs here, with no players.
  *
  * @example
  * ```ts
@@ -84,6 +98,7 @@ export class NetworkServerLibrary extends NetworkServerLibraryBase {
         config.WSS_KEY,
       );
       this._signaling.listen();
+      this._server.transports = Object.fromEntries(CHANNELS.map((c) => [c, NO_CLIENTS]));
       return;
     }
 
