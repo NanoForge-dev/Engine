@@ -39,7 +39,7 @@ const generateRoomCode = (): string =>
  * reach its own room's host.
  *
  * Runs on `Bun.serve`; started by `NetworkServerLibrary` when
- * `LISTENING_SIGNALING_PORT` is set.
+ * `NETWORK_MODE` is `p2p`, on `LISTENING_TCP_PORT`.
  */
 export class SignalingServer {
   private readonly _rooms = new Map<string, Room>();

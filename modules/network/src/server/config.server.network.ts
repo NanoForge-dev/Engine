@@ -32,18 +32,6 @@ export class ServerConfigNetwork extends NetworkConfig {
   LISTENING_UDP_PORT?: string;
 
   /**
-   * Port of the peer-to-peer signaling server, which pairs the players of a
-   * `NetworkPeerLibrary` game for their WebRTC handshake.
-   *
-   * @remarks
-   * Can be the only port set, for a server that hosts no game itself.
-   */
-  @Expose()
-  @IsOptional()
-  @IsPort()
-  LISTENING_SIGNALING_PORT?: string;
-
-  /**
    * Network interface address the server binds to.
    *
    * @default "0.0.0.0"

@@ -19,6 +19,7 @@ import {
   encodeTypedPacket,
   sortPackets,
 } from "../shared/packet";
+import { ROOM_PARAM } from "../shared/signaling";
 import type { ClientTransport } from "../shared/transport";
 import type { ClientSession } from "./client-session";
 import type {
@@ -36,13 +37,15 @@ const CONNECT_POLL_MS = 50;
  *
  * @remarks
  * Shared by `NetworkClientLibrary` (TCP and UDP to a dedicated server) and
- * `NetworkPeerLibrary` (WebRTC to a host, or loopback on the host).
+ * the `NETWORK_MODE=p2p` mode (WebRTC to a host, or loopback on the host).
  */
 export class NetworkClient {
   /** Transport carrying each channel; a missing channel throws when used. */
   public transports: Partial<Record<Channel, ClientTransport<Channel>>> = {};
   /** Session shared with the transports, filled by the server's welcome. */
   public readonly session: ClientSession = {};
+  /** Where the room code of a peer-to-peer game is read from: the host, or the joined room. */
+  public room: { readonly room: string | undefined } | undefined;
 
   private readonly _dispatcher = new PacketDispatcher<ClientPacketInfo>();
   /** Typed packets drained from the transports, dispatched by the next `run`. */
@@ -68,6 +71,18 @@ export class NetworkClient {
   /** Client id assigned by the server, `undefined` until welcomed. */
   public get clientId(): string | undefined {
     return this.session.id;
+  }
+
+  /** See `NetworkClientContextApi.roomCode`. */
+  public get roomCode(): string | undefined {
+    return this.room?.room;
+  }
+
+  /** See `NetworkClientContextApi.inviteLink`. */
+  public get inviteLink(): string | undefined {
+    const code = this.roomCode;
+    if (code === undefined) return undefined;
+    return `${location.origin}${location.pathname}?${ROOM_PARAM}=${encodeURIComponent(code)}`;
   }
 
   /** Typed packets: per-type listeners, `read` and `send`. */
@@ -159,6 +174,12 @@ export class NetworkClient {
       },
       get clientId() {
         return client.clientId;
+      },
+      get roomCode() {
+        return client.roomCode;
+      },
+      get inviteLink() {
+        return client.inviteLink;
       },
     };
   }

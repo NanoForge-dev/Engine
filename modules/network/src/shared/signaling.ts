@@ -1,5 +1,5 @@
 /**
- * Messages of the peer-to-peer signaling server (`LISTENING_SIGNALING_PORT`),
+ * Messages of the peer-to-peer signaling server (`NETWORK_MODE=p2p`),
  * which pairs a host with its joiners for the WebRTC handshake only.
  *
  * @remarks
@@ -19,6 +19,9 @@ export const ROOM_PARAM = "room";
  * tab open for minutes in testing).
  */
 export const HOST_LEFT_CODE = 4001;
+
+/** Global key under which the browser `NetworkServerLibrary` publishes its `PeerHost` for the page's client. */
+export const PEER_HOST_KEY = Symbol.for("nanoforge.network.host");
 
 /** Largest signaling frame accepted, far above any SDP offer or ICE candidate. */
 export const MAX_SIGNAL_BYTES = 64 * 1024;

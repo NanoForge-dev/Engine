@@ -1,19 +1,11 @@
-import { type Context, type InitContext, Library, defineLibraryKey } from "@nanoforge-dev/common";
-import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/editor-lib";
+import type { Context, InitContext } from "@nanoforge-dev/common";
+import type { EditorInitContext } from "@nanoforge-dev/editor-lib";
 import { registerEnv } from "@nanoforge-dev/env";
 
-import {
-  type ChannelOptions,
-  RELIABLE_CHANNELS,
-  UNRELIABLE_CHANNELS,
-  isReliableChannel,
-} from "../shared/channels";
-import type { NetworkData, NetworkPayload } from "../shared/network-data";
-import { type Trace, createTrace, traceServer } from "../shared/trace";
-import { type ClientId, type ClientInfo, ClientRegistry, type ClientsApi } from "./client-registry";
+import { RELIABLE_CHANNELS, UNRELIABLE_CHANNELS, isReliableChannel } from "../shared/channels";
+import { createTrace, traceServer } from "../shared/trace";
 import { ServerConfigNetwork } from "./config.server.network";
-import { NetworkServer } from "./network-server";
-import type { NetworkServerContextApi, ServerPacketsApi } from "./network-server-context.type";
+import { NetworkServerLibraryBase } from "./server.network.base";
 import { SignalingServer } from "./signaling.server.network";
 import { TCPServer } from "./tcp.server.network";
 import { UDPServer } from "./udp.server.network";
@@ -34,7 +26,9 @@ import { UDPServer } from "./udp.server.network";
  * - `ICE_SERVERS` — STUN/TURN servers for the UDP transport, comma-separated or a JSON array (default: `[]`).
  * - `ICE_PORT` — fixed, multiplexed UDP port for the UDP transport (optional).
  * - `ADVERTISE_IP` — public address written into host ICE candidates (optional).
- * - `LISTENING_SIGNALING_PORT` — signaling port pairing `NetworkPeerLibrary` players (optional).
+ * - `NETWORK_MODE` — `p2p` (set by `nf` from `network: "p2p"`): the game runs in
+ *   the host player's browser, and this server only pairs players, on
+ *   `LISTENING_TCP_PORT`.
  *
  * @example
  * ```ts
@@ -46,34 +40,16 @@ import { UDPServer } from "./udp.server.network";
  * });
  * ```
  */
-export class NetworkServerLibrary extends Library implements EditorAwareLibrary {
-  readonly key = defineLibraryKey("network");
-
+export class NetworkServerLibrary extends NetworkServerLibraryBase {
   private _tcp?: TCPServer;
   private _udp?: UDPServer;
   private _signaling?: SignalingServer;
 
-  private readonly _registry = new ClientRegistry();
-  private readonly _server = new NetworkServer(
-    this._registry,
-    (channel) =>
-      `Channel ${channel} needs ${isReliableChannel(channel) ? "LISTENING_TCP_PORT" : "LISTENING_UDP_PORT"} to be set`,
-  );
-
-  /** Client sessions shared by the TCP and UDP servers. */
-  public get clients(): ClientsApi {
-    return this._server.clients;
-  }
-
-  private _trace: Trace | undefined;
-
   constructor() {
-    super({ runAfter: ["ecs"] });
-  }
-
-  /** Typed packets: per-type listeners, `read` and sending. */
-  public get packets(): ServerPacketsApi {
-    return this._server.packets;
+    super(
+      (channel) =>
+        `Channel ${channel} needs ${isReliableChannel(channel) ? "LISTENING_TCP_PORT" : "LISTENING_UDP_PORT"} to be set`,
+    );
   }
 
   public override async __init(ctx: InitContext): Promise<void> {
@@ -86,11 +62,7 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
 
     const config = await registerEnv(ServerConfigNetwork, ctx.env);
 
-    if (
-      config.LISTENING_TCP_PORT === undefined &&
-      config.LISTENING_UDP_PORT === undefined &&
-      config.LISTENING_SIGNALING_PORT === undefined
-    ) {
+    if (config.LISTENING_TCP_PORT === undefined && config.LISTENING_UDP_PORT === undefined) {
       throw new Error("NetworkServerLibrary: no listening port specified.");
     }
 
@@ -99,6 +71,20 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
       (config.WSS_CERT === undefined && config.WSS_KEY !== undefined)
     ) {
       throw new Error("NetworkServerLibrary: both WSS_CERT and WSS_KEY must be provided together.");
+    }
+
+    if (config.NETWORK_MODE === "p2p") {
+      if (config.LISTENING_TCP_PORT === undefined) {
+        throw new Error("NetworkServerLibrary: p2p needs LISTENING_TCP_PORT for signaling.");
+      }
+      this._signaling = new SignalingServer(
+        +config.LISTENING_TCP_PORT,
+        config.LISTENING_INTERFACE,
+        config.WSS_CERT,
+        config.WSS_KEY,
+      );
+      this._signaling.listen();
+      return;
     }
 
     if (config.LISTENING_TCP_PORT !== undefined) {
@@ -128,16 +114,6 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
       this._udp.listen();
     }
 
-    if (config.LISTENING_SIGNALING_PORT !== undefined) {
-      this._signaling = new SignalingServer(
-        +config.LISTENING_SIGNALING_PORT,
-        config.LISTENING_INTERFACE,
-        config.WSS_CERT,
-        config.WSS_KEY,
-      );
-      this._signaling.listen();
-    }
-
     this.routeChannels();
   }
 
@@ -154,93 +130,14 @@ export class NetworkServerLibrary extends Library implements EditorAwareLibrary 
   }
 
   /**
-   * Send a payload to every client reachable on a channel.
-   *
-   * @param data - Bytes, a string, or any value `JSON.stringify` can encode.
-   * @param options - `channel` to send on, `Channel.ReliableOrdered` by default.
-   * @throws When the channel's port was not configured, or `data` cannot be
-   * encoded as JSON.
-   */
-  public sendToAll(data: NetworkPayload, options?: ChannelOptions): void {
-    this._server.sendToAll(data, options);
-  }
-
-  /**
-   * Send a payload to one client.
-   *
-   * @param clientId - Client identifier.
-   * @param data - Bytes, a string, or any value `JSON.stringify` can encode.
-   * @param options - `channel` to send on, `Channel.ReliableOrdered` by default.
-   * @throws When the channel's port was not configured, or `data` cannot be
-   * encoded as JSON.
-   */
-  public sendToClient(clientId: ClientId, data: NetworkPayload, options?: ChannelOptions): void {
-    this._server.sendToClient(clientId, data, options);
-  }
-
-  /**
-   * Return the packets each client sent since the last call.
-   *
-   * @remarks
-   * Call this method once per frame: packets left unread for a whole tick are
-   * dropped, and typed packets never show up here.  Without a `channel`, the
-   * packets of every configured channel are merged per client, reliable channels first.
-   *
-   * @param options - `channel` to read from, every channel by default.
-   * @returns Map of client id to packets, each read with `bytes()`, `text()`,
-   * `json()`…
-   * @throws When the channel's port was not configured.
-   */
-  public getReceivedPackets(options?: ChannelOptions): Map<ClientId, NetworkData[]> {
-    return this._server.getReceivedPackets(options);
-  }
-
-  /**
-   * Return the clients reachable on a channel.
-   *
-   * @param options - `channel` to check, any configured channel by default.
-   * @returns Snapshot array of client ids.
-   * @throws When the channel's port was not configured.
-   */
-  public getConnectedClients(options?: ChannelOptions): ClientId[] {
-    return this._server.getConnectedClients(options);
-  }
-
-  /**
-   * Return what is known about a client session: its address, user agent,
-   * query parameters and attached transports.
-   *
-   * @param clientId - Client identifier.
-   * @returns The live session info, or `undefined` when the client is gone.
-   */
-  public getClientInfo(clientId: ClientId): ClientInfo | undefined {
-    return this._server.getClientInfo(clientId);
-  }
-
-  /**
    * Traces packets for the editor (`network-trace`, `network-stats`) while
    * its `welcome` asks for it.
    */
-  public async __editorInit(ctx: EditorInitContext): Promise<void> {
+  public override async __editorInit(ctx: EditorInitContext): Promise<void> {
     const trace = createTrace(ctx.editor);
     if (this._tcp) traceServer(this._tcp, "tcp", trace);
     if (this._udp) traceServer(this._udp, "udp", trace);
     this._trace = trace;
-  }
-
-  /** Sends the totals of the packets traced for the editor (also while paused). */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override async __events(_ctx: Context): Promise<void> {
-    this._trace?.tick();
-  }
-
-  /** Calls the listeners of the typed packets received since the last tick. */
-  public override async __run(ctx: Context): Promise<void> {
-    this._server.run(ctx);
-  }
-
-  public override expose(): NetworkServerContextApi {
-    return this._server.expose();
   }
 
   /** TCP carries the reliable channels, UDP the unreliable ones. */

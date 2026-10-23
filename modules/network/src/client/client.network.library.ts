@@ -2,13 +2,17 @@ import { type Context, type InitContext, Library, defineLibraryKey } from "@nano
 import type { EditorAwareLibrary, EditorInitContext } from "@nanoforge-dev/editor-lib";
 import { registerEnv } from "@nanoforge-dev/env";
 
+import type { PeerHost } from "../server/peer-host";
 import {
+  CHANNELS,
+  CONNECT_TIMEOUT_MS,
   type ChannelOptions,
   RELIABLE_CHANNELS,
   UNRELIABLE_CHANNELS,
   isReliableChannel,
 } from "../shared/channels";
 import type { NetworkData, NetworkPayload } from "../shared/network-data";
+import { PEER_HOST_KEY, ROOM_PARAM } from "../shared/signaling";
 import { type Trace, createTrace, traceClient } from "../shared/trace";
 import { ClientConfigNetwork } from "./config.client.network";
 import { NetworkClient } from "./network-client";
@@ -32,6 +36,10 @@ import { UDPClient } from "./udp.client.network";
  * - `SERVER_UDP_PORT` — signaling port for UDP/WebRTC (optional).
  * - `WSS` — set to `"true"` to use `wss://` / `https://` (default: `false`).
  * - `ICE_SERVERS` — STUN/TURN servers for the UDP transport, comma-separated or a JSON array (default: `[]`).
+ * - `NETWORK_MODE` — `p2p` (set by `nf` from `network: "p2p"`): without `?room=` in
+ *   the page URL, this player hosts the game, running the server app in this
+ *   tab; with it, the player joins that room's host over WebRTC.  The signaling
+ *   server is reached at `SERVER_ADDRESS` and `SERVER_TCP_PORT`.
  *
  * @example
  * ```ts
@@ -57,6 +65,16 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
     return this._client.clientId;
   }
 
+  /** See `NetworkClientContextApi.roomCode`. */
+  public get roomCode(): string | undefined {
+    return this._client.roomCode;
+  }
+
+  /** See `NetworkClientContextApi.inviteLink`. */
+  public get inviteLink(): string | undefined {
+    return this._client.inviteLink;
+  }
+
   private _trace: Trace | undefined;
 
   constructor() {
@@ -75,6 +93,8 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
     if (config.SERVER_TCP_PORT === undefined && config.SERVER_UDP_PORT === undefined) {
       throw new Error("NetworkClientLibrary: no server port specified to connect to.");
     }
+
+    if (config.NETWORK_MODE === "p2p") return this.connectPeer(ctx, config);
 
     if (config.SERVER_TCP_PORT !== undefined) {
       this._tcp = new TCPClient(
@@ -169,5 +189,74 @@ export class NetworkClientLibrary extends Library implements EditorAwareLibrary 
 
   public override expose(): NetworkClientContextApi {
     return this._client.expose();
+  }
+
+  private async connectPeer(ctx: InitContext, config: ClientConfigNetwork): Promise<void> {
+    if (config.SERVER_TCP_PORT === undefined) {
+      throw new Error(
+        "NetworkClientLibrary: p2p needs SERVER_TCP_PORT to reach the signaling server.",
+      );
+    }
+
+    const room = new URLSearchParams(location.search).get(ROOM_PARAM);
+    if (room !== null) {
+      const udp = (this._udp = new UDPClient(
+        +config.SERVER_TCP_PORT,
+        config.SERVER_ADDRESS,
+        config.WSS,
+        config.ICE_SERVERS,
+        this._client.session,
+        CHANNELS,
+        { [ROOM_PARAM]: room },
+      ));
+      this._client.transports = Object.fromEntries(CHANNELS.map((c) => [c, udp]));
+      this._client.room = { room };
+      await this._client.openChannels([
+        ["Peer", { connect: () => udp.connect(CONNECT_TIMEOUT_MS) }],
+      ]);
+      return;
+    }
+
+    const host = await this.startServer(ctx);
+    const local = host.attachLocal();
+    this._client.session.id = local.id;
+    this._client.transports = Object.fromEntries(CHANNELS.map((c) => [c, local.transport]));
+    this._client.room = host;
+    console.info(`Invite: ${this.inviteLink}`);
+  }
+
+  private async startServer(ctx: InitContext): Promise<PeerHost> {
+    const main = ctx.files.get("/server/main.js");
+    if (main === undefined) {
+      throw new Error(
+        'NetworkClientLibrary: p2p needs the server app built for the browser: run `nf build` with network: "p2p".',
+      );
+    }
+
+    const files = new Map(
+      [...ctx.files]
+        .filter(([path]) => path.startsWith("/server/"))
+        .map(([path, url]) => [path.slice("/server".length), url]),
+    );
+    const server = await import(main);
+    let failure: { error: unknown } | undefined;
+    server.main({ files, env: ctx.env }).catch((error: unknown) => (failure = { error }));
+
+    const deadline = Date.now() + CONNECT_TIMEOUT_MS;
+    for (;;) {
+      const host = Reflect.get(globalThis, PEER_HOST_KEY) as PeerHost | undefined;
+      if (host) return host;
+      if (failure) {
+        throw new Error("NetworkClientLibrary: the server app failed to start", {
+          cause: failure.error,
+        });
+      }
+      if (Date.now() >= deadline) {
+        throw new Error(
+          `NetworkClientLibrary: the server app did not start within ${CONNECT_TIMEOUT_MS}ms`,
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
   }
 }

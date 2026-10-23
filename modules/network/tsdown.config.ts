@@ -13,8 +13,8 @@ export default [
     tsconfig: "tsconfig.server.json",
   }),
   createTsdownConfig({
-    entry: "src/peer/index.ts",
-    outDir: "dist/peer",
-    tsconfig: "tsconfig.peer.json",
+    entry: "src/server/browser.ts",
+    outDir: "dist/server-browser",
+    tsconfig: "tsconfig.server.json",
   }),
 ];

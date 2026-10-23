@@ -5,7 +5,7 @@ export type ClientId = string;
 
 /**
  * Transport a connection was made over: `"local"` is the host's own player and
- * `"peer"` a WebRTC link to a peer host (see `NetworkPeerLibrary`).
+ * `"peer"` a WebRTC link to a peer host (`NETWORK_MODE=p2p`).
  */
 export type Transport = "tcp" | "udp" | "local" | "peer";
 

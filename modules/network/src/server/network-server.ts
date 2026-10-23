@@ -27,7 +27,7 @@ import type {
  *
  * @remarks
  * Shared by `NetworkServerLibrary` (TCP and UDP transports, on Bun) and the
- * host of `NetworkPeerLibrary` (WebRTC and loopback, in a browser), so it
+ * browser `NetworkServerLibrary` (WebRTC and loopback, in the host's tab), so it
  * imports nothing runtime-specific.
  */
 export class NetworkServer {

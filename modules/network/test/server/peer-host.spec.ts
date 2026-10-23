@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { PeerHost } from "../../src/peer/peer-host";
 import { ClientRegistry } from "../../src/server/client-registry";
+import { PeerHost } from "../../src/server/peer-host";
 import { CHANNELS, Channel, PacketSequencer } from "../../src/shared/channels";
 
 /** Stand-in for a data channel a joiner opened, labelled `label`. */

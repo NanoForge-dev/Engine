@@ -1,9 +1,9 @@
 import { waitForWelcome } from "../client/client-session";
-import type { ClientId, ClientRegistry, ConnectionInfo } from "../server/client-registry";
 import { CHANNELS, Channel, PacketSequencer, channelFromLabel } from "../shared/channels";
 import type { WelcomeMessage } from "../shared/session";
 import { type HostSignalMessage, MAX_SIGNAL_BYTES, parseSignal } from "../shared/signaling";
 import type { ClientTransport, ServerTransport } from "../shared/transport";
+import type { ClientId, ClientRegistry, ConnectionInfo } from "./client-registry";
 
 /** Host side of one WebRTC data channel. */
 type DataChannelState = {
