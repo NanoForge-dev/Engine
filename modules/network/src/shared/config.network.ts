@@ -1,4 +1,4 @@
-import { Default, Expose, IsArray, Transform } from "@nanoforge-dev/env";
+import { Default, Expose, IsArray, IsIn, Transform } from "@nanoforge-dev/env";
 
 import { DEFAULT_NANOFORGE_ICE_SERVERS } from "../default";
 
@@ -65,4 +65,15 @@ export class NetworkConfig {
   @Default(DEFAULT_NANOFORGE_ICE_SERVERS)
   @IsArray()
   ICE_SERVERS!: RTCIceServer[];
+
+  /**
+   * `p2p` when the game's `nanoforge.config.ts` sets `network: "p2p"`: the
+   * server app runs in the host player's browser. Set by the `nf` CLI.
+   *
+   * @default "dedicated"
+   */
+  @Expose()
+  @Default("dedicated")
+  @IsIn(["dedicated", "p2p"])
+  NETWORK_MODE!: "dedicated" | "p2p";
 }

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { UDPClient } from "../../src/client/udp.client.network";
-import { Channel, PacketSequencer } from "../../src/shared/channels";
+import { CHANNELS, Channel, PacketSequencer } from "../../src/shared/channels";
 
 const welcome = { type: "welcome", id: "client-0", token: "t0k3n" };
 
@@ -106,6 +106,65 @@ describe("UDPClient", () => {
         ["unreliable-ordered", { ordered: false, maxRetransmits: 0 }],
         ["unreliable-unordered", { ordered: false, maxRetransmits: 0 }],
       ]);
+    });
+
+    it("should open the four channels of a peer-to-peer link in a room", async () => {
+      const client = new UDPClient(9000, "127.0.0.1", false, [], {}, CHANNELS, { room: "ABC234" });
+      await connectWelcomed(client);
+
+      expect(vi.mocked(WebSocket)).toHaveBeenCalledWith("ws://127.0.0.1:9000/?room=ABC234");
+      expect(pc.createDataChannel.mock.calls).toStrictEqual([
+        ["reliable-ordered", {}],
+        ["reliable-unordered", { ordered: false }],
+        ["unreliable-ordered", { ordered: false, maxRetransmits: 0 }],
+        ["unreliable-unordered", { ordered: false, maxRetransmits: 0 }],
+      ]);
+
+      channels.get("reliable-ordered")!.readyState = "open";
+      client.sendData(Channel.ReliableOrdered, new Uint8Array([1]));
+      expect(client.isConnected(Channel.ReliableOrdered)).toBe(true);
+      expect(channels.get("reliable-ordered")!.send).toHaveBeenCalledWith(new Uint8Array([1]));
+    });
+
+    it("should close when the signaling server says the host left", async () => {
+      const client = new UDPClient(9000, "127.0.0.1", false, [], {}, CHANNELS, { room: "ABC234" });
+      await connectWelcomed(client);
+      channels.get("reliable-ordered")!.readyState = "open";
+      pc.close = vi.fn();
+      ws.close = vi.fn();
+
+      ws.onclose({ code: 1006 });
+      expect(client.isConnected(Channel.ReliableOrdered)).toBe(true);
+      ws.onclose({ code: 4001 });
+      expect(client.isConnected(Channel.ReliableOrdered)).toBe(false);
+      expect(pc.close).toHaveBeenCalled();
+    });
+
+    it("should close when the peer connection fails, though its channels say open", async () => {
+      const client = new UDPClient(8081, "127.0.0.1", false);
+      await connectWelcomed(client);
+      channels.get("unreliable-ordered")!.readyState = "open";
+      pc.close = vi.fn();
+      ws.close = vi.fn();
+
+      pc.connectionState = "disconnected";
+      pc.onconnectionstatechange();
+      expect(client.isConnected(Channel.UnreliableOrdered)).toBe(true);
+      pc.connectionState = "failed";
+      pc.onconnectionstatechange();
+      expect(client.isConnected(Channel.UnreliableOrdered)).toBe(false);
+    });
+
+    it("should close the signaling socket and the peer connection", async () => {
+      const client = new UDPClient(8081, "127.0.0.1", false);
+      await connectWelcomed(client);
+      ws.close = vi.fn();
+      pc.close = vi.fn();
+
+      client.close();
+      expect(ws.close).toHaveBeenCalled();
+      expect(pc.close).toHaveBeenCalled();
+      expect(client.isConnected(Channel.UnreliableOrdered)).toBe(false);
     });
 
     it("should report each channel connected once its data channel opens", async () => {
@@ -257,7 +316,7 @@ describe("UDPClient", () => {
     it("should reject when the signaling socket closes before the welcome", async () => {
       const client = new UDPClient(8081, "127.0.0.1", false);
       const connecting = client.connect();
-      ws.onclose();
+      ws.onclose({ code: 1006 });
 
       await expect(connecting).rejects.toThrow("UDP signaling closed before the server welcome");
     });

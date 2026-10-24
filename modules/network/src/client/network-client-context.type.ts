@@ -59,6 +59,10 @@ export interface NetworkClientContextApi {
   readonly packets: ClientPacketsApi;
   /** Client id assigned by the server, shared by TCP and UDP. `undefined` until welcomed. */
   readonly clientId: string | undefined;
+  /** Code of the peer-to-peer game this player hosts or joined, `undefined` otherwise. */
+  readonly roomCode: string | undefined;
+  /** Link to send to other players so they join this peer-to-peer game, `undefined` otherwise. */
+  readonly inviteLink: string | undefined;
   /**
    * Send bytes, a string or a JSON value to the server, on
    * `Channel.ReliableOrdered` unless another `channel` is given.

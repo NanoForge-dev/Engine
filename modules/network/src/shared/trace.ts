@@ -4,6 +4,8 @@ import type {
   EditorNetworkTrace,
 } from "@nanoforge-dev/editor-lib";
 
+import type { ClientTransport, ServerTransport } from "./transport";
+
 type Transport = EditorNetworkTrace["transport"];
 
 export interface Trace {
@@ -90,17 +92,6 @@ export const createTrace = (editor: EditorContextApi): Trace => {
   trace.tick = tick;
   return trace;
 };
-
-interface ClientTransport<C> {
-  sendData(channel: C, data: Uint8Array): void;
-  getReceivedPackets(channel: C): Uint8Array[];
-}
-
-interface ServerTransport<C> {
-  sendToEverybody(channel: C, data: Uint8Array): void;
-  sendToClient(channel: C, clientId: string, data: Uint8Array): void;
-  getReceivedPackets(channel: C): Map<string, Uint8Array[]>;
-}
 
 /** Traces the packets a client transport sends and receives. */
 export const traceClient = <C>(

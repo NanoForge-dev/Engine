@@ -32,6 +32,7 @@ export type WelcomeWait = {
  * @param ip - Server hostname or IP.
  * @param port - Server port.
  * @param session - Current client session.
+ * @param params - Extra query parameters, such as a peer-to-peer `room`.
  * @returns The URL to connect to.
  */
 export const buildServerUrl = (
@@ -39,10 +40,16 @@ export const buildServerUrl = (
   ip: string,
   port: number,
   session: ClientSession,
+  params: Record<string, string> = {},
 ): string => {
   const url = `ws${wss ? "s" : ""}://${ip}:${port}`;
-  if (session.token === undefined) return url;
-  return `${url}/?${SESSION_TOKEN_PARAM}=${encodeURIComponent(session.token)}`;
+  const query = Object.entries({
+    ...params,
+    ...(session.token !== undefined && { [SESSION_TOKEN_PARAM]: session.token }),
+  })
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join("&");
+  return query === "" ? url : `${url}/?${query}`;
 };
 
 /**
