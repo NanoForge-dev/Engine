@@ -4,6 +4,7 @@
     "enabled": true
   },
   "globalDependencies": ["tsconfig.json"],
+  "globalPassThroughEnv": ["EMSDK_PYTHON"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
