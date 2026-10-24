@@ -109,8 +109,10 @@ export const showInvite = (registry: Registry, ctx: Context) => {
   them; the default list only has STUN servers.
 - **Trust.** The host runs the server app, so it can cheat. Check what players
   send with `definePacket`'s `validate`. Anyone with the room code can join.
-- **Background tabs.** Browsers may slow down timers in hidden tabs, so keep the
-  host's tab in the foreground.
+- **Background tabs.** Browsers slow down timers in hidden tabs, so the server
+  app in the host's tab times its ticks with a Web Worker: the game keeps its
+  pace for every player when the host switches tabs. Only the host's own view
+  slows down while hidden.
 - **Server environment.** The server app gets the client's environment:
   `NANOFORGE_SERVER_*` variables do not reach it in this mode.
 

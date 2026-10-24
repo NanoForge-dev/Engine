@@ -267,8 +267,9 @@ ctx.network.inviteLink; // "https://example.com/?room=ABC234", to send to other 
 ```
 
 The game ends when the host leaves: each player's `isConnected()` turns `false`.
-Keep packets at or below 64 KiB, add a TURN server to `ICE_SERVERS` for players
-behind strict NATs, and keep the host's tab in the foreground. See the
+Keep packets at or below 64 KiB and add a TURN server to `ICE_SERVERS` for
+players behind strict NATs. The host's server keeps its pace when its tab is
+hidden. See the
 [peer-to-peer docs](https://github.com/NanoForge-dev/Engine/blob/main/docs/docs/network/network-peer.mdx).
 
 ## Links
