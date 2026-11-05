@@ -20,8 +20,10 @@ The [`cube-3d` example](https://github.com/NanoForge-dev/Engine/tree/main/exampl
 ### 1. Install
 
 ```sh
-pnpm add @nanoforge-dev/graphics-3d
+pnpm add @nanoforge-dev/graphics-3d three
 ```
+
+`three` is a peer dependency: the app installs it, so the game and Three.js add-ons share one copy. Also add `@types/three` (same version) if you import add-ons from `three/addons`.
 
 ### 2. Register the library
 
@@ -94,14 +96,15 @@ You never call `renderer.setSize`, and you never set a camera's `aspect` yoursel
 
 ## `Context.graphics`
 
-| Member                                | What it is                                                                                  |
-| ------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `scene`                               | The Three.js `Scene` rendered every tick.                                                   |
-| `camera`                              | The camera used for rendering. Assign another one to switch; the viewport is applied to it. |
-| `renderer`                            | The `WebGPURenderer`. Never call `setAnimationLoop`: the engine drives rendering.           |
-| `backend`                             | `"webgpu"` or `"webgl"`.                                                                    |
-| `raycast(clientX, clientY, objects?)` | Objects under a page point (e.g. a `PointerEvent`), nearest first.                          |
-| `worldToScreen(point)`                | Where a world point is drawn in the page, in CSS px.                                        |
+| Member                                | What it is                                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `scene`                               | The Three.js `Scene` rendered every tick.                                                               |
+| `camera`                              | The camera used for rendering. Assign another one to switch; the viewport is applied to it.             |
+| `renderer`                            | The `WebGPURenderer`. Never call `setAnimationLoop`: the engine drives rendering.                       |
+| `render`                              | Draws one frame. Assign your own function for post-processing (see [Advanced](./advanced#render-loop)). |
+| `backend`                             | `"webgpu"` or `"webgl"`.                                                                                |
+| `raycast(clientX, clientY, objects?)` | Objects under a page point (e.g. a `PointerEvent`), nearest first.                                      |
+| `worldToScreen(point)`                | Where a world point is drawn in the page, in CSS px.                                                    |
 
 ## Options
 

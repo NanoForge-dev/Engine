@@ -16,7 +16,7 @@ The library adds no layer between you and Three.js. Everything below is plain Th
 | `@nanoforge-dev/graphics-3d/three/tsl` | `three/tsl`: the Three.js Shading Language.                       |
 | `three/addons/...`                     | Add-ons (`GLTFLoader`, `OrbitControls`…), from `three` directly.  |
 
-The subpaths only re-export `three`, so the game bundles a single copy. Add-ons import `three`, which shares its core classes with `three/webgpu`.
+The subpaths only re-export `three`. `three` is a peer dependency that the app installs, so the library, the game and the add-ons resolve the same copy. Add-ons import `three`, which shares its core classes with `three/webgpu`. For add-on types, add `@types/three` at the same version.
 
 ### Loading a model
 
@@ -72,7 +72,21 @@ canvas.addEventListener("pointerdown", (event) => {
 
 ## Render loop
 
-Never call `renderer.setAnimationLoop` or render from `requestAnimationFrame`. The engine renders once per tick, and the editor relies on this: pause freezes the image, and step draws exactly one frame. To draw several passes (post-processing), render them from a system and let the library draw the main scene.
+Never call `renderer.setAnimationLoop` or render from `requestAnimationFrame`. The engine renders once per tick, and the editor relies on this: pause freezes the image, and step draws exactly one frame. To draw something else than `scene` through `camera`, such as a post-processing pipeline, replace the library's render step. The library still calls it once per tick, and for editor screenshots:
+
+```ts
+import { PostProcessing } from "@nanoforge-dev/graphics-3d/three";
+import { pass, saturation } from "@nanoforge-dev/graphics-3d/three/tsl";
+
+const { renderer, scene, camera } = ctx.graphics;
+const postProcessing = new PostProcessing(renderer);
+const scenePass = pass(scene, camera);
+postProcessing.outputNode = saturation(scenePass.getTextureNode(), 0.2);
+
+ctx.graphics.render = () => postProcessing.render();
+```
+
+Assign `undefined` to go back to the default render. The custom render is reset when the game restarts.
 
 ## Editor bridge
 

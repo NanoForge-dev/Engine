@@ -34,7 +34,7 @@ The library also guarantees the following:
 - **Telling 2D from 3D:** both libraries use the key `graphics`, so `hello.libraries` cannot tell them apart. The editor must look at the app's dependencies (`@nanoforge-dev/graphics-3d` vs `graphics-2d`). It could also look at the `graphics-camera` answer.
 - **The viewport type is 2D:** `EngineViewport` (`packages/protocol`) maps game units to px in 2D. For 3D, it still gives the canvas rectangle, and `graphics-camera` gives the rest.
 - **No hot reload today:** a source change while watching rebuilds the app, but nothing restarts the running game. Restart is the manual `runtime.restart`. Asset changes also trigger a rebuild, with no filter. "Hot reload" for 3D therefore means a rebuild plus a restart (manual, or automatic if the editor decides so). The engine side is ready for that.
-- **Class names:** `build-scene.ts` matches shapes by class name only (`Rect`, `Circle`), and the ECS renames a component whose name clashes with a bundled class (`Sphere` → `Sphere2`). Three.js ships `Sphere`, `Plane`, `Box3`… That is why the 3D components are named with a `3D` suffix.
+- **Class names:** `build-scene.ts` matches shapes by class name only (`Rect`, `Circle`), and the bundler renames a component class whose name clashes with another bundled class (`Sphere` → `Sphere2`), which the ECS then fails to match. Three.js ships `Sphere`, `Plane`, `Box3`… That is why the 3D components are named with a `3D` suffix.
 - **Vector preset:** `@preset vector` already supports `x`/`y`/`z` (slots `x, y, z, w`, minimum 2). A 3D position needs no new preset.
 
 ## Components (not in the engine library)
