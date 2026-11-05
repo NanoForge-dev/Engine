@@ -79,11 +79,11 @@
   },
   "dependencies": {
     "@nanoforge-dev/common": "workspace:*",
-    "@types/three": "catalog:graphics",
-    "three": "catalog:graphics"
+    "@types/three": "catalog:graphics"
   },
   "peerDependencies": {
-    "@nanoforge-dev/editor-lib": "workspace:*"
+    "@nanoforge-dev/editor-lib": "workspace:*",
+    "three": "catalog:graphics"
   },
   "peerDependenciesMeta": {
     "@nanoforge-dev/editor-lib": {
@@ -98,6 +98,7 @@
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",
     "eslint": "catalog:lint",
     "prettier": "catalog:lint",
+    "three": "catalog:graphics",
     "tsdown": "catalog:build",
     "typescript": "catalog:core",
     "unrun": "catalog:build",

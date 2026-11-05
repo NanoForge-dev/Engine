@@ -17,9 +17,11 @@
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",
+    "@types/three": "catalog:graphics",
     "eslint": "catalog:lint",
     "lint-staged": "catalog:ci",
     "prettier": "catalog:lint",
+    "three": "catalog:graphics",
     "typescript": "catalog:core"
   },
   "private": true,

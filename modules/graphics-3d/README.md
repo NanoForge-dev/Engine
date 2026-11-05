@@ -19,13 +19,13 @@
 
 ## Installation
 
-**Node.js 26 or newer is required.**
+**Node.js 26 or newer is required.** `three` is a peer dependency: install it next to the library, so the game and Three.js add-ons share one copy.
 
 ```sh
-npm install @nanoforge-dev/graphics-3d
-yarn add @nanoforge-dev/graphics-3d
-pnpm add @nanoforge-dev/graphics-3d
-bun add @nanoforge-dev/graphics-3d
+npm install @nanoforge-dev/graphics-3d three
+yarn add @nanoforge-dev/graphics-3d three
+pnpm add @nanoforge-dev/graphics-3d three
+bun add @nanoforge-dev/graphics-3d three
 ```
 
 ## Example usage

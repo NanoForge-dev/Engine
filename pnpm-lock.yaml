@@ -406,6 +406,9 @@ importers:
       '@trivago/prettier-plugin-sort-imports':
         specifier: catalog:lint
         version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      '@types/three':
+        specifier: catalog:graphics
+        version: 0.187.0
       eslint:
         specifier: catalog:lint
         version: 10.9.1(jiti@2.6.1)(supports-color@10.2.2)
@@ -415,6 +418,9 @@ importers:
       prettier:
         specifier: catalog:lint
         version: 3.9.6
+      three:
+        specifier: catalog:graphics
+        version: 0.187.0
       typescript:
         specifier: catalog:core
         version: 6.0.3
@@ -679,9 +685,6 @@ importers:
       '@types/three':
         specifier: catalog:graphics
         version: 0.187.0
-      three:
-        specifier: catalog:graphics
-        version: 0.187.0
     devDependencies:
       '@favware/cliff-jumper':
         specifier: catalog:ci
@@ -704,6 +707,9 @@ importers:
       prettier:
         specifier: catalog:lint
         version: 3.9.6
+      three:
+        specifier: catalog:graphics
+        version: 0.187.0
       tsdown:
         specifier: catalog:build
         version: 0.22.14(typescript@6.0.3)(unrun@0.3.1(synckit@0.11.13))
