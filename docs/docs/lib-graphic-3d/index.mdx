@@ -1,0 +1,303 @@
+---
+title: "3D graphics library benchmark"
+icon: "cube"
+description: "Comparison of 3D libraries with WebGPU and a WebGL fallback, for the game and the editor"
+---
+
+# 3D graphics library benchmark
+
+NanoForge needs a 3D graphics library next to `graphics-2d` (Konva). It must render with WebGPU and fall back to WebGL by itself, perform well, and be accessible. It is used by the game and by the editor (Scene screen, entity drag, screenshots, pop-out window).
+
+Benchmark run on 2026-11-05.
+
+## Method
+
+- Each library is scored on every criterion: ✅ meets it, ⚠️ partly or with a workaround, ❌ does not, ❓ unknown (not measured or not tested yet).
+- Each score has one line of evidence: official docs, the library's source, or a measurement.
+- **Measured:** B2 (bundle size) and C5 (math in Node). Everything else comes from docs and source code. Nothing was run in a browser yet.
+- **Eliminatory:** A1, and every ❌ in families C and D. Those decide whether the library can be integrated at all.
+
+## Criteria
+
+### A. Rendering and compatibility
+
+| Id  | Criterion          | Description                                                             | How it is measured                                       |
+| --- | ------------------ | ----------------------------------------------------------------------- | -------------------------------------------------------- |
+| A1  | WebGL fallback     | Falls back to WebGL by itself when WebGPU is missing, without app code. | Docs and source of the device/engine creation.           |
+| A2  | Backend parity     | Features lost on WebGL (shadows, post-process, compute…).               | Docs of WebGPU status; list of WebGPU-only features.     |
+| A3  | Write-once shaders | One material or custom shader source runs on both backends.             | Docs of the shader/material system (TSL, NodeMaterial…). |
+| A4  | Browser targets    | Chrome, Firefox, Safari, mobile.                                        | Docs and caniuse for WebGPU; WebGL2 support otherwise.   |
+
+### B. Performance
+
+| Id  | Criterion       | Description                                                                                     | How it is measured                                                                                                |
+| --- | --------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| B1  | FPS under load  | Frame time of a typical scene (many meshes, instancing) on each backend.                        | In-browser benchmark scene. Not run yet.                                                                          |
+| B2  | Bundle size     | Minimal cost of a game. The loader caches games per file and the editor tracks its chunk sizes. | Minimal scene (renderer, camera, box, material, light), `esbuild --bundle --minify --format=esm`, then `gzip -9`. |
+| B3  | Init time       | Time from `__init` to the first frame.                                                          | In-browser measurement. Not run yet.                                                                              |
+| B4  | Off main thread | OffscreenCanvas and worker rendering.                                                           | Docs and constructor types.                                                                                       |
+
+### C. Engine integration
+
+Modelled on `Graphics2DLibrary` (`modules/graphics-2d`).
+
+| Id  | Criterion            | Description                                                                                                                                   | How it is measured                                                       |
+| --- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| C1  | Provided container   | Renders into a canvas or element we give it, without its own page or app shell.                                                               | Constructor API.                                                         |
+| C2  | Render from our tick | A frame can be rendered on demand from the engine tick, with no forced `requestAnimationFrame` loop. Needed for pause and step in the editor. | Source of the render loop.                                               |
+| C3  | Clean teardown       | `__clear` destroys everything: no GPU leak, no leftover global (we already delete `window.Konva`).                                            | Dispose API; globals added on import, checked in Node and in the bundle. |
+| C4  | Follows the viewport | Resize, pixel ratio, letterbox, pixel perfect, from `ViewportState`.                                                                          | Resize, pixel ratio and viewport APIs.                                   |
+| C5  | Math on the server   | `Vector3`, `Quaternion` and matrices import in Node or Bun without a DOM, for components shared by client and server.                         | `node` ESM import of the math classes and one transform.                 |
+| C6  | ECS friendly         | A light scene graph we sync from our components, not an entity system of its own.                                                             | Docs of the scene model.                                                 |
+
+### D. Editor integration
+
+| Id  | Criterion        | Description                                                                                                                      | How it is measured                                   |
+| --- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| D1  | Picking          | Screen to object raycast, and world to screen projection (the editor outlines entities over the game from the `viewport` event). | Picking and projection APIs.                         |
+| D2  | Transform gizmos | Translate, rotate, scale, in the library or an official addon.                                                                   | Docs and package contents.                           |
+| D3  | Editor camera    | Orbit and fly controls, separate from the game camera.                                                                           | Official controls.                                   |
+| D4  | Scene from data  | Builds the scene from the static model of `main.ts`, without running the game (what the 2D Scene screen does).                   | Serialization / scene loading APIs.                  |
+| D5  | Canvas capture   | PNG screenshot on WebGPU and WebGL.                                                                                              | Screenshot API, or `toBlob` constraints per backend. |
+| D6  | Pop-out window   | Rendering survives the canvas moving to another window or document.                                                              | In-browser test. Not run yet.                        |
+
+### E. Accessibility
+
+| Id  | Criterion        | Description                                                                            | How it is measured                         |
+| --- | ---------------- | -------------------------------------------------------------------------------------- | ------------------------------------------ |
+| E1  | Ease of learning | Docs quality, number of examples, effort for a hello cube with a glTF model.           | Docs, example count, size of a hello cube. |
+| E2  | Player a11y      | 3D objects exposed to the DOM and ARIA, keyboard navigation, `prefers-reduced-motion`. | Docs and source search.                    |
+| E3  | Visual a11y      | Colorblind post-process, contrast, UI scaling.                                         | Docs of post-process and UI.               |
+
+### F. Ecosystem and sustainability
+
+| Id  | Criterion  | Description                                                    | How it is measured              |
+| --- | ---------- | -------------------------------------------------------------- | ------------------------------- |
+| F1  | License    | MIT or Apache, no proprietary part or mandatory SaaS.          | `LICENSE` and package metadata. |
+| F2  | Activity   | Commits and releases over 12 months, maintainers (bus factor). | GitHub and npm APIs.            |
+| F3  | TypeScript | Shipped types and their quality.                               | Package contents.               |
+| F4  | Assets     | glTF, KTX2/Basis, Draco, skeletal animation.                   | Docs of loaders.                |
+
+### G. Game features
+
+| Id  | Criterion           | Description                                        | How it is measured |
+| --- | ------------------- | -------------------------------------------------- | ------------------ |
+| G1  | Materials and light | PBR, shadows, environment lighting.                | Docs.              |
+| G2  | Physics             | Official integration or plugin.                    | Docs.              |
+| G3  | UI in 3D            | Text, sprites, 2D overlay (combinable with Konva). | Docs.              |
+
+## Candidates
+
+| Library                                                                   | Version        | License    |
+| ------------------------------------------------------------------------- | -------------- | ---------- |
+| [Three.js](https://github.com/mrdoob/three.js) (`three/webgpu`)           | r187 (0.187.0) | MIT        |
+| [Babylon.js](https://github.com/BabylonJS/Babylon.js) (`@babylonjs/core`) | 9.34.0         | Apache-2.0 |
+| [PlayCanvas Engine](https://github.com/playcanvas/engine) (`playcanvas`)  | 2.23.3         | MIT        |
+| [luma.gl](https://github.com/visgl/luma.gl) (`@luma.gl/*`)                | 9.4.2          | MIT        |
+
+### Eliminated at A1
+
+| Library                                                      | Reason                                                                                                                                                    |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Galacean Engine](https://github.com/galacean/engine) 1.6.13 | No WebGPU backend, including the 2.0 alphas.                                                                                                              |
+| [LayaAir](https://github.com/layabox/LayaAir) 3.4.2          | WebGPU is picked at build time (separate WebGPU and WebGL bundles), no runtime fallback. The WebGPU driver is closed source and the engine is not on npm. |
+| [RedGPU](https://github.com/redcamel/RedGPU)                 | WebGPU only.                                                                                                                                              |
+| Orillusion, TypeGPU                                          | WebGPU only.                                                                                                                                              |
+
+## Results
+
+|                            | Three.js  | Babylon.js | PlayCanvas | luma.gl    |
+| -------------------------- | --------- | ---------- | ---------- | ---------- |
+| A1 WebGL fallback          | ✅        | ✅         | ✅         | ✅         |
+| A2 Backend parity          | ⚠️        | ⚠️         | ⚠️         | ⚠️         |
+| A3 Write-once shaders      | ✅        | ✅         | ⚠️         | ❌         |
+| A4 Browser targets         | ✅        | ✅         | ✅         | ✅         |
+| B1 FPS under load          | ❓        | ❓         | ❓         | ❓         |
+| B2 Bundle size (gzip)      | ⚠️ 222 KB | ❌ 424 KB  | ⚠️ 279 KB  | ⚠️ 112 KB  |
+| B3 Init time               | ❓        | ❓         | ❓         | ❓         |
+| B4 Off main thread         | ⚠️        | ✅         | ⚠️         | ⚠️         |
+| C1 Provided container      | ✅        | ✅         | ✅         | ✅         |
+| C2 Render from our tick    | ⚠️        | ✅         | ⚠️         | ✅         |
+| C3 Clean teardown          | ⚠️        | ✅         | ⚠️         | ⚠️         |
+| C4 Follows the viewport    | ✅        | ✅         | ✅         | ✅         |
+| C5 Math on the server      | ✅        | ✅         | ✅         | ✅         |
+| C6 ECS friendly            | ⚠️        | ⚠️         | ❌         | ✅         |
+| D1 Picking                 | ✅        | ✅         | ✅         | ⚠️         |
+| D2 Transform gizmos        | ✅        | ✅         | ✅         | ❌         |
+| D3 Editor camera           | ✅        | ✅         | ✅         | ✅         |
+| D4 Scene from data         | ✅        | ✅         | ⚠️         | ⚠️         |
+| D5 Canvas capture          | ⚠️        | ✅         | ⚠️         | ⚠️         |
+| D6 Pop-out window          | ❓        | ❓         | ❓         | ❓         |
+| E1 Ease of learning        | ✅        | ✅         | ✅         | ⚠️         |
+| E2 Player a11y             | ❌        | ⚠️         | ❌         | ❌         |
+| E3 Visual a11y             | ⚠️        | ⚠️         | ⚠️         | ❌         |
+| F1 License                 | ✅        | ✅         | ✅         | ✅         |
+| F2 Activity                | ✅        | ✅         | ✅         | ⚠️         |
+| F3 TypeScript              | ⚠️        | ✅         | ✅         | ✅         |
+| F4 Assets                  | ✅        | ✅         | ✅         | ⚠️         |
+| G1 Materials and light     | ✅        | ✅         | ✅         | ⚠️         |
+| G2 Physics                 | ⚠️        | ✅         | ⚠️         | ❌         |
+| G3 UI in 3D                | ✅        | ✅         | ✅         | ⚠️         |
+| **✅ Meets**               | **16**    | **22**     | **15**     | **10**     |
+| **⚠️ Partly**              | **10**    | **4**      | **10**     | **12**     |
+| **❌ Does not**            | **1**     | **1**      | **2**      | **5**      |
+| **❓ Unknown**             | **3**     | **3**      | **3**      | **3**      |
+| **Eliminatory (A1, C, D)** | passes    | passes     | fails (C6) | fails (D2) |
+
+## Findings
+
+- **PlayCanvas** is out on C6: its own entity-component system would compete with ours.
+- **luma.gl** is out on D2: no transform gizmo. It is also low level (no built-in lit material) and about 90% of commits come from one person.
+- **Babylon.js** leads:
+  - the only library with something for player a11y (`@babylonjs/accessibility`);
+  - render on demand without a hidden loop, clean teardown, shipped types, a screenshot API and official Havok physics;
+  - its weak point is size: 424 KB gzip, about twice Three.js (191 KB for the first load with code splitting).
+- **Three.js** is second:
+  - lighter, and by far the largest ecosystem;
+  - but an internal `requestAnimationFrame` loop runs until `dispose()`, the import sets `window.__THREE__`, types are a separate package (`@types/three`), and there is nothing for a11y.
+
+## Evidence
+
+### Three.js
+
+| Id  | Score | Evidence                                                                                                                                                                 |
+| --- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A1  | ✅    | `WebGPURenderer` switches to its WebGL2 backend by itself; `forceWebGL` forces it. [Docs](https://threejs.org/docs/#api/en/renderers/webgpu/WebGPURenderer)              |
+| A2  | ⚠️    | Shadows and TSL post-processing on both; storage textures, indirect draw and full compute are reduced on WebGL2. [Manual](https://threejs.org/manual/#en/webgpurenderer) |
+| A3  | ✅    | TSL and node materials compile to WGSL and GLSL from one source. [TSL](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language)                                |
+| A4  | ✅    | WebGPU on Chrome/Edge 113+, Safari 26, Firefox 141+ (Windows); WebGL2 elsewhere. [caniuse](https://caniuse.com/webgpu)                                                   |
+| B1  | ❓    | Not measured; no official benchmark.                                                                                                                                     |
+| B2  | ⚠️    | Measured 818 KB raw, 222 KB gzip. The `three/webgpu` entry pulls the whole node system.                                                                                  |
+| B3  | ❓    | Async: `await renderer.init()` before `render()`. Not measured.                                                                                                          |
+| B4  | ⚠️    | OffscreenCanvas documented for WebGL; WebGPU in a worker not verified. [Manual](https://threejs.org/manual/#en/offscreencanvas)                                          |
+| C1  | ✅    | Takes our `canvas`, or `renderer.domElement` goes in any container.                                                                                                      |
+| C2  | ⚠️    | `render()` can be called from our tick, but it starts an internal rAF bookkeeping loop that runs until `dispose()`.                                                      |
+| C3  | ⚠️    | `await renderer.dispose()`, plus `.dispose()` on each geometry, material, texture. Import sets `window.__THREE__` in a browser.                                          |
+| C4  | ✅    | `setSize`, `setPixelRatio`, `setViewport`, `setScissor`, `camera.setViewOffset`.                                                                                         |
+| C5  | ✅    | Measured: `Vector3`, `Quaternion`, `Matrix4` import and compute in Node 24 with no DOM.                                                                                  |
+| C6  | ⚠️    | `Object3D` imposes no entity system, but it is a heavy OOP hierarchy to keep in sync.                                                                                    |
+| D1  | ✅    | `Raycaster.setFromCamera`, `Vector3.project(camera)`. [Docs](https://threejs.org/docs/#api/en/core/Raycaster)                                                            |
+| D2  | ✅    | Official `TransformControls` addon.                                                                                                                                      |
+| D3  | ✅    | Official `OrbitControls`, `MapControls`, `FlyControls`, `ArcballControls`.                                                                                               |
+| D4  | ✅    | `Object3D.toJSON()` and `ObjectLoader`. [Docs](https://threejs.org/docs/#api/en/loaders/ObjectLoader)                                                                    |
+| D5  | ⚠️    | `toBlob` only right after `render()` (WebGL needs `preserveDrawingBuffer`); WebGPU untested.                                                                             |
+| D6  | ❓    | Not tested; the WebGPU device is tied to the original document.                                                                                                          |
+| E1  | ✅    | Large manual, about 500 official examples, hello cube with `GLTFLoader` in about 20 lines. [Examples](https://threejs.org/examples/)                                     |
+| E2  | ❌    | No ARIA, keyboard navigation or reduced-motion support.                                                                                                                  |
+| E3  | ⚠️    | No built-in colorblind pass; writable as a TSL post-process.                                                                                                             |
+| F1  | ✅    | MIT, no SaaS.                                                                                                                                                            |
+| F2  | ✅    | About 2,300 commits in 12 months, monthly releases, 117k stars, 33.5M npm downloads per week.                                                                            |
+| F3  | ⚠️    | Types in the separate `@types/three`, sometimes behind a release.                                                                                                        |
+| F4  | ✅    | `GLTFLoader`, `KTX2Loader`, `DRACOLoader`, `AnimationMixer`.                                                                                                             |
+| G1  | ✅    | `MeshStandardMaterial`, `MeshPhysicalMaterial`, shadow maps, PMREM/IBL.                                                                                                  |
+| G2  | ⚠️    | No official physics; basic Rapier, Jolt and Ammo wrappers in the examples.                                                                                               |
+| G3  | ✅    | Sprites, `CSS2DRenderer`/`CSS3DRenderer`, troika-three-text; Konva on top or as a `CanvasTexture`.                                                                       |
+
+### Babylon.js
+
+| Id  | Score | Evidence                                                                                                                                                                                                                            |
+| --- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1  | ✅    | `EngineFactory.CreateAsync` tries WebGPU, then WebGL, then `NullEngine`. [Docs](https://doc.babylonjs.com/setup/support/webGPU)                                                                                                     |
+| A2  | ⚠️    | Shadows, post-process and PBR on both; compute shaders are WebGPU only. [Status](https://doc.babylonjs.com/setup/support/webGPU/webGPUStatus)                                                                                       |
+| A3  | ✅    | Built-in materials and `NodeMaterial` emit GLSL and WGSL; hand-written shaders need both. [Docs](https://doc.babylonjs.com/setup/support/webGPU/webGPUWGSL)                                                                         |
+| A4  | ✅    | WebGPU where available; WebGL2/1 fallback for mobile and older browsers.                                                                                                                                                            |
+| B1  | ❓    | Not measured; no official cross-library benchmark.                                                                                                                                                                                  |
+| B2  | ❌    | Measured 1.81 MB raw, 424 KB gzip (WebGPU + fallback, deep imports). WebGL only: 344 KB. Code splitting: 191 KB first chunk.                                                                                                        |
+| B3  | ❓    | WebGPU init is async (`initAsync`), WebGL is sync. Not measured.                                                                                                                                                                    |
+| B4  | ✅    | OffscreenCanvas in a worker is documented. [Docs](https://doc.babylonjs.com/features/featuresDeepDive/scene/offscreenCanvas)                                                                                                        |
+| C1  | ✅    | `new Engine(canvas)` / `new WebGPUEngine(canvas)` takes our canvas.                                                                                                                                                                 |
+| C2  | ✅    | `runRenderLoop` is opt-in; `scene.render()` from our tick.                                                                                                                                                                          |
+| C3  | ✅    | `scene.dispose()` and `engine.dispose()`; no global on import from the ES packages (only the UMD build sets `window.BABYLON`).                                                                                                      |
+| C4  | ✅    | `engine.resize()`, `setHardwareScalingLevel()`, `adaptToDeviceRatio`, camera `viewport`.                                                                                                                                            |
+| C5  | ✅    | Measured: `Maths/math.vector.js` imports and computes in Node 24 with no DOM.                                                                                                                                                       |
+| C6  | ⚠️    | No entity system imposed, but `TransformNode`/`Mesh` are heavy OOP objects.                                                                                                                                                         |
+| D1  | ✅    | `scene.pick(x, y)`, `createPickingRay`, `Vector3.Project`. [Docs](https://doc.babylonjs.com/features/featuresDeepDive/mesh/interactions/picking_collisions)                                                                         |
+| D2  | ✅    | `GizmoManager` in core: position, rotation, scale, bounding box. [Docs](https://doc.babylonjs.com/features/featuresDeepDive/mesh/gizmo)                                                                                             |
+| D3  | ✅    | ArcRotate, Universal and Free cameras; `scene.activeCamera` switch.                                                                                                                                                                 |
+| D4  | ✅    | `SceneSerializer`, `.babylon` JSON, `AssetContainer`. [Docs](https://doc.babylonjs.com/setup/support/.babylonFileFormat)                                                                                                            |
+| D5  | ✅    | `CreateScreenshotAsync`, `CreateScreenshotUsingRenderTargetAsync`, backend agnostic (not tested on WebGPU). [Docs](https://doc.babylonjs.com/features/featuresDeepDive/scene/renderToPNG)                                           |
+| D6  | ❓    | Not tested; the engine resolves the window from `canvas.ownerDocument`, camera inputs likely need re-attaching.                                                                                                                     |
+| E1  | ✅    | Large docs and a Playground with thousands of samples; hello cube and glTF in about 10 lines each. [Playground](https://playground.babylonjs.com)                                                                                   |
+| E2  | ⚠️    | `@babylonjs/accessibility` mirrors tagged meshes as HTML for screen readers and keyboard navigation; no reduced-motion support. [Docs](https://doc.babylonjs.com/features/featuresDeepDive/accessibility/accessibilityScreenReader) |
+| E3  | ⚠️    | Image processing and custom post-process, no built-in colorblind filter; GUI scales with `idealWidth`.                                                                                                                              |
+| F1  | ✅    | Apache-2.0; Havok plugin MIT; no SaaS.                                                                                                                                                                                              |
+| F2  | ✅    | 26k stars, about 1,700 commits and 100+ releases in 12 months, 369k npm downloads per week.                                                                                                                                         |
+| F3  | ✅    | Written in TypeScript, ships `.d.ts`.                                                                                                                                                                                               |
+| F4  | ✅    | glTF via `@babylonjs/loaders`; KTX2/Basis, Draco, meshopt, skeletal and morph animation.                                                                                                                                            |
+| G1  | ✅    | `PBRMaterial`, cascaded shadows, IBL.                                                                                                                                                                                               |
+| G2  | ✅    | Physics v2 with the official Havok plugin (`@babylonjs/havok`).                                                                                                                                                                     |
+| G3  | ✅    | `@babylonjs/gui`, sprites, text; Konva on top with a transparent `clearColor`.                                                                                                                                                      |
+
+### PlayCanvas
+
+| Id  | Score | Evidence                                                                                                                                                                              |
+| --- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1  | ✅    | `createGraphicsDevice(canvas, { deviceTypes: ['webgpu', 'webgl2'] })` always appends WebGL2 as a last fallback. [Docs](https://developer.playcanvas.com/user-manual/graphics/webgpu/) |
+| A2  | ⚠️    | Shadows, post-process and clustered lighting on both; compute is WebGPU only; WebGPU documented as maturing.                                                                          |
+| A3  | ⚠️    | Built-in materials run on both; custom `ShaderMaterial` needs GLSL and WGSL.                                                                                                          |
+| A4  | ✅    | WebGL2 everywhere, WebGPU where available.                                                                                                                                            |
+| B1  | ❓    | Not measured; no official benchmark.                                                                                                                                                  |
+| B2  | ⚠️    | Measured 1.08 MB raw, 279 KB gzip (`AppBase` with render, camera and light systems).                                                                                                  |
+| B3  | ❓    | Async `createGraphicsDevice`. Not measured.                                                                                                                                           |
+| B4  | ⚠️    | No documented worker rendering path.                                                                                                                                                  |
+| C1  | ✅    | `new AppBase(canvas)` takes our canvas.                                                                                                                                               |
+| C2  | ⚠️    | `app.start()` runs its own rAF loop; `update(dt)` + `render()` from our tick works but is not documented.                                                                             |
+| C3  | ⚠️    | `app.destroy()`, `device.destroy()`; static `AppBase._applications` registry, physics needs a global `Ammo`.                                                                          |
+| C4  | ✅    | `resizeCanvas`, `setCanvasResolution`, `setCanvasFillMode`, `maxPixelRatio`, camera `rect`.                                                                                           |
+| C5  | ✅    | Measured: `Vec3`, `Quat`, `Mat4` import and compute in Node 24 with no DOM.                                                                                                           |
+| C6  | ❌    | Imposes its own Entity + ComponentSystem model. [Docs](https://developer.playcanvas.com/user-manual/ecs/)                                                                             |
+| D1  | ✅    | `screenToWorld`, `worldToScreen`, `Picker`.                                                                                                                                           |
+| D2  | ✅    | Official translate, rotate, scale gizmos and view cube. [Docs](https://developer.playcanvas.com/user-manual/gizmos/)                                                                  |
+| D3  | ✅    | Official `camera-controls` script (orbit, fly).                                                                                                                                       |
+| D4  | ⚠️    | Scene and template formats target the SaaS editor export.                                                                                                                             |
+| D5  | ⚠️    | `toBlob` with `preserveDrawingBuffer` on WebGL; on WebGPU right after render or from a render target.                                                                                 |
+| D6  | ❓    | Not tested; the device is tied to the canvas context.                                                                                                                                 |
+| E1  | ✅    | Large manual, 300+ live examples, hello cube in about 10 lines. [Examples](https://playcanvas.vercel.app/)                                                                            |
+| E2  | ❌    | No ARIA or reduced-motion support.                                                                                                                                                    |
+| E3  | ⚠️    | No colorblind filter; UI screen scale modes.                                                                                                                                          |
+| F1  | ✅    | Engine MIT; the SaaS editor is optional.                                                                                                                                              |
+| F2  | ✅    | 17k stars, nightly betas, 148k npm downloads per week, maintained by Snap.                                                                                                            |
+| F3  | ✅    | Ships `playcanvas.d.ts`, generated from JSDoc.                                                                                                                                        |
+| F4  | ✅    | glTF/GLB, KTX2/Basis, Draco, skeletal animation and anim state graph.                                                                                                                 |
+| G1  | ✅    | PBR `StandardMaterial`, clustered lights, cascaded shadows, IBL.                                                                                                                      |
+| G2  | ⚠️    | Official rigidbody components rely on ammo.js as a global.                                                                                                                            |
+| G3  | ✅    | Element component (MSDF text, images), sprites, screen-space UI.                                                                                                                      |
+
+### luma.gl
+
+| Id  | Score | Evidence                                                                                                                                                     |
+| --- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A1  | ✅    | `luma.createDevice({ type: 'best-available', adapters: [webgpuAdapter, webgl2Adapter] })`. [Docs](https://luma.gl/docs/api-guide/background/webgpu-vs-webgl) |
+| A2  | ⚠️    | No compute or storage buffers on WebGL2; 9.4 shadows are WebGPU only.                                                                                        |
+| A3  | ❌    | App shaders need WGSL and GLSL; the Slang transpiler is still alpha.                                                                                         |
+| A4  | ✅    | WebGL2 everywhere, WebGPU where available.                                                                                                                   |
+| B1  | ❓    | Not measured; no 3D scene benchmark.                                                                                                                         |
+| B2  | ⚠️    | Measured 399 KB raw, 112 KB gzip, without any built-in lit material (hand-written shaders).                                                                  |
+| B3  | ❓    | Async `createDevice`. Not measured.                                                                                                                          |
+| B4  | ⚠️    | Canvas type accepts `OffscreenCanvas`; no worker docs.                                                                                                       |
+| C1  | ✅    | `createCanvasContext` with our canvas or container. [Docs](https://luma.gl/docs/api-reference/core/canvas-context)                                           |
+| C2  | ✅    | No rAF in core; `AnimationLoop` is optional.                                                                                                                 |
+| C3  | ⚠️    | `destroy()` APIs; import sets `globalThis.luma`, `mathgl`, `probe`, `Probe`.                                                                                 |
+| C4  | ✅    | `autoResize`, `useDevicePixels`, `pixelSizeSource`.                                                                                                          |
+| C5  | ✅    | Measured: `@math.gl/core` imports in Node 24 with no DOM (8.7 KB gzip).                                                                                      |
+| C6  | ✅    | No entity system; `Model` per entity or optional `ScenegraphNode`.                                                                                           |
+| D1  | ⚠️    | GPU picking only; no CPU raycast, world to screen by hand.                                                                                                   |
+| D2  | ❌    | No transform gizmo.                                                                                                                                          |
+| D3  | ✅    | `OrbitControls` in `@luma.gl/engine` 9.4.                                                                                                                    |
+| D4  | ⚠️    | No scene format; glTF load and export only.                                                                                                                  |
+| D5  | ⚠️    | No screenshot helper; `toBlob` right after `submit()`, untested.                                                                                             |
+| D6  | ❓    | Not tested; the device belongs to the original window's `navigator.gpu`.                                                                                     |
+| E1  | ⚠️    | 135 examples but low level: a hello cube needs hand-written WGSL and GLSL.                                                                                   |
+| E2  | ❌    | No a11y features.                                                                                                                                            |
+| E3  | ❌    | No colorblind or contrast features.                                                                                                                          |
+| F1  | ✅    | MIT.                                                                                                                                                         |
+| F2  | ⚠️    | Active (about 1,000 commits in 12 months), but about 90% from one person; downloads come mostly from deck.gl.                                                |
+| F3  | ✅    | Written in TypeScript, detailed `.d.ts`.                                                                                                                     |
+| F4  | ⚠️    | glTF with skin, morph and animation; Draco needs `@loaders.gl/draco` added.                                                                                  |
+| G1  | ⚠️    | PBR and IBL; shadows only in `@luma.gl/experimental`, WebGPU only.                                                                                           |
+| G2  | ❌    | No physics integration.                                                                                                                                      |
+| G3  | ⚠️    | `TextRenderer`, no sprite or UI system.                                                                                                                      |
+
+## Next steps
+
+- In-browser proof of concept for the two finalists, Babylon.js and Three.js, to fill the ❓ rows: B1 FPS, B3 init time, D6 pop-out window, and D5 capture on WebGPU.
