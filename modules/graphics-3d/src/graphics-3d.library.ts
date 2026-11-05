@@ -89,6 +89,8 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
       forceWebGL: this._options.forceWebGL ?? false,
     });
     await this._renderer.init();
+    // Three resets `info` from its own animation loop, which is not our tick: we reset it per frame.
+    this._renderer.info.autoReset = false;
     this._scene = new Scene();
     const camera = new PerspectiveCamera(50, 16 / 9, 0.1, 1000);
     camera.position.set(0, 0, 5);
@@ -138,6 +140,7 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override async __run(_ctx: Context): Promise<void> {
+    this.renderer.info.reset();
     this._draw();
     const drawCalls = this.renderer.info.render.drawCalls;
     if (drawCalls > DRAW_CALL_WARNING && !this._warnedDrawCalls) {

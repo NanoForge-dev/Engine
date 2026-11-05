@@ -18,7 +18,7 @@ const fake = vi.hoisted(() => {
     this.params = params;
     this.domElement = params.canvas;
     this.backend = params.forceWebGL ? { isWebGLBackend: true } : { isWebGPUBackend: true };
-    this.info = { render: { drawCalls: 1 } };
+    this.info = { autoReset: true, render: { drawCalls: 1 }, reset: vi.fn() };
     this.init = vi.fn(async () => this);
     this.render = vi.fn();
     this.setSize = vi.fn();
@@ -197,7 +197,16 @@ describe("Graphics3DLibrary", () => {
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
       const library = new Graphics3DLibrary();
       await library.__init(makeInitContext());
-      lastRenderer().info.render.drawCalls = DRAW_CALL_WARNING + 1;
+      const renderer = lastRenderer();
+      expect(renderer.info.autoReset).toBe(false);
+      let callsPerFrame = 10;
+      renderer.render.mockImplementation(() => (renderer.info.render.drawCalls += callsPerFrame));
+      renderer.info.reset.mockImplementation(() => (renderer.info.render.drawCalls = 0));
+      // Counts must not pile up across ticks: Three only resets them from its own loop.
+      for (let tick = 0; tick < 300; tick++) await run(library);
+      expect(warn).not.toHaveBeenCalled();
+
+      callsPerFrame = DRAW_CALL_WARNING + 1;
       await run(library);
       await run(library);
       expect(warn).toHaveBeenCalledTimes(1);
