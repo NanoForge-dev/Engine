@@ -38,7 +38,9 @@ catalogs:
     class-transformer: ^0.5.1
     class-validator: ^0.14.3
   graphics:
+    '@types/three': ^0.187.0
     konva: ^10.2.3
+    three: ^0.187.0
   lint:
     '@eslint/js': ^10.0.1
     '@trivago/prettier-plugin-sort-imports': ^6.0.2
