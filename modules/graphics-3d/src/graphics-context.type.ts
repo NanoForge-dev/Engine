@@ -20,6 +20,14 @@ export interface Graphics3DContextApi {
    * `(0, 0, 5)` looking at the origin; assign another camera to switch.
    */
   camera: Camera;
+  /**
+   * Draws one frame. The library calls it once per tick, after the systems,
+   * and for editor screenshots. By default it renders `scene` through
+   * `camera`. Assign your own function to render a post-processing pipeline
+   * instead. Assign `undefined` to go back to the default. Reset on restart.
+   */
+  get render(): () => void;
+  set render(render: (() => void) | undefined);
   /** Which backend runs. */
   readonly backend: Graphics3DBackend;
   /**

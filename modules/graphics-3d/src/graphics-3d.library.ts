@@ -65,6 +65,7 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
   private _editor?: EditorContextApi;
   private _sentView?: Matrix4;
   private _sentProjection?: Matrix4;
+  private _customRender?: () => void;
 
   constructor(private readonly _options: Graphics3DOptions = {}) {
     super();
@@ -107,9 +108,9 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
   public async __editorInit(ctx: EditorInitContext): Promise<void> {
     this._editor = ctx.editor;
     ctx.editor.on("graphics-capture", () => {
-      if (!this._renderer || !this._scene || !this._camera) return;
+      if (!this._renderer) return;
       // A WebGL/WebGPU canvas is only readable right after a render.
-      this._renderer.render(this._scene, this._camera);
+      this._draw();
       ctx.editor.emit("graphics-capture", this._renderer.domElement.toDataURL("image/png"));
     });
   }
@@ -137,9 +138,8 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override async __run(_ctx: Context): Promise<void> {
-    const renderer = this.renderer;
-    renderer.render(this.scene, this.camera);
-    const drawCalls = renderer.info.render.drawCalls;
+    this._draw();
+    const drawCalls = this.renderer.info.render.drawCalls;
     if (drawCalls > DRAW_CALL_WARNING && !this._warnedDrawCalls) {
       this._warnedDrawCalls = true;
       console.warn(
@@ -157,7 +157,8 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
       this._renderer.domElement.remove();
     }
     this._renderer = this._scene = this._camera = this._viewport = undefined;
-    this._editor = this._sentView = this._sentProjection = undefined;
+    // `__editorInit` runs once per app, so the editor is kept across restarts.
+    this._sentView = this._sentProjection = this._customRender = undefined;
     delete (globalThis as { __THREE__?: unknown }).__THREE__;
   }
 
@@ -180,6 +181,14 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
     if (!this._renderer) this.throwNotInitializedError();
     this._camera = camera;
     this._applyCamera();
+  }
+
+  public get render(): () => void {
+    return () => this._draw();
+  }
+
+  public set render(render: (() => void) | undefined) {
+    this._customRender = render;
   }
 
   public get backend(): Graphics3DBackend {
@@ -231,9 +240,21 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
       get backend() {
         return library.backend;
       },
+      get render() {
+        return library.render;
+      },
+      set render(render) {
+        library.render = render;
+      },
       raycast: (clientX, clientY, objects) => library.raycast(clientX, clientY, objects),
       worldToScreen: (point) => library.worldToScreen(point),
     };
+  }
+
+  /** Draws one frame with the custom render function, or the scene through the camera. */
+  private _draw(): void {
+    if (this._customRender) this._customRender();
+    else this.renderer.render(this.scene, this.camera);
   }
 
   /** Sizes the canvas to the visible game area and letterboxes it inside the container. */

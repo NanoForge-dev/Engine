@@ -172,6 +172,27 @@ describe("Graphics3DLibrary", () => {
       expect(lastRenderer().setAnimationLoop).not.toHaveBeenCalled();
     });
 
+    it("calls a custom render function instead, until it is reset or the game restarts", async () => {
+      const library = new Graphics3DLibrary();
+      await library.__init(makeInitContext());
+      const render = vi.fn();
+      library.expose().render = render;
+      await run(library);
+      expect(render).toHaveBeenCalledOnce();
+      expect(lastRenderer().render).not.toHaveBeenCalled();
+
+      library.expose().render = undefined;
+      await run(library);
+      expect(lastRenderer().render).toHaveBeenCalledOnce();
+
+      library.expose().render = render;
+      await library.__clear();
+      await library.__init(makeInitContext());
+      await run(library);
+      expect(render).toHaveBeenCalledOnce();
+      expect(lastRenderer().render).toHaveBeenCalledOnce();
+    });
+
     it("warns once when a frame has too many draw calls", async () => {
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
       const library = new Graphics3DLibrary();
@@ -339,6 +360,23 @@ describe("Graphics3DLibrary", () => {
       library.camera.position.x = 2;
       await events(library);
       expect(editor.emit).toHaveBeenCalledTimes(2);
+    });
+
+    it("keeps emitting the camera after a restart (__editorInit runs once per app)", async () => {
+      const { library, editor } = await setup({ graphicsCamera: true });
+      await library.__clear();
+      await library.__init(makeInitContext());
+      await events(library);
+      expect(editor.emit).toHaveBeenCalledWith("graphics-camera", expect.anything());
+    });
+
+    it("captures through the custom render function", async () => {
+      const { library, editor, send } = await setup({});
+      const render = vi.fn();
+      library.render = render;
+      send("graphics-capture");
+      expect(render).toHaveBeenCalledOnce();
+      expect(editor.emit).toHaveBeenCalledWith("graphics-capture", expect.any(String));
     });
 
     it("renders a frame and returns it as a PNG on graphics-capture", async () => {
