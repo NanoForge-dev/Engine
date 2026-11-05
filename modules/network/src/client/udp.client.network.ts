@@ -1,12 +1,13 @@
 import {
   Channel,
+  DATA_CHANNEL_OPTIONS,
   PacketSequencer,
   UNRELIABLE_CHANNELS,
-  UNRELIABLE_CHANNEL_OPTIONS,
-  type UnreliableChannel,
 } from "../shared/channels";
+import { HOST_LEFT_CODE } from "../shared/signaling";
 import {
   type ClientSession,
+  WELCOME_TIMEOUT_MS,
   type WelcomeWait,
   applyWelcome,
   buildServerUrl,
@@ -24,13 +25,14 @@ type DataChannelState = {
 
 /**
  * WebRTC connection to a NanoForge UDP server, carrying the unreliable
- * channels.
+ * channels — or to a peer-to-peer host, carrying all four.
  *
  * @remarks
  * Uses a WebSocket signaling channel to perform the SDP/ICE handshake, then
- * opens one RTCDataChannel per unreliable channel, labelled with its
- * {@link Channel} value.  Both use `ordered: false` and `maxRetransmits: 0`
- * for minimal latency.  Each data channel message is one packet;
+ * opens one RTCDataChannel per channel it carries, labelled with its
+ * {@link Channel} value and set up with `DATA_CHANNEL_OPTIONS`: the
+ * unreliable ones use `ordered: false` and `maxRetransmits: 0` for minimal
+ * latency.  Each data channel message is one packet;
  * `UnreliableOrdered` packets carry a sequence number and late ones are
  * dropped.
  *
@@ -42,15 +44,25 @@ type DataChannelState = {
  * `__init`.
  */
 export class UDPClient {
-  private readonly _channels = new Map<UnreliableChannel, DataChannelState>();
+  private readonly _channels = new Map<Channel, DataChannelState>();
   private _welcome: WelcomeWait | null = null;
+  private _webSocket: WebSocket | null = null;
+  private _peerConnection: RTCPeerConnection | null = null;
 
+  /**
+   * @param _carried - Channels to open, the unreliable ones for a dedicated
+   * server.
+   * @param _params - Extra query parameters of the signaling URL, such as a
+   * peer-to-peer `room`.
+   */
   constructor(
     private _port: number,
     private _ip: string,
     private _wss: boolean,
     private _iceServers: RTCIceServer[] = [],
     private readonly _session: ClientSession = {},
+    private readonly _carried: readonly Channel[] = UNRELIABLE_CHANNELS,
+    private readonly _params: Record<string, string> = {},
   ) {}
 
   /**
@@ -62,14 +74,16 @@ export class UDPClient {
    * server's welcome is received.  The data channels may become open shortly
    * after — check `isConnected`.
    *
+   * @param welcomeTimeoutMs - How long to wait for the welcome.  A peer-to-peer
+   * host only welcomes a joiner once its channels are open, so it waits longer.
    * @throws When the signaling socket fails or closes before the welcome, or
-   * when no welcome arrives within `WELCOME_TIMEOUT_MS`.
+   * when no welcome arrives within `welcomeTimeoutMs`.
    */
-  public async connect(): Promise<void> {
-    const welcome = (this._welcome = waitForWelcome("UDP"));
+  public async connect(welcomeTimeoutMs = WELCOME_TIMEOUT_MS): Promise<void> {
+    const welcome = (this._welcome = waitForWelcome("UDP", welcomeTimeoutMs));
     try {
-      const webSocket: WebSocket = this.connectToServerWebSocket();
-      const rtcPeerConnection: RTCPeerConnection = this.getRtcChannelFromIceServer();
+      const webSocket = (this._webSocket = this.connectToServerWebSocket());
+      const rtcPeerConnection = (this._peerConnection = this.getRtcChannelFromIceServer());
       this.setupIceConnection(rtcPeerConnection, webSocket);
       await this.sendIceOffer(rtcPeerConnection, webSocket);
     } catch (error) {
@@ -86,21 +100,32 @@ export class UDPClient {
   }
 
   /**
+   * Close the signaling socket and the peer connection.
+   */
+  public close(): void {
+    this._webSocket?.close();
+    this._peerConnection?.close();
+    this._webSocket = null;
+    this._peerConnection = null;
+    this._channels.clear();
+  }
+
+  /**
    * Return `true` when the data channel of `channel` is open.
    *
-   * @param channel - Unreliable channel to check.
+   * @param channel - Channel to check.
    */
-  public isConnected(channel: UnreliableChannel): boolean {
+  public isConnected(channel: Channel): boolean {
     return this._channels.get(channel)?.channel.readyState === "open";
   }
 
   /**
-   * Send a payload to the server on an unreliable channel.
+   * Send a payload to the server on a channel.
    *
-   * @param channel - Unreliable channel to send on.
+   * @param channel - Channel to send on.
    * @param data - Raw payload bytes.
    */
-  public sendData(channel: UnreliableChannel, data: Uint8Array): void {
+  public sendData(channel: Channel, data: Uint8Array): void {
     const state = this._channels.get(channel);
     if (!state) {
       console.error("UDP not connected");
@@ -110,12 +135,12 @@ export class UDPClient {
   }
 
   /**
-   * Return the packets received on an unreliable channel since the last call.
+   * Return the packets received on a channel since the last call.
    *
-   * @param channel - Unreliable channel to read.
+   * @param channel - Channel to read.
    * @returns Array of packet buffers, in arrival order.
    */
-  public getReceivedPackets(channel: UnreliableChannel): Uint8Array[] {
+  public getReceivedPackets(channel: Channel): Uint8Array[] {
     const state = this._channels.get(channel);
     if (!state) return [];
     const packets = state.packets;
@@ -124,7 +149,7 @@ export class UDPClient {
   }
 
   private connectToServerWebSocket(): WebSocket {
-    const serverUrl = buildServerUrl(this._wss, this._ip, this._port, this._session);
+    const serverUrl = buildServerUrl(this._wss, this._ip, this._port, this._session, this._params);
     console.log("Try to connect for UDP to " + serverUrl.split("?")[0]);
     const webSocket = new WebSocket(serverUrl);
 
@@ -132,22 +157,28 @@ export class UDPClient {
       console.error("UDP connection error : WebSocket Error", { cause: e });
       this._welcome?.settle(new Error("UDP connection error", { cause: e }));
     };
-    webSocket.onclose = (): void => {
+    webSocket.onclose = (event: CloseEvent): void => {
       this._welcome?.settle(new Error("UDP signaling closed before the server welcome"));
+      if (event.code === HOST_LEFT_CODE) this.close();
     };
     return webSocket;
   }
 
   private getRtcChannelFromIceServer(): RTCPeerConnection {
     const rtcPeerConnection = new RTCPeerConnection({ iceServers: this._iceServers });
-    for (const channel of UNRELIABLE_CHANNELS) {
+    // Chrome keeps the data channels open after the connection failed.
+    rtcPeerConnection.onconnectionstatechange = () => {
+      const state = rtcPeerConnection.connectionState;
+      if (state === "failed" || state === "closed") this.close();
+    };
+    for (const channel of this._carried) {
       this.openDataChannel(rtcPeerConnection, channel);
     }
     return rtcPeerConnection;
   }
 
-  private openDataChannel(rtcPeerConnection: RTCPeerConnection, channel: UnreliableChannel): void {
-    const dataChannel = rtcPeerConnection.createDataChannel(channel, UNRELIABLE_CHANNEL_OPTIONS);
+  private openDataChannel(rtcPeerConnection: RTCPeerConnection, channel: Channel): void {
+    const dataChannel = rtcPeerConnection.createDataChannel(channel, DATA_CHANNEL_OPTIONS[channel]);
     dataChannel.binaryType = "arraybuffer";
     const state: DataChannelState = {
       channel: dataChannel,

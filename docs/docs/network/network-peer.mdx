@@ -1,0 +1,134 @@
+---
+title: "Peer-to-peer Networking"
+icon: "book"
+description: "Run the same client and server apps without a game server: one player hosts"
+---
+
+# Peer-to-peer Networking
+
+A game made of a client app and a server app can run **without a game server**.
+The first player to open the game hosts it: their browser tab runs the server
+app next to their client app. The other players join that tab over WebRTC, on
+the same four [channels](./packet-framing) and typed packets.
+
+Nothing changes in the game code: the same systems, components and
+`ctx.network` APIs run in both modes. Only one line of configuration picks the
+mode.
+
+## Turning it on
+
+In the workspace `nanoforge.config.ts`:
+
+```ts
+import { defineConfig } from "@nanoforge-dev/config";
+
+export default defineConfig({
+  type: "workspace",
+  packages: ["apps/*"],
+  network: "p2p", // "dedicated" (default) runs the server app in Bun
+});
+```
+
+The environment is the same as with a dedicated server:
+
+```dotenv
+NANOFORGE_CLIENT_SERVER_ADDRESS=127.0.0.1
+NANOFORGE_CLIENT_SERVER_TCP_PORT=4445
+NANOFORGE_SERVER_LISTENING_TCP_PORT=4445
+
+# STUN for every player; add a TURN server for players behind strict NATs
+NANOFORGE_ICE_SERVERS=stun:stun.cloudflare.com:3478
+```
+
+## How it works
+
+```
+             server process (Bun): signaling only
+               ╱            ╲
+          host tab ───────── player tab      one WebRTC connection per player,
+          server app ╲                       carrying the four channels
+          + client app╲───── player tab
+```
+
+- `nf build` builds the server app a second time, for the browser, into the
+  client's output (`server/`). The engine picks browser builds of
+  `@nanoforge-dev/ecs/server` and `@nanoforge-dev/network/server` on its own.
+- `nf start` sets `NETWORK_MODE=p2p` for both apps. The Bun server process then
+  only pairs players for the WebRTC handshake, on `LISTENING_TCP_PORT`. Game
+  traffic never goes through it, and one process serves any number of games.
+  The server app still starts there, with no players: its sends do nothing.
+- A page opened **without** `?room=` hosts: its client app starts the server
+  app in the same tab and joins it through an in-memory loopback. The server
+  app gets the client's environment.
+- A page opened **with** `?room=CODE` joins that game's host over WebRTC.
+- The host and its client app keep separate worlds, exactly as on two machines.
+
+## Inviting players
+
+The host logs its invite link to the console. The game can also show it:
+
+| `ctx.network` member | Host                  | Player who joined     | Dedicated mode |
+| -------------------- | --------------------- | --------------------- | -------------- |
+| `roomCode`           | `"ABC234"`            | `"ABC234"`            | `undefined`    |
+| `inviteLink`         | page URL `?room=CODE` | page URL `?room=CODE` | `undefined`    |
+
+```ts
+export const showInvite = (registry: Registry, ctx: Context) => {
+  const link = ctx.network.inviteLink;
+  if (link) inviteText.text(`Invite your friends: ${link}`);
+};
+```
+
+## Developing, testing and deploying
+
+- **Editor:** play runs the game in dedicated mode. The game code is the same in
+  both modes.
+- **Locally:** `nf build && nf start`, open the game, then open the logged
+  invite link in a second tab.
+- **Hosted:** build and enable a host as usual. Each player who opens the game
+  without a link hosts their own game, so one host serves many games at once.
+
+## Players coming and going
+
+- **A player joins.** `server.clients.onConnect` fires on the host once the
+  player's four channels are open, so the listener can already send to it.
+- **A player leaves.** `server.clients.onDisconnect` fires as soon as the
+  signaling server reports it gone, a data channel closes, or its connection
+  fails.
+- **The host leaves.** The game ends: the signaling server closes the room, and
+  each player's `isConnected()` turns `false` about a second later.
+
+## Limits
+
+- **Message size.** Keep each packet at or below 64 KiB: WebRTC data channels
+  cap message size.
+- **`ReliableUnordered` is really unordered**, unlike over a dedicated server's
+  WebSocket.
+- **NAT.** A direct connection fails for some pairs of players, typically on
+  strict corporate or mobile networks. A TURN server in `ICE_SERVERS` relays
+  them; the default list only has STUN servers.
+- **Trust.** The host runs the server app, so it can cheat. Check what players
+  send with `definePacket`'s `validate`. Anyone with the room code can join.
+- **Background tabs.** Browsers slow down timers in hidden tabs, so the server
+  app in the host's tab times its ticks with a Web Worker: the game keeps its
+  pace for every player when the host switches tabs. Only the host's own view
+  slows down while hidden.
+- **Server environment.** The server app gets the client's environment:
+  `NANOFORGE_SERVER_*` variables do not reach it in this mode.
+
+## Signaling protocol
+
+JSON text frames, at most 64 KiB each:
+
+| Who    | Sends                                | Server forwards                       |
+| ------ | ------------------------------------ | ------------------------------------- |
+| Host   | connects without a `room`            | `{type:"room", room}` to the host     |
+| Player | connects with `?room=CODE`           | HTTP 404 when the room does not exist |
+| Player | any frame (its WebRTC offer and ICE) | `{type:"signal", from, data}` to host |
+| Host   | `{type:"signal", to, data}`          | `data` to that player of its room     |
+| Player | closes                               | `{type:"leave", from}` to the host    |
+| Host   | closes                               | close code `4001` to its players      |
+
+The host welcomes a player (`{type:"welcome", id, token}`) once its data
+channels are open, so players speak the same protocol as with a dedicated UDP
+server.

@@ -12,4 +12,9 @@ export default [
     outDir: "dist/server",
     tsconfig: "tsconfig.server.json",
   }),
+  createTsdownConfig({
+    entry: "src/server/browser.ts",
+    outDir: "dist/server-browser",
+    tsconfig: "tsconfig.server.json",
+  }),
 ];

@@ -46,6 +46,10 @@
       }
     },
     "./server": {
+      "browser": {
+        "types": "./dist/client/index.d.ts",
+        "default": "./dist/client/index.js"
+      },
       "require": {
         "types": "./dist/server/index.d.cts",
         "default": "./dist/server/index.cjs"
