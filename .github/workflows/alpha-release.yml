@@ -15,6 +15,7 @@ on:
           - "@nanoforge-dev/editor-lib"
           - "@nanoforge-dev/env"
           - "@nanoforge-dev/graphics-2d"
+          - "@nanoforge-dev/graphics-3d"
           - "@nanoforge-dev/input"
           - "@nanoforge-dev/music"
           - "@nanoforge-dev/network"

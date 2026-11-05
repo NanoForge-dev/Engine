@@ -10,6 +10,10 @@ modules:graphics-2d:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\ngraphics-2d\\n"
 
+modules:graphics-3d:
+  - "### Which (package|utils|package or utils) is this (bug
+    report|feature request) for\\?\\n\\ngraphics-3d\\n"
+
 modules:input:
   - "### Which (package|utils|package or utils) is this (bug
     report|feature request) for\\?\\n\\ninput\\n"
