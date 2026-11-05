@@ -10,6 +10,24 @@ NanoForge needs a 3D graphics library next to `graphics-2d` (Konva). It must ren
 
 Benchmark run on 2026-11-05.
 
+## Decision
+
+**NanoForge uses [Three.js](./three-js)**, confirmed after a discussion with the team.
+
+Babylon.js scores higher (23 ✅ against 19 ✅), but Three.js was chosen for:
+
+- a lighter bundle (222 KB gzip against 424 KB) and a faster start (about 60 ms against 350 ms to the first frame);
+- the same performance on WebGPU and WebGL in the POC;
+- by far the largest ecosystem, examples and community.
+
+What the `graphics-3d` library has to handle itself, from the benchmark:
+
+- player a11y (E2): nothing is built in;
+- the internal `requestAnimationFrame` loop that runs until `renderer.dispose()` (C2);
+- deleting `window.__THREE__` in `__clear` (C3);
+- types from the separate `@types/three` package (F3);
+- physics through our own integration (G2).
+
 ## Method
 
 - Each library is scored on every criterion: ✅ meets it, ⚠️ partly or with a workaround, ❌ does not, ❓ unknown (not measured or not tested yet).
@@ -167,5 +185,5 @@ Modelled on `Graphics2DLibrary` (`modules/graphics-2d`).
 
 ## Next steps
 
-- Prototype a `graphics-3d` library on the chosen finalist, following `Graphics2DLibrary`.
-- Measure with instancing, and on Firefox, Safari and mobile, before the final choice.
+- Build a `graphics-3d` library on Three.js, following `Graphics2DLibrary` (see the [integration notes](./three-js#integration-notes)).
+- Measure with instancing, and on Firefox, Safari and mobile.
