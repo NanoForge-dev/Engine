@@ -1,0 +1,56 @@
+---
+title: "Graphics 3D: performance"
+icon: "gauge"
+description: "Drawing many objects with @nanoforge-dev/graphics-3d"
+---
+
+# Graphics 3D: performance
+
+Each `Mesh` costs one draw call per frame. In the [benchmark POC](../lib-graphic-3d/poc), 2,000 meshes run at the display rate, while 20,000 run at about 12 FPS.
+
+When a frame has more than 2,000 draw calls, the library logs this warning once:
+
+```
+[graphics-3d] 2400 draw calls in one frame: the frame rate may drop. Draw many identical objects with one InstancedMesh (see the graphics-3d "Performance" docs page).
+```
+
+## Many identical objects: `InstancedMesh`
+
+An `InstancedMesh` draws many copies of one geometry and one material in a single draw call. Each copy has its own matrix (and optionally its own color).
+
+```ts
+import {
+  BoxGeometry,
+  Color,
+  InstancedMesh,
+  MeshStandardMaterial,
+  Object3D,
+} from "@nanoforge-dev/graphics-3d/three";
+
+const count = 20_000;
+const trees = new InstancedMesh(new BoxGeometry(0.2, 1, 0.2), new MeshStandardMaterial(), count);
+const dummy = new Object3D();
+
+for (let i = 0; i < count; i++) {
+  dummy.position.set((i % 200) - 100, 0.5, Math.floor(i / 200) - 50);
+  dummy.updateMatrix();
+  trees.setMatrixAt(i, dummy.matrix);
+  trees.setColorAt(i, new Color().setHSL(0.3, 0.6, 0.3 + Math.random() * 0.2));
+}
+ctx.graphics.scene.add(trees);
+```
+
+To move copies later, set their matrices again and flag the change:
+
+```ts
+trees.setMatrixAt(index, dummy.matrix);
+trees.instanceMatrix.needsUpdate = true;
+```
+
+With `raycast`, a hit on an instanced mesh carries `instanceId`, the index of the copy.
+
+## Other tips
+
+- Share geometries and materials between meshes instead of creating one per object.
+- Merge static geometry that never moves (`mergeGeometries` from `three/addons/utils/BufferGeometryUtils.js`).
+- Check `ctx.graphics.renderer.info.render.drawCalls` to see the cost of a frame.
