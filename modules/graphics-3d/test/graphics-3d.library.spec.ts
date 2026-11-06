@@ -116,6 +116,14 @@ const makeEditor = (features: Record<string, unknown>) => {
 describe("Graphics3DLibrary", () => {
   beforeEach(() => {
     fake.renderers.length = 0;
+    // Node has no ResizeObserver; the tests that need one stub their own.
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        observe() {}
+        disconnect() {}
+      },
+    );
   });
 
   it("uses the reserved 'graphics' key", () => {
@@ -305,6 +313,40 @@ describe("Graphics3DLibrary", () => {
       library.camera = camera;
       expect(camera.aspect).toBeCloseTo(1920 / 1080);
       expect(camera.view?.fullWidth).toBe(1920);
+    });
+  });
+
+  describe("without a viewport", () => {
+    afterEach(() => vi.unstubAllGlobals());
+
+    it("follows container resizes at the window's pixel ratio, until cleared", async () => {
+      let onResize: () => void = () => {};
+      const disconnected = vi.fn();
+      vi.stubGlobal(
+        "ResizeObserver",
+        class {
+          constructor(callback: () => void) {
+            onResize = callback;
+          }
+          observe() {}
+          disconnect() {
+            disconnected();
+          }
+        },
+      );
+      const container = makeContainer();
+      Object.assign(container.ownerDocument, { defaultView: { devicePixelRatio: 2 } });
+      const library = new Graphics3DLibrary();
+      await library.__init(makeInitContext(container));
+      const renderer = lastRenderer();
+      expect(renderer.setPixelRatio).toHaveBeenLastCalledWith(2);
+
+      Object.assign(container, { offsetWidth: 1024, offsetHeight: 768 });
+      onResize();
+      expect(renderer.setSize).toHaveBeenLastCalledWith(1024, 768);
+
+      await library.__clear();
+      expect(disconnected).toHaveBeenCalledOnce();
     });
   });
 

@@ -13,7 +13,7 @@ import type {
 import {
   type Camera,
   type Intersection,
-  type Matrix4,
+  Matrix4,
   type Object3D,
   OrthographicCamera,
   PerspectiveCamera,
@@ -63,8 +63,13 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
   private _unsubscribeViewport?: () => void;
   private _warnedDrawCalls = false;
   private _editor?: EditorContextApi;
-  private _sentView?: Matrix4;
-  private _sentProjection?: Matrix4;
+  private _hasSent = false;
+  private readonly _view = new Matrix4();
+  private readonly _sentView = new Matrix4();
+  private readonly _sentProjection = new Matrix4();
+  private readonly _raycaster = new Raycaster();
+  private readonly _ndc = new Vector2();
+  private _observer?: ResizeObserver;
   private _customRender?: () => void;
 
   constructor(private readonly _options: Graphics3DOptions = {}) {
@@ -109,8 +114,7 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
       this._applyViewport(ctx.viewport.state);
       this._unsubscribeViewport = ctx.viewport.onChange((state) => this._applyViewport(state));
     } else {
-      renderer.setSize(ctx.container.offsetWidth, ctx.container.offsetHeight);
-      this._applyCamera();
+      this._followContainer(ctx.container);
     }
   }
 
@@ -130,21 +134,23 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override async __events(_ctx: Context): Promise<void> {
     if (!this._editor?.welcome?.features.graphicsCamera) {
-      this._sentView = this._sentProjection = undefined;
+      this._hasSent = false;
       return;
     }
     const camera = this._camera;
     if (!camera) return;
     // Also refreshes the parents: a camera attached to a moving object follows it.
     camera.updateWorldMatrix(true, false);
-    const view = camera.matrixWorld.clone().invert();
-    if (this._sentView?.equals(view) && this._sentProjection?.equals(camera.projectionMatrix))
+    const view = this._view.copy(camera.matrixWorld).invert();
+    const projection = camera.projectionMatrix;
+    if (this._hasSent && this._sentView.equals(view) && this._sentProjection.equals(projection))
       return;
-    this._sentView = view;
-    this._sentProjection = camera.projectionMatrix.clone();
+    this._hasSent = true;
+    this._sentView.copy(view);
+    this._sentProjection.copy(projection);
     this._editor.emit("graphics-camera", {
       view: view.toArray(),
-      projection: camera.projectionMatrix.toArray(),
+      projection: projection.toArray(),
     });
   }
 
@@ -171,7 +177,10 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
     }
     this._renderer = this._scene = this._camera = this._viewport = undefined;
     // `__editorInit` runs once per app, so the editor is kept across restarts.
-    this._sentView = this._sentProjection = this._customRender = undefined;
+    this._hasSent = false;
+    this._customRender = undefined;
+    this._observer?.disconnect();
+    this._observer = undefined;
     delete (globalThis as { __THREE__?: unknown }).__THREE__;
   }
 
@@ -217,13 +226,12 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
     objects: Object3D[] = this.scene.children,
   ): Intersection[] {
     const rect = this.renderer.domElement.getBoundingClientRect();
-    const ndc = new Vector2(
+    this._ndc.set(
       ((clientX - rect.left) / rect.width) * 2 - 1,
       -((clientY - rect.top) / rect.height) * 2 + 1,
     );
-    const raycaster = new Raycaster();
-    raycaster.setFromCamera(ndc, this.camera);
-    return raycaster.intersectObjects(objects, true);
+    this._raycaster.setFromCamera(this._ndc, this.camera);
+    return this._raycaster.intersectObjects(objects, true);
   }
 
   public worldToScreen(point: Vector3): ScreenPoint {
@@ -290,6 +298,26 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
     this._applyCamera();
     // Resizing clears the canvas; a paused game has no tick to redraw it.
     this._draw();
+  }
+
+  /**
+   * Without a viewport, sizes the canvas to the container and follows its
+   * resizes, at the device pixel ratio of the container's window.
+   */
+  private _followContainer(container: HTMLElement): void {
+    const renderer = this.renderer;
+    const resize = () => {
+      renderer.setPixelRatio(container.ownerDocument.defaultView?.devicePixelRatio ?? 1);
+      renderer.setSize(container.offsetWidth, container.offsetHeight);
+      this._applyCamera();
+    };
+    resize();
+    // Resizing clears the canvas: redraw, since a paused game has no tick to do it.
+    this._observer = new ResizeObserver(() => {
+      resize();
+      this._draw();
+    });
+    this._observer.observe(container);
   }
 
   /**
