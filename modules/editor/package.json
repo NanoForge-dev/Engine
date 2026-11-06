@@ -54,8 +54,7 @@
     "test:unit": "vitest run --config ../../vitest.config.ts",
     "prepack": "pnpm run build && pnpm run lint",
     "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'modules/editor/*'",
-    "release": "cliff-jumper",
-    "docs": "mint-tsdocs generate"
+    "release": "cliff-jumper"
   },
   "dependencies": {
     "@nanoforge-dev/common": "workspace:*"

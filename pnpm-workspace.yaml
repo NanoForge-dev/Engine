@@ -31,8 +31,6 @@ catalogs:
     turbo: ^2.10.12
     typescript: ^6.0.3
   docs:
-    '@microsoft/api-extractor': ^7.59.0
-    mint-tsdocs: ^0.0.8
     typedoc: ^0.28.19
     typedoc-plugin-markdown: ^4.11.0
   env:
