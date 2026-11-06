@@ -5,6 +5,11 @@ export class NetworkId {
   constructor(public id: number) {}
 }
 
+/** A paddle, tagged with the seat it belongs to. */
+export class Paddle {
+  constructor(public seat: 1 | 2) {}
+}
+
 /** Position in server field units (1920 × 1080, y down). */
 export class Position {
   constructor(

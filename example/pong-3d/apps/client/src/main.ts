@@ -8,7 +8,15 @@ import { NetworkClientLibrary } from "@nanoforge-dev/network/client";
 
 import { AssignId, PADDLE, Play, Seat } from "../../../shared/protocol";
 import { BALL_RADIUS, buildArena, createBall, createPaddle } from "./arena";
-import { CameraRig, Model, NetworkId, Player, Position, Velocity } from "./components/components";
+import {
+  CameraRig,
+  Model,
+  NetworkId,
+  Paddle,
+  Player,
+  Position,
+  Velocity,
+} from "./components/components";
 import { applyMoves, controlPlayer, draw, followCamera, move } from "./systems/systems";
 
 export const main = async (options: ClientRunOptions): Promise<void> => {
@@ -56,6 +64,8 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
     paddle1: spawnModel(new Model(paddle1, PADDLE.width / 2, PADDLE.height / 2)),
     paddle2: spawnModel(new Model(paddle2, PADDLE.width / 2, PADDLE.height / 2)),
   };
+  registry.addComponent(entities.paddle1, new Paddle(1));
+  registry.addComponent(entities.paddle2, new Paddle(2));
 
   const me = registry.spawnEntity();
   registry.addComponent(

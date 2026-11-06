@@ -5,7 +5,15 @@ import type { InputEnum } from "@nanoforge-dev/input";
 import { ControllerAxis, ControllerButton } from "@nanoforge-dev/input/controller";
 
 import { FIELD, Input, Move, PADDLE } from "../../../../shared/protocol";
-import { CameraRig, Model, NetworkId, Player, Position, Velocity } from "../components/components";
+import {
+  CameraRig,
+  Model,
+  NetworkId,
+  Paddle,
+  Player,
+  Position,
+  Velocity,
+} from "../components/components";
 import { fieldToWorld } from "../field";
 
 /** Predicts movement between two server updates. */
@@ -84,10 +92,10 @@ const look = new Vector3();
  */
 export function followCamera(registry: Registry, ctx: Context) {
   const players = registry.getZipper([Player, CameraRig]);
-  const paddles = registry.getZipper([NetworkId, Position]);
+  const paddles = registry.getZipper([Paddle, Position]);
 
   players.forEach(({ Player, CameraRig }) => {
-    const paddle = paddles.find((entity) => entity.NetworkId.id === Player.seat);
+    const paddle = paddles.find((entity) => entity.Paddle.seat === Player.seat);
     if (Player.seat !== 0 && paddle) {
       const side = Player.seat === 1 ? 1 : -1;
       const centerY = paddle.Position.y + PADDLE.height / 2;

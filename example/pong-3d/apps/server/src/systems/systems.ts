@@ -153,11 +153,7 @@ export const bounce = (registry: Registry, ctx: Context) => {
     }
     const prevSpeed = Math.sqrt(zip[0].Velocity.x ** 2 + zip[0].Velocity.y ** 2);
     const newSpeed = prevSpeed * 1.1;
-    const posOnPaddle =
-      (zip[0].Position.y -
-        (zip[0].Position.x < 960 ? zip[paddleTouched].Position.y : zip[paddleTouched].Position.y) +
-        15) /
-      330;
+    const posOnPaddle = (zip[0].Position.y - zip[paddleTouched].Position.y + 15) / 330;
     const baseAngle = posOnPaddle * ((6 * Math.PI) / 8) + Math.PI / 8 - Math.PI / 2;
     const outAngle = zip[0].Position.x < 960 ? baseAngle : -baseAngle + Math.PI;
     zip[0].Velocity.x = Math.cos(outAngle) * newSpeed;
