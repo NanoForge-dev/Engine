@@ -6,12 +6,15 @@ const GAME_PORTS = { "game-2d": 3101, "game-3d": 3102 };
 export default defineConfig({
   testDir: "e2e/graphics",
   forbidOnly: !!process.env.CI,
+  // CI runners render WebGL on the CPU (SwiftShader): parallel games starve each other.
+  workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   // Reference screenshots come from CI's Linux Chromium; other platforms render different pixels.
   ignoreSnapshots: process.platform !== "linux",
   expect: {
     // Absorbs antialiasing and rasterization noise; a missing mesh or wrong camera changes far more.
-    toHaveScreenshot: { maxDiffPixelRatio: 0.01 },
+    // The timeout covers slow software-rendered captures: one 3D capture can take seconds on CI.
+    toHaveScreenshot: { maxDiffPixelRatio: 0.01, timeout: 30_000 },
   },
   use: {
     browserName: "chromium",
