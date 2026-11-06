@@ -27,5 +27,3 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
     secrets:
       NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-
-  # Repo-specific alpha images go after it: see "Alpha images" in the README.
