@@ -18,7 +18,7 @@ declare module "@nanoforge-dev/editor-lib" {
   }
   interface EditorEventMap {
     "graphics-camera": [EditorGraphicsCamera];
-    /** Answer to `graphics-capture`: the frame as a PNG data URL. */
+    /** Answer to `graphics-capture`: the frame as a PNG data URL, or empty when there is no renderer. */
     "graphics-capture": [string];
   }
   interface EditorCommandMap {

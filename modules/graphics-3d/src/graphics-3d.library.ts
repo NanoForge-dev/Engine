@@ -83,14 +83,22 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
     canvas.style.display = "block";
     ctx.container.appendChild(canvas);
 
-    this._renderer = new WebGPURenderer({
+    const renderer = new WebGPURenderer({
       canvas,
       antialias: true,
       forceWebGL: this._options.forceWebGL ?? false,
     });
-    await this._renderer.init();
+    try {
+      await renderer.init();
+    } catch (error) {
+      // The app's init fails here, so `__clear` never runs: release what we created.
+      canvas.remove();
+      await renderer.dispose();
+      throw error;
+    }
+    this._renderer = renderer;
     // Three resets `info` from its own animation loop, which is not our tick: we reset it per frame.
-    this._renderer.info.autoReset = false;
+    renderer.info.autoReset = false;
     this._scene = new Scene();
     const camera = new PerspectiveCamera(50, 16 / 9, 0.1, 1000);
     camera.position.set(0, 0, 5);
@@ -101,7 +109,7 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
       this._applyViewport(ctx.viewport.state);
       this._unsubscribeViewport = ctx.viewport.onChange((state) => this._applyViewport(state));
     } else {
-      this._renderer.setSize(ctx.container.offsetWidth, ctx.container.offsetHeight);
+      renderer.setSize(ctx.container.offsetWidth, ctx.container.offsetHeight);
       this._applyCamera();
     }
   }
@@ -110,7 +118,8 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
   public async __editorInit(ctx: EditorInitContext): Promise<void> {
     this._editor = ctx.editor;
     ctx.editor.on("graphics-capture", () => {
-      if (!this._renderer) return;
+      // No renderer between a clear and an init: answer empty so the editor does not wait.
+      if (!this._renderer) return ctx.editor.emit("graphics-capture", "");
       // A WebGL/WebGPU canvas is only readable right after a render.
       this._draw();
       ctx.editor.emit("graphics-capture", this._renderer.domElement.toDataURL("image/png"));
@@ -126,7 +135,8 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
     }
     const camera = this._camera;
     if (!camera) return;
-    camera.updateMatrixWorld();
+    // Also refreshes the parents: a camera attached to a moving object follows it.
+    camera.updateWorldMatrix(true, false);
     const view = camera.matrixWorld.clone().invert();
     if (this._sentView?.equals(view) && this._sentProjection?.equals(camera.projectionMatrix))
       return;
@@ -186,8 +196,9 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
     this._applyCamera();
   }
 
+  /** The render step in use now, so a custom render can wrap it without calling itself. */
   public get render(): () => void {
-    return () => this._draw();
+    return this._customRender ?? (() => this._drawDefault());
   }
 
   public set render(render: (() => void) | undefined) {
@@ -257,7 +268,11 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
   /** Draws one frame with the custom render function, or the scene through the camera. */
   private _draw(): void {
     if (this._customRender) this._customRender();
-    else this.renderer.render(this.scene, this.camera);
+    else this._drawDefault();
+  }
+
+  private _drawDefault(): void {
+    this.renderer.render(this.scene, this.camera);
   }
 
   /** Sizes the canvas to the visible game area and letterboxes it inside the container. */
@@ -273,6 +288,8 @@ export class Graphics3DLibrary extends Library implements EditorAwareLibrary {
     style.left = `${state.contentLeft}px`;
     style.top = `${state.contentTop}px`;
     this._applyCamera();
+    // Resizing clears the canvas; a paused game has no tick to redraw it.
+    this._draw();
   }
 
   /**

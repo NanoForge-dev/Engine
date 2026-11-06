@@ -4,6 +4,7 @@ import {
   BoxGeometry,
   Mesh,
   MeshStandardMaterial,
+  Object3D,
   PerspectiveCamera,
   Texture,
   Vector3,
@@ -193,6 +194,20 @@ describe("Graphics3DLibrary", () => {
       expect(lastRenderer().render).toHaveBeenCalledOnce();
     });
 
+    it("lets a custom render wrap the previous one without calling itself", async () => {
+      const library = new Graphics3DLibrary();
+      await library.__init(makeInitContext());
+      const overlay = vi.fn();
+      const base = library.expose().render;
+      library.expose().render = () => {
+        base();
+        overlay();
+      };
+      await run(library);
+      expect(overlay).toHaveBeenCalledOnce();
+      expect(lastRenderer().render).toHaveBeenCalledOnce();
+    });
+
     it("warns once when a frame has too many draw calls", async () => {
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
       const library = new Graphics3DLibrary();
@@ -274,6 +289,13 @@ describe("Graphics3DLibrary", () => {
       expect(camera.view).toMatchObject(close({ fullWidth: 1000, fullHeight: 1000, offsetX: 0 }));
     });
 
+    it("redraws right after a resize, so a paused game does not show a blank canvas", async () => {
+      const { viewport, renderer } = await setup(state("contain", 1000, 1000));
+      renderer.render.mockClear();
+      viewport.emit(state("contain", 1920, 1080));
+      expect(renderer.render).toHaveBeenCalledOnce();
+    });
+
     it("follows viewport changes and applies them to a camera assigned later", async () => {
       const { library, viewport, renderer, canvas } = await setup(state("contain", 1000, 1000));
       viewport.emit(state("contain", 1920, 1080));
@@ -287,6 +309,22 @@ describe("Graphics3DLibrary", () => {
   });
 
   describe("teardown", () => {
+    it("removes the canvas and disposes the renderer when init fails", async () => {
+      const original = fake.WebGPURenderer.getMockImplementation() ?? (() => {});
+      fake.WebGPURenderer.mockImplementationOnce(function (this: any, params: any) {
+        original.call(this, params);
+        this.init = vi.fn(async () => {
+          throw new Error("no GPU");
+        });
+      });
+      const container = makeContainer();
+      const library = new Graphics3DLibrary();
+      await expect(library.__init(makeInitContext(container))).rejects.toThrow("no GPU");
+      const [canvas] = container.canvases;
+      expect(canvas?.remove).toHaveBeenCalledOnce();
+      expect(lastRenderer().dispose).toHaveBeenCalledOnce();
+    });
+
     afterEach(() => {
       delete (globalThis as { __THREE__?: unknown }).__THREE__;
     });
@@ -386,6 +424,25 @@ describe("Graphics3DLibrary", () => {
       send("graphics-capture");
       expect(render).toHaveBeenCalledOnce();
       expect(editor.emit).toHaveBeenCalledWith("graphics-capture", expect.any(String));
+    });
+
+    it("answers graphics-capture with an empty string between a clear and an init", async () => {
+      const { library, editor, send } = await setup({});
+      await library.__clear();
+      send("graphics-capture");
+      expect(editor.emit).toHaveBeenCalledWith("graphics-capture", "");
+    });
+
+    it("sends the camera's world position, parents included", async () => {
+      const { library, editor } = await setup({ graphicsCamera: true });
+      const parent = new Object3D();
+      const camera = new PerspectiveCamera();
+      parent.add(camera);
+      parent.position.x = 3;
+      library.expose().camera = camera;
+      await events(library);
+      const view = (editor.emit.mock.calls.at(-1)?.[1] as { view: number[] }).view;
+      expect(view[12]).toBeCloseTo(-3);
     });
 
     it("renders a frame and returns it as a PNG on graphics-capture", async () => {
