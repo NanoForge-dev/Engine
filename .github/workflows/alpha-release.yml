@@ -1,29 +1,15 @@
 name: Alpha Release
+# The alpha is <next version>-alpha.<branch>.<n>: the exact number is in the job summary.
+run-name: Alpha release ${{ inputs.packages }} on ${{ github.ref_name }}${{ inputs.dry-run && ' (dry run)' || '' }}
 
 on:
   workflow_dispatch:
     inputs:
-      package:
-        description: "The published name of a single package to release"
-        type: choice
-        required: true
-        options:
-          - "@nanoforge-dev/asset"
-          - "@nanoforge-dev/common"
-          - "@nanoforge-dev/core"
-          - "@nanoforge-dev/ecs"
-          - "@nanoforge-dev/editor-lib"
-          - "@nanoforge-dev/env"
-          - "@nanoforge-dev/graphics-2d"
-          - "@nanoforge-dev/graphics-3d"
-          - "@nanoforge-dev/input"
-          - "@nanoforge-dev/music"
-          - "@nanoforge-dev/network"
-          - "@nanoforge-dev/scene"
-          - "@nanoforge-dev/sound"
-          - "@nanoforge-dev/utils-eslint-config"
-          - "@nanoforge-dev/utils-prettier-config"
-      dry_run:
+      packages:
+        description: Comma-separated packages (empty = the only package of .github/nanoforge.json)
+        type: string
+        default: ""
+      dry-run:
         description: Perform a dry run?
         type: boolean
         default: false
@@ -33,23 +19,13 @@ permissions:
   id-token: write
 
 jobs:
-  alpha-release:
+  alpha:
     name: Alpha release
-    runs-on: ubuntu-latest
-    if: github.repository_owner == 'NanoForge-dev'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+    uses: nanoforge-dev/actions/.github/workflows/alpha-release.yml@v3
+    with:
+      packages: ${{ inputs.packages }}
+      dry-run: ${{ inputs.dry-run }}
+    secrets:
+      NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
-      - name: Prepare
-        uses: ./.github/actions/prepare
-
-      - name: Release alpha
-        uses: ./node_modules/@nanoforge-dev/actions/actions/release-dev
-        with:
-          package: ${{ inputs.package }}
-          tag: alpha
-          dry: ${{ inputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Repo-specific alpha images go after it: see "Alpha images" in the README.

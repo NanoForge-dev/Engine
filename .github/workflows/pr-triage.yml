@@ -1,4 +1,5 @@
-name: "PR Triage"
+name: PR Triage
+
 on:
   pull_request_target:
     types:
@@ -6,33 +7,13 @@ on:
       - edited
       - reopened
       - synchronize
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
-  label:
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-    name: Label
-    if: github.event.action != 'edited'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Label pull request
-        uses: actions/labeler@v7
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          sync-labels: true
-  validate-title:
-    name: Validate title
-    runs-on: ubuntu-latest
-    steps:
-      - name: Validate pull request title
-        env:
-          TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          REGEX="^(revert: )?(feat|fix|docs|style|refactor|perf|test|build|ci|chore|types)(\\(.+\\))?!?: .{1,72}$"
-
-          echo "Title: \"$TITLE\""
-
-          if [[ ! "$TITLE" =~ $REGEX ]]; then
-            exit 1
-          fi
+  triage:
+    name: Triage
+    uses: nanoforge-dev/actions/.github/workflows/pr-triage.yml@v3

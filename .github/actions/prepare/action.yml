@@ -1,30 +1,14 @@
 name: prepare
-description: Prepare action
-inputs:
-  pnpm-install:
-    description: Install pnpm depedencies
-    default: "true"
-  emsdk-install:
-    description: Install emscriptens
-    default: "true"
-  build:
-    description: Build packages
-    default: "true"
+description: Installs Node.js, pnpm and the dependencies, then emsdk, then builds the packages
 runs:
   using: composite
   steps:
-    - if: inputs.pnpm-install == 'true'
-      name: Install pnpm and Node.js
-      uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c
-      with:
-        runtime: node@26
-        cache: true
+    - name: Set up Node.js, pnpm and the dependencies
+      uses: nanoforge-dev/actions/setup@v3
 
-    - if: inputs.emsdk-install == 'true'
-      name: Install emsdk
+    - name: Install emsdk
       uses: ./.github/actions/emsdk-install
 
-    - if: inputs.build == 'true'
-      name: Build packages
+    - name: Build packages
       shell: bash
       run: pnpm run build
