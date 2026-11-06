@@ -26,6 +26,7 @@
     "test": "pnpm run test:unit && pnpm run test:e2e",
     "test:unit": "turbo run test:unit --concurrency=5",
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
+    "test:e2e:graphics": "playwright test",
     "prepare": "husky",
     "docs": "turbo run docs --concurrency=5 && ./scripts/sync-docs-references.sh"
   },
@@ -36,6 +37,7 @@
     "@nanoforge-dev/actions": "catalog:ci",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
+    "@playwright/test": "catalog:test",
     "@trivago/prettier-plugin-sort-imports": "catalog:lint",
     "@types/node": "catalog:core",
     "@vitest/coverage-v8": "catalog:test",

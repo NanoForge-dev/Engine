@@ -21,3 +21,6 @@ CHANGELOG.md
 
 emsdk-cache/
 docs/api
+
+playwright-report/
+test-results/

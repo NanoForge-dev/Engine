@@ -209,6 +209,9 @@ catalogs:
       specifier: ^0.33.4
       version: 0.33.4
   test:
+    '@playwright/test':
+      specifier: 1.64.1
+      version: 1.64.1
     '@vitest/coverage-v8':
       specifier: ^4.1.11
       version: 4.1.11
@@ -238,6 +241,9 @@ importers:
       '@nanoforge-dev/utils-prettier-config':
         specifier: workspace:*
         version: link:utils/prettier-config
+      '@playwright/test':
+        specifier: catalog:test
+        version: 1.64.1
       '@trivago/prettier-plugin-sort-imports':
         specifier: catalog:lint
         version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
@@ -295,6 +301,78 @@ importers:
       '@nanoforge-dev/env':
         specifier: workspace:*
         version: link:../../packages/env
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  e2e/game-2d:
+    devDependencies:
+      '@nanoforge-dev/cli':
+        specifier: ^2.3.0
+        version: 2.3.0(@types/node@26.4.0)(synckit@0.11.13)
+      '@nanoforge-dev/config':
+        specifier: catalog:config
+        version: 2.3.0(synckit@0.11.13)
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  e2e/game-2d/apps/client:
+    devDependencies:
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../../../packages/core
+      '@nanoforge-dev/ecs':
+        specifier: workspace:*
+        version: link:../../../../modules/ecs
+      '@nanoforge-dev/graphics-2d':
+        specifier: workspace:*
+        version: link:../../../../modules/graphics-2d
+      '@nanoforge-dev/input':
+        specifier: workspace:*
+        version: link:../../../../modules/input
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  e2e/game-3d:
+    devDependencies:
+      '@nanoforge-dev/cli':
+        specifier: ^2.3.0
+        version: 2.3.0(@types/node@26.4.0)(synckit@0.11.13)
+      '@nanoforge-dev/config':
+        specifier: catalog:config
+        version: 2.3.0(synckit@0.11.13)
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  e2e/game-3d/apps/client:
+    devDependencies:
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../../../packages/core
+      '@nanoforge-dev/ecs':
+        specifier: workspace:*
+        version: link:../../../../modules/ecs
+      '@nanoforge-dev/graphics-3d':
+        specifier: workspace:*
+        version: link:../../../../modules/graphics-3d
+      '@nanoforge-dev/input':
+        specifier: workspace:*
+        version: link:../../../../modules/input
+      '@types/three':
+        specifier: catalog:graphics
+        version: 0.187.0
+      three:
+        specifier: catalog:graphics
+        version: 0.187.0
       typescript:
         specifier: catalog:core
         version: 6.0.3
@@ -1738,16 +1816,16 @@ packages:
     resolution: {integrity: sha512-bqbrH8ulFSiZz1iisJHtHeEzj1RV/70uErCYHeW4DIhVPsWbBfWKFvg/ghAbmPk5vsj0YnhDX6DSpik4S1QoiQ==}
     engines: {node: '25'}
 
-  '@nanoforge-dev/loader-client@1.5.1':
-    resolution: {integrity: sha512-1PueGpj8DbjRcZTVVCKAkKi4A8gyBaFTkfp78fFrW47J0HZcfS8pq+AaNaBjEUOozn0E7L+U8zGf/5laxTRe1A==}
+  '@nanoforge-dev/loader-client@1.6.0':
+    resolution: {integrity: sha512-hW4jz6QSVuF9wC6CIJfE2cmHGFCXNZFEy6dBYicaRFNZ/USF7FJBjyQvwyI5MoWdjwo0A7U/zPUfRe/3TuHzgA==}
     engines: {node: '26'}
 
-  '@nanoforge-dev/loader-server@1.5.1':
-    resolution: {integrity: sha512-RNqA0zpEhUXENKu5chJ+vQOhr8qK+a7z6XePmiCJygpSScJ8p1dlWquFYNwu9dBLHBP8BhK9dSFvXjPvHAYBxQ==}
+  '@nanoforge-dev/loader-server@1.6.0':
+    resolution: {integrity: sha512-Jnc9WHUMfCo8R11qPlIFPJ0COuwX6BJ8HkSTpyTMugNKvN9dcUIwiJ72NydLDGWeTbqqXGIcpFkIkX8APYP+WQ==}
     engines: {node: '26'}
 
-  '@nanoforge-dev/loader-website@1.5.1':
-    resolution: {integrity: sha512-Ugu5CvfbsCK2wG8RXBHkkVlNHkSlXz2xXxfqglID7Cb4E8PHO0p1hbE6e7+1fWXAdFhEivGQHSI1POIvgyP1Qg==}
+  '@nanoforge-dev/loader-website@1.6.0':
+    resolution: {integrity: sha512-szo3/jPBFqUvgYeyHIN6LfzyK0GFxkgTtPJaNcqyFKEkSytUxRdplE4r+WykcMVIk7LlUwbZ56wai7RS38cPfg==}
     engines: {node: '26'}
 
   '@nanoforge-dev/schematics@2.3.0':
@@ -2049,6 +2127,11 @@ packages:
   '@pkgr/core@0.3.6':
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
     engines: {node: ^14.18.0 || >=16.0.0}
+
+  '@playwright/test@1.64.1':
+    resolution: {integrity: sha512-IaYGml/nSOiZWROfPtuIL7neuu9qDOZ3TNvNljUIrhDMxiGTgPjzj/g9p9RxpS2tSepPDRY+UwAaEeiKtUvIAg==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   '@quansync/fs@1.0.0':
     resolution: {integrity: sha512-4TJ3DFtlf1L5LDMaM6CanJ/0lckGNtJcMjQ1NAV6zDmA0tEHKZtxNKin8EgPaVX1YzljbxckyT2tJrpQKAtngQ==}
@@ -3797,6 +3880,16 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
+  playwright-core@1.64.1:
+    resolution: {integrity: sha512-BC4s8y6SEVA6Q1rSxZTto8hI1KUI3xXlHGZgvGqP4IqPdI/a6FX9H29IDNz7vKo9l21b6LfYosScPL6M3xxyDQ==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.64.1:
+    resolution: {integrity: sha512-HCrVhHr5QQuwYoswEUGTb7gGp522yflbv/ST8nF4sFWGuLjQCt17Q/EubpGGSNKYn1tsTCPZxqHhHCfVURu7UA==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   plur@5.1.0:
     resolution: {integrity: sha512-VP/72JeXqak2KiOzjgKtQen5y3IZHn+9GOuLDafPv0eXa47xq0At93XahYBs26MsifCQ4enGKwbjBTKgb9QJXg==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -4907,8 +5000,8 @@ snapshots:
       '@inquirer/prompts': 8.7.2(@types/node@26.4.0)
       '@nanoforge-dev/config': 2.3.0(synckit@0.11.13)
       '@nanoforge-dev/editor': 0.1.4
-      '@nanoforge-dev/loader-client': 1.5.1
-      '@nanoforge-dev/loader-server': 1.5.1
+      '@nanoforge-dev/loader-client': 1.6.0
+      '@nanoforge-dev/loader-server': 1.6.0
       '@nanoforge-dev/schematics': 2.3.0(chokidar@5.0.0)
       ansis: 4.4.0
       bun: 1.4.2
@@ -4943,18 +5036,18 @@ snapshots:
       tar: 7.5.22
       typescript: 6.0.3
 
-  '@nanoforge-dev/loader-client@1.5.1':
+  '@nanoforge-dev/loader-client@1.6.0':
     dependencies:
-      '@nanoforge-dev/loader-website': 1.5.1
+      '@nanoforge-dev/loader-website': 1.6.0
       bun: 1.4.2
       commander: 15.0.0
 
-  '@nanoforge-dev/loader-server@1.5.1':
+  '@nanoforge-dev/loader-server@1.6.0':
     dependencies:
       bun: 1.4.2
       commander: 15.0.0
 
-  '@nanoforge-dev/loader-website@1.5.1': {}
+  '@nanoforge-dev/loader-website@1.6.0': {}
 
   '@nanoforge-dev/schematics@2.3.0(chokidar@5.0.0)':
     dependencies:
@@ -5152,6 +5245,10 @@ snapshots:
     optional: true
 
   '@pkgr/core@0.3.6': {}
+
+  '@playwright/test@1.64.1':
+    dependencies:
+      playwright: 1.64.1
 
   '@quansync/fs@1.0.0':
     dependencies:
@@ -6750,6 +6847,12 @@ snapshots:
   picomatch@4.0.5: {}
 
   picomatch@4.0.7: {}
+
+  playwright-core@1.64.1: {}
+
+  playwright@1.64.1:
+    dependencies:
+      playwright-core: 1.64.1
 
   plur@5.1.0:
     dependencies:

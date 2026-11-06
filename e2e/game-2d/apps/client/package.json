@@ -1,0 +1,14 @@
+{
+  "name": "e2e-game-2d-client",
+  "version": "0.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@nanoforge-dev/common": "workspace:*",
+    "@nanoforge-dev/core": "workspace:*",
+    "@nanoforge-dev/ecs": "workspace:*",
+    "@nanoforge-dev/graphics-2d": "workspace:*",
+    "@nanoforge-dev/input": "workspace:*",
+    "typescript": "catalog:core"
+  },
+  "private": true
+}
