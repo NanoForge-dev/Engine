@@ -8,6 +8,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      update-snapshots:
+        description: Regenerate the graphics e2e reference screenshots (uploaded as the graphics-e2e artifact)
+        type: boolean
+        default: false
 
 jobs:
   tests:
@@ -24,3 +29,29 @@ jobs:
 
       - name: "Run linter"
         run: pnpm lint
+
+  graphics:
+    # Pinned: the reference screenshots are rendered by this OS's Chromium and SwiftShader.
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Prepare
+        uses: ./.github/actions/prepare
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run graphics e2e tests
+        run: pnpm test:e2e:graphics ${{ inputs.update-snapshots && '--update-snapshots' || '' }}
+
+      - name: Upload report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: graphics-e2e
+          path: |
+            playwright-report/
+            test-results/
+            e2e/graphics/*-snapshots/

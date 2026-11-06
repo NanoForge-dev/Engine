@@ -3,6 +3,8 @@ packages:
   - modules/*
   - utils/*
   - e2e/game/**
+  - e2e/game-2d/**
+  - e2e/game-3d/**
   - example/**
 
 allowBuilds:
@@ -55,6 +57,7 @@ catalogs:
   network:
     node-datachannel: ^0.33.4
   test:
+    '@playwright/test': 1.64.1
     '@vitest/coverage-v8': ^4.1.11
     vitest: ^4.1.11
 

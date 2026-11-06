@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@nanoforge-dev/e2e-game-2d",
+  "version": "0.0.0",
+  "description": "NanoForge Engine - End-to-End test game for graphics-2d",
+  "type": "module",
+  "scripts": {
+    "start": "nf start"
+  },
+  "devDependencies": {
+    "@nanoforge-dev/cli": "^2.3.0",
+    "@nanoforge-dev/config": "catalog:config",
+    "typescript": "catalog:core"
+  },
+  "private": true,
+  "engines": {
+    "node": "26"
+  }
+}
