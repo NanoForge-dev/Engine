@@ -75,11 +75,11 @@ canvas.addEventListener("pointerdown", (event) => {
 Never call `renderer.setAnimationLoop` or render from `requestAnimationFrame`. The engine renders once per tick, and the editor relies on this: pause freezes the image, and step draws exactly one frame. To draw something else than `scene` through `camera`, such as a post-processing pipeline, replace the library's render step. The library still calls it once per tick, and for editor screenshots:
 
 ```ts
-import { PostProcessing } from "@nanoforge-dev/graphics-3d/three";
+import { RenderPipeline } from "@nanoforge-dev/graphics-3d/three";
 import { pass, saturation } from "@nanoforge-dev/graphics-3d/three/tsl";
 
 const { renderer, scene, camera } = ctx.graphics;
-const postProcessing = new PostProcessing(renderer);
+const postProcessing = new RenderPipeline(renderer);
 const scenePass = pass(scene, camera);
 postProcessing.outputNode = saturation(scenePass.getTextureNode(), 0.2);
 
