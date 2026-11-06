@@ -37,7 +37,7 @@ Every packet starts with the name of its packet type: one length byte, then the
 name in UTF-8, then the payload.
 
 - **Typed packets** (`ctx.network.packets.send`, see
-  [Typed packets](network-client#typed-packets)) carry the name given to
+  [Typed packets](./network-client#typed-packets)) carry the name given to
   `definePacket`, and their payload is the `JSON.stringify` text of the data,
   or nothing for a packet without payload.
   The receiver routes them to the listeners and `read` of that type.

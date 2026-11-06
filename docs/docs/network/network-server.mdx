@@ -18,7 +18,7 @@ The server listens on configured ports and accepts client connections. A single 
   `Channel.UnreliableOrdered` and `Channel.UnreliableUnordered`, carried by WebRTC data
   channels, for low-latency state updates.
 
-See [Packet Channels](packet-framing) for what each channel guarantees.
+See [Packet Channels](./packet-framing) for what each channel guarantees.
 
 ## Client identification
 
@@ -79,7 +79,7 @@ const decodedPackets = firstClientPackets.map((packet) => packet.json());
 ## Typed packets
 
 The server uses the same packet types as the client, from the shared protocol
-file (see [Typed packets](network-client#typed-packets)). Its listeners and
+file (see [Typed packets](./network-client#typed-packets)). Its listeners and
 `read` also get the sender.
 
 ```ts
@@ -103,5 +103,5 @@ the `validate` option of `definePacket`.
 
 ## Notes
 
-- See [Network Server API](network-server-api) for the full list of available functions.
-- For the channels and how packets are framed on each, see [Packet Channels](packet-framing).
+- See [Network Server API](./network-server-api) for the full list of available functions.
+- For the channels and how packets are framed on each, see [Packet Channels](./packet-framing).

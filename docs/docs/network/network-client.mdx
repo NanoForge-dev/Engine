@@ -11,7 +11,7 @@ This document describes how the `network-client` package connects to a `network-
 ## Overview
 
 A client connects to a single server instance and sends every packet on one of
-four [channels](packet-framing), picked with the `channel` option:
+four [channels](./packet-framing), picked with the `channel` option:
 
 - `Channel.ReliableOrdered` (the default) and `Channel.ReliableUnordered`,
   carried by a TCP WebSocket, for control commands such as join, play, and input.
@@ -84,6 +84,6 @@ ctx.network.packets.send(Play); // no payload to give
 
 ## Notes
 
-- See [Network Client API](network-client-api) for the full list of available functions,
+- See [Network Client API](./network-client-api) for the full list of available functions,
   and for how each kind of payload is encoded.
-- For the channels and how packets are framed on each, see [Packet Channels](packet-framing).
+- For the channels and how packets are framed on each, see [Packet Channels](./packet-framing).
