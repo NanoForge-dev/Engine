@@ -131,7 +131,8 @@ export abstract class NanoforgeApplication {
    * @param delayMs - Delay before it, in milliseconds.
    */
   protected schedule(tick: () => void, delayMs: number): void {
-    setTimeout(tick, delayMs);
+    // A tick longer than its budget gives a negative delay, which Node and Bun warn about.
+    setTimeout(tick, Math.max(0, delayMs));
   }
 
   protected async initialize(options: RunOptions | ClientRunOptions): Promise<void> {
