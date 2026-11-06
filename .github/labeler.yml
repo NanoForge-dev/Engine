@@ -24,6 +24,12 @@ modules:graphics-2d:
           - modules/graphics-2d/*
           - modules/graphics-2d/**/*
 
+modules:graphics-3d:
+  - changed-files:
+      - any-glob-to-any-file:
+          - modules/graphics-3d/*
+          - modules/graphics-3d/**/*
+
 modules:input:
   - changed-files:
       - any-glob-to-any-file:

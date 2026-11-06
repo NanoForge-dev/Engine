@@ -1,0 +1,97 @@
+---
+title: "Graphics 3D: editor proposal"
+icon: "pen-ruler"
+description: "Proposal for the editor's 3D Scene screen and plugin needs, for the editor's requirements session"
+---
+
+# Graphics 3D: editor proposal
+
+Input for the editor's requirements session on 3D (see `editor/CLAUDE.md`: a plugin starts with a requirements session and a spec in `docs/specs/<plugin>.md`). Nothing here is built on the editor side yet.
+
+**Goal:** a beginner edits a 3D scene without code, in the same way the 2D Scene screen works today.
+
+## What the engine provides now
+
+`@nanoforge-dev/graphics-3d` ([docs](./index)) adds to the editor bridge:
+
+| Name               | Kind    | Payload                | Use in the editor                                                                                                                      |
+| ------------------ | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `graphicsCamera`   | feature | `boolean`              | Ask for it in `welcome` while a 3D tool over the running game is active, like `viewport` in `GameMoveOverlay`.                         |
+| `graphics-camera`  | event   | `{ view, projection }` | Active camera matrices (column-major), sent once on start and then on every change. Together with `viewport` they map pointer ↔ world. |
+| `graphics-capture` | command | none                   | Ask for a screenshot: the engine renders a frame, even while paused.                                                                   |
+| `graphics-capture` | event   | PNG data URL           | The frame.                                                                                                                             |
+
+The library also guarantees the following:
+
+- **Rendering:** it renders only from the engine tick, so pause freezes the image and step draws one frame.
+- **Pop-out:** it creates its canvas in `container.ownerDocument`, so pop-out keeps working. A same-document iframe move was tested in the POC; a real `window.open` window was not.
+- **Restarts:** `__init`/`__clear` survive repeated restarts, as tested with 10 cycles. Each clear disposes GPU objects, removes the canvas and deletes `window.__THREE__`.
+
+## Findings that change the brief
+
+- **Screenshot:** `plugins/viewport/src/game/screenshot.ts` draws every canvas with `drawImage` at an arbitrary time. A WebGL or WebGPU canvas may be blank then, which never happened with Konva. When the app has graphics-3d, use `graphics-capture` instead.
+- **New feature flag:** `graphicsCamera` must be added to the editor's `mergeFeatures`, or it is silently dropped.
+- **Telling 2D from 3D:** both libraries use the key `graphics`, so `hello.libraries` cannot tell them apart. The editor must look at the app's dependencies (`@nanoforge-dev/graphics-3d` vs `graphics-2d`). It could also look at the `graphics-camera` answer.
+- **The viewport type is 2D:** `EngineViewport` (`packages/protocol`) maps game units to px in 2D. For 3D, it still gives the canvas rectangle, and `graphics-camera` gives the rest.
+- **No hot reload today:** a source change while watching rebuilds the app, but nothing restarts the running game. Restart is the manual `runtime.restart`. Asset changes also trigger a rebuild, with no filter. "Hot reload" for 3D therefore means a rebuild plus a restart (manual, or automatic if the editor decides so). The engine side is ready for that.
+- **Class names:** `build-scene.ts` matches shapes by class name only (`Rect`, `Circle`), and the bundler renames a component class whose name clashes with another bundled class (`Sphere` → `Sphere2`), which the ECS then fails to match. Three.js ships `Sphere`, `Plane`, `Box3`… That is why the 3D components are named with a `3D` suffix.
+- **Vector preset:** `@preset vector` already supports `x`/`y`/`z` (slots `x, y, z, w`, minimum 2). A 3D position needs no new preset.
+
+## Components (not in the engine library)
+
+ECS components and systems for 3D are built in [components-systems](https://github.com/NanoForge-dev/components-systems), not in the library:
+
+- transform: `Position3D`, `Rotation3D` (degrees), `Scale3D`;
+- shapes: `Box3D`, `Sphere3D`, `Plane3D`;
+- `Model3D` (`@asset model .glb .gltf`), `Camera3D`, `Light3D`;
+- the escape hatch `Object3DComponent`;
+- a sync system;
+- a pure function that maps component params to Three.js objects.
+
+The editor's Scene screen should import that same pure function, so the game and the Scene screen never drift.
+
+## Proposed editor work
+
+### 1. 3D Scene screen (`SCENE_EDITORS`)
+
+- **Building the scene:** build it from `main.ts` literals without running the game, as `build-scene.ts` does in 2D. Find the position by the `Position3D` component (numeric `x`/`y`/`z`), and turn component params into Three.js objects with the shared mapping function.
+- **Rendering:** render with its own `WebGPURenderer`, its own scene and an editor `OrbitControls` camera that is not the game camera.
+- **Picking and gizmos:** pick with `Raycaster`; move, rotate and scale with `TransformControls`.
+- **Writing a gizmo edit, while stopped:** write `Position3D` / `Rotation3D` / `Scale3D` args to code with `ecs.apply({ kind: "setArgs", … })`, undoable, as `SceneView` does for `Position`.
+- **Writing a gizmo edit, while playing:** apply it live with `live.setField` (`ecs-set-component`), then _Apply to code_.
+
+### 2. Move tool over the running game (`VIEWPORT_OVERLAYS`)
+
+While the tool is active, ask for `{ viewport: true, graphicsCamera: true }`. Then:
+
+1. Pointer → NDC on the canvas rectangle (`contentLeft`, `contentTop`, `visibleWidth`, `visibleHeight`).
+2. Unproject with `inverse(projection)`, then `inverse(view)`, which gives a world ray.
+3. Pick against the entities' bounds, or drag on a plane (the ground, or a plane facing the camera through the object).
+4. Write with `live.setField`.
+
+### 3. Drag and drop
+
+- **Model file:** dropping a `.glb`/`.gltf` from the file manager onto the 3D Scene screen spawns an entity with `Position3D` at the drop point (a ray on the `y = 0` plane) and `Model3D("<asset path>")`.
+- **Component:** dropping a component from the catalog onto an object adds it to that entity.
+
+### 4. Inspector contributions
+
+| Extension point    | Proposal                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `ecs.paramPresets` | `euler`: slots `x, y, z`, all numbers in degrees, shown with a wrap at ±180 and a dial. Used by `Rotation3D`.                        |
+| `ecs.paramPresets` | `vector` with a uniform-scale lock for `Scale3D` (like `size`'s ratio lock).                                                         |
+| `ecs.fieldEditors` | `ref` editors for `@nanoforge-dev/graphics-3d/three#Color` and `#Vector3`, for user components that take Three.js objects as params. |
+| `color` preset     | Already fits the `color` string params of the shape components.                                                                      |
+
+### 5. Toolbar
+
+- **Screenshot:** use `graphics-capture` for 3D apps.
+- **Pop-out:** already works.
+- **Zoom / pixel-perfect:** these are 2D-only. Hide them for 3D, or map zoom to camera zoom.
+
+## Questions for the session
+
+1. Should a source change restart the game automatically while playing, or stay manual?
+2. Should the 3D Scene screen live in the ECS plugin (next to the 2D one) or in its own plugin?
+3. Picking in the running game: are bounds-based picks on the editor side enough, or should we add a `graphics-pick` command answered by the engine (exact meshes)?
+4. Should the editor camera be saved per project, and should there be a "view from game camera" toggle?

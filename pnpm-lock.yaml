@@ -164,9 +164,15 @@ catalogs:
       specifier: ^0.14.3
       version: 0.14.4
   graphics:
+    '@types/three':
+      specifier: ^0.187.0
+      version: 0.187.0
     konva:
       specifier: ^10.2.3
       version: 10.3.2
+    three:
+      specifier: ^0.187.0
+      version: 0.187.0
   lint:
     '@eslint/js':
       specifier: ^10.0.1
@@ -349,6 +355,201 @@ importers:
       '@nanoforge-dev/network':
         specifier: workspace:*
         version: link:../../../../modules/network
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  example/cube-3d:
+    devDependencies:
+      '@nanoforge-dev/cli':
+        specifier: ^2.3.0
+        version: 2.3.0(@types/node@26.4.0)(synckit@0.11.13)
+      '@nanoforge-dev/config':
+        specifier: catalog:config
+        version: 2.3.0(synckit@0.11.13)
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      lint-staged:
+        specifier: catalog:ci
+        version: 17.4.1
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  example/cube-3d/apps/client:
+    devDependencies:
+      '@nanoforge-dev/asset':
+        specifier: workspace:*
+        version: link:../../../../packages/asset
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../../../packages/core
+      '@nanoforge-dev/ecs':
+        specifier: workspace:*
+        version: link:../../../../modules/ecs
+      '@nanoforge-dev/graphics-3d':
+        specifier: workspace:*
+        version: link:../../../../modules/graphics-3d
+      '@nanoforge-dev/utils-eslint-config':
+        specifier: workspace:*
+        version: link:../../../../utils/eslint-config
+      '@nanoforge-dev/utils-prettier-config':
+        specifier: workspace:*
+        version: link:../../../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      '@types/three':
+        specifier: catalog:graphics
+        version: 0.187.0
+      eslint:
+        specifier: catalog:lint
+        version: 10.9.1(jiti@2.6.1)(supports-color@10.2.2)
+      lint-staged:
+        specifier: catalog:ci
+        version: 17.4.1
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
+      three:
+        specifier: catalog:graphics
+        version: 0.187.0
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  example/pong-3d:
+    devDependencies:
+      '@nanoforge-dev/asset':
+        specifier: workspace:*
+        version: link:../../packages/asset
+      '@nanoforge-dev/cli':
+        specifier: ^2.3.0
+        version: 2.3.0(@types/node@26.4.0)(synckit@0.11.13)
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@nanoforge-dev/config':
+        specifier: catalog:config
+        version: 2.3.0(synckit@0.11.13)
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nanoforge-dev/env':
+        specifier: workspace:*
+        version: link:../../packages/env
+      '@nanoforge-dev/network':
+        specifier: workspace:*
+        version: link:../../modules/network
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      lint-staged:
+        specifier: catalog:ci
+        version: 17.4.1
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  example/pong-3d/apps/client:
+    devDependencies:
+      '@nanoforge-dev/asset':
+        specifier: workspace:*
+        version: link:../../../../packages/asset
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../../../packages/core
+      '@nanoforge-dev/ecs':
+        specifier: workspace:*
+        version: link:../../../../modules/ecs
+      '@nanoforge-dev/env':
+        specifier: workspace:*
+        version: link:../../../../packages/env
+      '@nanoforge-dev/graphics-3d':
+        specifier: workspace:*
+        version: link:../../../../modules/graphics-3d
+      '@nanoforge-dev/input':
+        specifier: workspace:*
+        version: link:../../../../modules/input
+      '@nanoforge-dev/network':
+        specifier: workspace:*
+        version: link:../../../../modules/network
+      '@nanoforge-dev/utils-eslint-config':
+        specifier: workspace:*
+        version: link:../../../../utils/eslint-config
+      '@nanoforge-dev/utils-prettier-config':
+        specifier: workspace:*
+        version: link:../../../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      eslint:
+        specifier: catalog:lint
+        version: 10.9.1(jiti@2.6.1)(supports-color@10.2.2)
+      lint-staged:
+        specifier: catalog:ci
+        version: 17.4.1
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
+      three:
+        specifier: catalog:graphics
+        version: 0.187.0
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+
+  example/pong-3d/apps/server:
+    devDependencies:
+      '@nanoforge-dev/asset':
+        specifier: workspace:*
+        version: link:../../../../packages/asset
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@nanoforge-dev/core':
+        specifier: workspace:*
+        version: link:../../../../packages/core
+      '@nanoforge-dev/ecs':
+        specifier: workspace:*
+        version: link:../../../../modules/ecs
+      '@nanoforge-dev/env':
+        specifier: workspace:*
+        version: link:../../../../packages/env
+      '@nanoforge-dev/network':
+        specifier: workspace:*
+        version: link:../../../../modules/network
+      '@nanoforge-dev/utils-eslint-config':
+        specifier: workspace:*
+        version: link:../../../../utils/eslint-config
+      '@nanoforge-dev/utils-prettier-config':
+        specifier: workspace:*
+        version: link:../../../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      eslint:
+        specifier: catalog:lint
+        version: 10.9.1(jiti@2.6.1)(supports-color@10.2.2)
+      lint-staged:
+        specifier: catalog:ci
+        version: 17.4.1
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
       typescript:
         specifier: catalog:core
         version: 6.0.3
@@ -592,6 +793,52 @@ importers:
       prettier:
         specifier: catalog:lint
         version: 3.9.6
+      tsdown:
+        specifier: catalog:build
+        version: 0.22.14(typescript@6.0.3)(unrun@0.3.1(synckit@0.11.13))
+      typescript:
+        specifier: catalog:core
+        version: 6.0.3
+      unrun:
+        specifier: catalog:build
+        version: 0.3.1(synckit@0.11.13)
+      vitest:
+        specifier: catalog:test
+        version: 4.1.11(@types/node@26.4.0)(@vitest/coverage-v8@4.1.11)(vite@8.2.2(@types/node@26.4.0)(jiti@2.6.1)(yaml@2.9.0))
+
+  modules/graphics-3d:
+    dependencies:
+      '@nanoforge-dev/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@types/three':
+        specifier: catalog:graphics
+        version: 0.187.0
+    devDependencies:
+      '@favware/cliff-jumper':
+        specifier: catalog:ci
+        version: 6.1.0
+      '@nanoforge-dev/editor-lib':
+        specifier: workspace:*
+        version: link:../editor
+      '@nanoforge-dev/utils-eslint-config':
+        specifier: workspace:*
+        version: link:../../utils/eslint-config
+      '@nanoforge-dev/utils-prettier-config':
+        specifier: workspace:*
+        version: link:../../utils/prettier-config
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:lint
+        version: 6.0.2(prettier@3.9.6)(supports-color@10.2.2)
+      eslint:
+        specifier: catalog:lint
+        version: 10.9.1(jiti@2.6.1)(supports-color@10.2.2)
+      prettier:
+        specifier: catalog:lint
+        version: 3.9.6
+      three:
+        specifier: catalog:graphics
+        version: 0.187.0
       tsdown:
         specifier: catalog:build
         version: 0.22.14(typescript@6.0.3)(unrun@0.3.1(synckit@0.11.13))
@@ -1204,6 +1451,9 @@ packages:
   '@conventional-changelog/template@1.4.0':
     resolution: {integrity: sha512-aalGyl7dbB5PArRebDIX43ZvBlXrYm9uWzGJ26t+4SzJVPsOuvfILGGbw5X4yX7i50YEmJ8zvbiWnqH/AAnZqg==}
     engines: {node: '>=22'}
+
+  '@dimforge/rapier3d-compat@0.12.0':
+    resolution: {integrity: sha512-uekIGetywIgopfD97oDL5PfeezkFpNhwlzlaEYNOA0N6ghdsOvh/HYjSMek5Q2O1PYvRSDFcqFVJl4r4ZBwOow==}
 
   '@dprint/formatter@0.5.1':
     resolution: {integrity: sha512-cdZUrm0iv/FnnY3CKE2dEcVhNEzrC551aE2h2mTFwQCRBrqyARLDnb7D+3PlXTUVp3s34ftlnGOVCmhLT9DeKA==}
@@ -2055,6 +2305,9 @@ packages:
     cpu: [arm64]
     os: [win32]
 
+  '@tweenjs/tween.js@23.1.3':
+    resolution: {integrity: sha512-vJmvvwFxYuGnF2axRtPYocag6Clbb5YS7kLL+SO/TeVFzHqDIWrNKYtcsPMibjDx9O+bu+psAy9NKfWklassUA==}
+
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
 
@@ -2082,8 +2335,17 @@ packages:
   '@types/node@26.4.0':
     resolution: {integrity: sha512-faiGnoIrLH/V8cibOMEAZ8pMw6oXqSukl29ra4mN8GdaB2ZewzeaLj+INpV5N+Z1eKWzY+IzaIZH2EIR6YZRNQ==}
 
+  '@types/stats.js@0.17.4':
+    resolution: {integrity: sha512-jIBvWWShCvlBqBNIZt0KAshWpvSjhkwkEu4ZUcASoAvhmrgAUI2t1dXrjSL4xXVLB4FznPrIsX3nKXFl/Dt4vA==}
+
+  '@types/three@0.187.0':
+    resolution: {integrity: sha512-v+vKNarUtk4n2QRZ4+CN5ygMM0ARUjXjIQl0R/unMUfmStFeVqGbgqarbrpoGTXRZoulSH16ePrVJVxPJEbMUA==}
+
   '@types/validator@13.15.10':
     resolution: {integrity: sha512-T8L6i7wCuyoK8A/ZeLYt1+q0ty3Zb9+qbSSvrIVitzT3YjZqkTZ40IbRsPanlB4h1QB3JVL1SYCdR6ngtFYcuA==}
+
+  '@types/webxr@0.5.24':
+    resolution: {integrity: sha512-h8fgEd/DpoS9CBrjEQXR+dIDraopAEfu4wYVNY2tEPwk60stPWhvZMf4Foo5FakuQ7HFZoa8WceaWFervK2Ovg==}
 
   '@typescript-eslint/eslint-plugin@8.68.0':
     resolution: {integrity: sha512-WASHDpCm6qO5jj9g1a+8NiW5+GCkAyLReR56/4VruYmNgfUmqpxOfZ2Yfb8xGfJPWv5Qi6LSD8sXdces3vbp/Q==}
@@ -2849,6 +3111,9 @@ packages:
       picomatch:
         optional: true
 
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
+
   figures@6.1.0:
     resolution: {integrity: sha512-d+l3qxjSesT4V7v2fh+QnmFnUWv9lSpjarhShNTgBOfA0ttejbQUAlHLitbjkoRiDulW0OPoQPYIGhIC8ohejg==}
     engines: {node: '>=18'}
@@ -3355,6 +3620,9 @@ packages:
     resolution: {integrity: sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA==}
     engines: {node: '>=18'}
 
+  meshoptimizer@1.1.1:
+    resolution: {integrity: sha512-oRFNWJRDA/WTrVj7NWvqa5HqE1t9MYDj2VaWirQCzCCrAd2GHrqR/sQezCxiWATPNlKTcRaPRHPJwIRoPBAp5g==}
+
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
@@ -3782,6 +4050,9 @@ packages:
   tar@7.5.22:
     resolution: {integrity: sha512-MFO/QzvtAOmJbkhOaCTvbGcFN9L9b+JunIsDwaKljSOdcLMea3NJ1k9Usz/rjdfSXTq4dfzfeS7W4p4YOAAHeA==}
     engines: {node: '>=18'}
+
+  three@0.187.0:
+    resolution: {integrity: sha512-Qiu7R+Cmh8CstZsY1uJOSWnVlfo7ZtNLV7mF8Jltk3LB3AtDu9cRZlcnRKkAk8Y4z6KKw35z7Y7Urd7jWY8etA==}
 
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
@@ -4338,6 +4609,8 @@ snapshots:
       conventional-commits-parser: 7.1.2
 
   '@conventional-changelog/template@1.4.0': {}
+
+  '@dimforge/rapier3d-compat@0.12.0': {}
 
   '@dprint/formatter@0.5.1': {}
 
@@ -5059,6 +5332,8 @@ snapshots:
   '@turbo/windows-arm64@2.10.12':
     optional: true
 
+  '@tweenjs/tween.js@23.1.3': {}
+
   '@types/argparse@1.0.38': {}
 
   '@types/bun@1.4.2':
@@ -5087,7 +5362,20 @@ snapshots:
     dependencies:
       undici-types: 8.3.0
 
+  '@types/stats.js@0.17.4': {}
+
+  '@types/three@0.187.0':
+    dependencies:
+      '@dimforge/rapier3d-compat': 0.12.0
+      '@tweenjs/tween.js': 23.1.3
+      '@types/stats.js': 0.17.4
+      '@types/webxr': 0.5.24
+      fflate: 0.8.3
+      meshoptimizer: 1.1.1
+
   '@types/validator@13.15.10': {}
+
+  '@types/webxr@0.5.24': {}
 
   '@typescript-eslint/eslint-plugin@8.68.0(@typescript-eslint/parser@8.68.0(eslint@10.9.1(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.9.1(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
@@ -5828,6 +6116,8 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.7
 
+  fflate@0.8.3: {}
+
   figures@6.1.0:
     dependencies:
       is-unicode-supported: 2.1.0
@@ -6242,6 +6532,8 @@ snapshots:
   math-intrinsics@1.1.0: {}
 
   meow@13.2.0: {}
+
+  meshoptimizer@1.1.1: {}
 
   micromatch@4.0.8:
     dependencies:
@@ -6689,6 +6981,8 @@ snapshots:
       minipass: 7.1.3
       minizlib: 3.1.0
       yallist: 5.0.0
+
+  three@0.187.0: {}
 
   tinybench@2.9.0: {}
 

@@ -1,0 +1,102 @@
+---
+title: "Graphics 3D: advanced"
+icon: "wand-magic-sparkles"
+description: "Full Three.js access, cameras, picking and editor events in @nanoforge-dev/graphics-3d"
+---
+
+# Graphics 3D: advanced
+
+The library adds no layer between you and Three.js. Everything below is plain Three.js on the objects of `Context.graphics`.
+
+## Importing Three.js
+
+| Import                                 | Content                                                           |
+| -------------------------------------- | ----------------------------------------------------------------- |
+| `@nanoforge-dev/graphics-3d/three`     | `three/webgpu`: the whole core, `WebGPURenderer`, node materials. |
+| `@nanoforge-dev/graphics-3d/three/tsl` | `three/tsl`: the Three.js Shading Language.                       |
+| `three/addons/...`                     | Add-ons (`GLTFLoader`, `OrbitControls`…), from `three` directly.  |
+
+The subpaths only re-export `three`. `three` is a peer dependency that the app installs, so the library, the game and the add-ons resolve the same copy. Add-ons import `three`, which shares its core classes with `three/webgpu`. For add-on types, add `@types/three` at the same version.
+
+### Loading a model
+
+Load project files through `ctx.assets`. It returns the URL the game serves the file at.
+
+```ts
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+const file = ctx.assets.getAsset("models/robot.glb");
+const gltf = await new GLTFLoader().loadAsync(file.path);
+ctx.graphics.scene.add(gltf.scene);
+```
+
+Do not await asset loads in a library's `__init`: start them and add the objects when they arrive.
+
+### Node materials and TSL
+
+`WebGPURenderer` compiles node materials to WGSL (WebGPU) and GLSL (WebGL2) from one source.
+
+```ts
+import { Mesh, MeshStandardNodeMaterial, SphereGeometry } from "@nanoforge-dev/graphics-3d/three";
+import { color, sin, time } from "@nanoforge-dev/graphics-3d/three/tsl";
+
+const material = new MeshStandardNodeMaterial();
+material.colorNode = color("#ff6040").mul(sin(time).mul(0.5).add(0.5));
+ctx.graphics.scene.add(new Mesh(new SphereGeometry(), material));
+```
+
+## Cameras
+
+Assign any camera to `graphics.camera`. The viewport is applied to it at once, and again on every change. For a `PerspectiveCamera`, the library sets `aspect`. For an `OrthographicCamera`, you choose `left`/`right`/`top`/`bottom` in design proportions.
+
+```ts
+import { OrthographicCamera } from "@nanoforge-dev/graphics-3d/three";
+
+graphics.camera = new OrthographicCamera(-16, 16, 9, -9, 0.1, 100);
+```
+
+After changing `fov`, `near` or `far`, call `camera.updateProjectionMatrix()`.
+
+## Picking
+
+`raycast` takes page coordinates, the ones pointer events give:
+
+```ts
+canvas.addEventListener("pointerdown", (event) => {
+  const [hit] = ctx.graphics.raycast(event.clientX, event.clientY);
+  if (hit) console.log("clicked", hit.object.name, "at", hit.point);
+});
+```
+
+`worldToScreen` goes the other way, for example to place an HTML label over an object.
+
+## Render loop
+
+Never call `renderer.setAnimationLoop` or render from `requestAnimationFrame`. The engine renders once per tick, and the editor relies on this: pause freezes the image, and step draws exactly one frame. To draw something else than `scene` through `camera`, such as a post-processing pipeline, replace the library's render step. The library still calls it once per tick, and for editor screenshots:
+
+```ts
+import { RenderPipeline } from "@nanoforge-dev/graphics-3d/three";
+import { pass, saturation } from "@nanoforge-dev/graphics-3d/three/tsl";
+
+const { renderer, scene, camera } = ctx.graphics;
+const postProcessing = new RenderPipeline(renderer);
+const scenePass = pass(scene, camera);
+postProcessing.outputNode = saturation(scenePass.getTextureNode(), 0.2);
+
+ctx.graphics.render = () => postProcessing.render();
+```
+
+Assign `undefined` to go back to the default render. The custom render is reset when the game restarts.
+
+## Editor bridge
+
+When the editor starts the game, the library adds to the editor protocol:
+
+| Name               | Direction       | Payload                | Purpose                                                                                |
+| ------------------ | --------------- | ---------------------- | -------------------------------------------------------------------------------------- |
+| `graphicsCamera`   | feature         | `boolean`              | Asked for in the editor's `welcome`.                                                   |
+| `graphics-camera`  | engine → editor | `{ view, projection }` | The active camera's matrices (16 numbers, column-major), on start and on every change. |
+| `graphics-capture` | editor → engine | none                   | Renders a frame now, even while paused.                                                |
+| `graphics-capture` | engine → editor | PNG data URL           | That frame. WebGL and WebGPU canvases are only readable right after a render.          |
+
+The projection includes the viewport crop, so its normalized device coordinates span the canvas. The canvas is drawn `visibleWidth` × `visibleHeight` CSS px at (`contentLeft`, `contentTop`) of the container (see the `viewport` event).

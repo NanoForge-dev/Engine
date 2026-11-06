@@ -1,0 +1,129 @@
+---
+title: "Graphics 3D"
+icon: "cube"
+description: "Render a 3D scene with @nanoforge-dev/graphics-3d, built on Three.js"
+---
+
+# Graphics 3D
+
+`@nanoforge-dev/graphics-3d` renders a 3D scene in the game's container with [Three.js](https://threejs.org/). It was chosen in the [3D graphics library benchmark](../lib-graphic-3d).
+
+- **Client only.** `__init` throws on a server (no container).
+- **One graphics library per app.** It uses the `graphics` key, like graphics-2d, so an app registers one or the other.
+- **WebGPU first.** It uses WebGPU where the browser has it, and WebGL2 elsewhere.
+- **Rendered by the engine.** One frame per tick, after the ECS systems. A paused game keeps its last image.
+
+## Your first 3D scene in 5 minutes
+
+The [`cube-3d` example](https://github.com/NanoForge-dev/Engine/tree/main/example/cube-3d) is this page as a complete app.
+
+### 1. Install
+
+```sh
+pnpm add @nanoforge-dev/graphics-3d three
+```
+
+`three` is a peer dependency: the app installs it, so the game and Three.js add-ons share one copy. Also add `@types/three` (same version) if you import add-ons from `three/addons`.
+
+### 2. Register the library
+
+```ts
+import { Graphics3DLibrary } from "@nanoforge-dev/graphics-3d";
+
+const app = NanoforgeFactory.createClient({
+  tickRate: 60,
+  viewport: { width: 1920, height: 1080, fit: "contain" },
+});
+const graphics = new Graphics3DLibrary();
+app.use(graphics);
+
+await app.init(options);
+```
+
+### 3. Add a light and an object
+
+Everything Three.js offers is imported from `@nanoforge-dev/graphics-3d/three`. Add objects to `graphics.scene` to show them. Without a light, `MeshStandardMaterial` objects are black.
+
+```ts
+import {
+  BoxGeometry,
+  DirectionalLight,
+  HemisphereLight,
+  Mesh,
+  MeshStandardMaterial,
+} from "@nanoforge-dev/graphics-3d/three";
+
+const sun = new DirectionalLight("white", 3);
+sun.position.set(3, 5, 4);
+graphics.scene.add(new HemisphereLight("white", "#445566", 1), sun);
+
+const cube = new Mesh(new BoxGeometry(1, 1, 1), new MeshStandardMaterial({ color: "#44aa88" }));
+graphics.scene.add(cube);
+```
+
+### 4. Place the camera
+
+The library starts with a perspective camera at `(0, 0, 5)`, looking at the origin.
+
+```ts
+graphics.camera.position.set(0, 1.5, 4);
+graphics.camera.lookAt(0, 0, 0);
+```
+
+### 5. Move things from a system
+
+The scene is drawn after the systems run, so a system changes objects and the next frame shows them. `ctx.app.delta` is in milliseconds.
+
+```ts
+export function spin(registry: Registry, ctx: Context) {
+  registry.getZipper([Model]).forEach(({ Model }) => {
+    Model.object.rotation.y += ctx.app.delta / 1000;
+  });
+}
+```
+
+Systems reach the library through `ctx.graphics`. Do not keep the scene in a module-level variable.
+
+## Viewport
+
+The canvas follows `Context.viewport` like the 2D stage:
+
+- the camera's full frame is the design resolution (`width` × `height` in `createClient`);
+- `contain` letterboxes it, `cover` crops it, `fill` stretches it;
+- the canvas is resized on every window, fullscreen or pixel-ratio change.
+
+You never call `renderer.setSize`, and you never set a camera's `aspect` yourself.
+
+## `Context.graphics`
+
+| Member                                | What it is                                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `scene`                               | The Three.js `Scene` rendered every tick.                                                               |
+| `camera`                              | The camera used for rendering. Assign another one to switch; the viewport is applied to it.             |
+| `renderer`                            | The `WebGPURenderer`. Never call `setAnimationLoop`: the engine drives rendering.                       |
+| `render`                              | Draws one frame. Assign your own function for post-processing (see [Advanced](./advanced#render-loop)). |
+| `backend`                             | `"webgpu"` or `"webgl"`.                                                                                |
+| `raycast(clientX, clientY, objects?)` | Objects under a page point (e.g. a `PointerEvent`), nearest first.                                      |
+| `worldToScreen(point)`                | Where a world point is drawn in the page, in CSS px.                                                    |
+
+## Options
+
+```ts
+new Graphics3DLibrary({ forceWebGL: true });
+```
+
+| Option       | Default | Effect                                                 |
+| ------------ | ------- | ------------------------------------------------------ |
+| `forceWebGL` | `false` | Use the WebGL2 backend even where WebGPU is available. |
+
+## Teardown
+
+When the game stops (or the editor restarts it), the library disposes everything in the scene: geometries, materials, their textures, and the scene's background and environment. It also disposes the renderer, removes the canvas and deletes `window.__THREE__`.
+
+Objects you removed from the scene yourself are not disposed by the library. Call their `dispose()` when you drop them.
+
+## Next
+
+- [Advanced](./advanced): Three.js add-ons, custom shaders, cameras, picking, editor events.
+- [Performance](./performance): many objects, and `InstancedMesh`.
+- [Editor proposal](./editor-proposal): what the editor needs for a 3D Scene screen.
