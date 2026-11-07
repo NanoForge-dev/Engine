@@ -17,7 +17,7 @@ This repository contains multiple packages with separate [releases][github-relea
 
 ## Documentation
 
-The full documentation can be found at: [https://docs.nanoforge.eu](https://docs.nanoforge.eu/docs/engine/getting-started/index)
+The full documentation can be found at: [https://docs.nanoforge.eu/docs/engine/getting-started/index](https://docs.nanoforge.eu/docs/engine/getting-started/index)
 
 ## Usage
 

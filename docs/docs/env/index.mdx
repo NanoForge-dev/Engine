@@ -8,15 +8,21 @@ Environment variables configure a game without changing its code: a server addre
 
 ## Set them
 
-Put them in a `.env` file at the root of the project, or in the shell that runs `nf dev` or `nf start`. Their names start with `NANOFORGE_`, and the prefix is removed before the game sees them: `NANOFORGE_GAME_MODE` becomes `GAME_MODE`. See [Environment variables](/docs/cli/configuration/environment-variables) in the CLI docs for which prefix reaches the client, the server, or both.
+Put them in a `.env` file at the root of the project. Their names start with `NANOFORGE_`, and the prefix is removed before the game sees them: `NANOFORGE_GAME_MODE` becomes `GAME_MODE`. In the `.env` file, `NANOFORGE_CLIENT_X` is meant for the client and `NANOFORGE_SERVER_X` for the server; both become `X`. See [Environment variables](/docs/cli/configuration/environment-variables) in the CLI docs.
 
-Never put a secret in a variable the client receives: the client runs in the player's browser.
+Never put a secret in a variable the client receives: the client runs in the player's browser. Put server-only values in the `.env` file with the `NANOFORGE_SERVER_` prefix, and never export secrets in the shell or container environment that runs `nf start` or `nf dev`.
 
 ## Read them
 
 The run options carry the variables as raw strings: `options.env` in `main`, and `ctx.env` in a library's `__init`. To check them and convert them to typed values, describe them with a class and pass it to `registerEnv` from `@nanoforge-dev/env`:
 
 ```ts
+declare module "@nanoforge-dev/common" {
+  interface Context {
+    rules: { mode: "coop" | "versus"; debug: boolean };
+  }
+}
+
 class GameEnv {
   @Expose()
   @Default("coop")
@@ -46,6 +52,7 @@ export class RulesLibrary extends Library {
 }
 ```
 
+- The `declare module` block types `ctx.rules`: see [Writing your own library](../getting-started/concepts#writing-your-own-library).
 - Mark every variable with `@Expose()`: the others are dropped.
 - `@Default(value)` gives the value of a missing variable. `@TransformToBoolean()` turns `"true"` and `"false"` into booleans. `@IsIpOrURL()` checks an address.
 - The package re-exports the [class-validator](https://github.com/typestack/class-validator) decorators (`@IsIn`, `@IsPort`, `@IsString`, `@IsOptional`...) and `Transform` from class-transformer.

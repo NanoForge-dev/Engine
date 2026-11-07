@@ -28,7 +28,7 @@ await app.init(options); // 2. initialize them
 await app.run(); // 3. start the game loop
 ```
 
-`app.use` throws once `init` was called. Libraries are ready only after `init` resolves.
+`app.use` throws once `init` has resolved: register every library before. Libraries are ready only after `init` resolves.
 
 ## Libraries
 
@@ -133,4 +133,4 @@ Register it like any other library: `app.use(new ScoreLibrary())`. Systems can t
 
 - The `declare module` block types `ctx.score`. `defineLibraryKey` only accepts a key declared there.
 - Return a plain object from `expose()`, never `this`, so game code can't call the hooks.
-- To set the order, pass relationships to `super()` in the constructor: `dependencies` are initialized first, `runBefore` libraries run before this one each tick, `runAfter` libraries run after it. `"*"` means every other library.
+- To set the order, pass relationships to `super()` in the constructor: `dependencies` are initialized first, `runBefore` libraries run before this one each tick, `runAfter` libraries run after it. In `runBefore` and `runAfter`, `"*"` means every other library; `dependencies` only takes library keys.

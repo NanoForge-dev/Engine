@@ -67,7 +67,7 @@ Then send and receive packets: see [Client networking](./network-client) and [Se
 
 ## Environment variables
 
-Both libraries read their settings from the environment, validated at `app.init`. With the `nf` CLI, prefix a variable with `NANOFORGE_CLIENT_` for the client, `NANOFORGE_SERVER_` for the server, or `NANOFORGE_` for both:
+Both libraries read their settings from the environment, validated at `app.init`. Set them in the project's `.env` file: prefix a variable with `NANOFORGE_CLIENT_` for the client, `NANOFORGE_SERVER_` for the server, or `NANOFORGE_` for both. See [Environment](../env/index) for where secrets may go.
 
 ```dotenv .env
 NANOFORGE_CLIENT_SERVER_ADDRESS=127.0.0.1
@@ -104,7 +104,7 @@ Both sides:
 | `NETWORK_MODE` | `dedicated`                   | `dedicated` or `p2p` (see [Peer-to-peer](./network-peer)).                                 |
 | `ICE_SERVERS`  | a list of public STUN servers | STUN and TURN servers for WebRTC: comma-separated URLs (`stun:host:port`) or a JSON array. |
 
-The client fails at start-up when it has neither port, and the server when it has neither listening port. A channel whose port is not set throws when used.
+The client fails at start-up when it has neither port, and the server when it has neither listening port. A channel whose port is not set throws when used, except on a [peer-to-peer](./network-peer) host, where every channel works.
 
 ## Pages in this section
 

@@ -43,7 +43,15 @@ export class Position {
 }
 ```
 
-The registry files each component under its `name`. When you add a component it reads `name` on the instance; when you query, it reads `name` on the class you pass. The two must match. `this.constructor.name` keeps them equal even when the build renames classes.
+The registry files each component under its `name`. When you add a component it reads `name` on the instance; when you query, it reads `name` on the class you pass. The two must match.
+
+<Warning>
+  Don't give a component class the name of another class in your game's bundle. When two classes
+  share a name, the bundler renames one (`Position2`), and the results of `getZipper` are then keyed
+  by that new name: destructuring `({Position})` gives `undefined`. Three.js and Konva export many
+  classes (`Sphere`, `Plane`, `Box3`, `Text`, `Image`, `Line`...), so prefer names that are clearly
+  yours, such as `Hitbox` or `PlayerSprite`.
+</Warning>
 
 An entity has at most one component of each type: adding a second `Position` replaces the first.
 

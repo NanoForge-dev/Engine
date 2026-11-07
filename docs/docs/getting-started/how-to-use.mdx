@@ -23,13 +23,21 @@ The fastest way to start is the NanoForge CLI, `nf`. It generates a project with
     Answer the prompts: name, language, package manager, and whether you want a server. For a first game, choose TypeScript (`ts`, the language of the examples in this documentation) and no server: the whole game then runs in the browser.
 
   </Step>
-  <Step title="Run it">
+  <Step title="Write your game">
     ```bash
     cd my-game
-    nf dev
     ```
 
-    `nf dev` builds the game, serves it, and rebuilds when you save a file. Open the address it prints in your browser. Then follow the [quickstart](./quickstart) to replace the generated code with your own game.
+    Follow the [quickstart](./quickstart): it replaces the generated `src` files with a small
+    game, then runs it with `nf dev`, which builds the game, serves it, and rebuilds when you
+    save a file.
+
+    <Note>
+      The sample the CLI generates for a project without a server registers the network
+      library, which needs a server address. Until the CLI template changes, running it as it
+      is fails at start-up with an environment validation error. The quickstart code doesn't
+      use the network library.
+    </Note>
 
   </Step>
 </Steps>
