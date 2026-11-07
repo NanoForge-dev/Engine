@@ -1,0 +1,170 @@
+---
+title: "Quickstart"
+icon: "rocket"
+description: "Build a small 2D game: a square you move with the arrow keys"
+---
+
+This page builds a complete client-only game: a square on a dark background that you move with the arrow keys. It uses the ECS, 2D graphics and input libraries, which is all most 2D games start from.
+
+You need a project first. If you don't have one, follow [Create a project](./how-to-use) with TypeScript and no server.
+
+## 1. Define the components
+
+A component is plain data attached to an entity. Each one is a class with a `name` field equal to its class name: the ECS uses that name to find the component again.
+
+Replace the files in `src/components` with one file, `src/components/components.ts`:
+
+```ts src/components/components.ts
+import { Rect } from "@nanoforge-dev/graphics-2d";
+
+export class Position {
+  name = this.constructor.name;
+
+  constructor(
+    public x: number,
+    public y: number,
+  ) {}
+}
+
+export class Velocity {
+  name = this.constructor.name;
+
+  constructor(
+    public x: number,
+    public y: number,
+  ) {}
+}
+
+export class Drawable {
+  name = this.constructor.name;
+
+  constructor(public shape: Rect) {}
+}
+
+export class Player {
+  name = this.constructor.name;
+
+  constructor(public speed: number) {}
+}
+```
+
+`Drawable` holds a Konva shape from `@nanoforge-dev/graphics-2d`. The shape is what you see; `Position` is where the game thinks the entity is.
+
+## 2. Write the systems
+
+A system is a function the engine calls on every tick with the registry and the context. It reads and changes components. `registry.getZipper([A, B])` returns every entity that has both components, as objects keyed by component name.
+
+Replace the files in `src/systems` with `src/systems/systems.ts`:
+
+```ts src/systems/systems.ts
+import type { Context } from "@nanoforge-dev/common";
+import type { Registry } from "@nanoforge-dev/ecs/client";
+import { InputEnum } from "@nanoforge-dev/input";
+
+import { Drawable, Player, Position, Velocity } from "../components/components";
+
+const WIDTH = 800;
+const HEIGHT = 600;
+const SIZE = 50;
+
+// Arrow keys set the player's velocity, in game units per second.
+export const controlPlayer = (registry: Registry, ctx: Context) => {
+  registry.getZipper([Player, Velocity]).forEach(({ Player, Velocity }) => {
+    const axis = (minus: InputEnum, plus: InputEnum) =>
+      (ctx.input.isKeyPressed(plus) ? 1 : 0) - (ctx.input.isKeyPressed(minus) ? 1 : 0);
+    Velocity.x = axis(InputEnum.ArrowLeft, InputEnum.ArrowRight) * Player.speed;
+    Velocity.y = axis(InputEnum.ArrowUp, InputEnum.ArrowDown) * Player.speed;
+  });
+};
+
+// Moves every entity by its velocity, scaled by the time since the last tick.
+export const move = (registry: Registry, ctx: Context) => {
+  const seconds = ctx.app.delta / 1000;
+  registry.getZipper([Position, Velocity]).forEach(({ Position, Velocity }) => {
+    Position.x = Math.min(Math.max(Position.x + Velocity.x * seconds, 0), WIDTH - SIZE);
+    Position.y = Math.min(Math.max(Position.y + Velocity.y * seconds, 0), HEIGHT - SIZE);
+  });
+};
+
+// Copies each position to its shape, so the screen follows the game state.
+export const draw = (registry: Registry) => {
+  registry.getZipper([Position, Drawable]).forEach(({ Position, Drawable }) => {
+    Drawable.shape.position({ x: Position.x, y: Position.y });
+  });
+};
+```
+
+- `ctx.input` comes from the input library, and `ctx.app.delta` is the time since the last tick, in milliseconds. Multiplying by it keeps the speed the same at any frame rate.
+- Systems run in the order you add them: read input, then move, then draw.
+
+## 3. Write the entry point
+
+`main` creates the application, registers the libraries, spawns the player entity and starts the game loop. Replace `src/main.ts`:
+
+```ts src/main.ts
+import type { ClientRunOptions } from "@nanoforge-dev/common";
+import { NanoforgeFactory } from "@nanoforge-dev/core";
+import { EcsLibrary } from "@nanoforge-dev/ecs/client";
+import { Graphics2DLibrary, Rect } from "@nanoforge-dev/graphics-2d";
+import { InputLibrary } from "@nanoforge-dev/input";
+
+import { Drawable, Player, Position, Velocity } from "./components/components";
+import { controlPlayer, draw, move } from "./systems/systems";
+
+export const main = async (options: ClientRunOptions): Promise<void> => {
+  const app = NanoforgeFactory.createClient({
+    tickRate: 60,
+    viewport: { width: 800, height: 600, fit: "contain" },
+  });
+
+  const graphics = new Graphics2DLibrary();
+  const ecs = new EcsLibrary();
+  app.use(graphics);
+  app.use(ecs);
+  app.use(new InputLibrary());
+
+  await app.init(options);
+
+  graphics.baseLayer.add(new Rect({ x: 0, y: 0, width: 800, height: 600, fill: "#1e1e2e" }));
+
+  const registry = ecs.registry;
+  const player = registry.spawnEntity();
+  const shape = new Rect({ width: 50, height: 50, fill: "#f38ba8" });
+  graphics.baseLayer.add(shape);
+  registry.addComponent(player, new Position(375, 275));
+  registry.addComponent(player, new Velocity(0, 0));
+  registry.addComponent(player, new Drawable(shape));
+  registry.addComponent(player, new Player(300));
+
+  registry.addSystem(controlPlayer);
+  registry.addSystem(move);
+  registry.addSystem(draw);
+
+  await app.run();
+};
+```
+
+The order matters:
+
+1. `app.use` registers each library. It must happen before `init`.
+2. `await app.init(options)` initializes every library. `graphics.baseLayer` and `ecs.registry` exist only after it.
+3. Spawn entities and add systems.
+4. `await app.run()` starts the game loop.
+
+The viewport sets the game's own resolution, 800 by 600 here. Positions are in these game units, and the engine scales the canvas to fit the browser window.
+
+## 4. Run it
+
+```bash
+nf dev
+```
+
+Open the address `nf dev` prints and press the arrow keys: the square moves and stops at the edges.
+
+## What's next
+
+- [Core concepts](./concepts) explains the application, libraries, the context and the game loop.
+- [ECS](../ecs/index) covers entities, components and systems in more depth.
+- [Graphics 2D](../graphics-2d/index), [Input](../input/index) and [Sound and music](../audio/index) cover the libraries this game uses, and the ones it could add.
+- [Assets](../assets/index) shows how to load images and sounds from the `assets` folder.
+- [Network](../network/index) shows how to add a server and other players.

@@ -4,6 +4,8 @@ icon: "book"
 description: "How a running game and the NanoForge editor talk to each other"
 ---
 
+To run and inspect your game in the NanoForge editor, register `EditorLibrary` from `@nanoforge-dev/editor-lib`. That is all a game needs: the rest of this page describes the protocol, for people who write an editor host or a library with editor features.
+
 When the editor starts a game, it passes two event emitters in `RunOptions.editor`:
 
 - `fromEditor`: editor → engine commands. `EditorLibrary` drains it at the start of every tick, including paused ticks.
@@ -50,12 +52,13 @@ The hook is not part of the engine: `EditorLibrary` calls it with `ctx.app.callH
 
 ## Run control
 
-| Command  | Effect                                        |
-| -------- | --------------------------------------------- |
-| `pause`  | `ctx.app.requestPause()`                      |
-| `resume` | `ctx.app.requestResume()`                     |
-| `step`   | runs exactly one tick while paused            |
-| `stop`   | `ctx.app.requestStop()`: clears every library |
+| Command  | Effect                                                                                                  |
+| -------- | ------------------------------------------------------------------------------------------------------- |
+| `pause`  | `ctx.app.requestPause()`                                                                                |
+| `resume` | `ctx.app.requestResume()`                                                                               |
+| `step`   | runs exactly one tick while paused                                                                      |
+| `stop`   | `ctx.app.requestStop()`: clears every library                                                           |
+| `mute`   | mutes (`true`) or unmutes (`false`) the sound and music libraries, on top of the game's own muted state |
 
 A command applies on the tick it is drained in. After a `stop`, that tick still completes before the libraries are cleared.
 
@@ -63,17 +66,28 @@ The engine reports each change of its run state with the `state` event: `"runnin
 
 ## Optional features
 
-Each feature is enabled only if the editor asks for it in `welcome.features`.
+Each feature is enabled only if the editor asks for it in `welcome.features`. The base features are:
 
-| Feature                                        | Event           | Payload                                                                                             |
-| ---------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------- |
-| `frameStats: { intervalMs }`                   | `frame-stats`   | `{ windowMs, ticks, tps, tick: { avg, max }, libraries: { [key]: { avg, max } } }`, durations in ms |
-| `logs: true`                                   | `log`           | `{ level, message }` for each console call made by the game's code                                  |
-| `logs: { values: true }`                       | `log`           | also `values` (the logged values, as trees) and `caller` (`<bundle file>:<line>:<column>`)          |
-| `networkTrace: { sampleRate?, maxPerSecond? }` | `network-trace` | `{ direction, transport, clientId?, size, head, time }` (network libraries)                         |
-| `viewport: true`                               | `viewport`      | the game's `ViewportState`, at once and on every change (clients)                                   |
+| Feature                                                   | Event           | Payload                                                                                                                                                                                               |
+| --------------------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `frameStats: { intervalMs }`                              | `frame-stats`   | `{ windowMs, ticks, tps, tick: { avg, max }, libraries: { [key]: { avg, max } } }`, durations in ms                                                                                                   |
+| `logs: true`                                              | `log`           | `{ level, message }` for each `console.debug`, `log`, `info`, `warn` and `error` call made by the game's code (`log` is reported as `info`)                                                           |
+| `logs: { values: true }`                                  | `log`           | also `values` (the logged values, as trees) and `caller` (`<bundle file>:<line>:<column>`)                                                                                                            |
+| `networkTrace: { sampleRate?, maxPerSecond?, maxBytes? }` | `network-trace` | `{ direction, transport, clientId?, size, head, data?, time }` (network libraries); `data` holds the first `maxBytes` bytes, hex encoded. A `network-stats` event also sends the totals every second. |
+| `viewport: true`                                          | `viewport`      | the game's `ViewportState`, at once and on every change (clients)                                                                                                                                     |
 
-Log forwarding only forwards console calls whose stack contains a frame of the game bundle. Output from before the `welcome` (library `__init`, the start of `main`) is kept, up to 200 lines, and sent as soon as the editor asks for logs. It is dropped if the editor doesn't ask for them. A client runs inside the editor page, and this keeps the editor's own console output out of the game logs.
+Libraries add their own features:
+
+| Feature                          | Library       | Events                                | Commands                                                                                                                            |
+| -------------------------------- | ------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `ecsWorld: { intervalMs }`       | `ecs`         | `ecs-world`                           | `ecs-set-component`, `ecs-add-component`, `ecs-remove-component`, `ecs-spawn-entity`, `ecs-remove-entity`, `ecs-set-system-enabled` |
+| `ecsSystemStats: { intervalMs }` | `ecs`         | `ecs-system-stats`                    |                                                                                                                                     |
+| `scenes: { intervalMs }`         | `scene`       | `scenes`                              | `scenes-load`, `scenes-unload`, `scenes-set-var`                                                                                    |
+| `graphicsCamera: true`           | `graphics-3d` | `graphics-camera`, `graphics-capture` | `graphics-capture`                                                                                                                  |
+
+The feature only turns the events on: the commands are handled whenever the library and `EditorLibrary` are registered. Their payloads are typed in each package (`EcsEditorCommands`, `SceneEditorCommands`...). See the API reference tab.
+
+Log forwarding only forwards console calls whose stack contains a frame of the game bundle. Output from before the `welcome` (library `__init`, the start of `main`) is kept, up to 200 lines, and sent as soon as the editor asks for logs. It is dropped if the editor doesn't ask for them. When more than 200 lines were waiting, a warning line says how many earlier lines were dropped. A client runs inside the editor page, and this keeps the editor's own console output out of the game logs.
 
 ### Logged values belong to the host
 
@@ -90,7 +104,10 @@ A point `(x, y)` of the game is drawn at `(contentLeft + originX + x * scaleX, c
 ## Hosting a game
 
 ```ts
-import { QueuedEventEmitter } from "@nanoforge-dev/editor-lib";
+import { EDITOR_PROTOCOL_VERSION, QueuedEventEmitter } from "@nanoforge-dev/editor-lib";
+
+// `main` is the game's entry point, `options` its run options, `handle` your event handler
+// and `serializeLogValue` your value serializer (optional, see above).
 
 const fromEditor = new QueuedEventEmitter(); // drained by the engine
 const toEditor = {
@@ -102,7 +119,10 @@ const toEditor = {
 };
 
 await main({ ...options, editor: { toEditor, fromEditor, serializeLogValue } });
-fromEditor.emit("welcome", { protocolVersion: 1, features: { frameStats: { intervalMs: 500 } } });
+fromEditor.emit("welcome", {
+  protocolVersion: EDITOR_PROTOCOL_VERSION,
+  features: { frameStats: { intervalMs: 500 } },
+});
 ```
 
 The game started by `main` must have registered `EditorLibrary`, or `RunOptions.editor` is ignored.

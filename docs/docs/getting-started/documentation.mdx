@@ -1,12 +1,16 @@
 ---
-title: "Documentation"
-icon: "book"
-description: "How the engine documentation is written and published"
+title: "About this documentation"
+icon: "book-open"
+description: "Where the engine guides and API reference are, and how to report a mistake"
 ---
 
-The engine documentation lives in the engine repository and is published to this site automatically at each engine release.
+The engine documentation has two parts:
 
-- **Pages** are the `.mdx` files in `docs/docs`. Their order and groups come from `docs/docs/navigation.json`: every page is listed there exactly once.
-- **API references** are generated from the TSDoc comments of each package by `pnpm run docs` (TypeDoc), into `docs/references`. They are never written by hand.
+- **Guides**, in this tab: what each package is for and how to use it, with examples. Start with [Create a project](./how-to-use).
+- **API reference**, in the API reference tab: every class, method, option and type of every package. It is generated from the comments in the engine source code.
 
-To change a page, edit it in the engine repository. Links between pages are relative to the file, like `./how-to-use` or `../network/index`.
+Both are published from the [engine repository](https://github.com/NanoForge-dev/Engine) at each engine release, so they match the latest published packages.
+
+## Report a mistake
+
+If a page is wrong, unclear or missing, open an issue on the [engine repository](https://github.com/NanoForge-dev/Engine/issues), or ask on [Discussions](https://github.com/NanoForge-dev/Engine/discussions). The guides are the `.mdx` files in the repository's `docs/docs` folder: you can also propose a change there with a pull request.

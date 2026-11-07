@@ -4,7 +4,7 @@ icon: "gauge"
 description: "Drawing many objects with @nanoforge-dev/graphics-3d"
 ---
 
-Each `Mesh` costs one draw call per frame. In the [benchmark POC](../lib-graphic-3d/poc), 2,000 meshes run at the display rate, while 20,000 run at about 12 FPS.
+Each `Mesh` costs one draw call per frame. In the engine team's benchmark, 2,000 meshes run at the display rate, while 20,000 run at about 12 FPS.
 
 When a frame has more than 2,000 draw calls, the library logs this warning once:
 

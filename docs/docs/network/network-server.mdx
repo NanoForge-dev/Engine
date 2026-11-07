@@ -1,10 +1,10 @@
 ---
-title: "Server Networking (network-server)"
+title: "Server networking"
 icon: "book"
-description: "How the server-side networking package works"
+description: "Accept clients, identify them, and exchange packets from the game server"
 ---
 
-This document explains the `network-server` package implementation and the APIs used from server-side code.
+`NetworkServerLibrary`, from `@nanoforge-dev/network/server`, accepts client connections in the game server. See [Network](./index) to register it and set its environment variables.
 
 ## Overview
 
@@ -81,7 +81,7 @@ file (see [Typed packets](./network-client#typed-packets)). Its listeners and
 `read` also get the sender.
 
 ```ts
-import { Input, Move, Play } from "../../shared/protocol";
+import { Input, Move } from "../../shared/protocol";
 
 // listen once, after app.init()
 network.packets.on(Input, ({ key }, { clientId, ctx }) => {

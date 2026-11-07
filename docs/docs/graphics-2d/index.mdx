@@ -1,0 +1,49 @@
+---
+title: "Graphics 2D"
+icon: "shapes"
+description: "Draw shapes, images and text with the 2D graphics library"
+---
+
+`@nanoforge-dev/graphics-2d` draws your game with [Konva](https://konvajs.org/), a canvas library. It works on the client only.
+
+## Register the library
+
+```ts
+import { Graphics2DLibrary } from "@nanoforge-dev/graphics-2d";
+
+const graphics = new Graphics2DLibrary();
+app.use(graphics);
+await app.init(options);
+```
+
+After `init`, `graphics.stage` and `graphics.baseLayer` are ready. Systems reach the same objects through `ctx.graphics.stage` and `ctx.graphics.baseLayer`. Both throw before `init`.
+
+You can't register `Graphics2DLibrary` and `Graphics3DLibrary` in the same app: both use the `graphics` key.
+
+## Draw
+
+The package re-exports the Konva classes: `Rect`, `Circle`, `Ellipse`, `Line`, `Text`, `Image`, `Sprite`, `Group`, `Layer` and the others. Create a shape and add it to a layer:
+
+```ts
+const hud = new Layer();
+ctx.graphics.stage.add(hud);
+const score = new Text({ x: 20, y: 20, text: "Score: 0", fontSize: 32, fill: "white" });
+hud.add(score);
+ctx.graphics.baseLayer.add(new Circle({ x: 400, y: 300, radius: 40, fill: "red" }));
+
+score.text("Score: 1");
+```
+
+- Change a shape through its methods (`shape.x(10)`, `shape.position({ x, y })`, `shape.fill("blue")`): the layer redraws on its own.
+- Add your own `Layer`s to `ctx.graphics.stage` to draw groups of shapes above or below others. Layers added later are drawn on top.
+- Keep the shape in a component and copy the entity's position to it in a system, as the [quickstart](../getting-started/quickstart) does.
+
+The [Konva documentation](https://konvajs.org/docs/) lists every shape and option.
+
+## Images
+
+Load an image from the `assets` folder with `ctx.assets`, then give it to an `Image` shape. See [Assets](../assets/index).
+
+## Coordinates and window size
+
+Positions are in game units, set by the `viewport` option of `NanoforgeFactory.createClient` (1920 by 1080 by default). The library scales the stage to the window and follows its size changes, so you never resize the canvas yourself. See [Core concepts](../getting-started/concepts#the-application).

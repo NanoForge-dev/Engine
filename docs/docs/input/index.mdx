@@ -1,0 +1,57 @@
+---
+title: "Input"
+icon: "keyboard"
+description: "Read the keyboard, the mouse and game controllers"
+---
+
+`@nanoforge-dev/input` reads the player's input on the client. It has two libraries:
+
+| Library             | Import from                           | Context key      |
+| ------------------- | ------------------------------------- | ---------------- |
+| `InputLibrary`      | `@nanoforge-dev/input/keyboard-mouse` | `ctx.input`      |
+| `ControllerLibrary` | `@nanoforge-dev/input/controller`     | `ctx.controller` |
+
+The root `@nanoforge-dev/input` exports the keyboard and mouse library too. Register the ones you need with `app.use(new InputLibrary())`. Both read the current state: call them from a system on every tick.
+
+## Keyboard and mouse
+
+Keys and mouse buttons are members of `InputEnum` (`InputEnum.KeyA`, `InputEnum.Space`, `InputEnum.ArrowUp`, `InputEnum.MouseLeft`...). Their values are the browser's `KeyboardEvent.code`, so they name a key's position, not its letter.
+
+```ts
+if (ctx.input.isKeyPressed(InputEnum.Space)) {
+  // jump
+}
+const mouse = ctx.input.getMousePosition(); // game coordinates
+if (ctx.input.isDragging(InputEnum.MouseLeft)) {
+  const drag = ctx.input.getDragState(); // startX, startY, x, y, deltaX, deltaY
+  void drag;
+}
+```
+
+| Method                | Returns                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| `isKeyPressed(key)`   | Whether the key or mouse button is held down.                                              |
+| `getPressedKeys()`    | Every key held down.                                                                       |
+| `getMousePosition()`  | The pointer position, in game coordinates.                                                 |
+| `getMouseState()`     | Position, previous position, movement, and whether the pointer is over the game (`focus`). |
+| `isDragging(button?)` | Whether a drag is in progress, with that button if given.                                  |
+| `getDragState()`      | Where the drag started, where it is, and how far it moved.                                 |
+| `getWheelState()`     | The scroll wheel movement.                                                                 |
+
+Mouse positions use the viewport, so they match the coordinates you draw with.
+
+## Controllers
+
+`ControllerLibrary` reads gamepads with the browser Gamepad API, in the standard layout. Buttons are members of `ControllerButton` (`A`, `B`, `X`, `Y`, `LeftBumper`, `Start`, `DPadUp`...), axes of `ControllerAxis`.
+
+```ts
+if (ctx.controller.isButtonJustPressed(ControllerButton.A)) {
+  // jump, once per press
+}
+const stick = ctx.controller.getStick("left"); // x and y, from -1 to 1
+```
+
+- Each method takes an optional controller index, `0` by default.
+- `isButtonJustPressed` and `isButtonJustReleased` are true for one tick only.
+- Small stick movements are reported as `0`. Change the threshold with `new ControllerLibrary({ deadzone: 0.2 })` (default `0.15`).
+- `onConnect(listener)` and `onDisconnect(listener)` tell you when a controller is plugged in or out. `vibrate(effect)` makes it rumble where the browser supports it.

@@ -4,12 +4,22 @@
     "pages": [
       "getting-started/index",
       "getting-started/how-to-use",
+      "getting-started/quickstart",
+      "getting-started/concepts",
       "getting-started/documentation"
     ]
   },
   {
-    "group": "Registry",
-    "pages": ["registry/index", "registry/writing-web-assembly"]
+    "group": "Building a game",
+    "pages": [
+      "ecs/index",
+      "graphics-2d/index",
+      "input/index",
+      "audio/index",
+      "assets/index",
+      "scene/index",
+      "env/index"
+    ]
   },
   {
     "group": "Network",
@@ -32,20 +42,7 @@
     "pages": ["editor/protocol"]
   },
   {
-    "group": "Design notes",
-    "pages": [
-      "graphics-3d/editor-proposal",
-      {
-        "group": "3D graphics library benchmark",
-        "pages": [
-          "lib-graphic-3d/index",
-          "lib-graphic-3d/three-js",
-          "lib-graphic-3d/babylon-js",
-          "lib-graphic-3d/playcanvas",
-          "lib-graphic-3d/luma-gl",
-          "lib-graphic-3d/poc"
-        ]
-      }
-    ]
+    "group": "ECS internals",
+    "pages": ["registry/index", "registry/writing-web-assembly"]
   }
 ]

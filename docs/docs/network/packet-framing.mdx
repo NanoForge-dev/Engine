@@ -21,7 +21,8 @@ useful once a newer one has arrived.
 
 The reliable channels need a TCP port (`SERVER_TCP_PORT` / `LISTENING_TCP_PORT`),
 the unreliable ones a UDP port (`SERVER_UDP_PORT` / `LISTENING_UDP_PORT`).
-Using a channel whose port is not configured throws.
+Using a channel whose port is not configured throws, except on a
+[peer-to-peer](./network-peer) host, where every channel works.
 
 Over TCP, `ReliableUnordered` is delivered in order in practice: it only
 promises that nothing is lost.

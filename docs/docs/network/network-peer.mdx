@@ -27,7 +27,9 @@ export default defineConfig({
 });
 ```
 
-The environment is the same as with a dedicated server:
+The environment is the same as with a dedicated server. The `nf` CLI removes the
+`NANOFORGE_CLIENT_` and `NANOFORGE_SERVER_` prefixes, so the library reads
+`SERVER_ADDRESS`, `LISTENING_TCP_PORT` and so on:
 
 ```dotenv
 NANOFORGE_CLIENT_SERVER_ADDRESS=127.0.0.1
@@ -94,12 +96,13 @@ export const showInvite = (registry: Registry, ctx: Context) => {
   signaling server reports it gone, a data channel closes, or its connection
   fails.
 - **The host leaves.** The game ends: the signaling server closes the room, and
-  each player's `isConnected()` turns `false` about a second later.
+  each player's `isConnected()` turns `false` as soon as its signaling socket
+  closes.
 
 ## Limits
 
-- **Message size.** Keep each packet at or below 64 KiB: WebRTC data channels
-  cap message size.
+- **Message size.** The library does not split packets. Keep each one at or
+  below 64 KiB, a size the data channels of every browser accept.
 - **`ReliableUnordered` is really unordered**, unlike over a dedicated server's
   WebSocket.
 - **NAT.** A direct connection fails for some pairs of players, typically on
@@ -118,14 +121,14 @@ export const showInvite = (registry: Registry, ctx: Context) => {
 
 JSON text frames, at most 64 KiB each:
 
-| Who    | Sends                                | Server forwards                       |
-| ------ | ------------------------------------ | ------------------------------------- |
-| Host   | connects without a `room`            | `{type:"room", room}` to the host     |
-| Player | connects with `?room=CODE`           | HTTP 404 when the room does not exist |
-| Player | any frame (its WebRTC offer and ICE) | `{type:"signal", from, data}` to host |
-| Host   | `{type:"signal", to, data}`          | `data` to that player of its room     |
-| Player | closes                               | `{type:"leave", from}` to the host    |
-| Host   | closes                               | close code `4001` to its players      |
+| Who    | Sends                                      | Server forwards                       |
+| ------ | ------------------------------------------ | ------------------------------------- |
+| Host   | connects without a `room`                  | `{type:"room", room}` to the host     |
+| Player | connects with `?room=CODE`                 | HTTP 404 when the room does not exist |
+| Player | any JSON object (its WebRTC offer and ICE) | `{type:"signal", from, data}` to host |
+| Host   | `{type:"signal", to, data}`                | `data` to that player of its room     |
+| Player | closes                                     | `{type:"leave", from}` to the host    |
+| Host   | closes                                     | close code `4001` to its players      |
 
 The host welcomes a player (`{type:"welcome", id, token}`) once its data
 channels are open, so players speak the same protocol as with a dedicated UDP

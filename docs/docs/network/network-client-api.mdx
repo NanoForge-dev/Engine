@@ -1,10 +1,12 @@
 ---
-title: "network-client API"
+title: "Network client API"
 icon: "book"
-description: "API reference for the client networking package"
+description: "Reference of NetworkClientLibrary, from @nanoforge-dev/network/client"
 ---
 
-`NetworkClientLibrary` is exposed on `ctx.network`. Its methods take an optional
+Register `NetworkClientLibrary` from `@nanoforge-dev/network/client`. Systems
+reach it through `ctx.network`, which exposes the methods below; the library
+instance has them too. They take an optional
 `{ channel }` to pick one of the four [channels](./packet-framing):
 `Channel.ReliableOrdered`, `Channel.ReliableUnordered`,
 `Channel.UnreliableOrdered` or `Channel.UnreliableUnordered`.
@@ -17,14 +19,7 @@ TCP connects first, then UDP with the TCP session token, so both share one clien
 id. `__init` rejects when a transport fails, or when its channels are not open
 within 10 seconds.
 
-```ts
-import { Channel } from "@nanoforge-dev/network/client";
-
-ctx.network.sendData({ type: "join" }); // Channel.ReliableOrdered
-ctx.network.sendData({ x: 1, y: 2 }, { channel: Channel.UnreliableOrdered });
-
-const messages = ctx.network.getReceivedPackets().map((packet) => packet.json()); // every channel
-```
+The [client guide](./network-client) has examples.
 
 ## sendData(data, options?)
 
@@ -127,6 +122,12 @@ the server has welcomed the client. It is only kept in memory: a page
 reload gets a new id.
 
 Type: `string | undefined`
+
+## roomCode and inviteLink
+
+In [peer-to-peer](./network-peer) mode, the code of the room the client hosts
+or joined, and a link other players open to join it. See the peer-to-peer page
+for when they are set.
 
 ## NetworkPayload
 
