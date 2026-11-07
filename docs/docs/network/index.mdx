@@ -1,22 +1,108 @@
 ---
-title: "Network Overview"
-icon: "book"
-description: "Overview of the engine networking docs"
+title: "Network"
+icon: "network-wired"
+description: "Add multiplayer to a game: set up the network libraries and their environment variables"
 ---
 
-This page describes the engine's networking libraries: `network-server` and `network-client`. Together they provide a small, pragmatic networking layer used by the example `pong-network` game. The same apps can also run without a game server, hosted by one of the players.
+`@nanoforge-dev/network` connects game clients to a game server. It has one library per side:
 
-## Goals
+| Library                | Import from                     | Runs on              |
+| ---------------------- | ------------------------------- | -------------------- |
+| `NetworkClientLibrary` | `@nanoforge-dev/network/client` | the client (browser) |
+| `NetworkServerLibrary` | `@nanoforge-dev/network/server` | the server (Bun)     |
 
-- Keep the protocol minimal and predictable for multiplayer games.
-- Let each packet pick its delivery guarantees through four channels: reliable or unreliable, ordered or unordered.
-- Use well-understood transports: TCP for the reliable channels and UDP (WebRTC) for low-latency, best-effort ones.
+Shared definitions, such as `Channel` and `definePacket`, come from `@nanoforge-dev/network`. Both libraries are reached through `ctx.network`.
 
-## Related Pages
+Each packet goes on one of four [channels](./packet-framing): reliable or unreliable, ordered or unordered. Reliable channels use a TCP WebSocket; unreliable ones use WebRTC data channels, for low-latency updates such as positions.
 
-- [Network Client](./network-client)
-- [Network Server](./network-server)
-- [Packet Channels](./packet-framing)
-- [Network Server API](./network-server-api)
-- [Network Client API](./network-client-api)
-- [Peer-to-peer Networking](./network-peer)
+A game can also run without a dedicated server: one player's browser hosts the game. See [Peer-to-peer](./network-peer).
+
+## Set up a client and a server
+
+Create the project with a server: `nf new` and answer **yes** to the server prompt. It generates `apps/client` and `apps/server`, each with its network library registered. Put the packet definitions both sides use in a shared file:
+
+```ts shared/protocol.ts
+import { Channel, definePacket } from "@nanoforge-dev/network";
+
+export const Input = definePacket<{ key: "up" | "down" }>("input");
+export const Move = definePacket<{ id: number; x: number; y: number }>("move", {
+  channel: Channel.UnreliableOrdered,
+});
+```
+
+Register the client library:
+
+```ts apps/client/src/main.ts
+import { NetworkClientLibrary } from "@nanoforge-dev/network/client";
+
+const network = new NetworkClientLibrary();
+app.use(network);
+await app.init(options); // connects to the server
+```
+
+And the server library, with the server ECS:
+
+```ts apps/server/src/main.ts
+import { EcsLibrary } from "@nanoforge-dev/ecs/server";
+import { NetworkServerLibrary } from "@nanoforge-dev/network/server";
+
+const app = NanoforgeFactory.createServer({ tickRate: 60 });
+const network = new NetworkServerLibrary();
+app.use(new EcsLibrary());
+app.use(network);
+await app.init(options); // starts listening
+```
+
+- The client connects during `app.init`, which rejects when the server can't be reached within 10 seconds.
+- Each tick, the network library runs before the ECS: the packets received are ready for your systems.
+- `NetworkServerLibrary` needs the Bun runtime, which `nf` uses to run servers.
+
+Then send and receive packets: see [Client networking](./network-client) and [Server networking](./network-server). The [pong-network example](https://github.com/NanoForge-dev/Engine/tree/main/example/pong-network) is a complete game.
+
+## Environment variables
+
+Both libraries read their settings from the environment, validated at `app.init`. With the `nf` CLI, prefix a variable with `NANOFORGE_CLIENT_` for the client, `NANOFORGE_SERVER_` for the server, or `NANOFORGE_` for both:
+
+```dotenv .env
+NANOFORGE_CLIENT_SERVER_ADDRESS=127.0.0.1
+NANOFORGE_CLIENT_SERVER_TCP_PORT=4445
+NANOFORGE_CLIENT_SERVER_UDP_PORT=4444
+NANOFORGE_SERVER_LISTENING_TCP_PORT=4445
+NANOFORGE_SERVER_LISTENING_UDP_PORT=4444
+```
+
+Client variables:
+
+| Variable          | Default | Meaning                                                                        |
+| ----------------- | ------- | ------------------------------------------------------------------------------ |
+| `SERVER_ADDRESS`  | none    | **Required.** The server's IP address or URL (`ws`, `wss`, `http` or `https`). |
+| `SERVER_TCP_PORT` | none    | The server's TCP port. Needed for the reliable channels.                       |
+| `SERVER_UDP_PORT` | none    | The server's UDP signaling port. Needed for the unreliable channels.           |
+| `WSS`             | `false` | `true` to connect with secure WebSockets.                                      |
+
+Server variables:
+
+| Variable              | Default   | Meaning                                                                                             |
+| --------------------- | --------- | --------------------------------------------------------------------------------------------------- |
+| `LISTENING_TCP_PORT`  | none      | Port of the reliable channels.                                                                      |
+| `LISTENING_UDP_PORT`  | none      | Port of the unreliable channels' signaling.                                                         |
+| `LISTENING_INTERFACE` | `0.0.0.0` | Address the server binds to.                                                                        |
+| `WSS_CERT`, `WSS_KEY` | none      | Paths to a TLS certificate and its key, for secure WebSockets. Set both or neither.                 |
+| `ICE_PORT`            | none      | One fixed UDP port for every WebRTC connection, so a firewall or port forward can allow it.         |
+| `ADVERTISE_IP`        | none      | Public IP written into the server's WebRTC candidates, when it runs behind a NAT or in a container. |
+
+Both sides:
+
+| Variable       | Default                       | Meaning                                                                                    |
+| -------------- | ----------------------------- | ------------------------------------------------------------------------------------------ |
+| `NETWORK_MODE` | `dedicated`                   | `dedicated` or `p2p` (see [Peer-to-peer](./network-peer)).                                 |
+| `ICE_SERVERS`  | a list of public STUN servers | STUN and TURN servers for WebRTC: comma-separated URLs (`stun:host:port`) or a JSON array. |
+
+The client fails at start-up when it has neither port, and the server when it has neither listening port. A channel whose port is not set throws when used.
+
+## Pages in this section
+
+- [Client networking](./network-client) and [Server networking](./network-server): send and receive data and typed packets, identify clients.
+- [Peer-to-peer](./network-peer): let a player host the game.
+- [Packet channels](./packet-framing): what each channel guarantees and how packets are framed.
+- [Client API](./network-client-api) and [Server API](./network-server-api): every method and type.
