@@ -4,7 +4,7 @@ icon: "cube"
 description: "Render a 3D scene with @nanoforge-dev/graphics-3d, built on Three.js"
 ---
 
-`@nanoforge-dev/graphics-3d` renders a 3D scene in the game's container with [Three.js](https://threejs.org/). It was chosen in the [3D graphics library benchmark](../lib-graphic-3d/index).
+`@nanoforge-dev/graphics-3d` renders a 3D scene in the game's container with [Three.js](https://threejs.org/).
 
 - **Client only.** `__init` throws on a server (no container).
 - **One graphics library per app.** It uses the `graphics` key, like graphics-2d, so an app registers one or the other.
@@ -25,18 +25,33 @@ pnpm add @nanoforge-dev/graphics-3d three
 
 ### 2. Register the library
 
+In `src/main.ts`, register the 3D library with the ECS:
+
 ```ts
+import type { ClientRunOptions } from "@nanoforge-dev/common";
+import { NanoforgeFactory } from "@nanoforge-dev/core";
+import { EcsLibrary } from "@nanoforge-dev/ecs/client";
 import { Graphics3DLibrary } from "@nanoforge-dev/graphics-3d";
 
-const app = NanoforgeFactory.createClient({
-  tickRate: 60,
-  viewport: { width: 1920, height: 1080, fit: "contain" },
-});
-const graphics = new Graphics3DLibrary();
-app.use(graphics);
+export const main = async (options: ClientRunOptions): Promise<void> => {
+  const app = NanoforgeFactory.createClient({
+    tickRate: 60,
+    viewport: { width: 1920, height: 1080, fit: "contain" },
+  });
+  const graphics = new Graphics3DLibrary();
+  const ecs = new EcsLibrary();
+  app.use(graphics);
+  app.use(ecs);
 
-await app.init(options);
+  await app.init(options);
+
+  // steps 3 to 5 go here
+
+  await app.run();
+};
 ```
+
+`graphics.scene`, `graphics.camera` and `graphics.renderer` exist only after `app.init` has resolved: before, they throw.
 
 ### 3. Add a light and an object
 
@@ -61,7 +76,7 @@ graphics.scene.add(cube);
 
 ### 4. Place the camera
 
-The library starts with a perspective camera at `(0, 0, 5)`, looking at the origin.
+The library starts with a perspective camera at `(0, 0, 5)`, looking at the origin (field of view 50, near 0.1, far 1000).
 
 ```ts
 graphics.camera.position.set(0, 1.5, 4);
@@ -70,17 +85,33 @@ graphics.camera.lookAt(0, 0, 0);
 
 ### 5. Move things from a system
 
-The scene is drawn after the systems run, so a system changes objects and the next frame shows them. `ctx.app.delta` is in milliseconds.
+The scene is drawn after the systems run, so a system changes objects and the next frame shows them. Keep each object in a component:
 
 ```ts
-export function spin(registry: Registry, ctx: Context) {
-  registry.getZipper([Model]).forEach(({ Model }) => {
-    Model.object.rotation.y += ctx.app.delta / 1000;
-  });
+import type { Object3D } from "@nanoforge-dev/graphics-3d/three";
+
+export class Model {
+  name = this.constructor.name;
+
+  constructor(public object: Object3D) {}
 }
 ```
 
-Systems reach the library through `ctx.graphics`. Do not keep the scene in a module-level variable.
+Then attach it to an entity in `main`, and add a system that turns it. `ctx.app.delta` is in milliseconds.
+
+```ts
+const registry = ecs.registry;
+const entity = registry.spawnEntity();
+registry.addComponent(entity, new Model(cube));
+
+registry.addSystem((registry: Registry, ctx: Context) => {
+  registry.getZipper([Model]).forEach(({ Model }) => {
+    Model.object.rotation.y += ctx.app.delta / 1000;
+  });
+});
+```
+
+`Registry` comes from `@nanoforge-dev/ecs/client` and `Context` from `@nanoforge-dev/common`. In systems, reach the library through `ctx.graphics` (`ctx.graphics.scene`, `ctx.graphics.camera`) rather than a module-level variable. See [ECS](../ecs/index) for components and systems.
 
 ## Viewport
 
@@ -88,21 +119,21 @@ The canvas follows `Context.viewport` like the 2D stage:
 
 - the camera's full frame is the design resolution (`width` × `height` in `createClient`);
 - `contain` letterboxes it, `cover` crops it, `fill` stretches it;
-- the canvas is resized on every window, fullscreen or pixel-ratio change.
+- the canvas is resized when the window or the container changes size, and on fullscreen changes.
 
 You never call `renderer.setSize`, and you never set a camera's `aspect` yourself.
 
 ## `Context.graphics`
 
-| Member                                | What it is                                                                                              |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `scene`                               | The Three.js `Scene` rendered every tick.                                                               |
-| `camera`                              | The camera used for rendering. Assign another one to switch; the viewport is applied to it.             |
-| `renderer`                            | The `WebGPURenderer`. Never call `setAnimationLoop`: the engine drives rendering.                       |
-| `render`                              | Draws one frame. Assign your own function for post-processing (see [Advanced](./advanced#render-loop)). |
-| `backend`                             | `"webgpu"` or `"webgl"`.                                                                                |
-| `raycast(clientX, clientY, objects?)` | Objects under a page point (e.g. a `PointerEvent`), nearest first.                                      |
-| `worldToScreen(point)`                | Where a world point is drawn in the page, in CSS px.                                                    |
+| Member                                | What it is                                                                                                                                         |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scene`                               | The Three.js `Scene` rendered every tick.                                                                                                          |
+| `camera`                              | The camera used for rendering. Assign another one to switch. The viewport is applied to `PerspectiveCamera` and `OrthographicCamera` cameras only. |
+| `renderer`                            | The `WebGPURenderer`. Never call `setAnimationLoop`: the engine drives rendering.                                                                  |
+| `render`                              | Draws one frame. Assign your own function for post-processing (see [Advanced](./advanced#render-loop)).                                            |
+| `backend`                             | `"webgpu"` or `"webgl"`.                                                                                                                           |
+| `raycast(clientX, clientY, objects?)` | Objects under a page point (e.g. a `PointerEvent`), nearest first.                                                                                 |
+| `worldToScreen(point)`                | Where a world point is drawn in the page, in CSS px.                                                                                               |
 
 ## Options
 
@@ -124,4 +155,3 @@ Objects you removed from the scene yourself are not disposed by the library. Cal
 
 - [Advanced](./advanced): Three.js add-ons, custom shaders, cameras, picking, editor events.
 - [Performance](./performance): many objects, and `InstancedMesh`.
-- [Editor proposal](./editor-proposal): what the editor needs for a 3D Scene screen.
