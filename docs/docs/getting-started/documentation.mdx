@@ -1,11 +1,12 @@
 ---
 title: "Documentation"
 icon: "book"
-description: "Overview of the engine documentation"
+description: "How the engine documentation is written and published"
 ---
 
-# Documentation
+The engine documentation lives in the engine repository and is published to this site automatically at each engine release.
 
-The documentation for the engine is separated across the different libraries of the engine. Everything is then gathered into this site and published from the repository automatically.
+- **Pages** are the `.mdx` files in `docs/docs`. Their order and groups come from `docs/docs/navigation.json`: every page is listed there exactly once.
+- **API references** are generated from the TSDoc comments of each package by `pnpm run docs` (TypeDoc), into `docs/references`. They are never written by hand.
 
-This documentation is written in reStructuredText and is now being migrated to MDX so it is easier to maintain alongside the rest of the site. Sphinx is used to generate the rendered documentation.
+To change a page, edit it in the engine repository. Links between pages are relative to the file, like `./how-to-use` or `../network/index`.

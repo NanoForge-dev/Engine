@@ -4,8 +4,6 @@ icon: "book"
 description: "How a running game and the NanoForge editor talk to each other"
 ---
 
-# Editor protocol
-
 When the editor starts a game, it passes two event emitters in `RunOptions.editor`:
 
 - `fromEditor`: editor → engine commands. `EditorLibrary` drains it at the start of every tick, including paused ticks.

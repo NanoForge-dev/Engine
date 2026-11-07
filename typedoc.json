@@ -1,0 +1,21 @@
+{
+  "$schema": "https://typedoc-plugin-markdown.org/schema.json",
+  "entryPointStrategy": "packages",
+  "entryPoints": ["packages/*", "modules/*"],
+  "packageOptions": {
+    "entryPoints": ["src/index.ts"]
+  },
+  "out": "docs/references",
+  "plugin": ["typedoc-plugin-markdown", "./docs/typedoc/mintlify.mjs"],
+  "fileExtension": ".mdx",
+  "entryFileName": "index",
+  "excludeScopesInPaths": true,
+  "sanitizeComments": true,
+  "hideBreadcrumbs": true,
+  "hidePageHeader": true,
+  "readme": "none",
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "hidePageTitle": true
+}

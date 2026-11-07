@@ -1,0 +1,51 @@
+[
+  {
+    "group": "Getting started",
+    "pages": [
+      "getting-started/index",
+      "getting-started/how-to-use",
+      "getting-started/documentation"
+    ]
+  },
+  {
+    "group": "Registry",
+    "pages": ["registry/index", "registry/writing-web-assembly"]
+  },
+  {
+    "group": "Network",
+    "pages": [
+      "network/index",
+      "network/network-client",
+      "network/network-server",
+      "network/network-peer",
+      "network/packet-framing",
+      "network/network-client-api",
+      "network/network-server-api"
+    ]
+  },
+  {
+    "group": "Graphics 3D",
+    "pages": ["graphics-3d/index", "graphics-3d/advanced", "graphics-3d/performance"]
+  },
+  {
+    "group": "Editor",
+    "pages": ["editor/protocol"]
+  },
+  {
+    "group": "Design notes",
+    "pages": [
+      "graphics-3d/editor-proposal",
+      {
+        "group": "3D graphics library benchmark",
+        "pages": [
+          "lib-graphic-3d/index",
+          "lib-graphic-3d/three-js",
+          "lib-graphic-3d/babylon-js",
+          "lib-graphic-3d/playcanvas",
+          "lib-graphic-3d/luma-gl",
+          "lib-graphic-3d/poc"
+        ]
+      }
+    ]
+  }
+]

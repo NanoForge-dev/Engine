@@ -6,9 +6,9 @@ import type { Context } from "../context";
  *
  * @remarks
  * Only accepts a key that is already a member of `Context` at the call
- * site — which means the library's own `declare module "@nanoforge-dev/common"
- * { interface Context { ... } }` augmentation must be part of the same
- * compilation unit. As a side effect, two libraries whose augmentations
+ * site — which means the library's own
+ * `declare module "@nanoforge-dev/common" { interface Context { ... } }`
+ * augmentation must be part of the same compilation unit. As a side effect, two libraries whose augmentations
  * declare the same key with incompatible shapes will fail to compile
  * together, catching accidental key collisions at build time.
  *

@@ -4,8 +4,6 @@ icon: "book"
 description: "The four delivery channels and how packets are framed on each"
 ---
 
-# Packet Channels
-
 Every packet is sent on one of four channels, picked with the `channel` option
 of the network methods, for example
 `ctx.network.sendData(data, { channel: Channel.UnreliableOrdered })`. Without
@@ -37,7 +35,7 @@ Every packet starts with the name of its packet type: one length byte, then the
 name in UTF-8, then the payload.
 
 - **Typed packets** (`ctx.network.packets.send`, see
-  [Typed packets](network-client#typed-packets)) carry the name given to
+  [Typed packets](./network-client#typed-packets)) carry the name given to
   `definePacket`, and their payload is the `JSON.stringify` text of the data,
   or nothing for a packet without payload.
   The receiver routes them to the listeners and `read` of that type.

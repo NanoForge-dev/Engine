@@ -4,8 +4,6 @@ icon: "book"
 description: "API reference for the server networking package"
 ---
 
-# network-server API
-
 ## ClientId
 
 `string`: an opaque, random identifier (UUID) of a client session. A client
@@ -14,7 +12,7 @@ connected over both TCP and UDP has the same `ClientId` on both servers.
 ## Methods
 
 `NetworkServerLibrary` is exposed on `ctx.network`. Its methods take an optional
-`{ channel }` to pick one of the four [channels](packet-framing):
+`{ channel }` to pick one of the four [channels](./packet-framing):
 `Channel.ReliableOrdered`, `Channel.ReliableUnordered`,
 `Channel.UnreliableOrdered` or `Channel.UnreliableUnordered`.
 
@@ -93,7 +91,7 @@ Returns: `ClientInfo | undefined` (`undefined` once the client is gone)
 ## packets (`ctx.network.packets`)
 
 Typed packets, declared with `definePacket` (see the
-[network-client API](network-client-api)). Packets of a type
+[network-client API](./network-client-api)). Packets of a type
 are routed to its listeners and to `read`, never to `getReceivedPackets`.
 
 ### on(packet, listener)
