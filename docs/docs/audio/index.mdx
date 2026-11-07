@@ -1,0 +1,59 @@
+---
+title: "Sound and music"
+icon: "volume-high"
+description: "Play sound effects and background music"
+---
+
+Two client libraries play audio:
+
+| Library        | Package                | Context key | For                                               |
+| -------------- | ---------------------- | ----------- | ------------------------------------------------- |
+| `SoundLibrary` | `@nanoforge-dev/sound` | `ctx.sound` | Sound effects. Several can play at the same time. |
+| `MusicLibrary` | `@nanoforge-dev/music` | `ctx.music` | Music. Playing a track stops the one before it.   |
+
+Both have the same three methods: `load(key, url)`, `play(key)` and `mute()`.
+
+## Load your files
+
+Put the audio files in your project's `assets` folder, then load each one under a key after `app.init`:
+
+```ts
+const app = NanoforgeFactory.createClient();
+const sound = new SoundLibrary();
+const music = new MusicLibrary();
+app.use(sound);
+app.use(music);
+
+await app.init(options);
+
+// `main` has no context: read the URLs of the files in `assets/` from the run options.
+const url = (path: string): string => {
+  const file = options.files.get(path);
+  if (!file) throw new Error(`Missing asset: ${path}`);
+  return file;
+};
+sound.load("jump", url("/jump.wav"));
+music.load("theme", url("/theme.mp3"));
+
+await app.run();
+```
+
+## Play
+
+From a system, or anywhere you have the context:
+
+```ts
+ctx.sound.play("jump");
+ctx.music.play("theme"); // stops the track that was playing
+ctx.sound.mute(); // toggles: sound effects start muted
+ctx.music.mute();
+```
+
+<Warning>
+  Both libraries start **muted**, and `mute()` toggles the muted state. Call `mute()` once to turn
+  the sound on, for example when the player clicks a "sound on" button. Browsers also block audio
+  until the player has interacted with the page.
+</Warning>
+
+- `play` throws `NfNotFound` when no file was loaded under that key.
+- `play` restarts nothing: playing a sound that is already playing has no effect until it ends.

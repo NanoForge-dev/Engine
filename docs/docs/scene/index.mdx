@@ -1,0 +1,73 @@
+---
+title: "Scenes"
+icon: "clapperboard"
+description: "Split your game into menus, levels and overlays, and share values between them"
+---
+
+`@nanoforge-dev/scene` splits a game into scenes: a menu, each level, a pause screen. A scene creates what it needs when it is loaded and removes it when it is unloaded.
+
+## Write scenes
+
+A scene extends `Scene` and overrides `load(ctx, scene)` and `unload(ctx)`. A scene that only spawns entities and adds systems can extend `EcsScene` from `@nanoforge-dev/ecs/scene` instead: write its `setup(registry, ctx)` like your `main`, and everything it spawns or adds is removed when the scene is unloaded.
+
+```ts
+export class Menu extends Scene {
+  override load(ctx: Context) {
+    ctx.scenes.vars.init("score", 0, { persistent: true });
+  }
+}
+
+export class Level1 extends EcsScene {
+  override setup(registry: Registry) {
+    const enemy = registry.spawnEntity();
+    registry.addComponent(enemy, new Position(400, 100));
+    registry.addSystem(enemyAi);
+  }
+}
+
+export class Pause extends Scene {
+  static override parent = Level1;
+}
+```
+
+A static `parent` loads a scene under another one: here `Pause` keeps `Level1` loaded under it.
+
+## Register the library
+
+Give `SceneLibrary` the first scene, and every scene of the game by id:
+
+```ts
+const scenes = new SceneLibrary({ initial: Menu, scenes: { Menu, Level1, Pause } });
+```
+
+The keys of `scenes` are the scene ids. Name them yourself: a bundler can rename classes, never these keys.
+
+## Change scene
+
+From a system, or anywhere you have the context:
+
+```ts
+void ctx.scenes.load(ctx, Level1); // unloads Menu, loads Level1
+void ctx.scenes.load(ctx, Pause); // Level1 stays loaded under Pause
+void ctx.scenes.unload(ctx, Pause);
+
+ctx.scenes.vars.set("score", (ctx.scenes.vars.get("score") ?? 0) + 1);
+```
+
+- Only one chain of scenes is loaded at a time, from a root scene to the current one. Loading a scene unloads the scenes it does not share with the new chain, deepest first, then loads the missing ones, root first.
+- Pass parameters with `ctx.scenes.load(ctx, Level1, { params })`. The scene reads them in `load(ctx, { params })`. Type them with `Scene<[params type]>`.
+- Changes are queued and made when no system is running: right after the systems of the current tick, or before the systems of the next one. In a system, don't wait for the promise `load` returns.
+
+## Shared values
+
+`ctx.scenes.vars` holds values shared by scenes and systems: `init`, `get`, `set`, `has` and `remove`. A value belongs to the scene that created it and goes away when that scene is unloaded, unless you create it with `{ persistent: true }`.
+
+Type your values by augmenting `SceneVars`:
+
+```ts
+declare module "@nanoforge-dev/scene" {
+  interface SceneVars {
+    score: number;
+  }
+}
+```

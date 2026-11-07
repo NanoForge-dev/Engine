@@ -1,0 +1,39 @@
+---
+title: "Assets"
+icon: "image"
+description: "Load images, sounds and data files shipped with your game"
+---
+
+Assets are the files your game ships with: images, sounds, levels, configuration. Put them in your project's `assets` folder. `nf build` copies its content next to the game code, so `assets/hero.png` becomes `/hero.png`.
+
+## Read an asset
+
+The asset library is built into every application: you never register it. Read a file with `ctx.assets.getAsset(path)`, from a system or a library hook:
+
+```ts
+const levels = await ctx.assets.getAsset("/levels.json").json();
+
+const hero = new window.Image();
+hero.src = ctx.assets.getAsset("/hero.png").path;
+ctx.graphics.baseLayer.add(new Image({ image: hero, x: 100, y: 100, width: 64, height: 64 }));
+
+ctx.sound.load("jump", ctx.assets.getAsset("/jump.wav").path);
+```
+
+`getAsset` returns an `NfFile`:
+
+| Member                                             | Gives                                                                         |
+| -------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `path`                                             | The URL of the file. Pass it to anything that loads a URL: an image, a sound. |
+| `json()`                                           | The content parsed as JSON.                                                   |
+| `text()`                                           | The content as a string.                                                      |
+| `arrayBuffer()`, `bytes()`, `blob()`, `formData()` | The content in that format.                                                   |
+
+- Paths are normalized: `"hero.png"`, `"/hero.png"` and `"//hero.png"` find the same file.
+- `getAsset` throws `NfNotFound` when no file has that path. The read methods fetch the file and throw `NfFetchException` when the fetch fails.
+
+## In `main`
+
+`main` has no context. There, read the URL from the run options: `options.files.get("/hero.png")` returns the same URL as `getAsset("/hero.png").path`, or `undefined` when the file is missing. [Sound and music](../audio/index) shows an example.
+
+To change the folder name, set `dir.assets` in the app's `nanoforge.config.ts`. See [the configuration file](/docs/cli/configuration/configuration-file).

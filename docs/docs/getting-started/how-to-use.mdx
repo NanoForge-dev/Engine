@@ -1,15 +1,62 @@
 ---
-title: "Introduction to using the Engine"
-icon: "book"
-description: "Getting started with the engine"
+title: "Create a project"
+icon: "folder-plus"
+description: "Generate a NanoForge game project with the CLI and run it in the browser"
 ---
 
-Whether you work on this engine as a developer or you want to use it, you will want a test project. This page is a walkthrough for setting up a basic project.
+The fastest way to start is the NanoForge CLI, `nf`. It generates a project with the engine packages already installed and wired, then builds and serves it for you. You don't need to set anything up by hand.
 
-## As a developer on the engine
+<Steps>
+  <Step title="Install the CLI">
+    ```bash
+    npm install -g @nanoforge-dev/cli
+    ```
 
-As a developer you want to be able to use your changes in your own project. Therefore it is recommended to use the provided [CLI](https://github.com/NanoForge-dev/CLI).
+    See [Installation](/docs/cli/getting-started/installation) for the other package managers.
 
-## As a user
+  </Step>
+  <Step title="Generate the project">
+    ```bash
+    nf new
+    ```
 
-As a user you can either use the template and change the dependency location, or create a project and add the Nanoforge dependencies. It is recommended to use Bun as a package manager.
+    Answer the prompts: name, language, package manager, and whether you want a server. Say no to the server for a first game: the whole game then runs in the browser.
+
+  </Step>
+  <Step title="Run it">
+    ```bash
+    cd my-game
+    nf dev
+    ```
+
+    `nf dev` builds the game, serves it, and rebuilds when you save a file. Open the address it prints in your browser to play the generated sample game.
+
+  </Step>
+</Steps>
+
+## What you get
+
+Without a server, the project is one client application:
+
+```
+my-game/
+├── nanoforge.config.ts   # type: "client"
+├── package.json
+├── assets/               # images, sounds, data files
+└── src/
+    ├── main.ts           # entry point: creates and runs the application
+    ├── components/
+    └── systems/
+```
+
+With a server, the project is a workspace with one such folder per application, `apps/client` and `apps/server`, and a root `nanoforge.config.ts` that lists them.
+
+- `src/main.ts` exports a `main` function. The NanoForge loader calls it with the options the game needs (the page element to draw in, the game files, the environment).
+- `src/components` and `src/systems` hold the game logic. See [ECS](../ecs/index).
+- Files in `assets/` are served with the game. See [Assets](../assets/index).
+
+The CLI documentation covers every command and option: [CLI quickstart](/docs/cli/getting-started/quickstart), [nf new](/docs/cli/commands/new) and [the configuration file](/docs/cli/configuration/configuration-file).
+
+## Next
+
+Follow the [quickstart](./quickstart) to replace the sample with your own small game.

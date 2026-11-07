@@ -1,0 +1,54 @@
+---
+title: "Environment"
+icon: "sliders"
+description: "Read and validate environment variables in your game"
+---
+
+Environment variables configure a game without changing its code: a server address, a port, a game mode.
+
+## Set them
+
+Put them in a `.env` file at the root of the project, or in the shell that runs `nf dev` or `nf start`. Their names start with `NANOFORGE_`, and the prefix is removed before the game sees them: `NANOFORGE_GAME_MODE` becomes `GAME_MODE`. See [Environment variables](/docs/cli/configuration/environment-variables) in the CLI docs for which prefix reaches the client, the server, or both.
+
+Never put a secret in a variable the client receives: the client runs in the player's browser.
+
+## Read them
+
+The run options carry the variables as raw strings: `options.env` in `main`, and `ctx.env` in a library's `__init`. To check them and convert them to typed values, describe them with a class and pass it to `registerEnv` from `@nanoforge-dev/env`:
+
+```ts
+class GameEnv {
+  @Expose()
+  @Default("coop")
+  @IsIn(["coop", "versus"])
+  GAME_MODE!: "coop" | "versus";
+
+  @Expose()
+  @TransformToBoolean()
+  @IsBoolean()
+  @Default(false)
+  DEBUG!: boolean;
+}
+
+export class RulesLibrary extends Library {
+  readonly key = defineLibraryKey("rules");
+
+  private _env?: GameEnv;
+
+  public override async __init(ctx: InitContext): Promise<void> {
+    this._env = await registerEnv(GameEnv, ctx.env);
+  }
+
+  public override expose() {
+    if (!this._env) this.throwNotInitializedError();
+    return { mode: this._env.GAME_MODE, debug: this._env.DEBUG };
+  }
+}
+```
+
+- Mark every variable with `@Expose()`: the others are dropped.
+- `@Default(value)` gives the value of a missing variable. `@TransformToBoolean()` turns `"true"` and `"false"` into booleans. `@IsIpOrURL()` checks an address.
+- The package re-exports the [class-validator](https://github.com/typestack/class-validator) decorators (`@IsIn`, `@IsPort`, `@IsString`, `@IsOptional`...) and `Transform` from class-transformer.
+- `registerEnv` throws `NfEnvValidationException` with every failed check, so a bad value stops the game at start-up instead of later.
+
+The network library reads its own variables this way: see [Network](../network/index#environment-variables).

@@ -1,0 +1,136 @@
+---
+title: "Core concepts"
+icon: "lightbulb"
+description: "Applications, libraries, the context, the game loop, the ECS and the client/server split"
+---
+
+This page explains the pieces every NanoForge game is made of. The [quickstart](./quickstart) shows them working together.
+
+## The application
+
+Your game's `src/main.ts` exports a `main` function. The NanoForge loader calls it with the run options: the page element to draw in (`container`, client only), the game files (`files`) and the environment variables (`env`). You pass these options on to the application.
+
+You create the application with `NanoforgeFactory` from `@nanoforge-dev/core`:
+
+| Call                                     | Use it for              | Options                               |
+| ---------------------------------------- | ----------------------- | ------------------------------------- |
+| `NanoforgeFactory.createClient(options)` | the game in the browser | `tickRate` (default `60`), `viewport` |
+| `NanoforgeFactory.createServer(options)` | a game server, on Bun   | `tickRate` (default `60`)             |
+
+The `viewport` option sets the game's design resolution (`width` and `height`, default 1920 by 1080) and how it fits the window (`fit`: `"contain"` by default, `"cover"` or `"fill"`). Game coordinates are always in that resolution; the engine scales the canvas to the window.
+
+Every application has the same three steps:
+
+```ts
+const app = NanoforgeFactory.createClient({ tickRate: 60 });
+app.use(new EcsLibrary()); // 1. register libraries
+await app.init(options); // 2. initialize them
+await app.run(); // 3. start the game loop
+```
+
+`app.use` throws once `init` was called. Libraries are ready only after `init` resolves.
+
+## Libraries
+
+Everything the engine does, it does through a **library**: the ECS, graphics, input, audio, networking and scenes are all libraries. You register the ones your game needs with `app.use`, and each one adds a key to the context:
+
+| Library                                                 | Context key              |
+| ------------------------------------------------------- | ------------------------ |
+| `EcsLibrary` (`@nanoforge-dev/ecs/client` or `/server`) | `ctx.ecs`                |
+| `Graphics2DLibrary` or `Graphics3DLibrary`              | `ctx.graphics`           |
+| `InputLibrary` (`@nanoforge-dev/input`)                 | `ctx.input`              |
+| `ControllerLibrary` (`@nanoforge-dev/input/controller`) | `ctx.controller`         |
+| `SoundLibrary`, `MusicLibrary`                          | `ctx.sound`, `ctx.music` |
+| `SceneLibrary` (`@nanoforge-dev/scene`)                 | `ctx.scenes`             |
+| `NetworkClientLibrary` or `NetworkServerLibrary`        | `ctx.network`            |
+| `EditorLibrary` (`@nanoforge-dev/editor-lib`)           | `ctx.editor`             |
+
+Two libraries can't share a key: registering both graphics libraries throws.
+
+## The context
+
+The context (`Context` from `@nanoforge-dev/common`) is the object every system and library receives each tick. It always has:
+
+- `ctx.app`: the loop state and controls. `delta` (milliseconds since the last tick), `tickRate`, `isRunning`, `isPaused`, and `requestStop()`, `requestPause()`, `requestResume()`, `requestStep()`.
+- `ctx.assets`: the game files. `ctx.assets.getAsset("/hero.png")`. See [Assets](../assets/index).
+- `ctx.vars`: a key/value store shared by every library and system for the whole run.
+- `ctx.viewport`: on the client only, the design resolution and conversions between screen and game coordinates.
+
+The other keys come from the libraries you registered, as in the table above.
+
+## The game loop
+
+`app.run()` starts a loop that runs `tickRate` times per second. Each library has four hooks, called in this order:
+
+1. `__init`, once, during `app.init`. A library that lists another in its `dependencies` is initialized after it.
+2. `__events`, every tick, even when the game is paused.
+3. `__run`, every tick unless the game is paused. This is where `EcsLibrary` runs your systems.
+4. `__clear`, once, after `ctx.app.requestStop()` stops the loop.
+
+The engine orders libraries for each tick. For example the network library runs before the ECS, so packets received this tick are ready for your systems.
+
+## Entities, components and systems
+
+The game state lives in the ECS registry, `ctx.ecs.registry` (or `ecs.registry` in `main`):
+
+- an **entity** is an id, made with `registry.spawnEntity()`;
+- a **component** is a data object attached to an entity with `registry.addComponent(entity, component)`;
+- a **system** is a function `(registry, ctx) => void`, added with `registry.addSystem(system)` and called on every tick.
+
+See [ECS](../ecs/index) for the details.
+
+## Client and server
+
+A game can run as a client alone, or as a client plus a server:
+
+- The **client** runs in the browser. It draws, plays sounds and reads input. The graphics, input and audio libraries work only there.
+- The **server** runs on Bun. It has no screen: it owns the shared game state and sends it to the clients. It uses `EcsLibrary` from `@nanoforge-dev/ecs/server` and `NetworkServerLibrary`.
+- Both sides share their packet definitions through a common file. See [Network](../network/index), and [Peer-to-peer](../network/network-peer) to run the server inside a player's browser instead.
+
+## Writing your own library
+
+A library is a class that extends `Library` from `@nanoforge-dev/common`. It declares its context key, then overrides the hooks it needs and `expose()`, which returns what `ctx.[key]` gives to game code:
+
+```ts
+import { type Context, Library, defineLibraryKey } from "@nanoforge-dev/common";
+
+export interface ScoreApi {
+  add(points: number): void;
+  readonly value: number;
+}
+
+declare module "@nanoforge-dev/common" {
+  interface Context {
+    score: ScoreApi;
+  }
+}
+
+export class ScoreLibrary extends Library {
+  readonly key = defineLibraryKey("score");
+
+  private _value = 0;
+
+  public override async __run(ctx: Context): Promise<void> {
+    if (this._value >= 10) ctx.app.requestStop();
+  }
+
+  public override expose(): ScoreApi {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const library = this;
+    return {
+      add: (points) => {
+        library._value += points;
+      },
+      get value() {
+        return library._value;
+      },
+    };
+  }
+}
+```
+
+Register it like any other library: `app.use(new ScoreLibrary())`. Systems can then call `ctx.score.add(1)`.
+
+- The `declare module` block types `ctx.score`. `defineLibraryKey` only accepts a key declared there.
+- Return a plain object from `expose()`, never `this`, so game code can't call the hooks.
+- To set the order, pass relationships to `super()` in the constructor: `dependencies` are initialized first, `runBefore` libraries run before this one each tick, `runAfter` libraries run after it. `"*"` means every other library.
