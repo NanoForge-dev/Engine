@@ -1,0 +1,63 @@
+---
+title: "PlayCanvas"
+icon: "cube"
+description: "PlayCanvas in the 3D graphics library benchmark: verdict and evidence per criterion"
+---
+
+Part of the [3D graphics library benchmark](./index). Scores: ✅ meets, ⚠️ partly, ❌ does not, ❓ unknown.
+
+|            |                                                           |
+| ---------- | --------------------------------------------------------- |
+| Package    | `playcanvas`                                              |
+| Version    | 2.23.3                                                    |
+| License    | MIT (the SaaS editor is optional)                         |
+| Repository | [playcanvas/engine](https://github.com/playcanvas/engine) |
+| Result     | Eliminated (C6)                                           |
+| Totals     | ✅ 15 · ⚠️ 10 · ❌ 2 · ❓ 3                               |
+
+## Verdict
+
+- Solid engine with editor tools (picking, official gizmos, camera controls) and good docs.
+- Eliminated on C6: rendering goes through its own `Entity` + `ComponentSystem` model (render, camera and light are components). It would run a second ECS next to ours, or force us to drive low-level `GraphNode`/`MeshInstance` objects, which is not the documented use.
+- Driving it from our tick works (`app.update(dt)` + `app.render()` without `app.start()`), but it is not documented.
+
+## Integration notes
+
+- `__init`: `await createGraphicsDevice(canvas, { deviceTypes: ['webgpu', 'webgl2'] })`, then `new AppBase(canvas)` with only the component systems we need (the measured 279 KB gzip).
+- `__clear`: `app.destroy()` and `device.destroy()`; the static `AppBase._applications` registry keeps an entry per canvas id.
+- Physics through the official components needs ammo.js as a global `Ammo`, which cannot be shared with a Node server.
+
+## Evidence
+
+| Id  | Score | Evidence                                                                                                                                                                              |
+| --- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1  | ✅    | `createGraphicsDevice(canvas, { deviceTypes: ['webgpu', 'webgl2'] })` always appends WebGL2 as a last fallback. [Docs](https://developer.playcanvas.com/user-manual/graphics/webgpu/) |
+| A2  | ⚠️    | Shadows, post-process and clustered lighting on both; compute is WebGPU only; WebGPU documented as maturing.                                                                          |
+| A3  | ⚠️    | Built-in materials run on both; custom `ShaderMaterial` needs GLSL and WGSL.                                                                                                          |
+| A4  | ✅    | WebGL2 everywhere, WebGPU where available.                                                                                                                                            |
+| B1  | ❓    | Not measured; no official benchmark.                                                                                                                                                  |
+| B2  | ⚠️    | Measured 1.08 MB raw, 279 KB gzip (`AppBase` with render, camera and light systems).                                                                                                  |
+| B3  | ❓    | Async `createGraphicsDevice`. Not measured.                                                                                                                                           |
+| B4  | ⚠️    | No documented worker rendering path.                                                                                                                                                  |
+| C1  | ✅    | `new AppBase(canvas)` takes our canvas.                                                                                                                                               |
+| C2  | ⚠️    | `app.start()` runs its own rAF loop; `update(dt)` + `render()` from our tick works but is not documented.                                                                             |
+| C3  | ⚠️    | `app.destroy()`, `device.destroy()`; static `AppBase._applications` registry, physics needs a global `Ammo`.                                                                          |
+| C4  | ✅    | `resizeCanvas`, `setCanvasResolution`, `setCanvasFillMode`, `maxPixelRatio`, camera `rect`.                                                                                           |
+| C5  | ✅    | Measured: `Vec3`, `Quat`, `Mat4` import and compute in Node 24 with no DOM.                                                                                                           |
+| C6  | ❌    | Imposes its own Entity + ComponentSystem model. [Docs](https://developer.playcanvas.com/user-manual/ecs/)                                                                             |
+| D1  | ✅    | `screenToWorld`, `worldToScreen`, `Picker`.                                                                                                                                           |
+| D2  | ✅    | Official translate, rotate, scale gizmos and view cube. [Docs](https://developer.playcanvas.com/user-manual/gizmos/)                                                                  |
+| D3  | ✅    | Official `camera-controls` script (orbit, fly).                                                                                                                                       |
+| D4  | ⚠️    | Scene and template formats target the SaaS editor export.                                                                                                                             |
+| D5  | ⚠️    | `toBlob` with `preserveDrawingBuffer` on WebGL; on WebGPU right after render or from a render target.                                                                                 |
+| D6  | ❓    | Not tested; the device is tied to the canvas context.                                                                                                                                 |
+| E1  | ✅    | Large manual, 300+ live examples, hello cube in about 10 lines. [Examples](https://playcanvas.vercel.app/)                                                                            |
+| E2  | ❌    | No ARIA or reduced-motion support.                                                                                                                                                    |
+| E3  | ⚠️    | No colorblind filter; UI screen scale modes.                                                                                                                                          |
+| F1  | ✅    | Engine MIT; the SaaS editor is optional.                                                                                                                                              |
+| F2  | ✅    | 17k stars, nightly betas, 148k npm downloads per week, maintained by Snap.                                                                                                            |
+| F3  | ✅    | Ships `playcanvas.d.ts`, generated from JSDoc.                                                                                                                                        |
+| F4  | ✅    | glTF/GLB, KTX2/Basis, Draco, skeletal animation and anim state graph.                                                                                                                 |
+| G1  | ✅    | PBR `StandardMaterial`, clustered lights, cascaded shadows, IBL.                                                                                                                      |
+| G2  | ⚠️    | Official rigidbody components rely on ammo.js as a global.                                                                                                                            |
+| G3  | ✅    | Element component (MSDF text, images), sprites, screen-space UI.                                                                                                                      |

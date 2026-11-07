@@ -1,4 +1,5 @@
-name: "Label sync"
+name: Label Sync
+
 on:
   workflow_dispatch:
   push:
@@ -6,19 +7,12 @@ on:
       - main
     paths:
       - ".github/labels.yml"
+
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   label-sync:
     name: Label sync
-    permissions:
-      contents: read
-      issues: write
-    runs-on: ubuntu-latest
-    if: github.repository_owner == 'NanoForge-dev'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Label sync
-        uses: crazy-max/ghaction-github-labeler@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+    uses: nanoforge-dev/actions/.github/workflows/label-sync.yml@v3

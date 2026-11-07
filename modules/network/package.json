@@ -46,6 +46,10 @@
       }
     },
     "./server": {
+      "browser": {
+        "types": "./dist/server-browser/browser.d.ts",
+        "default": "./dist/server-browser/browser.js"
+      },
       "require": {
         "types": "./dist/server/index.d.cts",
         "default": "./dist/server/index.cjs"
@@ -74,8 +78,7 @@
     "test:unit": "vitest run --config ../../vitest.config.ts",
     "prepack": "pnpm run build && pnpm run lint",
     "changelog": "git cliff --prepend ./CHANGELOG.md -u -c ./cliff.toml -r ../../ --include-path 'modules/network/*'",
-    "release": "cliff-jumper",
-    "docs": "mint-tsdocs generate"
+    "release": "cliff-jumper"
   },
   "dependencies": {
     "@nanoforge-dev/common": "workspace:*",

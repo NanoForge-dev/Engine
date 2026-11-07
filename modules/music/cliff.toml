@@ -32,7 +32,7 @@ body = """
 		{% if commit.breaking %}\
 			{% for footer in commit.footers %}\
 				{% if footer.breaking %}\
-					\n{% raw %}  {% endraw %}- **{{ footer.token }}{{ footer.separator }}** {{ footer.value }}\
+					\n{% raw %}  {% endraw %}- **{{ footer.token }}{{ footer.separator }}** {{ footer.value | split(pat="\n\n") | first | replace(from="\n", to=" ") }}\
 				{% endif %}\
 			{% endfor %}\
 		{% endif %}\
@@ -52,6 +52,7 @@ footer = ""
 conventional_commits = true
 filter_unconventional = true
 commit_parsers = [
+	{ field = "breaking", pattern = "true", group = "Breaking Changes"},
 	{ message = "^feat", group = "Features"},
 	{ message = "^fix", group = "Bug Fixes"},
 	{ message = "^docs", group = "Documentation"},

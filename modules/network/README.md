@@ -15,7 +15,7 @@
 
 ## About
 
-`@nanoforge-dev/network` is NanoForge's built-in networking library. It ships two subpath entry points — `@nanoforge-dev/network/client` and `@nanoforge-dev/network/server` — each sending packets on four channels: `Channel.ReliableOrdered` and `Channel.ReliableUnordered` over TCP (WebSocket), `Channel.UnreliableOrdered` and `Channel.UnreliableUnordered` over UDP (WebRTC data channels). The root entry, `@nanoforge-dev/network`, exposes the types shared by both, such as `NetworkConfig`. Splitting client and server into separate entry points keeps the server's runtime-only dependencies (`Bun.serve`, `node-datachannel`) out of a client's bundle graph entirely.
+`@nanoforge-dev/network` is NanoForge's built-in networking library. It ships two subpath entry points — `@nanoforge-dev/network/client` and `@nanoforge-dev/network/server` — each sending packets on four channels: `Channel.ReliableOrdered` and `Channel.ReliableUnordered` over TCP (WebSocket), `Channel.UnreliableOrdered` and `Channel.UnreliableUnordered` over UDP (WebRTC data channels). The root entry, `@nanoforge-dev/network`, exposes the types shared by both, such as `NetworkConfig`. Splitting client and server into separate entry points keeps the server's runtime-only dependencies (`Bun.serve`, `node-datachannel`) out of a client's bundle graph entirely. The same two entry points also run a game without a game server, hosted by one of the players (see [Peer-to-peer](#peer-to-peer)).
 
 > **The server entry point requires the [Bun](https://bun.sh) runtime.** `@nanoforge-dev/network/server` is built on Bun's native WebSocket server (`Bun.serve`) and does not run on Node.js. The client entry point is runtime-agnostic and targets the browser.
 
@@ -240,6 +240,37 @@ On the client, `ctx.network.clientId` holds the id once the server has welcomed 
 starts a new session with a new id.
 
 Using a channel whose port wasn't configured on that side throws.
+
+### Peer-to-peer
+
+Set `network: "p2p"` in the workspace `nanoforge.config.ts` and the same client
+and server apps run without a game server: the first player to open the game
+hosts it, running the server app in their own tab, and the others join that tab
+over WebRTC, on the same four channels and typed packets. No game code changes.
+
+```ts
+// nanoforge.config.ts (workspace)
+export default defineConfig({ type: "workspace", packages: ["apps/*"], network: "p2p" });
+```
+
+- `nf build` also builds the server app for the browser, into the client's
+  output. `nf start` sets `NETWORK_MODE=p2p` for both apps.
+- The Bun server process only pairs players (WebRTC signaling), on
+  `LISTENING_TCP_PORT`. Players reach it with the usual `SERVER_ADDRESS` and
+  `SERVER_TCP_PORT`, so the env stays the same as with a dedicated server.
+- A page opened without `?room=` hosts a game; `?room=CODE` joins one. The host
+  logs its invite link, and the game can show it:
+
+```ts
+ctx.network.roomCode; // "ABC234", on the host and on players who joined
+ctx.network.inviteLink; // "https://example.com/?room=ABC234", to send to other players
+```
+
+The game ends when the host leaves: each player's `isConnected()` turns `false`.
+Keep packets at or below 64 KiB and add a TURN server to `ICE_SERVERS` for
+players behind strict NATs. The host's server keeps its pace when its tab is
+hidden. See the
+[peer-to-peer docs](https://github.com/NanoForge-dev/Engine/blob/main/docs/docs/network/network-peer.mdx).
 
 ## Links
 

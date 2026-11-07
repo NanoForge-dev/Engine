@@ -95,6 +95,17 @@ describe("ClientRegistry", () => {
       expect(onConnect).toHaveBeenCalledWith(registry.get(tcp.id));
     });
 
+    it("should register a new session before notifying its connection", () => {
+      const registry = new ClientRegistry();
+      const order: string[] = [];
+      registry.onConnect(() => order.push("listener"));
+
+      const session = registry.attach(null, connection("peer"), ({ id }) =>
+        order.push(`register ${id}`),
+      );
+      expect(order).toStrictEqual([`register ${session.id}`, "listener"]);
+    });
+
     it("should notify a disconnection only once the last transport closes", () => {
       const registry = new ClientRegistry();
       const onDisconnect = vi.fn();

@@ -4,6 +4,7 @@
     "enabled": true
   },
   "globalDependencies": ["tsconfig.json"],
+  "globalPassThroughEnv": ["EMSDK_PYTHON"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -41,20 +42,6 @@
         "tsdown.config.ts"
       ],
       "outputs": [],
-      "outputLogs": "errors-only"
-    },
-    "docs": {
-      "dependsOn": ["^docs"],
-      "inputs": [
-        "src/**",
-        "wasm/**",
-        "test/**",
-        "package.json",
-        "tsconfig.json",
-        "mint-tsdocs.config.ts",
-        "../../docs/templates/**"
-      ],
-      "outputs": ["../../docs/references/**"],
       "outputLogs": "errors-only"
     }
   }

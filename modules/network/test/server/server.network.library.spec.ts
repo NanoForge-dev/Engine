@@ -136,6 +136,29 @@ describe("NetworkServerLibrary", () => {
       ).not.toThrow();
     });
 
+    it("should only start a signaling server on LISTENING_TCP_PORT in p2p mode", async () => {
+      const stop = vi.fn();
+      serve.mockImplementation(() => ({ stop }));
+      const lib = new NetworkServerLibrary();
+      await lib.__init(makeInitContext({ LISTENING_TCP_PORT: "4445", NETWORK_MODE: "p2p" }));
+
+      expect(serve).toHaveBeenCalledTimes(1);
+      expect(serve.mock.calls[0]?.[0].port).toBe(4445);
+      expect(serve.mock.calls[0]?.[0].websocket.maxPayloadLength).toBe(64 * 1024);
+      expect(() => lib.sendToAll("hi", { channel: Channel.UnreliableUnordered })).not.toThrow();
+      expect(lib.getConnectedClients()).toStrictEqual([]);
+      expect(lib.getReceivedPackets()).toStrictEqual(new Map());
+      await lib.__clear({} as never);
+      expect(stop).toHaveBeenCalledWith(true);
+    });
+
+    it("should need LISTENING_TCP_PORT in p2p mode", async () => {
+      const ctx = makeInitContext({ LISTENING_UDP_PORT: "4444", NETWORK_MODE: "p2p" });
+      await expect(new NetworkServerLibrary().__init(ctx)).rejects.toThrow(
+        "p2p needs LISTENING_TCP_PORT",
+      );
+    });
+
     it("should default LISTENING_INTERFACE to 0.0.0.0 when not provided", async () => {
       const ctx = makeInitContext({ LISTENING_TCP_PORT: "9000" });
       const lib = new NetworkServerLibrary();

@@ -54,6 +54,10 @@
   description: "Related to Graphics2D library"
   color: "1c3f78"
 
+- name: "modules:graphics-3d"
+  description: "Related to Graphics3D library"
+  color: "1c3f78"
+
 - name: "modules:input"
   description: "Related to Input library"
   color: "1c3f78"

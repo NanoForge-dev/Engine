@@ -3,6 +3,8 @@ packages:
   - modules/*
   - utils/*
   - e2e/game/**
+  - e2e/game-2d/**
+  - e2e/game-3d/**
   - example/**
 
 allowBuilds:
@@ -19,7 +21,6 @@ catalogs:
     '@commitlint/cli': ^21.2.2
     '@commitlint/config-conventional': ^21.2.2
     '@favware/cliff-jumper': ^6.0.0
-    '@nanoforge-dev/actions': ^2.1.5
     husky: ^9.1.7
     lint-staged: ^17.4.1
   config:
@@ -30,15 +31,15 @@ catalogs:
     turbo: ^2.10.12
     typescript: ^6.0.3
   docs:
-    '@microsoft/api-extractor': ^7.59.0
-    mint-tsdocs: ^0.0.8
     typedoc: ^0.28.19
     typedoc-plugin-markdown: ^4.11.0
   env:
     class-transformer: ^0.5.1
     class-validator: ^0.14.3
   graphics:
+    '@types/three': ^0.187.0
     konva: ^10.2.3
+    three: ^0.187.0
   lint:
     '@eslint/js': ^10.0.1
     '@trivago/prettier-plugin-sort-imports': ^6.0.2
@@ -53,6 +54,7 @@ catalogs:
   network:
     node-datachannel: ^0.33.4
   test:
+    '@playwright/test': 1.64.1
     '@vitest/coverage-v8': ^4.1.11
     vitest: ^4.1.11
 

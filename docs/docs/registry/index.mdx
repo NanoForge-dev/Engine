@@ -1,10 +1,10 @@
 ---
-title: "Registry"
+title: "Registry internals"
 icon: "book"
-description: "Registry and WebAssembly notes"
+description: "How the C++ ECS registry is exposed to JavaScript through WebAssembly"
 ---
 
-# Registry
+This page is for contributors to the engine. To use the ECS in a game, see [ECS](../ecs/index).
 
 The registry class is written in C++ and exposed to WebAssembly using Emscripten. That choice keeps the performance benefits of C++ for entity and component management while still making the code available to web applications.
 

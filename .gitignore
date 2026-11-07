@@ -237,9 +237,10 @@ docs/ecs-lib/api/typescript.md
 
 emsdk-cache/
 .vscode
-.tsdocs
 
 references/
 .direnv
 
 packages/old-core/
+playwright-report/
+test-results/

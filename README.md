@@ -17,11 +17,11 @@ This repository contains multiple packages with separate [releases][github-relea
 
 ## Documentation
 
-The full documentation can be found at: [https://nanoforge-dev.github.io/docs/engine](https://nanoforge-dev.github.io/docs/engine)
+The full documentation can be found at: [https://docs.nanoforge.eu/docs/engine/getting-started/index](https://docs.nanoforge.eu/docs/engine/getting-started/index)
 
 ## Usage
 
-To use Nanoforge Engine, please refer to the [CLI documentation][cli-source] !
+To use Nanoforge Engine, please refer to the [CLI documentation][cli-docs] !
 
 First, install the CLI :
 
@@ -37,18 +37,17 @@ nf new
 
 ## Packages
 
+- `@nanoforge-dev/asset` ([source][asset-source]) - The built-in asset library, to read the files shipped with a game
 - `@nanoforge-dev/common` ([source][common-source]) - Common interfaces and utilities used by Nanoforge Engine
-- `@nanoforge-dev/core` ([source][core-source]) - A core package that contains game main loop
-- `@nanoforge-dev/ecs-lib` ([source][ecs-lib-source]) - A powerful data structure for managing game entities (_do not use this in your projects_)
-- `@nanoforge-dev/ecs-client` ([source][ecs-client-source]) - A wrapper of `@nanoforge-dev/ecs-lib` for client-side usage
-- `@nanoforge-dev/ecs-server` ([source][ecs-server-source]) - A wrapper of `@nanoforge-dev/ecs-lib` for server-side usage
-- `@nanoforge-dev/config` ([source][config-source]) - A wrapper of `class-validator` and `class-transformer` to imports validation and transformation decorators
+- `@nanoforge-dev/core` ([source][core-source]) - A core package that creates the application and runs the game loop
+- `@nanoforge-dev/env` ([source][env-source]) - A wrapper of `class-validator` and `class-transformer` to validate environment variables
+- `@nanoforge-dev/ecs` ([source][ecs-source]) - A powerful data structure for managing game entities, for the client and the server
+- `@nanoforge-dev/editor-lib` ([source][editor-source]) - The bridge between a running game and the NanoForge editor
 - `@nanoforge-dev/graphics-2d` ([source][graphics-2d-source]) - A base 2D graphics library
-- `@nanoforge-dev/asset-manager` ([source][asset-manager-source]) - A manager for loading assets to uniform workwith between client and server
-- `@nanoforge-dev/network-client` ([source][network-client-source]) - A network lib with tcp and udp support for client-side usage
-- `@nanoforge-dev/network-server` ([source][network-server-source]) - A network lib with tcp and udp support for server-side usage
-- `@nanoforge-dev/input` ([source][input-source]) - An input manager for handling keyboard and mouse events
+- `@nanoforge-dev/graphics-3d` ([source][graphics-3d-source]) - A 3D graphics library built on Three.js
+- `@nanoforge-dev/input` ([source][input-source]) - An input manager for handling keyboard, mouse and controller events
 - `@nanoforge-dev/music` ([source][music-source]) - A music player for your game
+- `@nanoforge-dev/network` ([source][network-source]) - A network lib with tcp and udp support, for the client and the server
 - `@nanoforge-dev/scene` ([source][scene-source]) - A scene manager, with vars shared by scenes and systems
 - `@nanoforge-dev/sound` ([source][sound-source]) - A sound manager for your game
 
@@ -62,20 +61,19 @@ If you don't understand something in the documentation, you are experiencing pro
 
 [contributing]: https://github.com/NanoForge-dev/Engine/blob/main/.github/CONTRIBUTING.md
 [discussions]: https://github.com/NanoForge-dev/Engine/discussions
-[cli-source]: https://github.com/NanoForge-dev/CLI
+[cli-docs]: https://docs.nanoforge.eu/docs/cli/getting-started/quickstart
 [github-releases]: https://github.com/NanoForge-dev/Engine/releases
-[asset-manager-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/asset-manager
+[asset-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/asset
 [common-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/common
-[config-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/config
 [core-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/core
-[ecs-client-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/ecs-client
-[ecs-lib-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/ecs-lib
-[ecs-server-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/ecs-server
-[graphics-2d-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/graphics-2d
-[input-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/input
-[music-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/music
-[network-client-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/network-client
-[network-server-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/network-server
+[env-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/env
+[ecs-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/ecs
+[editor-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/editor
+[graphics-2d-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/graphics-2d
+[graphics-3d-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/graphics-3d
+[input-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/input
+[music-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/music
+[network-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/network
 [scene-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/scene
-[sound-source]: https://github.com/NanoForge-dev/Engine/tree/main/packages/sound
+[sound-source]: https://github.com/NanoForge-dev/Engine/tree/main/modules/sound
 [good-first-issue]: https://github.com/NanoForge-dev/Engine/contribute

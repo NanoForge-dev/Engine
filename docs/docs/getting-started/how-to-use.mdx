@@ -1,0 +1,70 @@
+---
+title: "Create a project"
+icon: "folder-plus"
+description: "Generate a NanoForge game project with the CLI and run it in the browser"
+---
+
+The fastest way to start is the NanoForge CLI, `nf`. It generates a project with the engine packages already installed and wired, then builds and serves it for you. You don't need to set anything up by hand.
+
+<Steps>
+  <Step title="Install the CLI">
+    ```bash
+    npm install -g @nanoforge-dev/cli
+    ```
+
+    See [Installation](/docs/cli/getting-started/installation) for the other package managers.
+
+  </Step>
+  <Step title="Generate the project">
+    ```bash
+    nf new
+    ```
+
+    Answer the prompts: name, language, package manager, and whether you want a server. For a first game, choose TypeScript (`ts`, the language of the examples in this documentation) and no server: the whole game then runs in the browser.
+
+  </Step>
+  <Step title="Write your game">
+    ```bash
+    cd my-game
+    ```
+
+    Follow the [quickstart](./quickstart): it replaces the generated `src` files with a small
+    game, then runs it with `nf dev`, which builds the game, serves it, and rebuilds when you
+    save a file.
+
+    <Note>
+      The sample the CLI generates for a project without a server registers the network
+      library, which needs a server address. Until the CLI template changes, running it as it
+      is fails at start-up with an environment validation error. The quickstart code doesn't
+      use the network library.
+    </Note>
+
+  </Step>
+</Steps>
+
+## What you get
+
+Without a server, the project is one client application:
+
+```
+my-game/
+├── nanoforge.config.ts   # type: "client"
+├── package.json
+├── assets/               # images, sounds, data files
+└── src/
+    ├── main.ts           # entry point: creates and runs the application
+    ├── components/
+    └── systems/
+```
+
+With a server, the project is a workspace with one such folder per application, `apps/client` and `apps/server`, and a root `nanoforge.config.ts` that lists them.
+
+- `src/main.ts` exports a `main` function. The NanoForge loader calls it with the options the game needs (the page element to draw in, the game files, the environment).
+- `src/components` and `src/systems` hold the game logic. See [ECS](../ecs/index).
+- Files in `assets/` are served with the game. See [Assets](../assets/index).
+
+The CLI documentation covers every command and option: [CLI quickstart](/docs/cli/getting-started/quickstart), [nf new](/docs/cli/commands/new) and [the configuration file](/docs/cli/configuration/configuration-file).
+
+## Next
+
+Follow the [quickstart](./quickstart) to replace the sample with your own small game.

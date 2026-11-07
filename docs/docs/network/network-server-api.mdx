@@ -1,10 +1,8 @@
 ---
-title: "network-server API"
+title: "Network server API"
 icon: "book"
-description: "API reference for the server networking package"
+description: "Reference of NetworkServerLibrary, from @nanoforge-dev/network/server"
 ---
-
-# network-server API
 
 ## ClientId
 
@@ -13,24 +11,18 @@ connected over both TCP and UDP has the same `ClientId` on both servers.
 
 ## Methods
 
-`NetworkServerLibrary` is exposed on `ctx.network`. Its methods take an optional
-`{ channel }` to pick one of the four [channels](packet-framing):
+Register `NetworkServerLibrary` from `@nanoforge-dev/network/server`. Systems
+reach it through `ctx.network`, which exposes the methods below; the library
+instance has them too. They take an optional
+`{ channel }` to pick one of the four [channels](./packet-framing):
 `Channel.ReliableOrdered`, `Channel.ReliableUnordered`,
 `Channel.UnreliableOrdered` or `Channel.UnreliableUnordered`.
 
 Reliable channels need `LISTENING_TCP_PORT` and unreliable ones
-`LISTENING_UDP_PORT`. Using a channel whose port is not configured throws.
+`LISTENING_UDP_PORT`. Using a channel whose port is not configured throws,
+except on a peer-to-peer host, where every channel works.
 
-```ts
-import { Channel } from "@nanoforge-dev/network/server";
-
-ctx.network.sendToAll({ type: "start" }); // Channel.ReliableOrdered
-ctx.network.sendToAll({ x: 1, y: 2 }, { channel: Channel.UnreliableUnordered });
-
-ctx.network.getReceivedPackets().forEach((packets, clientId) => {
-  const messages = packets.map((packet) => packet.json()); // every channel
-});
-```
+The [server guide](./network-server) has examples.
 
 ### sendToAll(data, options?)
 
@@ -49,7 +41,8 @@ Returns: `void`
 ### sendToClient(clientId, data, options?)
 
 Send a payload to one client. Logs an error when the client is not reachable on
-the channel.
+the channel. Throws a `TypeError` when `data` cannot be encoded as JSON
+(`undefined`, a function).
 
 Parameter `clientId`: `ClientId` client identifier.
 
@@ -93,7 +86,7 @@ Returns: `ClientInfo | undefined` (`undefined` once the client is gone)
 ## packets (`ctx.network.packets`)
 
 Typed packets, declared with `definePacket` (see the
-[network-client API](network-client-api)). Packets of a type
+[network-client API](./network-client-api)). Packets of a type
 are routed to its listeners and to `read`, never to `getReceivedPackets`.
 
 ### on(packet, listener)
@@ -127,31 +120,13 @@ Throws a `TypeError` when `data` cannot be encoded as JSON.
 
 Send a packet to one client, like `sendToAll`.
 
-## NetworkPayload
+## NetworkPayload and NetworkData
 
-What `sendToAll` and `sendToClient` accept. Their payload carries no format
-tag: the receiver reads a packet the way it was sent.
-
-| Value                                              | Encoded as            | Read back with                |
-| -------------------------------------------------- | --------------------- | ----------------------------- |
-| `Uint8Array`, `ArrayBuffer`, any `ArrayBufferView` | The bytes as they are | `bytes()` or `arrayBuffer()`  |
-| `string`                                           | UTF-8 text            | `text()`                      |
-| `NetworkData`                                      | Its bytes, unchanged  | What the original sender used |
-| Any other value (object, array, number, …)         | `JSON.stringify` text | `json()`                      |
-
-Passing a received `NetworkData` relays a client's packet as it is.
-
-## NetworkData
-
-One received packet. Its methods are synchronous and return a new value on
-every call.
-
-| Method          | Returns                                                                    |
-| --------------- | -------------------------------------------------------------------------- |
-| `bytes()`       | `Uint8Array`: the payload bytes.                                           |
-| `arrayBuffer()` | `ArrayBuffer`: the payload bytes.                                          |
-| `text()`        | `string`: the payload decoded as UTF-8.                                    |
-| `json<T>()`     | `T`: the payload parsed as JSON. Throws a `SyntaxError` if it is not JSON. |
+Payloads are encoded and read back the same way on both sides: see
+[NetworkPayload](./network-client-api#networkpayload) and
+[NetworkData](./network-client-api#networkdata) in the client API. Passing a
+received `NetworkData` to `sendToAll` or `sendToClient` relays a client's packet
+as it is.
 
 ## clients (`ctx.network.clients`)
 
@@ -187,23 +162,23 @@ Returns: `() => void` that removes the listener.
 
 ## ClientInfo
 
-| Field         | Type                                             | Description                                       |
-| ------------- | ------------------------------------------------ | ------------------------------------------------- |
-| `id`          | `ClientId`                                       | Session identifier.                               |
-| `connectedAt` | `number`                                         | Timestamp (ms) of the first transport connection. |
-| `transports`  | `{ tcp?: ConnectionInfo; udp?: ConnectionInfo }` | Transports currently attached (live object).      |
+| Field         | Type                                         | Description                                                                                                                                                     |
+| ------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`          | `ClientId`                                   | Session identifier.                                                                                                                                             |
+| `connectedAt` | `number`                                     | Timestamp (ms) of the first transport connection.                                                                                                               |
+| `transports`  | `Partial<Record<Transport, ConnectionInfo>>` | Transports currently attached (live object). `Transport` is `"tcp"`, `"udp"`, `"local"` (a peer-to-peer host's own player) or `"peer"` (a peer-to-peer player). |
 
 ## ConnectionInfo
 
-| Field         | Type                     | Description                                                 |
-| ------------- | ------------------------ | ----------------------------------------------------------- |
-| `transport`   | `"tcp" \| "udp"`         | Transport of this connection.                               |
-| `address`     | `string`                 | Remote address.                                             |
-| `port`        | `number`                 | Remote port.                                                |
-| `family`      | `string`                 | `"IPv4"` or `"IPv6"`.                                       |
-| `userAgent`   | `string \| undefined`    | `User-Agent` header of the upgrade request.                 |
-| `origin`      | `string \| undefined`    | `Origin` header of the upgrade request.                     |
-| `params`      | `Record<string, string>` | Query parameters of the upgrade request, without the token. |
-| `connectedAt` | `number`                 | Timestamp (ms) of the upgrade request.                      |
+| Field         | Type                     | Description                                                                                 |
+| ------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| `transport`   | `Transport`              | Transport of this connection.                                                               |
+| `address`     | `string`                 | Remote address, or `"unknown"` when the runtime can't tell (always on a peer-to-peer host). |
+| `port`        | `number`                 | Remote port, or `0` when unknown.                                                           |
+| `family`      | `string`                 | `"IPv4"`, `"IPv6"` or `"unknown"`.                                                          |
+| `userAgent`   | `string \| undefined`    | `User-Agent` header of the upgrade request.                                                 |
+| `origin`      | `string \| undefined`    | `Origin` header of the upgrade request.                                                     |
+| `params`      | `Record<string, string>` | Query parameters of the upgrade request, without the token.                                 |
+| `connectedAt` | `number`                 | Timestamp (ms) of the upgrade request.                                                      |
 
 `Cookie` and `Authorization` headers are never recorded.

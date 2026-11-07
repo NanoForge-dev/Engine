@@ -1,0 +1,48 @@
+[
+  {
+    "group": "Getting started",
+    "pages": [
+      "getting-started/index",
+      "getting-started/how-to-use",
+      "getting-started/quickstart",
+      "getting-started/concepts",
+      "getting-started/documentation"
+    ]
+  },
+  {
+    "group": "Building a game",
+    "pages": [
+      "ecs/index",
+      "graphics-2d/index",
+      "input/index",
+      "audio/index",
+      "assets/index",
+      "scene/index",
+      "env/index"
+    ]
+  },
+  {
+    "group": "Network",
+    "pages": [
+      "network/index",
+      "network/network-client",
+      "network/network-server",
+      "network/network-peer",
+      "network/packet-framing",
+      "network/network-client-api",
+      "network/network-server-api"
+    ]
+  },
+  {
+    "group": "Graphics 3D",
+    "pages": ["graphics-3d/index", "graphics-3d/advanced", "graphics-3d/performance"]
+  },
+  {
+    "group": "Editor",
+    "pages": ["editor/protocol"]
+  },
+  {
+    "group": "ECS internals",
+    "pages": ["registry/index", "registry/writing-web-assembly"]
+  }
+]

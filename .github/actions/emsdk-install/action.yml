@@ -10,12 +10,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set up swap space
-      if: runner.os == 'Linux'
-      uses: pierotofy/set-swap-space@v1.0
-      with:
-        swap-size-gb: 10
-
     - name: Cache rotation keys
       id: cache-rotation
       shell: bash

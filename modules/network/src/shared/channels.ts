@@ -118,6 +118,28 @@ export const UNRELIABLE_CHANNEL_OPTIONS: RTCDataChannelInit = {
 };
 
 /**
+ * WebRTC data channel options of every channel, for links where all four run
+ * over WebRTC (peer-to-peer).  The unreliable ones match
+ * `UNRELIABLE_CHANNEL_OPTIONS`; `ReliableUnordered` really is unordered here,
+ * unlike over the TCP WebSocket.
+ */
+export const DATA_CHANNEL_OPTIONS: Record<Channel, RTCDataChannelInit> = {
+  [Channel.ReliableOrdered]: {},
+  [Channel.ReliableUnordered]: { ordered: false },
+  [Channel.UnreliableOrdered]: UNRELIABLE_CHANNEL_OPTIONS,
+  [Channel.UnreliableUnordered]: UNRELIABLE_CHANNEL_OPTIONS,
+};
+
+/**
+ * Find the channel a WebRTC data channel stands for, on a peer-to-peer link.
+ *
+ * @param label - Label of the data channel, which is the channel value.
+ * @returns The channel, or `undefined` for an unknown label.
+ */
+export const channelFromLabel = (label: string): Channel | undefined =>
+  CHANNELS.find((channel) => channel === label);
+
+/**
  * Find the unreliable channel a WebRTC data channel stands for.
  *
  * @param label - Label of the data channel, which is the channel value.

@@ -117,11 +117,22 @@ export abstract class NanoforgeApplication {
       const tickMs = performance.now() - tickTimer;
       for (const observer of observers) observer.onTick?.(tickMs, Date.now());
 
-      setTimeout(loop, tickLengthMs + tickStart - Date.now());
+      this.schedule(loop, tickLengthMs + tickStart - Date.now());
     };
 
     this.appState.setIsRunning(true);
-    setTimeout(loop);
+    this.schedule(loop, 0);
+  }
+
+  /**
+   * Call `tick` once `delayMs` elapsed: the next tick of the game loop.
+   *
+   * @param tick - Next tick of the game loop.
+   * @param delayMs - Delay before it, in milliseconds.
+   */
+  protected schedule(tick: () => void, delayMs: number): void {
+    // A tick longer than its budget gives a negative delay, which Node and Bun warn about.
+    setTimeout(tick, Math.max(0, delayMs));
   }
 
   protected async initialize(options: RunOptions | ClientRunOptions): Promise<void> {

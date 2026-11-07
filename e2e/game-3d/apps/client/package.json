@@ -1,0 +1,16 @@
+{
+  "name": "e2e-game-3d-client",
+  "version": "0.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@nanoforge-dev/common": "workspace:*",
+    "@nanoforge-dev/core": "workspace:*",
+    "@nanoforge-dev/ecs": "workspace:*",
+    "@nanoforge-dev/graphics-3d": "workspace:*",
+    "@nanoforge-dev/input": "workspace:*",
+    "@types/three": "catalog:graphics",
+    "three": "catalog:graphics",
+    "typescript": "catalog:core"
+  },
+  "private": true
+}

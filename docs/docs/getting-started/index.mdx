@@ -1,0 +1,48 @@
+---
+title: "Engine"
+icon: "book"
+description: "What the NanoForge engine is, what its packages do, and where to start"
+---
+
+NanoForge is a game engine for the web browser, written in TypeScript. A game is a set of small libraries that you register on an application: an ECS to hold the game state, a renderer, an input reader, audio, networking. You only add the ones your game needs.
+
+A game has a **client**, which runs in the browser, and can have a **server**, which runs on Bun. Both use the same engine and the same ECS.
+
+## Start here
+
+<CardGroup cols={2}>
+  <Card title="Create a project" icon="folder-plus" href="./how-to-use">
+    Install the CLI and generate a project with `nf new`.
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="./quickstart">
+    Build a small 2D game you move with the arrow keys.
+  </Card>
+  <Card title="Core concepts" icon="lightbulb" href="./concepts">
+    Applications, libraries, the context, the game loop and the ECS.
+  </Card>
+  <Card title="About this documentation" icon="book-open" href="./documentation">
+    Where the guides and the API reference are.
+  </Card>
+</CardGroup>
+
+## Packages
+
+Every package is published on npm under `@nanoforge-dev/`. Projects made with `nf new` already depend on the ones they use.
+
+| Package                      | Side   | What it is for                                                                                     | Guide                                 |
+| ---------------------------- | ------ | -------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| `@nanoforge-dev/core`        | both   | Creates the client or server application and runs the game loop.                                   | [Core concepts](./concepts)           |
+| `@nanoforge-dev/common`      | both   | Shared types (`Context`, `Library`, run options) and exceptions.                                   | [Core concepts](./concepts)           |
+| `@nanoforge-dev/ecs`         | both   | The entity component system: entities, components and systems. Import from `/client` or `/server`. | [ECS](../ecs/index)                   |
+| `@nanoforge-dev/asset`       | both   | The built-in asset library behind `ctx.assets`. You never register it.                             | [Assets](../assets/index)             |
+| `@nanoforge-dev/env`         | both   | Validates environment variables into a typed class.                                                | [Environment](../env/index)           |
+| `@nanoforge-dev/graphics-2d` | client | 2D drawing with [Konva](https://konvajs.org/): shapes, images, text, layers.                       | [Graphics 2D](../graphics-2d/index)   |
+| `@nanoforge-dev/graphics-3d` | client | 3D rendering with [Three.js](https://threejs.org/).                                                | [Graphics 3D](../graphics-3d/index)   |
+| `@nanoforge-dev/input`       | client | Keyboard and mouse, and controllers from `/controller`.                                            | [Input](../input/index)               |
+| `@nanoforge-dev/sound`       | client | Short sound effects.                                                                               | [Sound and music](../audio/index)     |
+| `@nanoforge-dev/music`       | client | Background music, one track at a time.                                                             | [Sound and music](../audio/index)     |
+| `@nanoforge-dev/scene`       | both   | Scenes (menus, levels, pause screens) and values shared between them.                              | [Scenes](../scene/index)              |
+| `@nanoforge-dev/network`     | both   | Client/server and peer-to-peer networking. Import from `/client` or `/server`.                     | [Network](../network/index)           |
+| `@nanoforge-dev/editor-lib`  | both   | Lets the NanoForge editor run and inspect your game.                                               | [Editor protocol](../editor/protocol) |
+
+The full list of classes, methods and options of each package is in the **API reference** tab.

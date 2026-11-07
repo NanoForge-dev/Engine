@@ -4,23 +4,58 @@ on:
   pull_request:
     branches:
       - main
+  # Pushes to main fill the caches that pull requests restore.
   push:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      update-snapshots:
+        description: Regenerate the graphics e2e reference screenshots (uploaded as the graphics-e2e artifact)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    name: Tests
+    uses: nanoforge-dev/actions/.github/workflows/tests.yml@v3
+    with:
+      style-scripts: '["lint"]'
+      unit-script: test:unit
+      e2e-script: test:e2e
+
+  graphics:
+    name: Graphics e2e tests
+    # Pinned: the reference screenshots are rendered by this OS's Chromium and SwiftShader.
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Prepare
         uses: ./.github/actions/prepare
 
-      - name: "Run tests"
-        run: pnpm test
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
 
-      - name: "Run linter"
-        run: pnpm lint
+      - name: Run graphics e2e tests
+        env:
+          UPDATE_SNAPSHOTS: ${{ inputs.update-snapshots }}
+        run: |
+          if [ "$UPDATE_SNAPSHOTS" = true ]; then set -- --update-snapshots; fi
+          pnpm test:e2e:graphics "$@"
+
+      - name: Upload report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: graphics-e2e
+          path: |
+            playwright-report/
+            test-results/
+            e2e/graphics/*-snapshots/

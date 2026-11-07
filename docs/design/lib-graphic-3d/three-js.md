@@ -1,0 +1,65 @@
+---
+title: "Three.js"
+icon: "cube"
+description: "Three.js in the 3D graphics library benchmark: verdict, integration notes and evidence per criterion"
+---
+
+Part of the [3D graphics library benchmark](./index). Scores: ✅ meets, ⚠️ partly, ❌ does not, ❓ unknown.
+
+|            |                                                       |
+| ---------- | ----------------------------------------------------- |
+| Package    | `three` (`three/webgpu` entry, `WebGPURenderer`)      |
+| Version    | r187 (0.187.0)                                        |
+| License    | MIT                                                   |
+| Repository | [mrdoob/three.js](https://github.com/mrdoob/three.js) |
+| Result     | **Chosen** (second on score)                          |
+| Totals     | ✅ 19 · ⚠️ 10 · ❌ 1 · ❓ 0                           |
+
+## Verdict
+
+- Lighter than Babylon.js (222 KB gzip) and by far the largest ecosystem (33.5M npm downloads per week).
+- Fast to start: 57 ms to the first frame with 2,000 meshes in the POC, and the same speed on WebGPU and WebGL.
+- Editor needs are covered by official addons: `Raycaster`, `TransformControls`, `OrbitControls`, `ObjectLoader`.
+- Weak points: an internal `requestAnimationFrame` loop runs until `dispose()` even when we render from our tick, the import leaves `window.__THREE__`, types are a separate package (`@types/three`), physics is only example wrappers, and nothing exists for player a11y.
+
+## Integration notes
+
+- `__init`: `new WebGPURenderer({ canvas })`, `await renderer.init()`. The WebGL2 fallback is automatic; `forceWebGL: true` forces it.
+- Tick: `renderer.render(scene, camera)` from our loop. Capture with `canvas.toDataURL()` right after it.
+- Viewport: `setSize(visibleWidth, visibleHeight, false)`, `setPixelRatio(pixelRatio)`, `camera.setViewOffset` for the origin.
+- `__clear`: dispose geometries, materials and textures we created, `await renderer.dispose()`, then `delete window.__THREE__` (as we do for `window.Konva`).
+
+## Evidence
+
+| Id  | Score | Evidence                                                                                                                                                                 |
+| --- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A1  | ✅    | `WebGPURenderer` switches to its WebGL2 backend by itself; `forceWebGL` forces it. [Docs](https://threejs.org/docs/#api/en/renderers/webgpu/WebGPURenderer)              |
+| A2  | ⚠️    | Shadows and TSL post-processing on both; storage textures, indirect draw and full compute are reduced on WebGL2. [Manual](https://threejs.org/manual/#en/webgpurenderer) |
+| A3  | ✅    | TSL and node materials compile to WGSL and GLSL from one source. [TSL](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language)                                |
+| A4  | ✅    | WebGPU on Chrome/Edge 113+, Safari 26, Firefox 141+ (Windows); WebGL2 elsewhere. [caniuse](https://caniuse.com/webgpu)                                                   |
+| B1  | ⚠️    | POC: 60 FPS (vsync cap) with 2,000 meshes; 11.7 FPS on WebGPU and 12.4 on WebGL with 20,000 unbatched meshes. See [POC](./poc).                                          |
+| B2  | ⚠️    | Measured 818 KB raw, 222 KB gzip. The `three/webgpu` entry pulls the whole node system.                                                                                  |
+| B3  | ✅    | POC: 57 ms to the first frame with 2,000 meshes, about 350 ms with 20,000, on both backends. See [POC](./poc).                                                           |
+| B4  | ⚠️    | OffscreenCanvas documented for WebGL; WebGPU in a worker not verified. [Manual](https://threejs.org/manual/#en/offscreencanvas)                                          |
+| C1  | ✅    | Takes our `canvas`, or `renderer.domElement` goes in any container.                                                                                                      |
+| C2  | ⚠️    | `render()` can be called from our tick, but it starts an internal rAF bookkeeping loop that runs until `dispose()`.                                                      |
+| C3  | ⚠️    | `await renderer.dispose()`, plus `.dispose()` on each geometry, material, texture. POC: `window.__THREE__` stays after dispose.                                          |
+| C4  | ✅    | `setSize`, `setPixelRatio`, `setViewport`, `setScissor`, `camera.setViewOffset`.                                                                                         |
+| C5  | ✅    | Measured: `Vector3`, `Quaternion`, `Matrix4` import and compute in Node 24 with no DOM.                                                                                  |
+| C6  | ⚠️    | `Object3D` imposes no entity system, but it is a heavy OOP hierarchy to keep in sync.                                                                                    |
+| D1  | ✅    | `Raycaster.setFromCamera`, `Vector3.project(camera)`. [Docs](https://threejs.org/docs/#api/en/core/Raycaster)                                                            |
+| D2  | ✅    | Official `TransformControls` addon.                                                                                                                                      |
+| D3  | ✅    | Official `OrbitControls`, `MapControls`, `FlyControls`, `ArcballControls`.                                                                                               |
+| D4  | ✅    | `Object3D.toJSON()` and `ObjectLoader`. [Docs](https://threejs.org/docs/#api/en/loaders/ObjectLoader)                                                                    |
+| D5  | ✅    | POC: `canvas.toDataURL()` right after `render()` gives a painted PNG on WebGPU and WebGL, without `preserveDrawingBuffer`.                                               |
+| D6  | ✅    | POC: the canvas moved into another document (iframe) keeps rendering on both backends, no error. A real `window.open` window is not tested.                              |
+| E1  | ✅    | Large manual, about 500 official examples, hello cube with `GLTFLoader` in about 20 lines. [Examples](https://threejs.org/examples/)                                     |
+| E2  | ❌    | No ARIA, keyboard navigation or reduced-motion support.                                                                                                                  |
+| E3  | ⚠️    | No built-in colorblind pass; writable as a TSL post-process.                                                                                                             |
+| F1  | ✅    | MIT, no SaaS.                                                                                                                                                            |
+| F2  | ✅    | About 2,300 commits in 12 months, monthly releases, 117k stars, 33.5M npm downloads per week.                                                                            |
+| F3  | ⚠️    | Types in the separate `@types/three`, sometimes behind a release.                                                                                                        |
+| F4  | ✅    | `GLTFLoader`, `KTX2Loader`, `DRACOLoader`, `AnimationMixer`.                                                                                                             |
+| G1  | ✅    | `MeshStandardMaterial`, `MeshPhysicalMaterial`, shadow maps, PMREM/IBL.                                                                                                  |
+| G2  | ⚠️    | No official physics; basic Rapier, Jolt and Ammo wrappers in the examples.                                                                                               |
+| G3  | ✅    | Sprites, `CSS2DRenderer`/`CSS3DRenderer`, troika-three-text; Konva on top or as a `CanvasTexture`.                                                                       |
