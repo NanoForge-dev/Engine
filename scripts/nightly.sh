@@ -43,6 +43,9 @@ setup() {
         cp -u packages/ecs-lib/lib/* packages/ecs-client/lib/ 2>/dev/null || true
         cp -u packages/ecs-lib/lib/* packages/ecs-server/lib/ 2>/dev/null || true
     fi
+
+    echo "Building workspace packages..."
+    pnpm run build || true
 }
 
 discover_packages() {
