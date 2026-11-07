@@ -34,6 +34,7 @@ const url = (path: string): string => {
 };
 sound.load("jump", url("/jump.wav"));
 music.load("theme", url("/theme.mp3"));
+music.play("theme");
 
 await app.run();
 ```
@@ -43,17 +44,33 @@ await app.run();
 From a system, or anywhere you have the context:
 
 ```ts
-ctx.sound.play("jump");
-ctx.music.play("theme"); // stops the track that was playing
-ctx.sound.mute(); // toggles: sound effects start muted
-ctx.music.mute();
+if (ctx.input.isKeyPressed(InputEnum.Space)) ctx.sound.play("jump");
 ```
 
+- `ctx.music.play(key)` stops the track that was playing before.
+- `play` throws `NfNotFound` when no file was loaded under that key.
+- Playing a sound that is already playing has no effect until it ends.
+
+## Turn the sound on
+
 <Warning>
-  Both libraries start **muted**, and `mute()` toggles the muted state. Call `mute()` once to turn
-  the sound on, for example when the player clicks a "sound on" button. Browsers also block audio
-  until the player has interacted with the page.
+  Both libraries start **muted**, and `mute()` toggles the muted state: call it once to turn the
+  sound on. Browsers also block audio until the player has interacted with the page, so tie it to a
+  key press or a click.
 </Warning>
 
-- `play` throws `NfNotFound` when no file was loaded under that key.
-- `play` restarts nothing: playing a sound that is already playing has no effect until it ends.
+A system runs on every tick, so toggle on the press, not while the key is held:
+
+```ts
+let wasPressed = false;
+
+// Toggles sound and music once per press of M.
+export const toggleSound = (_registry: Registry, ctx: Context) => {
+  const pressed = ctx.input.isKeyPressed(InputEnum.KeyM) ?? false;
+  if (pressed && !wasPressed) {
+    ctx.sound.mute();
+    ctx.music.mute();
+  }
+  wasPressed = pressed;
+};
+```

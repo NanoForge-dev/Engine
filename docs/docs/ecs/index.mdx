@@ -104,7 +104,7 @@ To add and remove a group of entities and systems together, such as a level, use
 
 ## Errors
 
-An error thrown in the C++ registry reaches JavaScript as a runtime error with a short message, such as `Entity index out of range.` from `entityFromIndex`. Check your ids before calling it.
+An error thrown in the C++ registry reaches JavaScript as a runtime error, with less detail than a JavaScript error. For example, `entityFromIndex` throws for an id that was never spawned or was killed: check your ids before calling it.
 
 ## Editor manifests
 

@@ -8,16 +8,20 @@ Assets are the files your game ships with: images, sounds, levels, configuration
 
 ## Read an asset
 
-The asset library is built into every application: you never register it. Read a file with `ctx.assets.getAsset(path)`, from a system or a library hook:
+The asset library is built into every application: you never register it. Read a file with `ctx.assets.getAsset(path)` wherever you have the context. Load each file once, not on every tick: a scene's `load` is a good place, and it can wait for the file (see [Scenes](../scene/index)).
 
 ```ts
-const levels = await ctx.assets.getAsset("/levels.json").json();
+export class Level extends Scene {
+  override async load(ctx: Context) {
+    const level = await ctx.assets.getAsset("/levels/1.json").json();
 
-const hero = new window.Image();
-hero.src = ctx.assets.getAsset("/hero.png").path;
-ctx.graphics.baseLayer.add(new Image({ image: hero, x: 100, y: 100, width: 64, height: 64 }));
+    const hero = new window.Image();
+    hero.src = ctx.assets.getAsset("/hero.png").path;
+    ctx.graphics.baseLayer.add(new Image({ image: hero, x: level.x, y: level.y }));
 
-ctx.sound.load("jump", ctx.assets.getAsset("/jump.wav").path);
+    ctx.sound.load("jump", ctx.assets.getAsset("/jump.wav").path);
+  }
+}
 ```
 
 `getAsset` returns an `NfFile`:

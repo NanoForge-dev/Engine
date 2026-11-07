@@ -6,12 +6,12 @@ description: "Read the keyboard, the mouse and game controllers"
 
 `@nanoforge-dev/input` reads the player's input on the client. It has two libraries:
 
-| Library             | Import from                       | Context key      |
-| ------------------- | --------------------------------- | ---------------- |
-| `InputLibrary`      | `@nanoforge-dev/input`            | `ctx.input`      |
-| `ControllerLibrary` | `@nanoforge-dev/input/controller` | `ctx.controller` |
+| Library             | Import from                           | Context key      |
+| ------------------- | ------------------------------------- | ---------------- |
+| `InputLibrary`      | `@nanoforge-dev/input/keyboard-mouse` | `ctx.input`      |
+| `ControllerLibrary` | `@nanoforge-dev/input/controller`     | `ctx.controller` |
 
-Register the ones you need with `app.use(new InputLibrary())`. Both read the current state: call them from a system on every tick.
+The root `@nanoforge-dev/input` exports the keyboard and mouse library too. Register the ones you need with `app.use(new InputLibrary())`. Both read the current state: call them from a system on every tick.
 
 ## Keyboard and mouse
 

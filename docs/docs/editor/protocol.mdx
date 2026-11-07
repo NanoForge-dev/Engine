@@ -85,7 +85,7 @@ Libraries add their own features:
 | `scenes: { intervalMs }`         | `scene`       | `scenes`                              | `scenes-load`, `scenes-unload`, `scenes-set-var`                                                                                    |
 | `graphicsCamera: true`           | `graphics-3d` | `graphics-camera`, `graphics-capture` | `graphics-capture`                                                                                                                  |
 
-Their payloads are typed in each package (`EcsEditorCommands`, `SceneEditorCommands`...). See the API reference tab.
+The feature only turns the events on: the commands are handled whenever the library and `EditorLibrary` are registered. Their payloads are typed in each package (`EcsEditorCommands`, `SceneEditorCommands`...). See the API reference tab.
 
 Log forwarding only forwards console calls whose stack contains a frame of the game bundle. Output from before the `welcome` (library `__init`, the start of `main`) is kept, up to 200 lines, and sent as soon as the editor asks for logs. It is dropped if the editor doesn't ask for them. When more than 200 lines were waiting, a warning line says how many earlier lines were dropped. A client runs inside the editor page, and this keeps the editor's own console output out of the game logs.
 

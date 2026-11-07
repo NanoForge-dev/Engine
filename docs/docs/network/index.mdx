@@ -56,6 +56,12 @@ await app.init(options); // starts listening
 - The client connects during `app.init`, which rejects when the server can't be reached within 10 seconds.
 - Each tick, the network library runs before the ECS: the packets received are ready for your systems.
 - `NetworkServerLibrary` needs the Bun runtime, which `nf` uses to run servers.
+- With pnpm, a bundled server can fail to start with `Cannot load native addon for node-datachannel`. Add this to `pnpm-workspace.yaml`:
+
+  ```yaml
+  publicHoistPattern:
+    - "@node-datachannel/*"
+  ```
 
 Then send and receive packets: see [Client networking](./network-client) and [Server networking](./network-server). The [pong-network example](https://github.com/NanoForge-dev/Engine/tree/main/example/pong-network) is a complete game.
 
