@@ -35,7 +35,7 @@ Engine/
 │   ├── graphics-2d/       @nanoforge-dev/graphics-2d — 2D rendering based on Konva, depends on common only (no dependency on ecs or editor-lib)
 │   ├── graphics-3d/       @nanoforge-dev/graphics-3d — 3D rendering based on Three.js (WebGPU, WebGL2 fallback), client only, exports ./three and ./three/tsl
 │   ├── network/           @nanoforge-dev/network — TCP/UDP networking via node-datachannel, plus a p2p mode (WebRTC), exports ./client and ./server
-│   ├── scene/              @nanoforge-dev/scene — scene management (scene library, paths, editor integration), depends on common, peer-depends on editor-lib
+│   ├── scene/              @nanoforge-dev/scene — scene management (scene library, paths, editor integration), depends on common, optional peer dependency on editor-lib
 │   ├── editor/            @nanoforge-dev/editor-lib — building blocks used by the editor
 │   ├── input/              @nanoforge-dev/input — keyboard/mouse and controller handling, exports ./keyboard-mouse and ./controller
 │   ├── music/              @nanoforge-dev/music — music player
@@ -105,7 +105,7 @@ The workflows in `.github/workflows` call the shared reusable workflows of `nano
 - **Conventional commits** are mandatory (commitlint + `@commitlint/config-conventional`), enforced by Husky's `commit-msg` hook.
 - **Husky hooks**: `pre-commit` runs lint-staged (Prettier `--ignore-unknown --write` on all staged files); `pre-push` runs `pnpm run build`, `pnpm run lint` and `pnpm run test`.
 - **Strict TypeScript**: `strict: true`, `noUncheckedIndexedAccess`, `noUnusedLocals/Parameters`, `noImplicitReturns`, experimental decorators enabled (`experimentalDecorators`, `useDefineForClassFields`) — notably used by `@nanoforge-dev/env` (class-validator/class-transformer).
-- Each package publishes in **dual ESM/CJS format** with separate type declarations (`.d.ts` / `.d.cts`), and an explicit `exports` map in its `package.json`.
+- Each package of `packages/*` and `modules/*` publishes in **dual ESM/CJS format** with separate type declarations (`.d.ts` / `.d.cts`), and an explicit `exports` map in its `package.json`.
 - **Per-package changelog**: each package has its own `CHANGELOG.md` generated via `git-cliff` filtered by path (`--include-path '<folder>/<x>/*'`, where `<folder>` is `packages`, `modules` or `utils`).
 - **Releases** (`.github/nanoforge.json`, see `.github/CONTRIBUTING.md`): the `engine` group (the 13 runtime packages) shares one version, tagged `<version>`, and its releases also sync the docs; the `utils` group (`utils-eslint-config`, `utils-prettier-config`) releases one package at a time with its own version, tagged `<package>@<version>`. Run the **Release PR** workflow, squash-merge the `releases/*` PR, and the **Release** workflow publishes. The **Alpha Release** workflow publishes an alpha from a feature branch. Other merged PRs release nothing.
 - Contribution: fork + PR, install Emscripten, `pnpm install --frozen-lockfile`, `pnpm build`, then `pnpm format && pnpm build && pnpm test:unit` before submitting (see `.github/CONTRIBUTING.md`).
