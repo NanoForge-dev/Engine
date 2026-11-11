@@ -10,6 +10,8 @@ import type { SoundContextApi } from "./sound-context.type";
  * Manages a collection of named `HTMLAudioElement` instances. Load sounds
  * with `load` and trigger playback with `play`. Unlike `MusicLibrary`,
  * multiple sounds may overlap — there's no single-track exclusivity.
+ *
+ * Sound effects start muted. Call `mute()` once to unmute them.
  */
 export class SoundLibrary extends Library implements EditorAwareLibrary {
   readonly key = defineLibraryKey("sound");

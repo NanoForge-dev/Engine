@@ -10,6 +10,8 @@ import type { MusicContextApi } from "./music-context.type";
  * Manages a collection of named `HTMLAudioElement` instances and ensures
  * only one track plays at a time — unlike `SoundLibrary`, starting a new
  * track pauses whichever one was playing.
+ *
+ * Music starts muted. Call `mute()` once to unmute it.
  */
 export class MusicLibrary extends Library implements EditorAwareLibrary {
   readonly key = defineLibraryKey("music");

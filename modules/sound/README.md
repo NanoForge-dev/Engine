@@ -51,6 +51,8 @@ public override async __run(ctx: Context): Promise<void> {
 }
 ```
 
+Sound effects start muted. Call `ctx.sound.mute()` once to unmute them.
+
 Call `ctx.sound.mute()` to toggle the muted state of every loaded sound effect. `play` throws `NfNotFound` when the given key was never loaded.
 
 ## Links

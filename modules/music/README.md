@@ -51,6 +51,8 @@ public override async __run(ctx: Context): Promise<void> {
 }
 ```
 
+Music starts muted. Call `ctx.music.mute()` once to unmute it.
+
 Call `ctx.music.mute()` to toggle the muted state of every loaded track. `play` throws `NfNotFound` when the given key was never loaded.
 
 ## Links
