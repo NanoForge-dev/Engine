@@ -8,7 +8,6 @@ pnpm-workspace.yaml
 
 packages/
 modules/
-example/
 utils/
 releases/
 .nanoforge/

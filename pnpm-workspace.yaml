@@ -5,7 +5,6 @@ packages:
   - e2e/game/**
   - e2e/game-2d/**
   - e2e/game-3d/**
-  - example/**
 
 allowBuilds:
   bun: true
