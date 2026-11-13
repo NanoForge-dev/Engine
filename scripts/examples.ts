@@ -87,7 +87,12 @@ const packageFiles = (dir: string): string[] =>
  */
 export const copyExample = (example: Example, dest: string, packages: Map<string, string>) => {
   rmSync(dest, { recursive: true, force: true });
-  cpSync(example.dir, dest, { recursive: true, filter: (src) => !SKIPPED.has(basename(src)) });
+  // Dereferenced: a link into the checkout would let the copy write to the real game.
+  cpSync(example.dir, dest, {
+    recursive: true,
+    dereference: true,
+    filter: (src) => !SKIPPED.has(basename(src)),
+  });
   // Its own workspace root, so pnpm never installs it into this repository's workspace.
   if (!existsSync(join(dest, "pnpm-workspace.yaml")))
     writeFileSync(

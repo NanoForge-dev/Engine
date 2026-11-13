@@ -1,4 +1,13 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs";
+import {
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "fs";
 import { tmpdir } from "os";
 import { dirname, join } from "path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -27,6 +36,7 @@ for (const skipped of [
   "pnpm-lock.yaml",
 ])
   write(`basics/pong/${skipped}`, "");
+symlinkSync(join(CHECKOUT, "basics/pong/src/main.ts"), join(CHECKOUT, "basics/pong/linked.ts"));
 write("demos/pong/package.json", {});
 write("games/not-an-example/README.md", "");
 
@@ -56,6 +66,7 @@ describe("pnpm examples", () => {
 
     expect(existsSync(join(dest, "stale.txt"))).toBe(false);
     expect(existsSync(join(dest, "src/main.ts"))).toBe(true);
+    expect(lstatSync(join(dest, "linked.ts")).isSymbolicLink()).toBe(false);
     for (const skipped of ["node_modules", "dist", ".nanoforge", "pnpm-lock.yaml"])
       expect(existsSync(join(dest, skipped))).toBe(false);
     expect(existsSync(join(dest, "pnpm-workspace.yaml"))).toBe(true);
