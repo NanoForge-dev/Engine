@@ -111,16 +111,19 @@ export const copyExample = (example: Example, dest: string, packages: Map<string
 };
 
 const findCheckout = async (from: string | undefined): Promise<string> => {
-  const candidate = from ?? process.env.NANOFORGE_EXAMPLES ?? join(ROOT, "..", "examples");
-  if (existsSync(candidate)) return resolve(candidate);
+  // pnpm runs scripts from the engine root: a relative path is the user's, from INIT_CWD.
+  const fromUser = (path: string) => resolve(process.env.INIT_CWD ?? ".", path);
+  const given = from ?? process.env.NANOFORGE_EXAMPLES;
+  const candidate = given ? fromUser(given) : join(ROOT, "..", "examples");
+  if (existsSync(candidate)) return candidate;
   if (from ?? process.env.NANOFORGE_EXAMPLES)
     throw new Error(`No examples checkout at ${candidate}`);
   if (!process.stdin.isTTY) throw new Error(`No examples checkout found.\n\n${USAGE}`);
   const answer = await input({
     message: "Path to your NanoForge examples checkout:",
-    validate: (value) => existsSync(value) || "No folder there",
+    validate: (value) => existsSync(fromUser(value)) || `No folder at ${fromUser(value)}`,
   });
-  return resolve(answer);
+  return fromUser(answer);
 };
 
 const main = async () => {
@@ -140,7 +143,14 @@ const main = async () => {
 
   let chosen: Example[];
   if (values.all) chosen = examples;
-  else if (values.games) chosen = pickExamples(examples, values.games.split(","));
+  else if (values.games)
+    chosen = pickExamples(
+      examples,
+      values.games
+        .split(",")
+        .map((name) => name.trim())
+        .filter(Boolean),
+    );
   else if (process.stdin.isTTY)
     chosen = await checkbox({
       message: "Examples to copy",
