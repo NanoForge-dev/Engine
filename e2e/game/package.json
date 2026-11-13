@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@nanoforge-dev/asset": "workspace:*",
-    "@nanoforge-dev/cli": "^2.3.0",
+    "@nanoforge-dev/cli": "^3.0.1",
     "@nanoforge-dev/common": "workspace:*",
     "@nanoforge-dev/config": "catalog:config",
     "@nanoforge-dev/core": "workspace:*",

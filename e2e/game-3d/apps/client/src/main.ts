@@ -1,6 +1,7 @@
-import type { ClientRunOptions, Context } from "@nanoforge-dev/common";
+import type { ClientRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { EcsLibrary, type Registry } from "@nanoforge-dev/ecs/client";
+import { EcsLibrary } from "@nanoforge-dev/ecs/client";
+import { EditorLibrary } from "@nanoforge-dev/editor-lib";
 import { type Graphics3DBackend, Graphics3DLibrary } from "@nanoforge-dev/graphics-3d";
 import {
   BoxGeometry,
@@ -9,9 +10,11 @@ import {
   HemisphereLight,
   Mesh,
   MeshStandardMaterial,
-  type Object3D,
 } from "@nanoforge-dev/graphics-3d/three";
-import { InputEnum, InputLibrary } from "@nanoforge-dev/input";
+import { InputLibrary } from "@nanoforge-dev/input";
+
+import { Model } from "./components/model.component";
+import { turnModel } from "./systems/turn-model.system";
 
 /** Read by the Playwright tests in `e2e/graphics`. */
 export interface E2EState {
@@ -19,15 +22,6 @@ export interface E2EState {
   backend: Graphics3DBackend;
   cube: { rotationY: number };
 }
-
-class Model {
-  name = "Model";
-
-  constructor(public object: Object3D) {}
-}
-
-// Fixed step per tick, not per second: screenshots and rotations must not depend on frame timing.
-const TURN = 0.05;
 
 export const main = async (options: ClientRunOptions): Promise<void> => {
   const app = NanoforgeFactory.createClient({
@@ -41,6 +35,7 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   app.use(graphics);
   app.use(ecs);
   app.use(input);
+  app.use(new EditorLibrary());
 
   await app.init(options);
 
@@ -67,16 +62,7 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   };
   (window as unknown as { __e2e: E2EState }).__e2e = state;
 
-  registry.addSystem((registry: Registry, ctx: Context) => {
-    registry.getZipper([Model]).forEach(({ Model }) => {
-      const turn =
-        (ctx.input.isKeyPressed(InputEnum.ArrowRight) ? TURN : 0) -
-        (ctx.input.isKeyPressed(InputEnum.ArrowLeft) ? TURN : 0);
-      Model.object.rotation.y += turn;
-      state.cube = { rotationY: Model.object.rotation.y };
-    });
-    state.tick++;
-  });
+  registry.addSystem(turnModel);
 
   await app.run();
 };

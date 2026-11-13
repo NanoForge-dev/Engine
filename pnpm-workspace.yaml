@@ -5,7 +5,6 @@ packages:
   - e2e/game/**
   - e2e/game-2d/**
   - e2e/game-3d/**
-  - example/**
 
 allowBuilds:
   bun: true
@@ -24,8 +23,9 @@ catalogs:
     husky: ^9.1.7
     lint-staged: ^17.4.1
   config:
-    '@nanoforge-dev/config': ^2.3.0
+    '@nanoforge-dev/config': ^3.0.1
   core:
+    '@inquirer/prompts': ^8.8.0
     '@types/bun': ^1.4.2
     '@types/node': ^26.4.0
     turbo: ^2.11.10

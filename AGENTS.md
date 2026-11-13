@@ -21,7 +21,7 @@ Nanoforge Engine is Nanoforge's game engine for the web browser. It is a monorep
 
 ## Project Structure
 
-A pnpm monorepo with several package folders grouped by role (`packages/*`, `modules/*`, `utils/*`), plus test apps (`e2e/game`, `e2e/game-2d`, `e2e/game-3d`) and example games (`example/*`).
+A pnpm monorepo with several package folders grouped by role (`packages/*`, `modules/*`, `utils/*`), plus test apps (`e2e/game`, `e2e/game-2d`, `e2e/game-3d`). The example games live in the [examples](https://github.com/NanoForge-dev/examples) repo; `pnpm examples` copies some of them here to test them against this engine (see Main Commands).
 
 ```
 Engine/
@@ -48,15 +48,11 @@ Engine/
 │   ├── game-2d/           @nanoforge-dev/e2e-game-2d (private) — 2D game rendered by the graphics e2e tests
 │   ├── game-3d/           @nanoforge-dev/e2e-game-3d (private) — 3D game rendered by the graphics e2e tests
 │   └── graphics/          Playwright specs (<game>.spec.ts) and their reference screenshots; not a package
-├── example/              # Example games (unscoped private packages)
-│   ├── pong-network/      Networked Pong, used as an integration test
-│   ├── pong-3d/           Networked 3D Pong (graphics-3d + network)
-│   └── cube-3d/           Minimal graphics-3d scene
 ├── docs/
 │   ├── docs/              Hand-written Mintlify pages (one folder per topic) + navigation.json
 │   ├── design/            Design proposals (e.g. graphics-3d-editor-proposal.md)
 │   └── typedoc/           mintlify.mjs, the typedoc plugin; the API reference is generated into docs/references (gitignored)
-└── scripts/              nightly.sh, the nightly test runner
+└── scripts/              nightly.sh, the nightly test runner; examples.ts, behind `pnpm examples`
 ```
 
 Each package of `packages/*` and `modules/*` follows the same layout convention: `src/` (code), `test/` (unit tests), `package.json` with dual ESM/CJS exports (`dist/index.js` + `dist/index.cjs` + `.d.ts`/`.d.cts` types). The `utils/*` packages are a bare `index.js`, ESM only, with no build step.
@@ -75,9 +71,10 @@ From the repo root:
 - `pnpm build` — builds all packages via Turborepo (`turbo run build --concurrency=5`).
 - `pnpm format` — Prettier write + `turbo run format` per package.
 - `pnpm lint` — Prettier check + `turbo run lint` per package (ESLint).
-- `pnpm test` — `test:unit` (per package, via Turborepo) then `test:e2e` (Vitest on `e2e/**/*.test.ts`, today `e2e/game.test.ts`).
+- `pnpm test` — `test:unit` (per package, via Turborepo) then `test:e2e` (Vitest on `e2e/**/*.test.ts`, today `e2e/game.test.ts` and `e2e/examples.test.ts`).
 - `pnpm test:e2e:graphics` — Playwright screenshot tests (`e2e/graphics/<game>.spec.ts`), not part of `pnpm test`. Each game is built and served with `nf build && nf start -p <port>` (`game-2d` on 3101, `game-3d` on 3102). Needs Chromium (`pnpm exec playwright install chromium`); screenshots are only compared on Linux, since the references come from CI's Linux Chromium.
 - `pnpm run docs` — builds the packages then runs `typedoc`, which writes the API reference of `packages/*` and `modules/*` as `.mdx` pages into `docs/references`. Use `pnpm run docs`: plain `pnpm docs` is pnpm's built-in command that opens a package's documentation in the browser.
+- `pnpm examples [--from <path>] [--games <a,b> | --all]` — `scripts/examples.ts` (run by Node's type stripping, no build): copies examples (`basics|demos|games/<name>` of a local [examples](https://github.com/NanoForge-dev/examples) checkout: `--from`, else `$NANOFORGE_EXAMPLES`, else `../examples`) into the gitignored `.examples/<group>/<name>`, rewrites their dependencies on this repo's packages to `link:<absolute path>`, and runs `pnpm install` in each copy. Each copy is its own pnpm workspace (its `pnpm-workspace.yaml`), so the engine's lockfile and workspace never change. Without `--games`/`--all` it shows a checkbox (terminal only). Needs `pnpm build` first. Only direct dependencies are linked. Its logic is tested by `e2e/examples.test.ts`.
 - `scripts/nightly.sh` — nightly test runner: unit tests with coverage (it only scans `packages/*`) then the Vitest e2e tests, and writes JSON and Markdown reports into `$REPORT_DIR` (default `reports/`). Needs `jq`.
 
 Within an individual package/module (e.g. `packages/core`):

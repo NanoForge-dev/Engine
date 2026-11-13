@@ -8,7 +8,7 @@
     "start": "nf start"
   },
   "devDependencies": {
-    "@nanoforge-dev/cli": "^2.3.0",
+    "@nanoforge-dev/cli": "^3.0.1",
     "@nanoforge-dev/config": "catalog:config",
     "typescript": "catalog:core"
   },

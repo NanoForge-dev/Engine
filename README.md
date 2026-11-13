@@ -35,6 +35,22 @@ And then create a new project :
 nf new
 ```
 
+Example games are in the [examples repository](https://github.com/NanoForge-dev/examples).
+
+## Test the examples against this engine
+
+`pnpm examples` copies example games from a local checkout of the examples repository into `.examples/<group>/<name>` (gitignored), points their engine dependencies at the packages of this repository (`link:`), and installs them. The checkout itself is only read.
+
+```bash
+pnpm build                                   # the copies use the built packages
+pnpm examples                                # pick the examples in a list
+pnpm examples --games input-keyboard,pong-3d # or name them (or group/name)
+pnpm examples --all --from ~/code/examples   # every example of a given checkout
+cd .examples/basics/input-keyboard && pnpm build && pnpm start
+```
+
+The checkout is `--from <path>`, else `$NANOFORGE_EXAMPLES`, else `../examples`; in a terminal, it asks when none is found. Running it again replaces the copies of the chosen examples.
+
 ## Packages
 
 - `@nanoforge-dev/asset` ([source][asset-source]) - The built-in asset library, to read the files shipped with a game

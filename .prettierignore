@@ -8,10 +8,10 @@ pnpm-workspace.yaml
 
 packages/
 modules/
-example/
 utils/
 releases/
 .nanoforge/
+.examples/
 
 .turbo/
 node_modules/

@@ -1,11 +1,18 @@
-import { type EditorComponentManifest } from "@nanoforge-dev/ecs/client";
-
+/**
+ * Counts down from `paramB`: the `exampleSystem` stops the game once it reaches 0.
+ *
+ * @component
+ * @side client
+ */
 export class ExampleComponent {
-  name = this.constructor.name;
+  name = "ExampleComponent";
 
   constructor(
+    /** Set to `end` by `exampleSystem` once `paramB` reaches 0. */
     public paramA: string,
+    /** Ticks left before the game stops. */
     public paramB: number,
+    /** Whether `paramAOrDefault` returns `paramA`. */
     public paramC: boolean = false,
   ) {}
 
@@ -21,35 +28,3 @@ export class ExampleComponent {
     this.paramB += 1;
   }
 }
-
-// * Required to generate code
-export default ExampleComponent.name;
-
-// * Required for the editor to display the component and generate code
-export const EDITOR_COMPONENT_MANIFEST: EditorComponentManifest = {
-  name: "Example",
-  description: "Example component description",
-  params: [
-    {
-      type: "string",
-      name: "Param A",
-      description: "Param A description",
-      example: "Example value",
-    },
-    {
-      type: "number",
-      name: "Param B",
-      description: "Param B description",
-      example: 3,
-    },
-    {
-      type: "boolean",
-      name: "Param C",
-      description: "Param C description",
-      example: true,
-      default: false,
-      // Not required because it has a default value
-      optional: true,
-    },
-  ],
-};
