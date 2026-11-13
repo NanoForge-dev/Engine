@@ -244,3 +244,6 @@ references/
 packages/old-core/
 playwright-report/
 test-results/
+
+# Copies made by pnpm examples
+.examples/

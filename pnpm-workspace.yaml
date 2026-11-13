@@ -25,6 +25,7 @@ catalogs:
   config:
     '@nanoforge-dev/config': ^3.0.1
   core:
+    '@inquirer/prompts': ^8.8.0
     '@types/bun': ^1.4.2
     '@types/node': ^26.4.0
     turbo: ^2.11.10

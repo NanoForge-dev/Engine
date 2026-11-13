@@ -134,6 +134,9 @@ catalogs:
       specifier: ^3.0.1
       version: 3.0.1
   core:
+    '@inquirer/prompts':
+      specifier: ^8.8.0
+      version: 8.8.0
     '@types/bun':
       specifier: ^1.4.2
       version: 1.4.2
@@ -226,6 +229,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: catalog:ci
         version: 21.2.4
+      '@inquirer/prompts':
+        specifier: catalog:core
+        version: 8.8.0(@types/node@26.4.0)
       '@nanoforge-dev/utils-eslint-config':
         specifier: workspace:*
         version: link:utils/eslint-config

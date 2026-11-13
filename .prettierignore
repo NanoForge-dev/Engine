@@ -11,6 +11,7 @@ modules/
 utils/
 releases/
 .nanoforge/
+.examples/
 
 .turbo/
 node_modules/

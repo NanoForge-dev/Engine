@@ -28,11 +28,13 @@
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
     "test:e2e:graphics": "playwright test",
     "prepare": "husky",
-    "docs": "turbo run build --concurrency=5 && typedoc"
+    "docs": "turbo run build --concurrency=5 && typedoc",
+    "examples": "node scripts/examples.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:ci",
     "@commitlint/config-conventional": "catalog:ci",
+    "@inquirer/prompts": "catalog:core",
     "@nanoforge-dev/utils-eslint-config": "workspace:*",
     "@nanoforge-dev/utils-prettier-config": "workspace:*",
     "@playwright/test": "catalog:test",
