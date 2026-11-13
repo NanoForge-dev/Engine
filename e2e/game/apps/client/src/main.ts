@@ -1,6 +1,7 @@
 import type { ClientRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { EcsLibrary } from "@nanoforge-dev/ecs/client";
+import { EditorLibrary } from "@nanoforge-dev/editor-lib";
 import { Graphics2DLibrary } from "@nanoforge-dev/graphics-2d";
 import { InputLibrary } from "@nanoforge-dev/input";
 import { MusicLibrary } from "@nanoforge-dev/music";
@@ -26,6 +27,7 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   app.use(music);
   app.use(network);
   app.use(sound);
+  app.use(new EditorLibrary());
 
   await app.init({
     ...options,

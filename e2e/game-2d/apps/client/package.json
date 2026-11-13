@@ -6,6 +6,7 @@
     "@nanoforge-dev/common": "workspace:*",
     "@nanoforge-dev/core": "workspace:*",
     "@nanoforge-dev/ecs": "workspace:*",
+    "@nanoforge-dev/editor-lib": "workspace:*",
     "@nanoforge-dev/graphics-2d": "workspace:*",
     "@nanoforge-dev/input": "workspace:*",
     "typescript": "catalog:core"

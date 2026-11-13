@@ -1,6 +1,7 @@
 import { type RunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
 import { EcsLibrary } from "@nanoforge-dev/ecs/server";
+import { EditorLibrary } from "@nanoforge-dev/editor-lib";
 
 import { ExampleComponent } from "./components/example.component";
 import { exampleSystem } from "./systems/example.system";
@@ -14,6 +15,7 @@ export const main = async (options: RunOptions): Promise<void> => {
 
   app.use(ecs);
   app.use(ticker);
+  app.use(new EditorLibrary());
 
   await app.init(options);
 

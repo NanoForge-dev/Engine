@@ -12,8 +12,9 @@
     "@nanoforge-dev/asset": "workspace:*",
     "@nanoforge-dev/common": "workspace:*",
     "@nanoforge-dev/core": "workspace:*",
-    "@nanoforge-dev/env": "workspace:*",
     "@nanoforge-dev/ecs": "workspace:*",
+    "@nanoforge-dev/editor-lib": "workspace:*",
+    "@nanoforge-dev/env": "workspace:*",
     "@nanoforge-dev/network": "workspace:*",
     "typescript": "catalog:core"
   },

@@ -1,23 +1,18 @@
-import type { ClientRunOptions, Context } from "@nanoforge-dev/common";
+import type { ClientRunOptions } from "@nanoforge-dev/common";
 import { NanoforgeFactory } from "@nanoforge-dev/core";
-import { EcsLibrary, type Registry } from "@nanoforge-dev/ecs/client";
+import { EcsLibrary } from "@nanoforge-dev/ecs/client";
+import { EditorLibrary } from "@nanoforge-dev/editor-lib";
 import { Circle, Graphics2DLibrary, Rect } from "@nanoforge-dev/graphics-2d";
-import { InputEnum, InputLibrary } from "@nanoforge-dev/input";
+import { InputLibrary } from "@nanoforge-dev/input";
+
+import { Player } from "./components/player.component";
+import { movePlayer } from "./systems/move-player.system";
 
 /** Read by the Playwright tests in `e2e/graphics`. */
 export interface E2EState {
   tick: number;
   player: { x: number; y: number };
 }
-
-class Player {
-  name = "Player";
-
-  constructor(public shape: Rect) {}
-}
-
-// Fixed step per tick, not per second: screenshots and positions must not depend on frame timing.
-const SPEED = 5;
 
 export const main = async (options: ClientRunOptions): Promise<void> => {
   const app = NanoforgeFactory.createClient({
@@ -30,6 +25,7 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   app.use(graphics);
   app.use(ecs);
   app.use(input);
+  app.use(new EditorLibrary());
 
   await app.init(options);
 
@@ -45,16 +41,7 @@ export const main = async (options: ClientRunOptions): Promise<void> => {
   const state: E2EState = { tick: 0, player: { x: square.x(), y: square.y() } };
   (window as unknown as { __e2e: E2EState }).__e2e = state;
 
-  registry.addSystem((registry: Registry, ctx: Context) => {
-    registry.getZipper([Player]).forEach(({ Player }) => {
-      const dx =
-        (ctx.input.isKeyPressed(InputEnum.ArrowRight) ? SPEED : 0) -
-        (ctx.input.isKeyPressed(InputEnum.ArrowLeft) ? SPEED : 0);
-      Player.shape.x(Player.shape.x() + dx);
-      state.player = { x: Player.shape.x(), y: Player.shape.y() };
-    });
-    state.tick++;
-  });
+  registry.addSystem(movePlayer);
 
   await app.run();
 };
