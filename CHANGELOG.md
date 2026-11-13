@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+# [3.0.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/nanoforge@2.0.0...@nanoforge-dev/nanoforge@3.0.0) - (2026-11-13)
+
+## Documentation
+
+- Use raw.githubusercontent URL for package README logos (#473) ([be72076](https://github.com/NanoForge-dev/Engine/commit/be72076931c43ab868ca9dd217f192a92f624a8b)) by @cdytotoro-ctrl
+### New Contributors
+- @cdytotoro-ctrl made their first contribution in #473
+
+## Features
+
+- Implement editor bridge and protocol integration (#445) ([0ca8811](https://github.com/NanoForge-dev/Engine/commit/0ca8811254926e9533c3d5dc9e513189cc2c3d5a)) by @Exeloo
+### New Contributors
+- @cdytotoro-ctrl made their first contribution in #473
+- **network:** P2p mode (#452) ([9f99718](https://github.com/NanoForge-dev/Engine/commit/9f9971874e0af3d0143039292cd02cbe75a45362)) by @Tchips46
+- Add controller input handling (#450) ([2fc8ece](https://github.com/NanoForge-dev/Engine/commit/2fc8ece324a3540d985c3c9904e41c8ad0be06e9)) by @josephinecr
+- Add scene manager (#447) ([f1ed011](https://github.com/NanoForge-dev/Engine/commit/f1ed0111dcce6718a4063fa4767394054eca9d09)) by @Exeloo
+- @josephinecr made their first contribution in #450
+- **graphics-3d:** Three.js 3D graphics library (#459) ([7af6ace](https://github.com/NanoForge-dev/Engine/commit/7af6ace6e4a3bedda704404ef209e58e8b9dd15f)) by @Tchips46
+# Changelog
+All notable changes to this project will be documented in this file.
+- **network:** Packet manager (#448) ([6444163](https://github.com/NanoForge-dev/Engine/commit/6444163c7ae8d88052d3b5349048bbea697e6eb7)) by @Tchips46
+- **network:** Send any type of data (#444) ([727e0fa](https://github.com/NanoForge-dev/Engine/commit/727e0faf195d7dc63d120786008e007dff3e2a4e)) by @Tchips46
+
+## Bug Fixes
+
+- **core:** Clamp negative tick delay to avoid TimeoutNegativeWarning (#460) ([11d35d7](https://github.com/NanoForge-dev/Engine/commit/11d35d77dd7efd64f1e00974548df45fc0f57393)) by @Tchips46
+- **network:** Move connect in init, openning all for chans (#449) ([e744c8e](https://github.com/NanoForge-dev/Engine/commit/e744c8e14d74b983f3a95fa5c59a9e751361dd8e)) by @Tchips46
+
+## Breaking Changes
+
+- **network:** Split packets into four delivery channels (#442) ([5abc79e](https://github.com/NanoForge-dev/Engine/commit/5abc79ed66898c1439880bffd854e8b8f70d7a9a)) by @Tchips46
+  - **BREAKING CHANGE:** ctx.network.tcp/udp are replaced by sendData / sendToAll / sendToClient / getReceivedPackets / getConnectedClients / isConnected with a channel option; the client only connects when connect() is called; the MAGIC_VALUE env var is removed; the wire format changed (TCP channel tag byte, two labelled data channels, sequence header, no terminator), so clients and servers must be upgraded together.
+
 # [2.0.0](https://github.com/NanoForge-dev/Engine/compare/@nanoforge-dev/nanoforge@1.4.2...@nanoforge-dev/nanoforge@2.0.0) - (2026-09-27)
 
 NanoForge 2.0 rewrites the engine. It replaces the typed "library slot" system (`useGraphics`, `useNetwork`, `ctx.libs.getX()`…) with one generic `app.use(library)` API and a typed `Context` object that each library extends. It also merges the client/server/lib package triplets into single modules with `/client` and `/server` entry points, moves networking to Bun, and adds an engine-owned viewport so games scale dynamically.

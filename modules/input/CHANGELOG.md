@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+# [3.0.0](https://github.com/NanoForge-dev/Engine/compare/2.0.0...3.0.0) - (2026-11-13)
+
+## Documentation
+
+- Use raw.githubusercontent URL for package README logos (#473) ([be72076](https://github.com/NanoForge-dev/Engine/commit/be72076931c43ab868ca9dd217f192a92f624a8b)) by @cdytotoro-ctrl
+
+## Features
+
+- Add controller input handling (#450) ([2fc8ece](https://github.com/NanoForge-dev/Engine/commit/2fc8ece324a3540d985c3c9904e41c8ad0be06e9)) by @josephinecr
+
+### New Contributors
+
+- @cdytotoro-ctrl made their first contribution in #473
+- @josephinecr made their first contribution in #450
+
 # [2.0.0](https://github.com/NanoForge-dev/Engine/compare/1.4.2...2.0.0) - (2026-09-27)
 
 ## Features
