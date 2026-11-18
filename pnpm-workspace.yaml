@@ -14,7 +14,7 @@ publicHoistPattern:
 
 catalogs:
   build:
-    tsdown: ^0.22.14
+    tsdown: ^0.23.7
     unrun: ^0.3.0
   ci:
     '@commitlint/cli': ^21.2.4
