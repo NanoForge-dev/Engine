@@ -28,7 +28,7 @@ The [server guide](./network-server) has examples.
 
 Send a payload to every client reachable on the channel.
 
-Parameter `data`: [`NetworkPayload`](#networkpayload), bytes, a string or any
+Parameter `data`: [`NetworkPayload`](#networkpayload-and-networkdata), bytes, a string or any
 JSON value.
 
 Option `channel`: `Channel` to send on. `Channel.ReliableOrdered` by default.
@@ -46,7 +46,7 @@ the channel. Throws a `TypeError` when `data` cannot be encoded as JSON
 
 Parameter `clientId`: `ClientId` client identifier.
 
-Parameter `data`: [`NetworkPayload`](#networkpayload), bytes, a string or any
+Parameter `data`: [`NetworkPayload`](#networkpayload-and-networkdata), bytes, a string or any
 JSON value.
 
 Option `channel`: `Channel` to send on. `Channel.ReliableOrdered` by default.
@@ -62,7 +62,7 @@ show up here.
 Option `channel`: `Channel` to read from. Without it, the packets of every
 configured channel are merged per client, reliable channels first.
 
-Returns: `Map<ClientId, NetworkData[]>`, see [NetworkData](#networkdata)
+Returns: `Map<ClientId, NetworkData[]>`, see [NetworkData](#networkpayload-and-networkdata)
 
 ### getConnectedClients(options?)
 

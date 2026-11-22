@@ -1,14 +1,14 @@
 <div align="center">
-    <br />
-    <p>
-        <a href="https://github.com/NanoForge-dev"><img src="https://raw.githubusercontent.com/NanoForge-dev/Engine/main/.github/logo.png" width="546" alt="NanoForge" /></a>
-    </p>
-    <br />
-    <p>
-        <a href="https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml"><img src="https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml/badge.svg" alt="Tests status" /></a>
-        <a href="https://github.com/NanoForge-dev/Engine/commits/main"><img src="https://img.shields.io/github/last-commit/NanoForge-dev/Engine.svg?logo=github&logoColor=ffffff" alt="Last commit" /></a>
-        <a href="https://github.com/NanoForge-dev/Engine/graphs/contributors"><img src="https://img.shields.io/github/contributors/NanoForge-dev/Engine.svg?maxAge=3600&logo=github&logoColor=fff&color=00c7be" alt="Contributors" /></a>
-    </p>
+<br />
+
+[<img src="https://raw.githubusercontent.com/NanoForge-dev/Engine/main/.github/logo.png" width="546" alt="NanoForge" />](https://github.com/NanoForge-dev)
+
+<br />
+
+[<img src="https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml/badge.svg" alt="Tests status" />](https://github.com/NanoForge-dev/Engine/actions/workflows/tests.yml)
+[<img src="https://img.shields.io/github/last-commit/NanoForge-dev/Engine.svg?logo=github&logoColor=ffffff" alt="Last commit" />](https://github.com/NanoForge-dev/Engine/commits/main)
+[<img src="https://img.shields.io/github/contributors/NanoForge-dev/Engine.svg?maxAge=3600&logo=github&logoColor=fff&color=00c7be" alt="Contributors" />](https://github.com/NanoForge-dev/Engine/graphs/contributors)
+
 </div>
 
 ## About
