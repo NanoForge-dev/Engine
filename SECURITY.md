@@ -8,4 +8,4 @@
 
 ## Reporting a Vulnerability
 
-Please report security issues to `support@nano-forge.com`.
+Please report security issues to `contact@nanoforge.eu`.
