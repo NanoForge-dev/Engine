@@ -37,13 +37,13 @@ Configuration is read from the environment via `@nanoforge-dev/env`. Put the rel
 ```dotenv
 # Client
 SERVER_ADDRESS=127.0.0.1
-SERVER_TCP_PORT=4445
-SERVER_UDP_PORT=4444
+SERVER_TCP_PORT=4444
+SERVER_UDP_PORT=4445
 
 # Server
 LISTENING_INTERFACE=0.0.0.0
-LISTENING_TCP_PORT=4445
-LISTENING_UDP_PORT=4444
+LISTENING_TCP_PORT=4444
+LISTENING_UDP_PORT=4445
 ```
 
 Either the TCP port or the UDP port (or both) must be set on each side. The TCP
